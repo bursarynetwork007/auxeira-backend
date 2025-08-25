@@ -1,510 +1,413 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auxeira SSE - Authentication</title>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 900px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .header {
-            background: linear-gradient(to right, #2c3e50, #4ca1af);
-            color: white;
-            padding: 25px;
-            text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .header p {
-            font-size: 16px;
-            opacity: 0.9;
-        }
-        
-        .content {
-            display: flex;
-            flex-direction: column;
-            padding: 30px;
-        }
-        
-        .tabs {
-            display: flex;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #eee;
-        }
-        
-        .tab {
-            padding: 15px 25px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            color: #777;
-            transition: all 0.3s ease;
-            text-align: center;
-            flex: 1;
-        }
-        
-        .tab.active {
-            color: #4ca1af;
-            border-bottom: 3px solid #4ca1af;
-        }
-        
-        .form-container {
-            overflow: hidden;
-        }
-        
-        .form {
-            display: none;
-            animation: fadeIn 0.5s ease forwards;
-        }
-        
-        .form.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #444;
-        }
-        
-        .input-with-icon {
-            position: relative;
-        }
-        
-        .input-with-icon i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #777;
-        }
-        
-        .input-with-icon input {
-            width: 100%;
-            padding: 15px 15px 15px 45px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        .input-with-icon input:focus {
-            border-color: #4ca1af;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(76, 161, 175, 0.2);
-        }
-        
-        .account-type {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .account-type label {
-            flex: 1;
-            text-align: center;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .account-type input[type="radio"] {
-            display: none;
-        }
-        
-        .account-type input[type="radio"]:checked + span {
-            border-color: #4ca1af;
-            background-color: rgba(76, 161, 175, 0.1);
-            color: #4ca1af;
-            font-weight: 600;
-        }
-        
-        .account-type span {
-            display: block;
-            padding: 10px;
-            border-radius: 6px;
-        }
-        
-        .recaptcha-container {
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
-        }
-        
-        .btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(to right, #2c3e50, #4ca1af);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn:hover {
-            background: linear-gradient(to right, #4ca1af, #2c3e50);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .message {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            display: none;
-        }
-        
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            display: block;
-        }
-        
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            display: block;
-        }
-        
-        .password-toggle {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #777;
-        }
-        
-        @media (min-width: 768px) {
-            .container {
-                flex-direction: row;
-                min-height: 600px;
-            }
-            
-            .header {
-                width: 40%;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-            }
-            
-            .content {
-                width: 60%;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-rocket"></i> Auxeira SSE</h1>
-            <p>Sustainable Startup Ecosystem</p>
-            <p>Join our platform to connect, grow, and measure your startup's sustainability impact.</p>
-        </div>
-        
-        <div class="content">
-            <div class="tabs">
-                <div class="tab active" id="login-tab">Login</div>
-                <div class="tab" id="signup-tab">Sign Up</div>
-            </div>
-            
-            <div class="form-container">
-                <!-- Login Form -->
-                <form id="login-form" class="form active">
-                    <div class="form-group">
-                        <label for="login-email">Email</label>
-                        <div class="input-with-icon">
-                            <i class="fas fa-envelope"></i>
-                            <input type="email" id="login-email" placeholder="Enter your email" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="login-password">Password</label>
-                        <div class="input-with-icon">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="login-password" placeholder="Enter your password" required>
-                            <span class="password-toggle" id="login-password-toggle">
-                                <i class="fas fa-eye"></i>
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="recaptcha-container">
-                        <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
-                    </div>
-                    
-                    <button type="submit" class="btn">Login</button>
-                    
-                    <div class="message" id="login-message"></div>
-                </form>
-                
-                <!-- Signup Form -->
-                <form id="signup-form" class="form">
-                    <div class="form-group">
-                        <label for="signup-firstname">First Name</label>
-                        <div class="input-with-icon">
-                            <i class="fas fa-user"></i>
-                            <input type="text" id="signup-firstname" placeholder="Enter your first name" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="signup-lastname">Last Name</label>
-                        <div class="input-with-icon">
-                            <i class="fas fa-user"></i>
-                            <input type="text" id="signup-lastname" placeholder="Enter your last name" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="signup-email">Email</label>
-                        <div class="input-with-icon">
-                            <i class="fas fa-envelope"></i>
-                            <input type="email" id="signup-email" placeholder="Enter your email" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="signup-password">Password</label>
-                        <div class="input-with-icon">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="signup-password" placeholder="Create a password" required>
-                            <span class="password-toggle" id="signup-password-toggle">
-                                <i class="fas fa-eye"></i>
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Account Type</label>
-                        <div class="account-type">
-                            <label>
-                                <input type="radio" name="account-type" value="startup" checked>
-                                <span><i class="fas fa-rocket"></i> Startup</span>
-                            </label>
-                            <label>
-                                <input type="radio" name="account-type" value="investor">
-                                <span><i class="fas fa-chart-line"></i> Investor</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="recaptcha-container">
-                        <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
-                    </div>
-                    
-                    <button type="submit" class="btn">Create Account</button>
-                    
-                    <div class="message" id="signup-message"></div>
-                </form>
-            </div>
-        </div>
-    </div>
+// routes/auth.js - Proper Backend Authentication Routes
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { Pool } = require('pg');
+const axios = require('axios');
+const rateLimit = require('express-rate-limit');
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // DOM Elements
-            const loginTab = document.getElementById('login-tab');
-            const signupTab = document.getElementById('signup-tab');
-            const loginForm = document.getElementById('login-form');
-            const signupForm = document.getElementById('signup-form');
-            const loginMessage = document.getElementById('login-message');
-            const signupMessage = document.getElementById('signup-message');
-            const loginPasswordToggle = document.getElementById('login-password-toggle');
-            const signupPasswordToggle = document.getElementById('signup-password-toggle');
-            const loginPassword = document.getElementById('login-password');
-            const signupPassword = document.getElementById('signup-password');
-            
-            // Tab switching
-            loginTab.addEventListener('click', () => switchTab('login'));
-            signupTab.addEventListener('click', () => switchTab('signup'));
-            
-            // Password visibility toggling
-            loginPasswordToggle.addEventListener('click', () => togglePasswordVisibility(loginPassword, loginPasswordToggle));
-            signupPasswordToggle.addEventListener('click', () => togglePasswordVisibility(signupPassword, signupPasswordToggle));
-            
-            // Form submissions
-            loginForm.addEventListener('submit', handleLogin);
-            signupForm.addEventListener('submit', handleSignup);
-            
-            function switchTab(tab) {
-                if (tab === 'login') {
-                    loginTab.classList.add('active');
-                    signupTab.classList.remove('active');
-                    loginForm.classList.add('active');
-                    signupForm.classList.remove('active');
-                    loginMessage.className = 'message';
-                } else {
-                    signupTab.classList.add('active');
-                    loginTab.classList.remove('active');
-                    signupForm.classList.add('active');
-                    loginForm.classList.remove('active');
-                    signupMessage.className = 'message';
+const router = express.Router();
+
+// Database connection
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+});
+
+// reCAPTCHA Configuration
+const RECAPTCHA_CONFIG = {
+    secretKey: process.env.RECAPTCHA_SECRET_KEY,
+    verifyUrl: 'https://www.google.com/recaptcha/api/siteverify',
+    minScore: parseFloat(process.env.RECAPTCHA_MIN_SCORE) || 0.5,
+    timeout: parseInt(process.env.RECAPTCHA_TIMEOUT) || 5000
+};
+
+// Rate limiting for authentication endpoints
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // Limit each IP to 5 requests per windowMs
+    message: {
+        success: false,
+        message: 'Too many authentication attempts. Please try again later.'
+    },
+    standardHeaders: true,
+    legacyHeaders: false
+});
+
+// Validation middleware
+const validateInput = (req, res, next) => {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+        return res.status(400).json({
+            success: false,
+            message: 'Email and password are required'
+        });
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Please provide a valid email address'
+        });
+    }
+    
+    // Password validation
+    if (password.length < 8) {
+        return res.status(400).json({
+            success: false,
+            message: 'Password must be at least 8 characters long'
+        });
+    }
+    
+    next();
+};
+
+// reCAPTCHA verification function
+async function verifyRecaptcha(token, remoteIP) {
+    if (!token || typeof token !== 'string' || token.length < 20) {
+        return {
+            success: false,
+            error: 'Invalid token format',
+            code: 'INVALID_TOKEN'
+        };
+    }
+
+    if (!RECAPTCHA_CONFIG.secretKey) {
+        console.error('reCAPTCHA secret key not configured');
+        return {
+            success: false,
+            error: 'Server configuration error',
+            code: 'CONFIG_ERROR'
+        };
+    }
+
+    try {
+        const startTime = Date.now();
+        
+        const response = await axios.post(
+            RECAPTCHA_CONFIG.verifyUrl,
+            null,
+            {
+                params: {
+                    secret: RECAPTCHA_CONFIG.secretKey,
+                    response: token,
+                    remoteip: remoteIP
+                },
+                timeout: RECAPTCHA_CONFIG.timeout,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 }
             }
+        );
+
+        const responseTime = Date.now() - startTime;
+        const data = response.data;
+
+        console.log(`reCAPTCHA verification - IP: ${remoteIP}, Score: ${data.score || 'N/A'}, Time: ${responseTime}ms`);
+
+        if (!data.success) {
+            const errorCodes = data['error-codes'] || [];
+            console.warn(`reCAPTCHA verification failed - Errors: ${errorCodes.join(', ')}`);
             
-            function togglePasswordVisibility(passwordField, toggle) {
-                if (passwordField.type === 'password') {
-                    passwordField.type = 'text';
-                    toggle.innerHTML = '<i class="fas fa-eye-slash"></i>';
-                } else {
-                    passwordField.type = 'password';
-                    toggle.innerHTML = '<i class="fas fa-eye"></i>';
-                }
-            }
+            return {
+                success: false,
+                score: data.score || 0,
+                errors: errorCodes,
+                code: 'VERIFICATION_FAILED'
+            };
+        }
+
+        if (data.score !== undefined && data.score < RECAPTCHA_CONFIG.minScore) {
+            console.warn(`reCAPTCHA score too low - Score: ${data.score}, Required: ${RECAPTCHA_CONFIG.minScore}`);
             
-            async function handleLogin(e) {
-                e.preventDefault();
-                
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-                const recaptchaToken = grecaptcha.getResponse();
-                
-                if (!recaptchaToken) {
-                    showMessage(loginMessage, 'Please complete the reCAPTCHA verification', 'error');
-                    return;
-                }
-                
-                try {
-                    const response = await fetch('/auth/login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ email, password, recaptcha_token: recaptchaToken })
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        showMessage(loginMessage, 'Login successful! Redirecting...', 'success');
-                        // Store token and user data (in a real application)
-                        localStorage.setItem('authToken', data.token);
-                        localStorage.setItem('user', JSON.stringify(data.user));
-                        
-                        // Redirect to dashboard after a short delay
-                        setTimeout(() => {
-                            window.location.href = '/dashboard.html';
-                        }, 1500);
-                    } else {
-                        showMessage(loginMessage, data.message || 'Login failed', 'error');
-                    }
-                } catch (error) {
-                    console.error('Login error:', error);
-                    showMessage(loginMessage, 'An error occurred during login', 'error');
-                }
-            }
-            
-            async function handleSignup(e) {
-                e.preventDefault();
-                
-                const firstName = document.getElementById('signup-firstname').value;
-                const lastName = document.getElementById('signup-lastname').value;
-                const email = document.getElementById('signup-email').value;
-                const password = document.getElementById('signup-password').value;
-                const accountType = document.querySelector('input[name="account-type"]:checked').value;
-                const recaptchaToken = grecaptcha.getResponse();
-                
-                if (!recaptchaToken) {
-                    showMessage(signupMessage, 'Please complete the reCAPTCHA verification', 'error');
-                    return;
-                }
-                
-                try {
-                    const response = await fetch('/auth/signup', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ 
-                            email, 
-                            password, 
-                            accountType, 
-                            firstName, 
-                            lastName, 
-                            recaptcha_token: recaptchaToken 
-                        })
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        showMessage(signupMessage, data.message, 'success');
-                        // Clear form
-                        document.getElementById('signup-form').reset();
-                        
-                        // Switch to login tab after a delay
-                        setTimeout(() => {
-                            switchTab('login');
-                        }, 2000);
-                    } else {
-                        showMessage(signupMessage, data.message || 'Signup failed', 'error');
-                    }
-                } catch (error) {
-                    console.error('Signup error:', error);
-                    showMessage(signupMessage, 'An error occurred during signup', 'error');
-                }
-            }
-            
-            function showMessage(element, text, type) {
-                element.textContent = text;
-                element.className = `message ${type}`;
+            return {
+                success: false,
+                score: data.score,
+                code: 'LOW_SCORE'
+            };
+        }
+
+        return {
+            success: true,
+            score: data.score,
+            hostname: data.hostname,
+            challenge_ts: data.challenge_ts,
+            responseTime
+        };
+
+    } catch (error) {
+        console.error('reCAPTCHA verification error:', {
+            message: error.message,
+            code: error.code,
+            response: error.response?.data
+        });
+
+        if (error.code === 'ECONNABORTED') {
+            return {
+                success: false,
+                error: 'Verification timeout',
+                code: 'TIMEOUT'
+            };
+        }
+
+        return {
+            success: false,
+            error: 'Verification failed',
+            code: 'NETWORK_ERROR'
+        };
+    }
+}
+
+// Get client IP helper
+function getClientIP(req) {
+    return req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+           req.headers['x-real-ip'] ||
+           req.connection?.remoteAddress ||
+           req.socket?.remoteAddress ||
+           req.ip ||
+           'unknown';
+}
+
+// Generate JWT token
+function generateToken(user) {
+    return jwt.sign(
+        { 
+            id: user.id, 
+            email: user.email,
+            account_type: user.account_type 
+        },
+        process.env.JWT_SECRET || 'your-secret-key',
+        { expiresIn: '24h' }
+    );
+}
+
+// JWT verification middleware
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({
+            success: false,
+            message: 'Access token required'
+        });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key', (err, user) => {
+        if (err) {
+            return res.status(403).json({
+                success: false,
+                message: 'Invalid or expired token'
+            });
+        }
+        req.user = user;
+        next();
+    });
+};
+
+// Routes
+
+// User Registration
+router.post('/signup', authLimiter, validateInput, async (req, res) => {
+    try {
+        const { email, password, firstName, lastName, accountType, recaptcha_token } = req.body;
+        const clientIP = getClientIP(req);
+
+        // Verify reCAPTCHA
+        const captchaResult = await verifyRecaptcha(recaptcha_token, clientIP);
+        
+        if (!captchaResult.success) {
+            return res.status(400).json({
+                success: false,
+                message: 'reCAPTCHA verification failed. Please try again.',
+                code: captchaResult.code
+            });
+        }
+
+        console.log(`Signup attempt - Email: ${email}, reCAPTCHA Score: ${captchaResult.score}`);
+
+        // Check if user already exists
+        const existingUser = await pool.query(
+            'SELECT id FROM users WHERE email = $1',
+            [email.toLowerCase()]
+        );
+
+        if (existingUser.rows.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'User with this email already exists'
+            });
+        }
+
+        // Hash password
+        const saltRounds = 12;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        // Insert new user
+        const newUser = await pool.query(
+            `INSERT INTO users (email, password_hash, account_type, created_at, updated_at) 
+             VALUES ($1, $2, $3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) 
+             RETURNING id, email, account_type, created_at`,
+            [email.toLowerCase(), hashedPassword, accountType || 'user']
+        );
+
+        const user = newUser.rows[0];
+        const token = generateToken(user);
+
+        res.status(201).json({
+            success: true,
+            message: 'Account created successfully',
+            user: {
+                id: user.id,
+                email: user.email,
+                account_type: user.account_type,
+                created_at: user.created_at
+            },
+            token
+        });
+
+    } catch (error) {
+        console.error('Signup error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error during registration'
+        });
+    }
+});
+
+// User Login
+router.post('/login', authLimiter, validateInput, async (req, res) => {
+    try {
+        const { email, password, recaptcha_token } = req.body;
+        const clientIP = getClientIP(req);
+
+        // Verify reCAPTCHA
+        const captchaResult = await verifyRecaptcha(recaptcha_token, clientIP);
+        
+        if (!captchaResult.success) {
+            return res.status(400).json({
+                success: false,
+                message: 'reCAPTCHA verification failed. Please try again.',
+                code: captchaResult.code
+            });
+        }
+
+        console.log(`Login attempt - Email: ${email}, reCAPTCHA Score: ${captchaResult.score}`);
+
+        // Find user
+        const userResult = await pool.query(
+            'SELECT id, email, password_hash, account_type, created_at FROM users WHERE email = $1',
+            [email.toLowerCase()]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid email or password'
+            });
+        }
+
+        const user = userResult.rows[0];
+
+        // Verify password
+        const isValidPassword = await bcrypt.compare(password, user.password_hash);
+        
+        if (!isValidPassword) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid email or password'
+            });
+        }
+
+        // Update last login timestamp
+        await pool.query(
+            'UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
+            [user.id]
+        );
+
+        const token = generateToken(user);
+
+        res.json({
+            success: true,
+            message: 'Login successful',
+            user: {
+                id: user.id,
+                email: user.email,
+                account_type: user.account_type,
+                created_at: user.created_at
+            },
+            token
+        });
+
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error during login'
+        });
+    }
+});
+
+// Get User Profile
+router.get('/profile', authenticateToken, async (req, res) => {
+    try {
+        const userResult = await pool.query(
+            'SELECT id, email, account_type, created_at, updated_at FROM users WHERE id = $1',
+            [req.user.id]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        const user = userResult.rows[0];
+
+        res.json({
+            success: true,
+            user: {
+                id: user.id,
+                email: user.email,
+                account_type: user.account_type,
+                created_at: user.created_at,
+                updated_at: user.updated_at
             }
         });
-    </script>
-</body>
-</html>
+
+    } catch (error) {
+        console.error('Profile fetch error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
+
+// Logout (client-side token removal, but we can log it)
+router.post('/logout', authenticateToken, (req, res) => {
+    console.log(`User ${req.user.email} logged out`);
+    
+    res.json({
+        success: true,
+        message: 'Logged out successfully'
+    });
+});
+
+// Verify Token
+router.get('/verify', authenticateToken, (req, res) => {
+    res.json({
+        success: true,
+        user: {
+            id: req.user.id,
+            email: req.user.email,
+            account_type: req.user.account_type
+        }
+    });
+});
+
+module.exports = router;
