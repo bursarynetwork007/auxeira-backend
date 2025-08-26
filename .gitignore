@@ -271,3 +271,4 @@ id_rsa.pub
 # Local development
 .local/
 .cache/
+.env
