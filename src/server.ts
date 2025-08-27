@@ -41,10 +41,11 @@ app.get('/', (req, res) => {
     });
 });
 
+
 // Import routes
-import authRoutes from './routes/auth';
-import sseRoutes from './routes/sse';
-import kpiRoutes from './routes/kpi';
+import authRoutes from './routes/auth.ts';
+import sseRoutes from './routes/sse.ts';
+import kpiRoutes from './routes/kpi.ts';
 
 // Use routes
 app.use('/api/auth', authLimiter, authRoutes);
