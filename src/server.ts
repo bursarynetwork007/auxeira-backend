@@ -9,6 +9,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+
 // Security middleware
 app.use(helmet());
 
@@ -58,7 +59,21 @@ app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/sse', sseRoutes);
 app.use('/api/kpi', kpiRoutes);
 
-app.listen(PORT, () => {
+// Add this to your server.ts before the other routes
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
+});
+
+
+
+
+
+
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Auxeira SSE Backend running on port ${PORT}`);
     console.log(`📊 Monitoring ${process.env.NODE_ENV || 'development'} environment`);
 });
