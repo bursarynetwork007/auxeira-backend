@@ -1,4 +1,6 @@
-initconst express = require('express');
+    ],
+    credentials: true
+const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -17,8 +19,6 @@ app.use(cors({
         'https://www.auxeira.com',
         process.env.FRONTEND_URL,
         'http://localhost:3000' // for testing
-    ],
-    credentials: true
 }));
 
 app.use(express.json());
