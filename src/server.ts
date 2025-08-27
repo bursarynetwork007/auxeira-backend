@@ -33,7 +33,7 @@ const authLimiter = rateLimit({
 
 // Basic health check
 app.get('/', (req, res) => {
-    res.json({
+    return res.json({
         message: 'Auxeira SSE Backend Running',
         version: '1.0.0',
         status: 'healthy',
@@ -43,9 +43,15 @@ app.get('/', (req, res) => {
 
 
 // Import routes
-import authRoutes from './routes/auth.ts';
-import sseRoutes from './routes/sse.ts';
-import kpiRoutes from './routes/kpi.ts';
+
+// To:
+import authRoutes from './routes/auth';
+import sseRoutes from './routes/sse';
+import kpiRoutes from './routes/kpi';
+
+
+
+
 
 // Use routes
 app.use('/api/auth', authLimiter, authRoutes);
