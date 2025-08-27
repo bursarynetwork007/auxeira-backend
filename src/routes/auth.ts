@@ -6,30 +6,6 @@ import { Pool } from 'pg';
 import axios from 'axios';
 import rateLimit from 'express-rate-limit';
 
-// Add this interface at the top of the file (after imports):
-interface RecaptchaResult {
-    success: boolean;
-    error?: string;
-    code?: string;
-    score?: number;
-    errors?: string[];
-    hostname?: string;
-    challenge_ts?: string;
-    responseTime?: number;
-}
-
-// Update the verifyRecaptcha function signature:
-async function verifyRecaptcha(token: string, remoteIP: string): Promise<RecaptchaResult> {
-    // ... keep the existing implementation
-}
-
-// Add this interface at the top of the file:
-interface AuthenticatedRequest extends express.Request {
-    user?: any;
-}
-
-
-
 const router = express.Router();
 
 // Database connection
@@ -39,7 +15,6 @@ const pool = new Pool({
 });
 
 // reCAPTCHA Configuration
-// Replace the RECAPTCHA_CONFIG section with this:
 const RECAPTCHA_CONFIG = {
     secretKey: process.env.RECAPTCHA_SECRET_KEY || '',
     verifyUrl: 'https://www.google.com/recaptcha/api/siteverify',
@@ -47,10 +22,8 @@ const RECAPTCHA_CONFIG = {
     timeout: parseInt(process.env.RECAPTCHA_TIMEOUT || '5000')
 };
 
-// Add this JWT_SECRET constant:
+// JWT secret
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-
-
 
 // Rate limiting for authentication endpoints
 const authLimiter = rateLimit({
@@ -65,12 +38,7 @@ const authLimiter = rateLimit({
 });
 
 // Validation middleware
-
-
-
-// Update the authenticateToken function:
-const authenticateToken = (req: AuthenticatedRequest, res: express.Response, next: express.NextFunction) => {
-    // ... keep the existing implementation
+const validateInput = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -101,7 +69,18 @@ const authenticateToken = (req: AuthenticatedRequest, res: express.Response, nex
 };
 
 // reCAPTCHA verification function
-async function verifyRecaptcha(token: string, remoteIP: string) {
+interface RecaptchaResult {
+    success: boolean;
+    error?: string;
+    code?: string;
+    score?: number;
+    errors?: string[];
+    hostname?: string;
+    challenge_ts?: string;
+    responseTime?: number;
+}
+
+async function verifyRecaptcha(token: string, remoteIP: string): Promise<RecaptchaResult> {
     if (!token || typeof token !== 'string' || token.length < 20) {
         return {
             success: false,
@@ -197,7 +176,6 @@ async function verifyRecaptcha(token: string, remoteIP: string) {
 }
 
 // Get client IP helper
-// Replace the getClientIP function with this:
 function getClientIP(req: express.Request): string {
     const forwardedFor = req.headers['x-forwarded-for'];
     let ip: string | undefined;
@@ -216,22 +194,26 @@ function getClientIP(req: express.Request): string {
            'unknown';
 }
 
-
 // Generate JWT token
-function generateToken(user: any) {
+function generateToken(user: any): string {
     return jwt.sign(
         {
             id: user.id,
             email: user.email,
             account_type: user.account_type
         },
-        process.env.JWT_SECRET || 'your-secret-key',
+        JWT_SECRET,
         { expiresIn: '24h' }
     );
 }
 
+// Extend Express Request interface to include user
+interface AuthenticatedRequest extends express.Request {
+    user?: any;
+}
+
 // JWT verification middleware
-const authenticateToken = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const authenticateToken = (req: AuthenticatedRequest, res: express.Response, next: express.NextFunction) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
@@ -242,14 +224,14 @@ const authenticateToken = (req: express.Request, res: express.Response, next: ex
         });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key', (err: any, user: any) => {
+    jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
         if (err) {
             return res.status(403).json({
                 success: false,
                 message: 'Invalid or expired token'
             });
         }
-        (req as AuthenticatedRequest).user = user;
+        req.user = user;
         next();
     });
 };
@@ -303,7 +285,7 @@ router.post('/signup', authLimiter, validateInput, async (req: express.Request, 
         const user = newUser.rows[0];
         const token = generateToken(user);
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             message: 'Account created successfully',
             user: {
@@ -316,8 +298,8 @@ router.post('/signup', authLimiter, validateInput, async (req: express.Request, 
         });
 
     } catch (error: any) {
-        console.error('Signup error:', error.message);
-        res.status(500).json({
+        console.error('Signup error:', error);
+        return res.status(500).json({
             success: false,
             message: 'Internal server error during registration'
         });
@@ -376,7 +358,7 @@ router.post('/login', authLimiter, validateInput, async (req: express.Request, r
 
         const token = generateToken(user);
 
-        res.json({
+        return res.json({
             success: true,
             message: 'Login successful',
             user: {
@@ -389,8 +371,8 @@ router.post('/login', authLimiter, validateInput, async (req: express.Request, r
         });
 
     } catch (error: any) {
-        console.error('Login error:', error.message);
-        res.status(500).json({
+        console.error('Login error:', error);
+        return res.status(500).json({
             success: false,
             message: 'Internal server error during login'
         });
@@ -398,11 +380,11 @@ router.post('/login', authLimiter, validateInput, async (req: express.Request, r
 });
 
 // Get User Profile
-router.get('/profile', authenticateToken, async (req: express.Request, res: express.Response) => {
+router.get('/profile', authenticateToken, async (req: AuthenticatedRequest, res: express.Response) => {
     try {
         const userResult = await pool.query(
             'SELECT id, email, account_type, created_at, updated_at FROM users WHERE id = $1',
-            [(req as AuthenticatedRequest).user.id]
+            [req.user.id]
         );
 
         if (userResult.rows.length === 0) {
@@ -414,7 +396,7 @@ router.get('/profile', authenticateToken, async (req: express.Request, res: expr
 
         const user = userResult.rows[0];
 
-        res.json({
+        return res.json({
             success: true,
             user: {
                 id: user.id,
@@ -426,8 +408,8 @@ router.get('/profile', authenticateToken, async (req: express.Request, res: expr
         });
 
     } catch (error: any) {
-        console.error('Profile fetch error:', error.message);
-        res.status(500).json({
+        console.error('Profile fetch error:', error);
+        return res.status(500).json({
             success: false,
             message: 'Internal server error'
         });
@@ -435,23 +417,23 @@ router.get('/profile', authenticateToken, async (req: express.Request, res: expr
 });
 
 // Logout (client-side token removal, but we can log it)
-router.post('/logout', authenticateToken, (req: express.Request, res: express.Response) => {
-    console.log(`User ${(req as AuthenticatedRequest).user.email} logged out`);
+router.post('/logout', authenticateToken, (req: AuthenticatedRequest, res: express.Response) => {
+    console.log(`User ${req.user.email} logged out`);
 
-    res.json({
+    return res.json({
         success: true,
         message: 'Logged out successfully'
     });
 });
 
 // Verify Token
-router.get('/verify', authenticateToken, (req: express.Request, res: express.Response) => {
-    res.json({
+router.get('/verify', authenticateToken, (req: AuthenticatedRequest, res: express.Response) => {
+    return res.json({
         success: true,
         user: {
-            id: (req as AuthenticatedRequest).user.id,
-            email: (req as AuthenticatedRequest).user.email,
-            account_type: (req as AuthenticatedRequest).user.account_type
+            id: req.user.id,
+            email: req.user.email,
+            account_type: req.user.account_type
         }
     });
 });
