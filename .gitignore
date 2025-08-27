@@ -272,3 +272,4 @@ id_rsa.pub
 .local/
 .cache/
 .env
+.idea/
