@@ -1,10 +1,10 @@
-    ],
-    credentials: true
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,8 +17,9 @@ app.use(cors({
     origin: [
         'https://auxeira.com',
         'https://www.auxeira.com',
-        process.env.FRONTEND_URL,
+        process.env.FRONTEND_URL || '',
         'http://localhost:3000' // for testing
+    ]
 }));
 
 app.use(express.json());
@@ -32,7 +33,7 @@ const authLimiter = rateLimit({
 
 // Basic health check
 app.get('/', (req, res) => {
-    res.json({ 
+    res.json({
         message: 'Auxeira SSE Backend Running',
         version: '1.0.0',
         status: 'healthy',
@@ -41,9 +42,9 @@ app.get('/', (req, res) => {
 });
 
 // Import routes
-const authRoutes = require('./routes/auth');
-const sseRoutes = require('./routes/sse');
-const kpiRoutes = require('./routes/kpi');
+import authRoutes from './routes/auth';
+import sseRoutes from './routes/sse';
+import kpiRoutes from './routes/kpi';
 
 // Use routes
 app.use('/api/auth', authLimiter, authRoutes);
