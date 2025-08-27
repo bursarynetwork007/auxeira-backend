@@ -213,26 +213,29 @@ interface AuthenticatedRequest extends express.Request {
 }
 
 // JWT verification middleware
+// JWT verification middleware
 const authenticateToken = (req: AuthenticatedRequest, res: express.Response, next: express.NextFunction) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
-        return res.status(401).json({
+        res.status(401).json({
             success: false,
             message: 'Access token required'
         });
+        return;
     }
 
     jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
         if (err) {
-            return res.status(403).json({
+            res.status(403).json({
                 success: false,
                 message: 'Invalid or expired token'
             });
+            return;
         }
         req.user = user;
-        return next(); // Added return here
+        next();
     });
 };
 
