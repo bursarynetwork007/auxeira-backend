@@ -7,8 +7,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
+// Fix: Parse PORT to number with proper fallback
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 // Security middleware
 app.use(helmet());
@@ -42,37 +42,26 @@ app.get('/', (req, res) => {
     });
 });
 
-
-// Import routes
-
-// To:
-import authRoutes from './routes/auth';
-import sseRoutes from './routes/sse';
-import kpiRoutes from './routes/kpi';
-
-
-
-
-
-// Use routes
-app.use('/api/auth', authLimiter, authRoutes);
-app.use('/api/sse', sseRoutes);
-app.use('/api/kpi', kpiRoutes);
-
-// Add this to your server.ts before the other routes
+// Health check endpoint
 app.get('/health', (req, res) => {
-    res.status(200).json({
+    return res.status(200).json({
         status: 'OK',
         timestamp: new Date().toISOString(),
         uptime: process.uptime()
     });
 });
 
+// Import routes
+import authRoutes from './routes/auth';
+import sseRoutes from './routes/sse';
+import kpiRoutes from './routes/kpi';
 
+// Use routes
+app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/sse', sseRoutes);
+app.use('/api/kpi', kpiRoutes);
 
-
-
-
+// Fix: Use the parsed PORT number and bind to 0.0.0.0
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Auxeira SSE Backend running on port ${PORT}`);
     console.log(`📊 Monitoring ${process.env.NODE_ENV || 'development'} environment`);
