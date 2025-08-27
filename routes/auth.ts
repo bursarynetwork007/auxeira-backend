@@ -1,10 +1,10 @@
-// routes/auth.js - Proper Backend Authentication Routes
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { Pool } = require('pg');
-const axios = require('axios');
-const rateLimit = require('express-rate-limit');
+// routes/auth.ts - Proper Backend Authentication Routes
+import express from 'express';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { Pool } from 'pg';
+import axios from 'axios';
+import rateLimit from 'express-rate-limit';
 
 const router = express.Router();
 
@@ -35,16 +35,16 @@ const authLimiter = rateLimit({
 });
 
 // Validation middleware
-const validateInput = (req, res, next) => {
+const validateInput = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { email, password } = req.body;
-    
+
     if (!email || !password) {
         return res.status(400).json({
             success: false,
             message: 'Email and password are required'
         });
     }
-    
+
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -53,7 +53,7 @@ const validateInput = (req, res, next) => {
             message: 'Please provide a valid email address'
         });
     }
-    
+
     // Password validation
     if (password.length < 8) {
         return res.status(400).json({
@@ -61,12 +61,12 @@ const validateInput = (req, res, next) => {
             message: 'Password must be at least 8 characters long'
         });
     }
-    
+
     next();
 };
 
 // reCAPTCHA verification function
-async function verifyRecaptcha(token, remoteIP) {
+async function verifyRecaptcha(token: string, remoteIP: string) {
     if (!token || typeof token !== 'string' || token.length < 20) {
         return {
             success: false,
@@ -86,7 +86,7 @@ async function verifyRecaptcha(token, remoteIP) {
 
     try {
         const startTime = Date.now();
-        
+
         const response = await axios.post(
             RECAPTCHA_CONFIG.verifyUrl,
             null,
@@ -111,7 +111,7 @@ async function verifyRecaptcha(token, remoteIP) {
         if (!data.success) {
             const errorCodes = data['error-codes'] || [];
             console.warn(`reCAPTCHA verification failed - Errors: ${errorCodes.join(', ')}`);
-            
+
             return {
                 success: false,
                 score: data.score || 0,
@@ -122,7 +122,7 @@ async function verifyRecaptcha(token, remoteIP) {
 
         if (data.score !== undefined && data.score < RECAPTCHA_CONFIG.minScore) {
             console.warn(`reCAPTCHA score too low - Score: ${data.score}, Required: ${RECAPTCHA_CONFIG.minScore}`);
-            
+
             return {
                 success: false,
                 score: data.score,
@@ -162,7 +162,7 @@ async function verifyRecaptcha(token, remoteIP) {
 }
 
 // Get client IP helper
-function getClientIP(req) {
+function getClientIP(req: express.Request) {
     return req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
            req.headers['x-real-ip'] ||
            req.connection?.remoteAddress ||
@@ -172,12 +172,12 @@ function getClientIP(req) {
 }
 
 // Generate JWT token
-function generateToken(user) {
+function generateToken(user: any) {
     return jwt.sign(
-        { 
-            id: user.id, 
+        {
+            id: user.id,
             email: user.email,
-            account_type: user.account_type 
+            account_type: user.account_type
         },
         process.env.JWT_SECRET || 'your-secret-key',
         { expiresIn: '24h' }
@@ -185,7 +185,7 @@ function generateToken(user) {
 }
 
 // JWT verification middleware
-const authenticateToken = (req, res, next) => {
+const authenticateToken = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
@@ -196,7 +196,7 @@ const authenticateToken = (req, res, next) => {
         });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key', (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key', (err: any, user: any) => {
         if (err) {
             return res.status(403).json({
                 success: false,
@@ -211,14 +211,14 @@ const authenticateToken = (req, res, next) => {
 // Routes
 
 // User Registration
-router.post('/signup', authLimiter, validateInput, async (req, res) => {
+router.post('/signup', authLimiter, validateInput, async (req: express.Request, res: express.Response) => {
     try {
         const { email, password, firstName, lastName, accountType, recaptcha_token } = req.body;
         const clientIP = getClientIP(req);
 
         // Verify reCAPTCHA
         const captchaResult = await verifyRecaptcha(recaptcha_token, clientIP);
-        
+
         if (!captchaResult.success) {
             return res.status(400).json({
                 success: false,
@@ -248,8 +248,8 @@ router.post('/signup', authLimiter, validateInput, async (req, res) => {
 
         // Insert new user
         const newUser = await pool.query(
-            `INSERT INTO users (email, password_hash, account_type, created_at, updated_at) 
-             VALUES ($1, $2, $3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) 
+            `INSERT INTO users (email, password_hash, account_type, created_at, updated_at)
+             VALUES ($1, $2, $3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
              RETURNING id, email, account_type, created_at`,
             [email.toLowerCase(), hashedPassword, accountType || 'user']
         );
@@ -279,14 +279,14 @@ router.post('/signup', authLimiter, validateInput, async (req, res) => {
 });
 
 // User Login
-router.post('/login', authLimiter, validateInput, async (req, res) => {
+router.post('/login', authLimiter, validateInput, async (req: express.Request, res: express.Response) => {
     try {
         const { email, password, recaptcha_token } = req.body;
         const clientIP = getClientIP(req);
 
         // Verify reCAPTCHA
         const captchaResult = await verifyRecaptcha(recaptcha_token, clientIP);
-        
+
         if (!captchaResult.success) {
             return res.status(400).json({
                 success: false,
@@ -314,7 +314,7 @@ router.post('/login', authLimiter, validateInput, async (req, res) => {
 
         // Verify password
         const isValidPassword = await bcrypt.compare(password, user.password_hash);
-        
+
         if (!isValidPassword) {
             return res.status(401).json({
                 success: false,
@@ -352,7 +352,7 @@ router.post('/login', authLimiter, validateInput, async (req, res) => {
 });
 
 // Get User Profile
-router.get('/profile', authenticateToken, async (req, res) => {
+router.get('/profile', authenticateToken, async (req: express.Request, res: express.Response) => {
     try {
         const userResult = await pool.query(
             'SELECT id, email, account_type, created_at, updated_at FROM users WHERE id = $1',
@@ -389,9 +389,9 @@ router.get('/profile', authenticateToken, async (req, res) => {
 });
 
 // Logout (client-side token removal, but we can log it)
-router.post('/logout', authenticateToken, (req, res) => {
+router.post('/logout', authenticateToken, (req: express.Request, res: express.Response) => {
     console.log(`User ${req.user.email} logged out`);
-    
+
     res.json({
         success: true,
         message: 'Logged out successfully'
@@ -399,7 +399,7 @@ router.post('/logout', authenticateToken, (req, res) => {
 });
 
 // Verify Token
-router.get('/verify', authenticateToken, (req, res) => {
+router.get('/verify', authenticateToken, (req: express.Request, res: express.Response) => {
     res.json({
         success: true,
         user: {
@@ -410,4 +410,4 @@ router.get('/verify', authenticateToken, (req, res) => {
     });
 });
 
-module.exports = router;
+export default router;

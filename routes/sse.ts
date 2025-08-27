@@ -1,8 +1,9 @@
-const express = require('express');
+import express from 'express';
+
 const router = express.Router();
 
 // Get SSI (Sustainable Success Index) score
-router.get('/ssi-score/:startupId', async (req, res) => {
+router.get('/ssi-score/:startupId', async (req: express.Request, res: express.Response) => {
     const { startupId } = req.params;
     
     // Mock SSI calculation based on your 4 domains
@@ -53,11 +54,11 @@ router.get('/ssi-score/:startupId', async (req, res) => {
 });
 
 // Submit behavioral data
-router.post('/behavior', async (req, res) => {
+router.post('/behavior', async (req: express.Request, res: express.Response) => {
     const { startupId, behaviorType, data } = req.body;
     
     // Calculate AUX token rewards based on behavior
-    const rewards = {
+    const rewards: Record<string, number> = {
         customer_interview: 50,
         financial_review: 75,
         team_one_on_one: 40,
@@ -74,4 +75,4 @@ router.post('/behavior', async (req, res) => {
     });
 });
 
-module.exports = router;
+export default router;
