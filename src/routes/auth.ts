@@ -65,7 +65,7 @@ const validateInput = (req: express.Request, res: express.Response, next: expres
         });
     }
 
-    next();
+    return next(); // Added return here
 };
 
 // reCAPTCHA verification function
@@ -84,8 +84,8 @@ async function verifyRecaptcha(token: string, remoteIP: string): Promise<Recaptc
     if (!token || typeof token !== 'string' || token.length < 20) {
         return {
             success: false,
-            error: 'Invalid token format',
-            code: 'INVALID_TOKEN'
+            error: 'Unexpected error in reCAPTCHA verification',
+            code: 'UNEXPECTED_ERROR'
         };
     }
 
@@ -232,7 +232,7 @@ const authenticateToken = (req: AuthenticatedRequest, res: express.Response, nex
             });
         }
         req.user = user;
-        next();
+        return next(); // Added return here
     });
 };
 
