@@ -3,8 +3,20 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import aiMentorshipRoutes from './routes/ai-mentorship';
 
 dotenv.config();
+
+
+
+
+
+
+
+
+
+
+
 
 const app = express();
 // Fix: Parse PORT to number with proper fallback
@@ -60,6 +72,8 @@ import kpiRoutes from './routes/kpi';
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/sse', sseRoutes);
 app.use('/api/kpi', kpiRoutes);
+app.use('/api/mentorship', aiMentorshipRoutes);
+
 
 // Fix: Use the parsed PORT number and bind to 0.0.0.0
 app.listen(PORT, '0.0.0.0', () => {
