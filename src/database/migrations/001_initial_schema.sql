@@ -471,6 +471,106 @@ CREATE TABLE payments (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- AI Mentorship Sessions
+CREATE TABLE ai_mentorship_sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    session_type VARCHAR(50) NOT NULL CHECK (session_type IN ('goal_setting', 'score_improvement', 'career_guidance', 'sustainability_advice', 'general_chat')),
+    topic VARCHAR(200),
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'paused', 'completed', 'cancelled')),
+    ai_model VARCHAR(50) NOT NULL DEFAULT 'gpt-4',
+    ai_personality VARCHAR(20) NOT NULL DEFAULT 'supportive' CHECK (ai_personality IN ('supportive', 'challenging', 'analytical', 'creative', 'professional')),
+    user_context JSONB NOT NULL,
+    session_goals JSONB DEFAULT '[]',
+    started_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    ended_at TIMESTAMP WITH TIME ZONE,
+    duration_minutes INTEGER,
+    message_count INTEGER DEFAULT 0,
+    user_satisfaction_rating INTEGER CHECK (user_satisfaction_rating >= 1 AND user_satisfaction_rating <= 5),
+    ai_response_quality DECIMAL(3,2),
+    goal_achievement_progress DECIMAL(5,2),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+-- AI Mentorship Messages
+CREATE TABLE ai_mentorship_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id UUID NOT NULL REFERENCES ai_mentorship_sessions(id) ON DELETE CASCADE,
+    sender VARCHAR(10) NOT NULL CHECK (sender IN ('user', 'ai')),
+    message_text TEXT NOT NULL,
+    message_data JSONB,
+    ai_model VARCHAR(50),
+    tokens_used INTEGER,
+    response_time_ms INTEGER,
+    confidence DECIMAL(3,2),
+    context_used JSONB,
+    user_rating INTEGER CHECK (user_rating >= 1 AND user_rating <= 5),
+    user_feedback TEXT,
+    was_helpful BOOLEAN,
+    sent_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+-- Mentorship Goals
+CREATE TABLE mentorship_goals (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    session_id UUID REFERENCES ai_mentorship_sessions(id) ON DELETE SET NULL,
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(20) NOT NULL CHECK (category IN ('social', 'sustainability', 'economic', 'career', 'personal')),
+    priority VARCHAR(10) NOT NULL DEFAULT 'medium' CHECK (priority IN ('high', 'medium', 'low')),
+    target_value DECIMAL(10,2),
+    current_value DECIMAL(10,2) DEFAULT 0,
+    unit VARCHAR(20),
+    target_date DATE,
+    created_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    status VARCHAR(20) NOT NULL DEFAULT 'not_started' CHECK (status IN ('not_started', 'in_progress', 'completed', 'paused', 'cancelled')),
+    progress_percentage INTEGER DEFAULT 0 CHECK (progress_percentage >= 0 AND progress_percentage <= 100),
+    milestones JSONB DEFAULT '[]',
+    ai_recommendations JSONB DEFAULT '[]',
+    suggested_actions JSONB DEFAULT '[]',
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+-- Mentorship Insights
+CREATE TABLE mentorship_insights (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    session_id UUID REFERENCES ai_mentorship_sessions(id) ON DELETE SET NULL,
+    type VARCHAR(30) NOT NULL CHECK (type IN ('pattern_recognition', 'improvement_opportunity', 'strength_identification', 'risk_warning', 'achievement_recognition')),
+    category VARCHAR(20) NOT NULL CHECK (category IN ('social', 'sustainability', 'economic', 'behavioral', 'goal_progress')),
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    significance VARCHAR(10) NOT NULL CHECK (significance IN ('high', 'medium', 'low')),
+    data_points JSONB DEFAULT '[]',
+    confidence DECIMAL(3,2) NOT NULL,
+    actionable_recommendations JSONB DEFAULT '[]',
+    related_resources JSONB DEFAULT '[]',
+    user_acknowledged BOOLEAN DEFAULT FALSE,
+    user_rating INTEGER CHECK (user_rating >= 1 AND user_rating <= 5),
+    user_notes TEXT,
+    generated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    expires_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+-- Create indexes for performance
+CREATE INDEX idx_ai_mentorship_sessions_user_id ON ai_mentorship_sessions(user_id);
+CREATE INDEX idx_ai_mentorship_sessions_status ON ai_mentorship_sessions(status);
+CREATE INDEX idx_ai_mentorship_messages_session_id ON ai_mentorship_messages(session_id);
+CREATE INDEX idx_ai_mentorship_messages_sent_at ON ai_mentorship_messages(sent_at);
+CREATE INDEX idx_mentorship_goals_user_id ON mentorship_goals(user_id);
+CREATE INDEX idx_mentorship_goals_status ON mentorship_goals(status);
+CREATE INDEX idx_mentorship_insights_user_id ON mentorship_insights(user_id);
+CREATE INDEX idx_mentorship_insights_generated_at ON mentorship_insights(generated_at);
+
+
+
+
+
 -- =============================================================================
 -- INDEXES FOR PERFORMANCE
 -- =============================================================================
