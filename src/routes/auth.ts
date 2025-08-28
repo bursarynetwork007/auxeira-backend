@@ -1,444 +1,398 @@
-// routes/auth.ts - Proper Backend Authentication Routes
-import express from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { Pool } from 'pg';
-import axios from 'axios';
+import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
+import { body, validationResult } from 'express-validator';
+import { authController } from '../controllers/auth.controller';
+import { 
+  authenticateToken, 
+  optionalAuth, 
+  requireEmailVerified,
+  rateLimitByUser 
+} from '../middleware/auth.middleware';
+import { logger } from '../utils/logger';
 
-const router = express.Router();
+const router = Router();
 
-// Database connection
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+// Rate limiting configurations
+const authRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 requests per windowMs
+  message: {
+    success: false,
+    message: 'Too many authentication attempts, please try again later',
+    error: 'RATE_LIMIT_EXCEEDED',
+    timestamp: new Date().toISOString(),
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-// reCAPTCHA Configuration
-const RECAPTCHA_CONFIG = {
-    secretKey: process.env.RECAPTCHA_SECRET_KEY || '',
-    verifyUrl: 'https://www.google.com/recaptcha/api/siteverify',
-    minScore: parseFloat(process.env.RECAPTCHA_MIN_SCORE || '0.5'),
-    timeout: parseInt(process.env.RECAPTCHA_TIMEOUT || '5000')
-};
-
-// JWT secret
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-
-// Rate limiting for authentication endpoints
-const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // Limit each IP to 5 requests per windowMs
-    message: {
-        success: false,
-        message: 'Too many authentication attempts. Please try again later.'
-    },
-    standardHeaders: true,
-    legacyHeaders: false
+const generalRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: {
+    success: false,
+    message: 'Too many requests, please try again later',
+    error: 'RATE_LIMIT_EXCEEDED',
+    timestamp: new Date().toISOString(),
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 // Validation middleware
-const validateInput = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).json({
-            success: false,
-            message: 'Email and password are required'
-        });
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        return res.status(400).json({
-            success: false,
-            message: 'Please provide a valid email address'
-        });
-    }
-
-    // Password validation
-    if (password.length < 8) {
-        return res.status(400).json({
-            success: false,
-            message: 'Password must be at least 8 characters long'
-        });
-    }
-
-    return next(); // Added return here
+const handleValidationErrors = (req: any, res: any, next: any) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      success: false,
+      message: 'Validation failed',
+      error: 'VALIDATION_ERROR',
+      details: errors.array(),
+      timestamp: new Date().toISOString(),
+    });
+  }
+  next();
 };
 
-// reCAPTCHA verification function
-interface RecaptchaResult {
-    success: boolean;
-    error?: string;
-    code?: string;
-    score?: number;
-    errors?: string[];
-    hostname?: string;
-    challenge_ts?: string;
-    responseTime?: number;
-}
+// Registration validation
+const registerValidation = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Valid email is required'),
+  body('password')
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters long')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
+  body('confirmPassword')
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error('Passwords do not match');
+      }
+      return true;
+    }),
+  body('firstName')
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .withMessage('First name is required and must be less than 100 characters'),
+  body('lastName')
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Last name is required and must be less than 100 characters'),
+  body('role')
+    .isIn(['student', 'founder', 'investor'])
+    .withMessage('Role must be student, founder, or investor'),
+  body('acceptedTerms')
+    .equals('true')
+    .withMessage('You must accept the terms and conditions'),
+  body('acceptedPrivacy')
+    .equals('true')
+    .withMessage('You must accept the privacy policy'),
+  body('recaptchaToken')
+    .notEmpty()
+    .withMessage('reCAPTCHA verification is required'),
+];
 
-async function verifyRecaptcha(token: string, remoteIP: string): Promise<RecaptchaResult> {
-    if (!token || typeof token !== 'string' || token.length < 20) {
-        return {
-            success: false,
-            error: 'Unexpected error in reCAPTCHA verification',
-            code: 'UNEXPECTED_ERROR'
-        };
-    }
+// Login validation
+const loginValidation = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Valid email is required'),
+  body('password')
+    .notEmpty()
+    .withMessage('Password is required'),
+];
 
-    if (!RECAPTCHA_CONFIG.secretKey) {
-        console.error('reCAPTCHA secret key not configured');
-        return {
-            success: false,
-            error: 'Server configuration error',
-            code: 'CONFIG_ERROR'
-        };
-    }
+// Change password validation
+const changePasswordValidation = [
+  body('currentPassword')
+    .notEmpty()
+    .withMessage('Current password is required'),
+  body('newPassword')
+    .isLength({ min: 8 })
+    .withMessage('New password must be at least 8 characters long')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage('New password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
+  body('confirmPassword')
+    .custom((value, { req }) => {
+      if (value !== req.body.newPassword) {
+        throw new Error('Passwords do not match');
+      }
+      return true;
+    }),
+];
 
-    try {
-        const startTime = Date.now();
+// Password reset validation
+const passwordResetValidation = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Valid email is required'),
+  body('recaptchaToken')
+    .notEmpty()
+    .withMessage('reCAPTCHA verification is required'),
+];
 
-        const response = await axios.post(
-            RECAPTCHA_CONFIG.verifyUrl,
-            null,
-            {
-                params: {
-                    secret: RECAPTCHA_CONFIG.secretKey,
-                    response: token,
-                    remoteip: remoteIP
-                },
-                timeout: RECAPTCHA_CONFIG.timeout,
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            }
-        );
+// Confirm password reset validation
+const confirmPasswordResetValidation = [
+  body('token')
+    .notEmpty()
+    .withMessage('Reset token is required'),
+  body('newPassword')
+    .isLength({ min: 8 })
+    .withMessage('New password must be at least 8 characters long')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage('New password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
+  body('confirmPassword')
+    .custom((value, { req }) => {
+      if (value !== req.body.newPassword) {
+        throw new Error('Passwords do not match');
+      }
+      return true;
+    }),
+];
 
-        const responseTime = Date.now() - startTime;
-        const data = response.data;
+// Email verification validation
+const emailVerificationValidation = [
+  body('token')
+    .notEmpty()
+    .withMessage('Verification token is required'),
+];
 
-        console.log(`reCAPTCHA verification - IP: ${remoteIP}, Score: ${data.score || 'N/A'}, Time: ${responseTime}ms`);
+// Refresh token validation
+const refreshTokenValidation = [
+  body('refreshToken')
+    .notEmpty()
+    .withMessage('Refresh token is required'),
+];
 
-        if (!data.success) {
-            const errorCodes = data['error-codes'] || [];
-            console.warn(`reCAPTCHA verification failed - Errors: ${errorCodes.join(', ')}`);
+// =============================================================================
+// PUBLIC ROUTES (No authentication required)
+// =============================================================================
 
-            return {
-                success: false,
-                score: data.score || 0,
-                errors: errorCodes,
-                code: 'VERIFICATION_FAILED'
-            };
-        }
+/**
+ * @route   POST /api/auth/register
+ * @desc    Register a new user
+ * @access  Public
+ */
+router.post('/register', 
+  authRateLimit,
+  registerValidation,
+  handleValidationErrors,
+  authController.register.bind(authController)
+);
 
-        if (data.score !== undefined && data.score < RECAPTCHA_CONFIG.minScore) {
-            console.warn(`reCAPTCHA score too low - Score: ${data.score}, Required: ${RECAPTCHA_CONFIG.minScore}`);
+/**
+ * @route   POST /api/auth/login
+ * @desc    Login user
+ * @access  Public
+ */
+router.post('/login',
+  authRateLimit,
+  loginValidation,
+  handleValidationErrors,
+  authController.login.bind(authController)
+);
 
-            return {
-                success: false,
-                score: data.score,
-                code: 'LOW_SCORE'
-            };
-        }
+/**
+ * @route   POST /api/auth/refresh
+ * @desc    Refresh authentication tokens
+ * @access  Public
+ */
+router.post('/refresh',
+  generalRateLimit,
+  refreshTokenValidation,
+  handleValidationErrors,
+  authController.refreshTokens.bind(authController)
+);
 
-        return {
-            success: true,
-            score: data.score,
-            hostname: data.hostname,
-            challenge_ts: data.challenge_ts,
-            responseTime
-        };
+/**
+ * @route   POST /api/auth/password/reset
+ * @desc    Request password reset
+ * @access  Public
+ */
+router.post('/password/reset',
+  authRateLimit,
+  passwordResetValidation,
+  handleValidationErrors,
+  authController.requestPasswordReset.bind(authController)
+);
 
-    } catch (error: any) {
-        console.error('reCAPTCHA verification error:', {
-            message: error.message,
-            code: error.code,
-            response: error.response?.data
-        });
+/**
+ * @route   POST /api/auth/password/confirm
+ * @desc    Confirm password reset
+ * @access  Public
+ */
+router.post('/password/confirm',
+  authRateLimit,
+  confirmPasswordResetValidation,
+  handleValidationErrors,
+  authController.confirmPasswordReset.bind(authController)
+);
 
-        if (error.code === 'ECONNABORTED') {
-            return {
-                success: false,
-                error: 'Verification timeout',
-                code: 'TIMEOUT'
-            };
-        }
+/**
+ * @route   POST /api/auth/email/verify
+ * @desc    Verify email address
+ * @access  Public
+ */
+router.post('/email/verify',
+  generalRateLimit,
+  emailVerificationValidation,
+  handleValidationErrors,
+  authController.verifyEmail.bind(authController)
+);
 
-        return {
-            success: false,
-            error: 'Verification failed',
-            code: 'NETWORK_ERROR'
-        };
-    }
-}
+/**
+ * @route   GET /api/auth/check
+ * @desc    Check authentication status
+ * @access  Public (optional auth)
+ */
+router.get('/check',
+  generalRateLimit,
+  optionalAuth,
+  authController.checkAuth.bind(authController)
+);
 
-// Get client IP helper
-function getClientIP(req: express.Request): string {
-    const forwardedFor = req.headers['x-forwarded-for'];
-    let ip: string | undefined;
+// =============================================================================
+// PROTECTED ROUTES (Authentication required)
+// =============================================================================
 
-    if (Array.isArray(forwardedFor)) {
-        ip = forwardedFor[0]?.trim();
-    } else if (typeof forwardedFor === 'string') {
-        ip = forwardedFor.split(',')[0]?.trim();
-    }
+/**
+ * @route   POST /api/auth/logout
+ * @desc    Logout user
+ * @access  Private
+ */
+router.post('/logout',
+  generalRateLimit,
+  authenticateToken,
+  authController.logout.bind(authController)
+);
 
-    return ip ||
-           req.headers['x-real-ip'] as string ||
-           req.connection?.remoteAddress ||
-           req.socket?.remoteAddress ||
-           (req as any).ip ||
-           'unknown';
-}
+/**
+ * @route   GET /api/auth/profile
+ * @desc    Get current user profile
+ * @access  Private
+ */
+router.get('/profile',
+  generalRateLimit,
+  authenticateToken,
+  authController.getProfile.bind(authController)
+);
 
-// Generate JWT token
-function generateToken(user: any): string {
-    return jwt.sign(
-        {
-            id: user.id,
-            email: user.email,
-            account_type: user.account_type
-        },
-        JWT_SECRET,
-        { expiresIn: '24h' }
-    );
-}
+/**
+ * @route   POST /api/auth/password/change
+ * @desc    Change user password
+ * @access  Private
+ */
+router.post('/password/change',
+  generalRateLimit,
+  authenticateToken,
+  changePasswordValidation,
+  handleValidationErrors,
+  authController.changePassword.bind(authController)
+);
 
-// Extend Express Request interface to include user
-interface AuthenticatedRequest extends express.Request {
-    user?: any;
-}
+/**
+ * @route   POST /api/auth/email/resend
+ * @desc    Resend email verification
+ * @access  Private
+ */
+router.post('/email/resend',
+  generalRateLimit,
+  authenticateToken,
+  rateLimitByUser(3, 60 * 60 * 1000), // 3 requests per hour per user
+  authController.resendEmailVerification.bind(authController)
+);
 
-// JWT verification middleware
-// JWT verification middleware
-const authenticateToken = (req: AuthenticatedRequest, res: express.Response, next: express.NextFunction) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+/**
+ * @route   GET /api/auth/sessions
+ * @desc    Get user sessions
+ * @access  Private
+ */
+router.get('/sessions',
+  generalRateLimit,
+  authenticateToken,
+  requireEmailVerified,
+  authController.getSessions.bind(authController)
+);
 
-    if (!token) {
-        res.status(401).json({
-            success: false,
-            message: 'Access token required'
-        });
-        return;
-    }
+/**
+ * @route   DELETE /api/auth/sessions/:sessionId
+ * @desc    Revoke a specific session
+ * @access  Private
+ */
+router.delete('/sessions/:sessionId',
+  generalRateLimit,
+  authenticateToken,
+  requireEmailVerified,
+  authController.revokeSession.bind(authController)
+);
 
-    jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
-        if (err) {
-            res.status(403).json({
-                success: false,
-                message: 'Invalid or expired token'
-            });
-            return;
-        }
-        req.user = user;
-        next();
+/**
+ * @route   DELETE /api/auth/sessions
+ * @desc    Revoke all sessions except current
+ * @access  Private
+ */
+router.delete('/sessions',
+  generalRateLimit,
+  authenticateToken,
+  requireEmailVerified,
+  authController.revokeAllSessions.bind(authController)
+);
+
+// =============================================================================
+// HEALTH CHECK AND TEST ROUTES
+// =============================================================================
+
+/**
+ * @route   GET /api/auth/health
+ * @desc    Health check for auth service
+ * @access  Public
+ */
+router.get('/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Auth service is healthy',
+    timestamp: new Date().toISOString(),
+    version: '2.0.0',
+  });
+});
+
+/**
+ * @route   GET /api/auth/test
+ * @desc    Test endpoint for development
+ * @access  Public (only in development)
+ */
+if (process.env.NODE_ENV === 'development') {
+  router.get('/test', (req, res) => {
+    res.status(200).json({
+      success: true,
+      message: 'Auth routes are working',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV,
     });
-};
+  });
+}
 
-// Routes
+// Error handling middleware for auth routes
+router.use((error: any, req: any, res: any, next: any) => {
+  logger.error('Auth route error', {
+    error: error.message,
+    stack: error.stack,
+    path: req.path,
+    method: req.method,
+    body: req.body,
+    ip: req.ip,
+  });
 
-// User Registration
-router.post('/signup', authLimiter, validateInput, async (req: express.Request, res: express.Response) => {
-    try {
-        const { email, password, firstName, lastName, accountType, recaptcha_token } = req.body;
-        const clientIP = getClientIP(req);
-
-        // Verify reCAPTCHA
-        const captchaResult = await verifyRecaptcha(recaptcha_token, clientIP);
-
-        if (!captchaResult.success) {
-            return res.status(400).json({
-                success: false,
-                message: 'reCAPTCHA verification failed. Please try again.',
-                code: captchaResult.code
-            });
-        }
-
-        console.log(`Signup attempt - Email: ${email}, reCAPTCHA Score: ${captchaResult.score}`);
-
-        // Check if user already exists
-        const existingUser = await pool.query(
-            'SELECT id FROM users WHERE email = $1',
-            [email.toLowerCase()]
-        );
-
-        if (existingUser.rows.length > 0) {
-            return res.status(400).json({
-                success: false,
-                message: 'User with this email already exists'
-            });
-        }
-
-        // Hash password
-        const saltRounds = 12;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-        // Insert new user
-        const newUser = await pool.query(
-            `INSERT INTO users (email, password_hash, account_type, created_at, updated_at)
-             VALUES ($1, $2, $3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-             RETURNING id, email, account_type, created_at`,
-            [email.toLowerCase(), hashedPassword, accountType || 'user']
-        );
-
-        const user = newUser.rows[0];
-        const token = generateToken(user);
-
-        return res.status(201).json({
-            success: true,
-            message: 'Account created successfully',
-            user: {
-                id: user.id,
-                email: user.email,
-                account_type: user.account_type,
-                created_at: user.created_at
-            },
-            token
-        });
-
-    } catch (error: any) {
-        console.error('Signup error:', error);
-        return res.status(500).json({
-            success: false,
-            message: 'Internal server error during registration'
-        });
-    }
-});
-
-// User Login
-router.post('/login', authLimiter, validateInput, async (req: express.Request, res: express.Response) => {
-    try {
-        const { email, password, recaptcha_token } = req.body;
-        const clientIP = getClientIP(req);
-
-        // Verify reCAPTCHA
-        const captchaResult = await verifyRecaptcha(recaptcha_token, clientIP);
-
-        if (!captchaResult.success) {
-            return res.status(400).json({
-                success: false,
-                message: 'reCAPTCHA verification failed. Please try again.',
-                code: captchaResult.code
-            });
-        }
-
-        console.log(`Login attempt - Email: ${email}, reCAPTCHA Score: ${captchaResult.score}`);
-
-        // Find user
-        const userResult = await pool.query(
-            'SELECT id, email, password_hash, account_type, created_at FROM users WHERE email = $1',
-            [email.toLowerCase()]
-        );
-
-        if (userResult.rows.length === 0) {
-            return res.status(401).json({
-                success: false,
-                message: 'Invalid email or password'
-            });
-        }
-
-        const user = userResult.rows[0];
-
-        // Verify password
-        const isValidPassword = await bcrypt.compare(password, user.password_hash);
-
-        if (!isValidPassword) {
-            return res.status(401).json({
-                success: false,
-                message: 'Invalid email or password'
-            });
-        }
-
-        // Update last login timestamp
-        await pool.query(
-            'UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
-            [user.id]
-        );
-
-        const token = generateToken(user);
-
-        return res.json({
-            success: true,
-            message: 'Login successful',
-            user: {
-                id: user.id,
-                email: user.email,
-                account_type: user.account_type,
-                created_at: user.created_at
-            },
-            token
-        });
-
-    } catch (error: any) {
-        console.error('Login error:', error);
-        return res.status(500).json({
-            success: false,
-            message: 'Internal server error during login'
-        });
-    }
-});
-
-// Get User Profile
-router.get('/profile', authenticateToken, async (req: AuthenticatedRequest, res: express.Response) => {
-    try {
-        const userResult = await pool.query(
-            'SELECT id, email, account_type, created_at, updated_at FROM users WHERE id = $1',
-            [req.user.id]
-        );
-
-        if (userResult.rows.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found'
-            });
-        }
-
-        const user = userResult.rows[0];
-
-        return res.json({
-            success: true,
-            user: {
-                id: user.id,
-                email: user.email,
-                account_type: user.account_type,
-                created_at: user.created_at,
-                updated_at: user.updated_at
-            }
-        });
-
-    } catch (error: any) {
-        console.error('Profile fetch error:', error);
-        return res.status(500).json({
-            success: false,
-            message: 'Internal server error'
-        });
-    }
-});
-
-// Logout (client-side token removal, but we can log it)
-router.post('/logout', authenticateToken, (req: AuthenticatedRequest, res: express.Response) => {
-    console.log(`User ${req.user.email} logged out`);
-
-    return res.json({
-        success: true,
-        message: 'Logged out successfully'
-    });
-});
-
-// Verify Token
-router.get('/verify', authenticateToken, (req: AuthenticatedRequest, res: express.Response) => {
-    return res.json({
-        success: true,
-        user: {
-            id: req.user.id,
-            email: req.user.email,
-            account_type: req.user.account_type
-        }
-    });
+  res.status(500).json({
+    success: false,
+    message: 'Internal server error in auth service',
+    error: 'INTERNAL_ERROR',
+    timestamp: new Date().toISOString(),
+  });
 });
 
 export default router;
