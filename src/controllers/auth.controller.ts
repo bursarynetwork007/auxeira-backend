@@ -1,48 +1,69 @@
 import { Request, Response } from 'express';
 import { authService } from '../services/auth.service';
-import { logger, logUserActivity } from '../utils/logger';
-import {
-  LoginRequest,
-  RegisterRequest,
-  ChangePasswordRequest,
-  ResetPasswordRequest,
-  ConfirmPasswordResetRequest,
-  VerifyEmailRequest,
-  RefreshTokenRequest,
-} from '../types/auth.types';
+import { loggers, performanceTimer } from '../utils/logger';
+import { AuthenticatedRequest, blacklistToken } from '../middleware/auth.middleware';
 
-/**
- * Authentication Controllers
- */
 export class AuthController {
   /**
    * Register a new user
    */
   async register(req: Request, res: Response): Promise<void> {
-    try {
-      const registerData: RegisterRequest = req.body;
-      const ipAddress = req.ip || req.connection.remoteAddress || 'unknown';
+    const timer = performanceTimer('auth_register_controller');
 
-      const result = await authService.register(registerData, ipAddress);
+    try {
+      const { email, password, firstName, lastName, role } = req.body;
+
+      loggers.auth('Registration attempt started', { email, role });
+
+      const result = await authService.register({
+        email,
+        password,
+        firstName,
+        lastName,
+        role,
+      });
 
       if (result.success) {
-        res.status(201).json(result);
+        loggers.auth('Registration successful', {
+          userId: result.user?.id,
+          email: result.user?.email,
+          role: result.user?.role,
+        });
+
+        res.status(201).json({
+          success: true,
+          message: result.message,
+          data: {
+            user: result.user,
+            token: result.token,
+            refreshToken: result.refreshToken,
+          },
+          timestamp: new Date().toISOString(),
+        });
       } else {
-        res.status(400).json(result);
+        loggers.auth('Registration failed', { email, reason: result.message });
+
+        res.status(400).json({
+          success: false,
+          message: result.message,
+          error: 'REGISTRATION_FAILED',
+          timestamp: new Date().toISOString(),
+        });
       }
     } catch (error) {
-      logger.error('Registration controller error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        body: req.body,
+      loggers.errorWithContext(error as Error, 'AUTH_REGISTER_CONTROLLER', {
+        email: req.body.email,
         ip: req.ip,
       });
 
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: 'Registration failed due to server error',
         error: 'INTERNAL_ERROR',
         timestamp: new Date().toISOString(),
       });
+    } finally {
+      timer.end();
     }
   }
 
@@ -50,179 +71,250 @@ export class AuthController {
    * Login user
    */
   async login(req: Request, res: Response): Promise<void> {
-    try {
-      const loginData: LoginRequest = req.body;
-      const ipAddress = req.ip || req.connection.remoteAddress || 'unknown';
-      const userAgent = req.get('User-Agent') || 'unknown';
+    const timer = performanceTimer('auth_login_controller');
 
-      const result = await authService.login(loginData, ipAddress, userAgent);
+    try {
+      const { email, password } = req.body;
+
+      loggers.auth('Login attempt started', { email, ip: req.ip });
+
+      const result = await authService.login({ email, password });
 
       if (result.success) {
-        res.status(200).json(result);
+        loggers.auth('Login successful', {
+          userId: result.user?.id,
+          email: result.user?.email,
+          role: result.user?.role,
+          ip: req.ip,
+        });
+
+        res.status(200).json({
+          success: true,
+          message: result.message,
+          data: {
+            user: result.user,
+            token: result.token,
+            refreshToken: result.refreshToken,
+          },
+          timestamp: new Date().toISOString(),
+        });
       } else {
-        res.status(401).json(result);
+        loggers.security('Login failed', {
+          email,
+          reason: result.message,
+          ip: req.ip,
+          userAgent: req.get('User-Agent'),
+        });
+
+        res.status(401).json({
+          success: false,
+          message: result.message,
+          error: 'LOGIN_FAILED',
+          timestamp: new Date().toISOString(),
+        });
       }
     } catch (error) {
-      logger.error('Login controller error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+      loggers.errorWithContext(error as Error, 'AUTH_LOGIN_CONTROLLER', {
         email: req.body.email,
         ip: req.ip,
       });
 
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: 'Login failed due to server error',
         error: 'INTERNAL_ERROR',
         timestamp: new Date().toISOString(),
       });
+    } finally {
+      timer.end();
     }
   }
 
   /**
-   * Refresh authentication tokens
+   * Refresh access token
    */
-  async refreshTokens(req: Request, res: Response): Promise<void> {
-    try {
-      const refreshData: RefreshTokenRequest = req.body;
-      const ipAddress = req.ip || req.connection.remoteAddress || 'unknown';
+  async refreshToken(req: Request, res: Response): Promise<void> {
+    const timer = performanceTimer('auth_refresh_token_controller');
 
-      const result = await authService.refreshTokens(refreshData, ipAddress);
+    try {
+      const { refreshToken } = req.body;
+
+      if (!refreshToken) {
+        res.status(400).json({
+          success: false,
+          message: 'Refresh token is required',
+          error: 'MISSING_REFRESH_TOKEN',
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      loggers.auth('Token refresh attempt started', { ip: req.ip });
+
+      const result = await authService.refreshToken(refreshToken);
 
       if (result.success) {
-        res.status(200).json(result);
+        loggers.auth('Token refresh successful', {
+          userId: result.user?.id,
+          email: result.user?.email,
+        });
+
+        res.status(200).json({
+          success: true,
+          message: result.message,
+          data: {
+            user: result.user,
+            token: result.token,
+          },
+          timestamp: new Date().toISOString(),
+        });
       } else {
-        res.status(401).json(result);
+        loggers.security('Token refresh failed', {
+          reason: result.message,
+          ip: req.ip,
+        });
+
+        res.status(401).json({
+          success: false,
+          message: result.message,
+          error: 'REFRESH_FAILED',
+          timestamp: new Date().toISOString(),
+        });
       }
     } catch (error) {
-      logger.error('Token refresh controller error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+      loggers.errorWithContext(error as Error, 'AUTH_REFRESH_TOKEN_CONTROLLER', {
         ip: req.ip,
       });
 
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: 'Token refresh failed due to server error',
         error: 'INTERNAL_ERROR',
         timestamp: new Date().toISOString(),
       });
+    } finally {
+      timer.end();
     }
   }
 
   /**
    * Logout user
    */
-  async logout(req: Request, res: Response): Promise<void> {
-    try {
-      const sessionToken = req.sessionToken;
-      const ipAddress = req.ip || req.connection.remoteAddress || 'unknown';
+  async logout(req: AuthenticatedRequest, res: Response): Promise<void> {
+    const timer = performanceTimer('auth_logout_controller');
 
-      if (!sessionToken) {
-        res.status(400).json({
+    try {
+      const userId = req.user?.userId;
+      const authHeader = req.headers['authorization'];
+      const token = authHeader && authHeader.split(' ')[1];
+
+      if (!userId) {
+        res.status(401).json({
           success: false,
-          message: 'Session token not found',
-          error: 'NO_SESSION_TOKEN',
+          message: 'Authentication required',
+          error: 'UNAUTHORIZED',
           timestamp: new Date().toISOString(),
         });
         return;
       }
 
-      const result = await authService.logout(sessionToken, ipAddress);
+      loggers.auth('Logout attempt started', { userId });
+
+      // Logout from service (removes refresh token)
+      const result = await authService.logout(userId);
+
+      // Blacklist the current access token
+      if (token) {
+        await blacklistToken(token, 24 * 60 * 60); // 24 hours
+      }
 
       if (result.success) {
-        res.status(200).json(result);
+        loggers.auth('Logout successful', { userId });
+
+        res.status(200).json({
+          success: true,
+          message: result.message,
+          timestamp: new Date().toISOString(),
+        });
       } else {
-        res.status(400).json(result);
+        res.status(500).json({
+          success: false,
+          message: result.message,
+          error: 'LOGOUT_FAILED',
+          timestamp: new Date().toISOString(),
+        });
       }
     } catch (error) {
-      logger.error('Logout controller error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        userId: req.user?.id,
-        ip: req.ip,
+      loggers.errorWithContext(error as Error, 'AUTH_LOGOUT_CONTROLLER', {
+        userId: req.user?.userId,
       });
 
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: 'Logout failed due to server error',
         error: 'INTERNAL_ERROR',
         timestamp: new Date().toISOString(),
       });
+    } finally {
+      timer.end();
     }
   }
 
   /**
-   * Get current user profile
+   * Get user profile
    */
-  async getProfile(req: Request, res: Response): Promise<void> {
+  async getProfile(req: AuthenticatedRequest, res: Response): Promise<void> {
+    const timer = performanceTimer('auth_get_profile_controller');
+
     try {
-      if (!req.user) {
+      const userId = req.user?.userId;
+
+      if (!userId) {
         res.status(401).json({
           success: false,
           message: 'Authentication required',
-          error: 'AUTHENTICATION_REQUIRED',
+          error: 'UNAUTHORIZED',
           timestamp: new Date().toISOString(),
         });
         return;
       }
 
-      res.status(200).json({
-        success: true,
-        message: 'Profile retrieved successfully',
-        data: req.user,
-        timestamp: new Date().toISOString(),
-      });
-    } catch (error) {
-      logger.error('Get profile controller error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        userId: req.user?.id,
-      });
+      loggers.auth('Profile retrieval started', { userId });
 
-      res.status(500).json({
-        success: false,
-        message: 'Internal server error',
-        error: 'INTERNAL_ERROR',
-        timestamp: new Date().toISOString(),
-      });
-    }
-  }
-
-  /**
-   * Change user password
-   */
-  async changePassword(req: Request, res: Response): Promise<void> {
-    try {
-      if (!req.user) {
-        res.status(401).json({
-          success: false,
-          message: 'Authentication required',
-          error: 'AUTHENTICATION_REQUIRED',
-          timestamp: new Date().toISOString(),
-        });
-        return;
-      }
-
-      const passwordData: ChangePasswordRequest = req.body;
-      const ipAddress = req.ip || req.connection.remoteAddress || 'unknown';
-
-      const result = await authService.changePassword(req.user.id, passwordData, ipAddress);
+      const result = await authService.getProfile(userId);
 
       if (result.success) {
-        res.status(200).json(result);
+        loggers.auth('Profile retrieved successfully', { userId });
+
+        res.status(200).json({
+          success: true,
+          message: result.message,
+          data: {
+            user: result.user,
+          },
+          timestamp: new Date().toISOString(),
+        });
       } else {
-        res.status(400).json(result);
+        res.status(404).json({
+          success: false,
+          message: result.message,
+          error: 'PROFILE_NOT_FOUND',
+          timestamp: new Date().toISOString(),
+        });
       }
     } catch (error) {
-      logger.error('Change password controller error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        userId: req.user?.id,
-        ip: req.ip,
+      loggers.errorWithContext(error as Error, 'AUTH_GET_PROFILE_CONTROLLER', {
+        userId: req.user?.userId,
       });
 
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: 'Failed to retrieve profile due to server error',
         error: 'INTERNAL_ERROR',
         timestamp: new Date().toISOString(),
       });
+    } finally {
+      timer.end();
     }
   }
 
@@ -230,86 +322,143 @@ export class AuthController {
    * Request password reset
    */
   async requestPasswordReset(req: Request, res: Response): Promise<void> {
+    const timer = performanceTimer('auth_request_password_reset_controller');
+
     try {
-      const resetData: ResetPasswordRequest = req.body;
-      const ipAddress = req.ip || req.connection.remoteAddress || 'unknown';
+      const { email } = req.body;
 
-      const result = await authService.requestPasswordReset(resetData, ipAddress);
+      if (!email) {
+        res.status(400).json({
+          success: false,
+          message: 'Email is required',
+          error: 'MISSING_EMAIL',
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
 
-      // Always return success to prevent email enumeration
-      res.status(200).json(result);
+      loggers.auth('Password reset request started', { email, ip: req.ip });
+
+      const result = await authService.generatePasswordResetToken(email);
+
+      // Always return success for security (don't reveal if email exists)
+      loggers.auth('Password reset request processed', { email });
+
+      res.status(200).json({
+        success: true,
+        message: result.message,
+        timestamp: new Date().toISOString(),
+      });
+
+      // In a real application, you would send the reset token via email
+      // For development, you might want to log it
+      if (process.env.NODE_ENV === 'development' && result.token) {
+        loggers.auth('Password reset token (DEV ONLY)', {
+          email,
+          token: result.token,
+        });
+      }
     } catch (error) {
-      logger.error('Password reset request controller error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+      loggers.errorWithContext(error as Error, 'AUTH_REQUEST_PASSWORD_RESET_CONTROLLER', {
         email: req.body.email,
         ip: req.ip,
       });
 
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: 'Password reset request failed due to server error',
         error: 'INTERNAL_ERROR',
         timestamp: new Date().toISOString(),
       });
+    } finally {
+      timer.end();
     }
   }
 
   /**
-   * Confirm password reset
+   * Reset password using token
    */
-  async confirmPasswordReset(req: Request, res: Response): Promise<void> {
-    try {
-      const resetData: ConfirmPasswordResetRequest = req.body;
-      const ipAddress = req.ip || req.connection.remoteAddress || 'unknown';
+  async resetPassword(req: Request, res: Response): Promise<void> {
+    const timer = performanceTimer('auth_reset_password_controller');
 
-      const result = await authService.confirmPasswordReset(resetData, ipAddress);
+    try {
+      const { token, newPassword } = req.body;
+
+      if (!token || !newPassword) {
+        res.status(400).json({
+          success: false,
+          message: 'Token and new password are required',
+          error: 'MISSING_FIELDS',
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      loggers.auth('Password reset attempt started', { ip: req.ip });
+
+      const result = await authService.resetPassword(token, newPassword);
 
       if (result.success) {
-        res.status(200).json(result);
+        loggers.auth('Password reset successful', { ip: req.ip });
+
+        res.status(200).json({
+          success: true,
+          message: result.message,
+          timestamp: new Date().toISOString(),
+        });
       } else {
-        res.status(400).json(result);
+        loggers.security('Password reset failed', {
+          reason: result.message,
+          ip: req.ip,
+        });
+
+        res.status(400).json({
+          success: false,
+          message: result.message,
+          error: 'RESET_FAILED',
+          timestamp: new Date().toISOString(),
+        });
       }
     } catch (error) {
-      logger.error('Password reset confirmation controller error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        token: req.body.token?.substring(0, 10) + '...',
+      loggers.errorWithContext(error as Error, 'AUTH_RESET_PASSWORD_CONTROLLER', {
         ip: req.ip,
       });
 
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: 'Password reset failed due to server error',
         error: 'INTERNAL_ERROR',
         timestamp: new Date().toISOString(),
       });
+    } finally {
+      timer.end();
     }
   }
 
   /**
-   * Verify email address
+   * Verify email (placeholder for future implementation)
    */
   async verifyEmail(req: Request, res: Response): Promise<void> {
     try {
-      const verifyData: VerifyEmailRequest = req.body;
-      const ipAddress = req.ip || req.connection.remoteAddress || 'unknown';
+      const { token } = req.params;
 
-      const result = await authService.verifyEmail(verifyData, ipAddress);
+      // TODO: Implement email verification logic
+      loggers.auth('Email verification attempted', { token, ip: req.ip });
 
-      if (result.success) {
-        res.status(200).json(result);
-      } else {
-        res.status(400).json(result);
-      }
+      res.status(200).json({
+        success: true,
+        message: 'Email verification feature coming soon',
+        timestamp: new Date().toISOString(),
+      });
     } catch (error) {
-      logger.error('Email verification controller error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        token: req.body.token?.substring(0, 10) + '...',
+      loggers.errorWithContext(error as Error, 'AUTH_VERIFY_EMAIL_CONTROLLER', {
+        token: req.params.token,
         ip: req.ip,
       });
 
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: 'Email verification failed due to server error',
         error: 'INTERNAL_ERROR',
         timestamp: new Date().toISOString(),
       });
@@ -317,222 +466,25 @@ export class AuthController {
   }
 
   /**
-   * Resend email verification
+   * Health check for authentication service
    */
-  async resendEmailVerification(req: Request, res: Response): Promise<void> {
+  async healthCheck(req: Request, res: Response): Promise<void> {
     try {
-      if (!req.user) {
-        res.status(401).json({
-          success: false,
-          message: 'Authentication required',
-          error: 'AUTHENTICATION_REQUIRED',
-          timestamp: new Date().toISOString(),
-        });
-        return;
-      }
-
-      if (req.user.emailVerified) {
-        res.status(400).json({
-          success: false,
-          message: 'Email is already verified',
-          error: 'EMAIL_ALREADY_VERIFIED',
-          timestamp: new Date().toISOString(),
-        });
-        return;
-      }
-
-      // TODO: Implement resend email verification logic
-      // This would involve creating a new verification token and sending email
-
-      await logUserActivity(req.user.id, 'email_verification_resent', 'user', {
-        email: req.user.email,
-        ip: req.ip,
-      });
-
       res.status(200).json({
         success: true,
-        message: 'Verification email sent successfully',
+        message: 'Authentication service is healthy',
+        service: 'auth',
+        version: '1.0.0',
         timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        environment: process.env.NODE_ENV || 'development',
       });
     } catch (error) {
-      logger.error('Resend email verification controller error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        userId: req.user?.id,
-        ip: req.ip,
-      });
+      loggers.errorWithContext(error as Error, 'AUTH_HEALTH_CHECK');
 
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
-        error: 'INTERNAL_ERROR',
-        timestamp: new Date().toISOString(),
-      });
-    }
-  }
-
-  /**
-   * Check authentication status
-   */
-  async checkAuth(req: Request, res: Response): Promise<void> {
-    try {
-      if (!req.user) {
-        res.status(401).json({
-          success: false,
-          message: 'Not authenticated',
-          error: 'NOT_AUTHENTICATED',
-          timestamp: new Date().toISOString(),
-        });
-        return;
-      }
-
-      res.status(200).json({
-        success: true,
-        message: 'Authenticated',
-        data: {
-          user: req.user,
-          authenticated: true,
-        },
-        timestamp: new Date().toISOString(),
-      });
-    } catch (error) {
-      logger.error('Check auth controller error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        userId: req.user?.id,
-      });
-
-      res.status(500).json({
-        success: false,
-        message: 'Internal server error',
-        error: 'INTERNAL_ERROR',
-        timestamp: new Date().toISOString(),
-      });
-    }
-  }
-
-  /**
-   * Get user sessions
-   */
-  async getSessions(req: Request, res: Response): Promise<void> {
-    try {
-      if (!req.user) {
-        res.status(401).json({
-          success: false,
-          message: 'Authentication required',
-          error: 'AUTHENTICATION_REQUIRED',
-          timestamp: new Date().toISOString(),
-        });
-        return;
-      }
-
-      // TODO: Implement get user sessions logic
-      // This would query the user_sessions table for active sessions
-
-      res.status(200).json({
-        success: true,
-        message: 'Sessions retrieved successfully',
-        data: {
-          sessions: [], // TODO: Implement actual session data
-        },
-        timestamp: new Date().toISOString(),
-      });
-    } catch (error) {
-      logger.error('Get sessions controller error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        userId: req.user?.id,
-      });
-
-      res.status(500).json({
-        success: false,
-        message: 'Internal server error',
-        error: 'INTERNAL_ERROR',
-        timestamp: new Date().toISOString(),
-      });
-    }
-  }
-
-  /**
-   * Revoke a specific session
-   */
-  async revokeSession(req: Request, res: Response): Promise<void> {
-    try {
-      if (!req.user) {
-        res.status(401).json({
-          success: false,
-          message: 'Authentication required',
-          error: 'AUTHENTICATION_REQUIRED',
-          timestamp: new Date().toISOString(),
-        });
-        return;
-      }
-
-      const { sessionId } = req.params;
-
-      // TODO: Implement revoke session logic
-      // This would invalidate a specific session
-
-      await logUserActivity(req.user.id, 'session_revoked', 'session', {
-        sessionId,
-        ip: req.ip,
-      });
-
-      res.status(200).json({
-        success: true,
-        message: 'Session revoked successfully',
-        timestamp: new Date().toISOString(),
-      });
-    } catch (error) {
-      logger.error('Revoke session controller error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        userId: req.user?.id,
-        sessionId: req.params.sessionId,
-      });
-
-      res.status(500).json({
-        success: false,
-        message: 'Internal server error',
-        error: 'INTERNAL_ERROR',
-        timestamp: new Date().toISOString(),
-      });
-    }
-  }
-
-  /**
-   * Revoke all sessions except current
-   */
-  async revokeAllSessions(req: Request, res: Response): Promise<void> {
-    try {
-      if (!req.user) {
-        res.status(401).json({
-          success: false,
-          message: 'Authentication required',
-          error: 'AUTHENTICATION_REQUIRED',
-          timestamp: new Date().toISOString(),
-        });
-        return;
-      }
-
-      // TODO: Implement revoke all sessions logic
-      // This would invalidate all sessions except the current one
-
-      await logUserActivity(req.user.id, 'all_sessions_revoked', 'session', {
-        currentSessionId: req.sessionToken,
-        ip: req.ip,
-      });
-
-      res.status(200).json({
-        success: true,
-        message: 'All other sessions revoked successfully',
-        timestamp: new Date().toISOString(),
-      });
-    } catch (error) {
-      logger.error('Revoke all sessions controller error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        userId: req.user?.id,
-      });
-
-      res.status(500).json({
-        success: false,
-        message: 'Internal server error',
+        message: 'Authentication service health check failed',
         error: 'INTERNAL_ERROR',
         timestamp: new Date().toISOString(),
       });
@@ -542,4 +494,3 @@ export class AuthController {
 
 // Export singleton instance
 export const authController = new AuthController();
-export default authController;

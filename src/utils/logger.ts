@@ -1,9 +1,8 @@
 import winston from 'winston';
-import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
 
 // Define log levels
-const logLevels = {
+const levels = {
   error: 0,
   warn: 1,
   info: 2,
@@ -11,8 +10,8 @@ const logLevels = {
   debug: 4,
 };
 
-// Define colors for each log level
-const logColors = {
+// Define colors for each level
+const colors = {
   error: 'red',
   warn: 'yellow',
   info: 'green',
@@ -20,213 +19,212 @@ const logColors = {
   debug: 'white',
 };
 
-// Add colors to winston
-winston.addColors(logColors);
+// Tell winston that you want to link the colors
+winston.addColors(colors);
 
-// Define log format
+// Define which level to log based on environment
+const level = () => {
+  const env = process.env.NODE_ENV || 'development';
+  const isDevelopment = env === 'development';
+  return isDevelopment ? 'debug' : 'warn';
+};
+
+// Define different log formats
 const logFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
   winston.format.errors({ stack: true }),
-  winston.format.json(),
-  winston.format.prettyPrint()
-);
-
-// Define console format for development
-const consoleFormat = winston.format.combine(
   winston.format.colorize({ all: true }),
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
-  winston.format.errors({ stack: true }),
   winston.format.printf(
-    (info) => `${info.timestamp} ${info.level}: ${info.message}${
-      info.stack ? `\n${info.stack}` : ''
-    }${
-      Object.keys(info).length > 3
-        ? `\n${JSON.stringify(
-            Object.fromEntries(
-              Object.entries(info).filter(([key]) =>
-                !['timestamp', 'level', 'message', 'stack'].includes(key)
-              )
-            ),
-            null,
-            2
-          )}`
-        : ''
-    }`
+    (info) => `${info.timestamp} ${info.level}: ${info.message}${info.stack ? '\n' + info.stack : ''}`
   )
 );
 
-// Create logs directory if it doesn't exist
-const logsDir = path.join(process.cwd(), 'logs');
-
-// Define transports
-const transports: winston.transport[] = [];
-
-// Console transport (always enabled)
-transports.push(
-  new winston.transports.Console({
-    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-    format: process.env.NODE_ENV === 'production' ? logFormat : consoleFormat,
-  })
+const jsonFormat = winston.format.combine(
+  winston.format.timestamp(),
+  winston.format.errors({ stack: true }),
+  winston.format.json()
 );
 
-// File transports (only in production or when LOG_TO_FILE is true)
-if (process.env.NODE_ENV === 'production' || process.env.LOG_TO_FILE === 'true') {
-  // Error log file
+// Define transports
+const transports = [
+  // Console transport
+  new winston.transports.Console({
+    level: level(),
+    format: logFormat,
+  }),
+];
+
+// Add file transports in production
+if (process.env.NODE_ENV === 'production') {
   transports.push(
-    new DailyRotateFile({
-      filename: path.join(logsDir, 'error-%DATE%.log'),
-      datePattern: 'YYYY-MM-DD',
+    // Error log file
+    new winston.transports.File({
+      filename: path.join(process.cwd(), 'logs', 'error.log'),
       level: 'error',
-      format: logFormat,
-      maxSize: '20m',
-      maxFiles: '14d',
-      zippedArchive: true,
-    })
-  );
-
-  // Combined log file
-  transports.push(
-    new DailyRotateFile({
-      filename: path.join(logsDir, 'combined-%DATE%.log'),
-      datePattern: 'YYYY-MM-DD',
-      format: logFormat,
-      maxSize: '20m',
-      maxFiles: '14d',
-      zippedArchive: true,
-    })
-  );
-
-  // HTTP log file
-  transports.push(
-    new DailyRotateFile({
-      filename: path.join(logsDir, 'http-%DATE%.log'),
-      datePattern: 'YYYY-MM-DD',
-      level: 'http',
-      format: logFormat,
-      maxSize: '20m',
-      maxFiles: '7d',
-      zippedArchive: true,
+      format: jsonFormat,
+      maxsize: 5242880, // 5MB
+      maxFiles: 5,
+    }),
+    // Combined log file
+    new winston.transports.File({
+      filename: path.join(process.cwd(), 'logs', 'combined.log'),
+      format: jsonFormat,
+      maxsize: 5242880, // 5MB
+      maxFiles: 5,
     })
   );
 }
 
-// Create logger instance
+// Create the logger
 const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
-  levels: logLevels,
-  format: logFormat,
+  level: level(),
+  levels,
+  format: jsonFormat,
   transports,
-  // Don't exit on handled exceptions
   exitOnError: false,
 });
 
-// Handle uncaught exceptions and unhandled rejections
-if (process.env.NODE_ENV === 'production') {
-  logger.exceptions.handle(
-    new DailyRotateFile({
-      filename: path.join(logsDir, 'exceptions-%DATE%.log'),
-      datePattern: 'YYYY-MM-DD',
-      maxSize: '20m',
-      maxFiles: '14d',
-      zippedArchive: true,
-    })
-  );
+// Create specialized logging functions
+export const loggers = {
+  // HTTP request logging
+  http: (message: string, meta?: any) => {
+    logger.http(message, meta);
+  },
 
-  logger.rejections.handle(
-    new DailyRotateFile({
-      filename: path.join(logsDir, 'rejections-%DATE%.log'),
-      datePattern: 'YYYY-MM-DD',
-      maxSize: '20m',
-      maxFiles: '14d',
-      zippedArchive: true,
-    })
-  );
-}
+  // Authentication logging
+  auth: (message: string, meta?: any) => {
+    logger.info(`[AUTH] ${message}`, meta);
+  },
 
-// Create a stream object for Morgan HTTP logging
-export const morganStream = {
-  write: (message: string) => {
-    logger.http(message.trim());
+  // Database logging
+  database: (message: string, meta?: any) => {
+    logger.info(`[DATABASE] ${message}`, meta);
+  },
+
+  // SSE scoring logging
+  sse: (message: string, meta?: any) => {
+    logger.info(`[SSE] ${message}`, meta);
+  },
+
+  // AI mentorship logging
+  ai: (message: string, meta?: any) => {
+    logger.info(`[AI] ${message}`, meta);
+  },
+
+  // Security logging
+  security: (message: string, meta?: any) => {
+    logger.warn(`[SECURITY] ${message}`, meta);
+  },
+
+  // Performance logging
+  performance: (message: string, meta?: any) => {
+    logger.info(`[PERFORMANCE] ${message}`, meta);
+  },
+
+  // Error logging with context
+  errorWithContext: (error: Error, context: string, meta?: any) => {
+    logger.error(`[${context}] ${error.message}`, {
+      error: error.message,
+      stack: error.stack,
+      context,
+      ...meta,
+    });
   },
 };
 
-// Helper functions for structured logging
-export const logWithContext = (level: string, message: string, context?: any) => {
-  logger.log(level, message, context);
+// Performance timing helper
+export const performanceTimer = (label: string) => {
+  const start = Date.now();
+  return {
+    end: (meta?: any) => {
+      const duration = Date.now() - start;
+      loggers.performance(`${label} completed in ${duration}ms`, {
+        duration,
+        label,
+        ...meta,
+      });
+      return duration;
+    },
+  };
 };
 
-export const logError = (error: Error, context?: any) => {
-  logger.error(error.message, {
+// Request logging middleware helper
+export const createRequestLogger = () => {
+  return (req: any, res: any, next: any) => {
+    const start = Date.now();
+
+    res.on('finish', () => {
+      const duration = Date.now() - start;
+      const { method, url, ip } = req;
+      const { statusCode } = res;
+
+      loggers.http(`${method} ${url}`, {
+        method,
+        url,
+        statusCode,
+        duration,
+        ip,
+        userAgent: req.get('User-Agent'),
+        userId: req.user?.userId,
+      });
+    });
+
+    next();
+  };
+};
+
+// Error logging helper
+export const logError = (error: Error, context?: string, meta?: any) => {
+  const errorInfo = {
+    message: error.message,
     stack: error.stack,
     name: error.name,
-    ...context,
-  });
-};
-
-export const logRequest = (req: any, res: any, responseTime?: number) => {
-  logger.http('HTTP Request', {
-    method: req.method,
-    url: req.url,
-    statusCode: res.statusCode,
-    responseTime: responseTime ? `${responseTime}ms` : undefined,
-    userAgent: req.get('User-Agent'),
-    ip: req.ip,
-    userId: req.user?.id,
-  });
-};
-
-export const logDatabaseQuery = (query: string, duration: number, rowCount?: number) => {
-  logger.debug('Database Query', {
-    query: query.substring(0, 100) + (query.length > 100 ? '...' : ''),
-    duration: `${duration}ms`,
-    rowCount,
-  });
-};
-
-export const logCacheOperation = (operation: string, key: string, hit?: boolean) => {
-  logger.debug('Cache Operation', {
-    operation,
-    key,
-    hit,
-  });
-};
-
-export const logExternalAPI = (service: string, endpoint: string, duration: number, statusCode?: number) => {
-  logger.info('External API Call', {
-    service,
-    endpoint,
-    duration: `${duration}ms`,
-    statusCode,
-  });
-};
-
-export const logUserActivity = (userId: string, action: string, resource?: string, details?: any) => {
-  logger.info('User Activity', {
-    userId,
-    action,
-    resource,
-    ...details,
-  });
-};
-
-export const logSecurityEvent = (event: string, details: any) => {
-  logger.warn('Security Event', {
-    event,
+    context: context || 'Unknown',
     timestamp: new Date().toISOString(),
-    ...details,
-  });
+    ...meta,
+  };
+
+  logger.error('Application error occurred', errorInfo);
 };
 
-export const logPerformanceMetric = (metric: string, value: number, unit: string, tags?: any) => {
-  logger.info('Performance Metric', {
-    metric,
-    value,
-    unit,
+// Success logging helper
+export const logSuccess = (message: string, meta?: any) => {
+  logger.info(`✅ ${message}`, meta);
+};
+
+// Warning logging helper
+export const logWarning = (message: string, meta?: any) => {
+  logger.warn(`⚠️ ${message}`, meta);
+};
+
+// Debug logging helper (only in development)
+export const logDebug = (message: string, meta?: any) => {
+  if (process.env.NODE_ENV === 'development') {
+    logger.debug(`🐛 ${message}`, meta);
+  }
+};
+
+// Startup logging
+export const logStartup = (port: number, environment: string) => {
+  logger.info('🚀 Server startup information', {
+    port,
+    environment,
+    nodeVersion: process.version,
+    platform: process.platform,
+    memory: process.memoryUsage(),
+    uptime: process.uptime(),
     timestamp: new Date().toISOString(),
-    ...tags,
   });
 };
 
-// Export the main logger
+// Shutdown logging
+export const logShutdown = (signal: string) => {
+  logger.info('🛑 Server shutdown initiated', {
+    signal,
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
+};
+
 export { logger };
 export default logger;

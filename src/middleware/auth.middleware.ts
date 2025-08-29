@@ -1,116 +1,81 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
 import { authService } from '../services/auth.service';
-import { config } from '../config';
-import { logger, logSecurityEvent } from '../utils/logger';
-import { JWTPayload, AuthenticatedUser } from '../types/auth.types';
+import { loggers } from '../utils/logger';
+import { cacheHelpers } from '../config/database';
 
-// Extend Express Request interface
-declare global {
-  namespace Express {
-    interface Request {
-      user?: AuthenticatedUser;
-      sessionToken?: string;
-    }
-  }
+// Extend Request interface to include user
+export interface AuthenticatedRequest extends Request {
+  user?: {
+    userId: string;
+    email: string;
+    role: string;
+  };
 }
 
 /**
- * Authentication middleware - validates JWT tokens and session
+ * Middleware to authenticate JWT tokens
  */
-export const authenticateToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const authenticateToken = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
-    // Extract token from Authorization header
-    const authHeader = req.headers.authorization;
+    const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
     if (!token) {
-      logSecurityEvent('auth_missing_token', {
-        path: req.path,
-        method: req.method,
-        ip: req.ip,
-        userAgent: req.get('User-Agent'),
-      });
-
       res.status(401).json({
         success: false,
-        message: 'Access token is required',
-        error: 'MISSING_TOKEN',
-        timestamp: new Date().toISOString(),
+        message: 'Access token required',
+        error: 'UNAUTHORIZED',
+        code: 'MISSING_TOKEN',
       });
       return;
     }
 
-    // Verify JWT token
-    let decoded: JWTPayload;
-    try {
-      decoded = jwt.verify(token, config.jwt.secret) as JWTPayload;
-    } catch (jwtError) {
-      logSecurityEvent('auth_invalid_token', {
-        path: req.path,
-        method: req.method,
-        ip: req.ip,
-        userAgent: req.get('User-Agent'),
-        tokenError: jwtError instanceof Error ? jwtError.message : 'Unknown JWT error',
-      });
-
-      res.status(401).json({
-        success: false,
-        message: 'Invalid or expired token',
-        error: 'INVALID_TOKEN',
-        timestamp: new Date().toISOString(),
-      });
-      return;
-    }
-
-    // Validate session in database/cache
-    const user = await authService.validateSession(decoded.sessionId);
-    if (!user) {
-      logSecurityEvent('auth_invalid_session', {
-        userId: decoded.userId,
-        sessionId: decoded.sessionId,
-        path: req.path,
-        method: req.method,
-        ip: req.ip,
-      });
-
-      res.status(401).json({
-        success: false,
-        message: 'Session is invalid or expired',
-        error: 'INVALID_SESSION',
-        timestamp: new Date().toISOString(),
-      });
-      return;
-    }
-
-    // Check if user account is still active
-    if (user.status !== 'active' && user.status !== 'pending_verification') {
-      logSecurityEvent('auth_inactive_account', {
-        userId: user.id,
-        status: user.status,
-        path: req.path,
-        method: req.method,
-        ip: req.ip,
-      });
-
+    // Verify token
+    const decoded = authService.verifyToken(token);
+    if (!decoded) {
       res.status(403).json({
         success: false,
-        message: 'Account is not active',
-        error: 'ACCOUNT_INACTIVE',
-        timestamp: new Date().toISOString(),
+        message: 'Invalid or expired token',
+        error: 'FORBIDDEN',
+        code: 'INVALID_TOKEN',
       });
       return;
     }
 
-    // Attach user to request
-    req.user = user;
-    req.sessionToken = decoded.sessionId;
+    // Check if token is blacklisted (optional - for logout functionality)
+    const isBlacklisted = await cacheHelpers.exists(`blacklist:${token}`);
+    if (isBlacklisted) {
+      res.status(403).json({
+        success: false,
+        message: 'Token has been revoked',
+        error: 'FORBIDDEN',
+        code: 'REVOKED_TOKEN',
+      });
+      return;
+    }
+
+    // Attach user info to request
+    req.user = {
+      userId: decoded.userId,
+      email: decoded.email,
+      role: decoded.role,
+    };
+
+    loggers.auth('Token authenticated successfully', {
+      userId: decoded.userId,
+      email: decoded.email,
+      endpoint: req.path,
+      method: req.method,
+    });
 
     next();
   } catch (error) {
-    logger.error('Authentication middleware error', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      path: req.path,
+    loggers.errorWithContext(error as Error, 'AUTH_MIDDLEWARE', {
+      endpoint: req.path,
       method: req.method,
       ip: req.ip,
     });
@@ -119,167 +84,147 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
       success: false,
       message: 'Authentication error',
       error: 'INTERNAL_ERROR',
-      timestamp: new Date().toISOString(),
+      code: 'AUTH_ERROR',
     });
   }
 };
+
+/**
+ * Middleware to check if user has required role
+ */
+export const requireRole = (allowedRoles: string | string[]) => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+    try {
+      if (!req.user) {
+        res.status(401).json({
+          success: false,
+          message: 'Authentication required',
+          error: 'UNAUTHORIZED',
+          code: 'NOT_AUTHENTICATED',
+        });
+        return;
+      }
+
+      const userRole = req.user.role;
+      const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+
+      if (!roles.includes(userRole)) {
+        loggers.security('Unauthorized role access attempt', {
+          userId: req.user.userId,
+          userRole,
+          requiredRoles: roles,
+          endpoint: req.path,
+          method: req.method,
+        });
+
+        res.status(403).json({
+          success: false,
+          message: 'Insufficient permissions',
+          error: 'FORBIDDEN',
+          code: 'INSUFFICIENT_PERMISSIONS',
+        });
+        return;
+      }
+
+      loggers.auth('Role authorization successful', {
+        userId: req.user.userId,
+        userRole,
+        endpoint: req.path,
+        method: req.method,
+      });
+
+      next();
+    } catch (error) {
+      loggers.errorWithContext(error as Error, 'ROLE_MIDDLEWARE', {
+        endpoint: req.path,
+        method: req.method,
+        userId: req.user?.userId,
+      });
+
+      res.status(500).json({
+        success: false,
+        message: 'Authorization error',
+        error: 'INTERNAL_ERROR',
+        code: 'ROLE_CHECK_ERROR',
+      });
+    }
+  };
+};
+
+/**
+ * Middleware for admin-only routes
+ */
+export const requireAdmin = requireRole('admin');
+
+/**
+ * Middleware for founder and admin routes
+ */
+export const requireFounderOrAdmin = requireRole(['founder', 'admin']);
+
+/**
+ * Middleware for investor, founder, and admin routes
+ */
+export const requireInvestorOrAbove = requireRole(['investor', 'founder', 'admin']);
 
 /**
  * Optional authentication middleware - doesn't fail if no token provided
  */
-export const optionalAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const optionalAuth = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
-    const authHeader = req.headers.authorization;
+    const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
-    if (!token) {
-      // No token provided, continue without authentication
-      next();
-      return;
-    }
-
-    // Try to authenticate if token is provided
-    try {
-      const decoded = jwt.verify(token, config.jwt.secret) as JWTPayload;
-      const user = await authService.validateSession(decoded.sessionId);
-
-      if (user && (user.status === 'active' || user.status === 'pending_verification')) {
-        req.user = user;
-        req.sessionToken = decoded.sessionId;
+    if (token) {
+      const decoded = authService.verifyToken(token);
+      if (decoded) {
+        // Check if token is blacklisted
+        const isBlacklisted = await cacheHelpers.exists(`blacklist:${token}`);
+        if (!isBlacklisted) {
+          req.user = {
+            userId: decoded.userId,
+            email: decoded.email,
+            role: decoded.role,
+          };
+        }
       }
-    } catch (error) {
-      // Ignore authentication errors in optional auth
-      logger.debug('Optional authentication failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        path: req.path,
-        ip: req.ip,
-      });
     }
 
     next();
   } catch (error) {
-    logger.error('Optional authentication middleware error', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      path: req.path,
-      ip: req.ip,
-    });
-
-    // Don't fail the request for optional auth errors
-    next();
-  }
-};
-
-/**
- * Role-based authorization middleware
- */
-export const requireRole = (allowedRoles: string | string[]) => {
-  const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
-
-  return (req: Request, res: Response, next: NextFunction): void => {
-    if (!req.user) {
-      res.status(401).json({
-        success: false,
-        message: 'Authentication required',
-        error: 'AUTHENTICATION_REQUIRED',
-        timestamp: new Date().toISOString(),
-      });
-      return;
-    }
-
-    if (!roles.includes(req.user.role)) {
-      logSecurityEvent('auth_insufficient_permissions', {
-        userId: req.user.id,
-        userRole: req.user.role,
-        requiredRoles: roles,
-        path: req.path,
-        method: req.method,
-        ip: req.ip,
-      });
-
-      res.status(403).json({
-        success: false,
-        message: 'Insufficient permissions',
-        error: 'INSUFFICIENT_PERMISSIONS',
-        timestamp: new Date().toISOString(),
-      });
-      return;
-    }
-
-    next();
-  };
-};
-
-/**
- * Email verification requirement middleware
- */
-export const requireEmailVerified = (req: Request, res: Response, next: NextFunction): void => {
-  if (!req.user) {
-    res.status(401).json({
-      success: false,
-      message: 'Authentication required',
-      error: 'AUTHENTICATION_REQUIRED',
-      timestamp: new Date().toISOString(),
-    });
-    return;
-  }
-
-  if (!req.user.emailVerified) {
-    logSecurityEvent('auth_email_not_verified', {
-      userId: req.user.id,
-      email: req.user.email,
-      path: req.path,
+    // Don't fail on optional auth errors, just continue without user
+    loggers.auth('Optional auth failed, continuing without user', {
+      endpoint: req.path,
       method: req.method,
-      ip: req.ip,
+      error: (error as Error).message,
     });
-
-    res.status(403).json({
-      success: false,
-      message: 'Email verification required',
-      error: 'EMAIL_NOT_VERIFIED',
-      timestamp: new Date().toISOString(),
-    });
-    return;
+    next();
   }
-
-  next();
 };
 
 /**
- * Subscription tier requirement middleware
+ * Middleware to validate request body fields
  */
-export const requireSubscription = (allowedTiers: string | string[]) => {
-  const tiers = Array.isArray(allowedTiers) ? allowedTiers : [allowedTiers];
-
+export const validateRequiredFields = (requiredFields: string[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
-    if (!req.user) {
-      res.status(401).json({
-        success: false,
-        message: 'Authentication required',
-        error: 'AUTHENTICATION_REQUIRED',
-        timestamp: new Date().toISOString(),
-      });
-      return;
+    const missingFields: string[] = [];
+
+    for (const field of requiredFields) {
+      if (!req.body[field]) {
+        missingFields.push(field);
+      }
     }
 
-    if (!tiers.includes(req.user.subscriptionTier)) {
-      logSecurityEvent('auth_insufficient_subscription', {
-        userId: req.user.id,
-        userTier: req.user.subscriptionTier,
-        requiredTiers: tiers,
-        path: req.path,
-        method: req.method,
-        ip: req.ip,
-      });
-
-      res.status(403).json({
+    if (missingFields.length > 0) {
+      res.status(400).json({
         success: false,
-        message: 'Subscription upgrade required',
-        error: 'INSUFFICIENT_SUBSCRIPTION',
-        data: {
-          currentTier: req.user.subscriptionTier,
-          requiredTiers: tiers,
-        },
-        timestamp: new Date().toISOString(),
+        message: `Missing required fields: ${missingFields.join(', ')}`,
+        error: 'VALIDATION_ERROR',
+        code: 'MISSING_FIELDS',
+        missingFields,
       });
       return;
     }
@@ -289,104 +234,201 @@ export const requireSubscription = (allowedTiers: string | string[]) => {
 };
 
 /**
- * Organization membership requirement middleware
+ * Middleware to validate email format
  */
-export const requireOrganization = (req: Request, res: Response, next: NextFunction): void => {
-  if (!req.user) {
-    res.status(401).json({
-      success: false,
-      message: 'Authentication required',
-      error: 'AUTHENTICATION_REQUIRED',
-      timestamp: new Date().toISOString(),
-    });
-    return;
-  }
+export const validateEmail = (req: Request, res: Response, next: NextFunction): void => {
+  const { email } = req.body;
 
-  if (!req.user.organizationId) {
-    res.status(403).json({
-      success: false,
-      message: 'Organization membership required',
-      error: 'NO_ORGANIZATION',
-      timestamp: new Date().toISOString(),
-    });
-    return;
+  if (email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid email format',
+        error: 'VALIDATION_ERROR',
+        code: 'INVALID_EMAIL',
+      });
+      return;
+    }
   }
 
   next();
 };
 
 /**
- * Rate limiting by user
+ * Middleware to validate password strength
  */
-export const rateLimitByUser = (maxRequests: number, windowMs: number) => {
-  const userRequests = new Map<string, { count: number; resetTime: number }>();
+export const validatePassword = (req: Request, res: Response, next: NextFunction): void => {
+  const { password } = req.body;
 
-  return (req: Request, res: Response, next: NextFunction): void => {
-    if (!req.user) {
-      next();
-      return;
-    }
-
-    const userId = req.user.id;
-    const now = Date.now();
-    const userLimit = userRequests.get(userId);
-
-    if (!userLimit || now > userLimit.resetTime) {
-      // Reset or initialize user limit
-      userRequests.set(userId, {
-        count: 1,
-        resetTime: now + windowMs,
-      });
-      next();
-      return;
-    }
-
-    if (userLimit.count >= maxRequests) {
-      logSecurityEvent('rate_limit_exceeded', {
-        userId,
-        path: req.path,
-        method: req.method,
-        ip: req.ip,
-        requestCount: userLimit.count,
-        maxRequests,
-      });
-
-      res.status(429).json({
+  if (password) {
+    if (password.length < 8) {
+      res.status(400).json({
         success: false,
-        message: 'Too many requests',
-        error: 'RATE_LIMIT_EXCEEDED',
-        data: {
-          maxRequests,
-          windowMs,
-          resetTime: new Date(userLimit.resetTime).toISOString(),
-        },
-        timestamp: new Date().toISOString(),
+        message: 'Password must be at least 8 characters long',
+        error: 'VALIDATION_ERROR',
+        code: 'WEAK_PASSWORD',
       });
       return;
     }
 
-    // Increment request count
-    userLimit.count++;
-    next();
+    // Optional: Add more password strength requirements
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    if (!hasUpperCase || !hasLowerCase || !hasNumbers) {
+      res.status(400).json({
+        success: false,
+        message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number',
+        error: 'VALIDATION_ERROR',
+        code: 'WEAK_PASSWORD',
+      });
+      return;
+    }
+  }
+
+  next();
+};
+
+/**
+ * Middleware to sanitize input data
+ */
+export const sanitizeInput = (req: Request, res: Response, next: NextFunction): void => {
+  // Trim whitespace from string fields
+  if (req.body) {
+    for (const key in req.body) {
+      if (typeof req.body[key] === 'string') {
+        req.body[key] = req.body[key].trim();
+      }
+    }
+
+    // Convert email to lowercase
+    if (req.body.email) {
+      req.body.email = req.body.email.toLowerCase();
+    }
+  }
+
+  next();
+};
+
+/**
+ * Middleware to check if user owns the resource
+ */
+export const requireOwnership = (userIdParam: string = 'userId') => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+    try {
+      if (!req.user) {
+        res.status(401).json({
+          success: false,
+          message: 'Authentication required',
+          error: 'UNAUTHORIZED',
+          code: 'NOT_AUTHENTICATED',
+        });
+        return;
+      }
+
+      const resourceUserId = req.params[userIdParam] || req.body[userIdParam];
+      const currentUserId = req.user.userId;
+
+      // Admin can access any resource
+      if (req.user.role === 'admin') {
+        next();
+        return;
+      }
+
+      // User can only access their own resources
+      if (resourceUserId !== currentUserId) {
+        loggers.security('Unauthorized resource access attempt', {
+          userId: currentUserId,
+          attemptedResourceUserId: resourceUserId,
+          endpoint: req.path,
+          method: req.method,
+        });
+
+        res.status(403).json({
+          success: false,
+          message: 'You can only access your own resources',
+          error: 'FORBIDDEN',
+          code: 'RESOURCE_ACCESS_DENIED',
+        });
+        return;
+      }
+
+      next();
+    } catch (error) {
+      loggers.errorWithContext(error as Error, 'OWNERSHIP_MIDDLEWARE', {
+        endpoint: req.path,
+        method: req.method,
+        userId: req.user?.userId,
+      });
+
+      res.status(500).json({
+        success: false,
+        message: 'Authorization error',
+        error: 'INTERNAL_ERROR',
+        code: 'OWNERSHIP_CHECK_ERROR',
+      });
+    }
   };
 };
 
 /**
- * Admin-only middleware
+ * Middleware to blacklist a token (for logout)
  */
-export const requireAdmin = requireRole(['admin', 'super_admin']);
+export const blacklistToken = async (token: string, expiresIn: number = 24 * 60 * 60): Promise<void> => {
+  try {
+    await cacheHelpers.set(`blacklist:${token}`, 'true', expiresIn);
+    loggers.auth('Token blacklisted successfully', { tokenPrefix: token.substring(0, 10) });
+  } catch (error) {
+    loggers.errorWithContext(error as Error, 'TOKEN_BLACKLIST');
+  }
+};
 
 /**
- * Super admin-only middleware
+ * Rate limiting for authentication endpoints
  */
-export const requireSuperAdmin = requireRole('super_admin');
+export const authRateLimit = {
+  // Stricter rate limiting for login attempts
+  login: {
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 attempts per window
+    message: {
+      success: false,
+      message: 'Too many login attempts, please try again later',
+      error: 'RATE_LIMIT_EXCEEDED',
+      code: 'LOGIN_RATE_LIMIT',
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+  },
 
-/**
- * Premium subscription middleware
- */
-export const requirePremium = requireSubscription(['premium', 'enterprise']);
+  // Rate limiting for registration
+  register: {
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 3, // 3 registrations per hour per IP
+    message: {
+      success: false,
+      message: 'Too many registration attempts, please try again later',
+      error: 'RATE_LIMIT_EXCEEDED',
+      code: 'REGISTER_RATE_LIMIT',
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+  },
 
-/**
- * Enterprise subscription middleware
- */
-export const requireEnterprise = requireSubscription('enterprise');
+  // Rate limiting for password reset
+  passwordReset: {
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 3, // 3 password reset attempts per hour
+    message: {
+      success: false,
+      message: 'Too many password reset attempts, please try again later',
+      error: 'RATE_LIMIT_EXCEEDED',
+      code: 'PASSWORD_RESET_RATE_LIMIT',
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+  },
+};

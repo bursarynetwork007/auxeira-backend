@@ -1,156 +1,198 @@
-import { Pool, PoolConfig } from 'pg';
+import { Pool } from 'pg';
+import { createClient } from 'redis';
 import { logger } from '../utils/logger';
 
-interface DatabaseConfig {
-  host: string;
-  port: number;
-  database: string;
-  username: string;
-  password: string;
-  ssl?: boolean;
-  maxConnections: number;
-  idleTimeoutMillis: number;
-  connectionTimeoutMillis: number;
-}
+// PostgreSQL connection pool
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
 
-class DatabaseConnection {
-  private pool: Pool;
-  private config: DatabaseConfig;
+// Redis client
+const redis = createClient({
+  url: process.env.REDIS_URL || 'redis://localhost:6379',
+});
 
-  constructor() {
-    this.config = this.loadConfig();
-    this.pool = this.createPool();
-    this.setupEventHandlers();
+// Redis event handlers
+redis.on('error', (err) => {
+  logger.error('Redis connection error:', err);
+});
+
+redis.on('connect', () => {
+  logger.info('Connected to Redis successfully');
+});
+
+redis.on('ready', () => {
+  logger.info('Redis client ready');
+});
+
+redis.on('end', () => {
+  logger.warn('Redis connection ended');
+});
+
+// PostgreSQL event handlers
+pool.on('connect', () => {
+  logger.info('New PostgreSQL client connected');
+});
+
+pool.on('error', (err) => {
+  logger.error('PostgreSQL pool error:', err);
+});
+
+// Database initialization function
+export const initializeDatabase = async (): Promise<void> => {
+  try {
+    // Test PostgreSQL connection
+    const client = await pool.connect();
+    const result = await client.query('SELECT NOW() as current_time, version() as pg_version');
+    logger.info('PostgreSQL connection successful', {
+      currentTime: result.rows[0].current_time,
+      version: result.rows[0].pg_version.split(' ')[0]
+    });
+    client.release();
+
+    // Connect to Redis
+    if (!redis.isOpen) {
+      await redis.connect();
+    }
+
+    // Test Redis connection
+    await redis.ping();
+    logger.info('Redis connection successful');
+
+    logger.info('All database connections initialized successfully');
+  } catch (error) {
+    logger.error('Database initialization failed:', error);
+    throw new Error(`Database initialization failed: ${error}`);
+  }
+};
+
+// Graceful shutdown function
+export const closeDatabaseConnections = async (): Promise<void> => {
+  try {
+    await pool.end();
+    logger.info('PostgreSQL pool closed');
+
+    if (redis.isOpen) {
+      await redis.quit();
+      logger.info('Redis connection closed');
+    }
+
+    logger.info('All database connections closed gracefully');
+  } catch (error) {
+    logger.error('Error closing database connections:', error);
+  }
+};
+
+// Database health check function
+export const checkDatabaseHealth = async (): Promise<{
+  postgresql: boolean;
+  redis: boolean;
+  details: any;
+}> => {
+  const health = {
+    postgresql: false,
+    redis: false,
+    details: {
+      postgresql: null,
+      redis: null,
+    }
+  };
+
+  try {
+    // Check PostgreSQL
+    const client = await pool.connect();
+    const result = await client.query('SELECT NOW()');
+    client.release();
+    health.postgresql = true;
+    health.details.postgresql = {
+      status: 'connected',
+      timestamp: result.rows[0].now,
+      poolSize: pool.totalCount,
+      idleCount: pool.idleCount,
+      waitingCount: pool.waitingCount
+    };
+  } catch (error) {
+    health.details.postgresql = {
+      status: 'error',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
   }
 
-  private loadConfig(): DatabaseConfig {
-    const databaseUrl = process.env.DATABASE_URL;
-
-    if (databaseUrl) {
-      // Parse Railway/Heroku style DATABASE_URL
-      const url = new URL(databaseUrl);
-      return {
-        host: url.hostname,
-        port: parseInt(url.port) || 5432,
-        database: url.pathname.slice(1),
-        username: url.username,
-        password: url.password,
-        ssl: process.env.NODE_ENV === 'production',
-        maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS || '20'),
-        idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT || '30000'),
-        connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT || '2000'),
+  try {
+    // Check Redis
+    if (redis.isOpen) {
+      await redis.ping();
+      health.redis = true;
+      health.details.redis = {
+        status: 'connected',
+        isOpen: redis.isOpen,
+        isReady: redis.isReady
+      };
+    } else {
+      health.details.redis = {
+        status: 'disconnected',
+        isOpen: false,
+        isReady: false
       };
     }
-
-    // Fallback to individual environment variables
-    return {
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432'),
-      database: process.env.DB_NAME || 'auxeira_db',
-      username: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || 'password',
-      ssl: process.env.NODE_ENV === 'production',
-      maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS || '20'),
-      idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT || '30000'),
-      connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT || '2000'),
+  } catch (error) {
+    health.details.redis = {
+      status: 'error',
+      error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
 
-  private createPool(): Pool {
-    const poolConfig: PoolConfig = {
-      host: this.config.host,
-      port: this.config.port,
-      database: this.config.database,
-      user: this.config.username,
-      password: this.config.password,
-      max: this.config.maxConnections,
-      idleTimeoutMillis: this.config.idleTimeoutMillis,
-      connectionTimeoutMillis: this.config.connectionTimeoutMillis,
-      ssl: this.config.ssl ? { rejectUnauthorized: false } : false,
-    };
+  return health;
+};
 
-    return new Pool(poolConfig);
-  }
-
-  private setupEventHandlers(): void {
-    this.pool.on('connect', (client) => {
-      logger.info('New database client connected', {
-        processId: client.processID,
-        database: this.config.database,
-      });
-    });
-
-    this.pool.on('error', (err, client) => {
-      logger.error('Database pool error', {
-        error: err.message,
-        stack: err.stack,
-        processId: client?.processID,
-      });
-    });
-  }
-
-  public getPool(): Pool {
-    return this.pool;
-  }
-
-  public async query(text: string, params?: any[]): Promise<any> {
-    const start = Date.now();
+// Cache helper functions
+export const cacheHelpers = {
+  async get(key: string): Promise<string | null> {
     try {
-      const result = await this.pool.query(text, params);
-      const duration = Date.now() - start;
-
-      logger.debug('Database query executed', {
-        query: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
-        duration: `${duration}ms`,
-        rows: result.rowCount,
-      });
-
-      return result;
+      return await redis.get(key);
     } catch (error) {
-      const duration = Date.now() - start;
-      logger.error('Database query failed', {
-        query: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
-        duration: `${duration}ms`,
-        error: error instanceof Error ? error.message : 'Unknown error',
-        params: params ? JSON.stringify(params).substring(0, 200) : undefined,
-      });
-      throw error;
+      logger.error('Cache get error:', error);
+      return null;
     }
-  }
+  },
 
-  public async testConnection(): Promise<boolean> {
+  async set(key: string, value: string, ttlSeconds?: number): Promise<boolean> {
     try {
-      const result = await this.query('SELECT NOW() as current_time, version() as version');
-      logger.info('Database connection test successful', {
-        currentTime: result.rows[0].current_time,
-        version: result.rows[0].version.split(' ')[0],
-        host: this.config.host,
-        database: this.config.database,
-      });
+      if (ttlSeconds) {
+        await redis.setEx(key, ttlSeconds, value);
+      } else {
+        await redis.set(key, value);
+      }
       return true;
     } catch (error) {
-      logger.error('Database connection test failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        host: this.config.host,
-        database: this.config.database,
-      });
+      logger.error('Cache set error:', error);
+      return false;
+    }
+  },
+
+  async del(key: string): Promise<boolean> {
+    try {
+      await redis.del(key);
+      return true;
+    } catch (error) {
+      logger.error('Cache delete error:', error);
+      return false;
+    }
+  },
+
+  async exists(key: string): Promise<boolean> {
+    try {
+      const result = await redis.exists(key);
+      return result === 1;
+    } catch (error) {
+      logger.error('Cache exists error:', error);
       return false;
     }
   }
+};
 
-  public async close(): Promise<void> {
-    try {
-      await this.pool.end();
-      logger.info('Database pool closed successfully');
-    } catch (error) {
-      logger.error('Error closing database pool', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-      throw error;
-    }
-  }
-}
-
-// Singleton instance
-export const database = new DatabaseConnection();
-export default database;
+export { pool, redis };
