@@ -36,11 +36,10 @@
       "@/services/*": ["services/*"],
       "@/utils/*": ["utils/*"],
       "@/types/*": ["types/*"]
-    }
+    },
+    "typeRoots": ["./src/types", "./node_modules/@types"]
   },
   "include": [
-    "compilerOptions": {
-    "typeRoots": ["./src/types", "./node_modules/@types"],
     "src/**/*"
   ],
   "exclude": [
