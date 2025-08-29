@@ -1,13 +1,13 @@
 cat > nixpacks.toml << 'EOF'
 [phases.setup]
-nixPkgs = ['nodejs-18_x', 'npm-9_x']
+nixPkgs = ["nodejs-18_x", "npm-9_x"]
 
 [phases.install]
-cmds = ['npm install --omit=dev --legacy-peer-deps']
+cmds = ["npm install --omit=dev --legacy-peer-deps"]
 
 [phases.build]
-cmds = ['npm run build']
+cmds = ["npm run build"]
 
 [start]
-cmd = 'npm start'
+cmd = "npm start"
 EOF
