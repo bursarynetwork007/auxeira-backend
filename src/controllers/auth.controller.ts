@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { authService } from '../services/auth.service';
-import { loggers, performanceTimer } from '../utils/logger';
+// NEW
+import { loggers } from '../utils/logger';
+import { performanceTimer } from '../utils/performance';
 import { AuthenticatedRequest, blacklistToken } from '../middleware/auth.middleware';
 
 export class AuthController {

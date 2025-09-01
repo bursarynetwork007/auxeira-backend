@@ -435,8 +435,8 @@ export class AuthService {
    * Generate access token
    */
   private generateAccessToken(payload: Omit<TokenPayload, 'iat' | 'exp'>): string {
-    return jwt.sign(payload, this.JWT_SECRET, {
-      expiresIn: this.JWT_EXPIRES_IN,
+    return jwt.sign(payload, this.JWT_SECRET as string, {
+      expiresIn: '24h'
     });
   }
 
@@ -444,8 +444,8 @@ export class AuthService {
    * Generate refresh token
    */
   private generateRefreshToken(payload: Omit<TokenPayload, 'iat' | 'exp'>): string {
-    return jwt.sign(payload, this.JWT_REFRESH_SECRET, {
-      expiresIn: this.JWT_REFRESH_EXPIRES_IN,
+    return jwt.sign(payload, this.JWT_REFRESH_SECRET as string, {
+      expiresIn: '7d',
     });
   }
 

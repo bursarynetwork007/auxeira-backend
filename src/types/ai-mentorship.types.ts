@@ -1,389 +1,353 @@
-// AI Mentorship System Types
+/**
+ * AI Mentorship Type Definitions
+ * Comprehensive types for the AI mentorship system
+ */
 
-export interface AIMentorshipSession {
+export interface AIMentorSession {
   id: string;
   userId: string;
-
-  // Session details
-  sessionType: 'goal_setting' | 'score_improvement' | 'career_guidance' | 'sustainability_advice' | 'general_chat';
+  sessionType: SessionType;
   topic?: string;
-  status: 'active' | 'paused' | 'completed' | 'cancelled';
-
-  // AI configuration
-  aiModel: 'gpt-4' | 'gpt-4-turbo' | 'gpt-3.5-turbo';
-  aiPersonality: 'supportive' | 'challenging' | 'analytical' | 'creative' | 'professional';
-
-  // Session context
-  userContext: UserMentorshipContext;
+  aiPersonality: AIPersonality;
   sessionGoals: string[];
-
-  // Session metadata
-  startedAt: Date;
-  endedAt?: Date;
-  durationMinutes?: number;
-  messageCount: number;
-
-  // Performance metrics
-  userSatisfactionRating?: number;
-  aiResponseQuality?: number;
-  goalAchievementProgress?: number;
-
-  // Metadata
+  focusAreas: string[];
+  status: SessionStatus;
   createdAt: Date;
-  updatedAt: Date;
+  endedAt?: Date;
+  lastActivityAt?: Date;
+  lastMessage?: string;
+  messageCount?: number;
+  feedback?: string;
+  rating?: number;
 }
 
-export interface UserMentorshipContext {
-  // User profile
-  role: 'student' | 'founder' | 'investor';
-  industry?: string;
-  experience: 'beginner' | 'intermediate' | 'advanced' | 'expert';
-
-  // Current SSE scores
-  currentSSEScore: {
-    overall: number;
-    social: number;
-    sustainability: number;
-    economic: number;
-  };
-
-  // Historical performance
-  scoreHistory: Array<{
-    date: Date;
-    overall: number;
-    social: number;
-    sustainability: number;
-    economic: number;
-  }>;
-
-  // Goals and preferences
-  primaryGoals: string[];
-  focusAreas: ('social' | 'sustainability' | 'economic')[];
-  learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
-
-  // Recent activities
-  recentBehaviors: Array<{
-    type: string;
-    category: 'social' | 'sustainability' | 'economic';
-    impact: number;
-    date: Date;
-  }>;
-
-  // Challenges and pain points
-  identifiedChallenges: string[];
-  improvementAreas: string[];
-}
-
-export interface AIMentorshipMessage {
+export interface AIMentorMessage {
   id: string;
   sessionId: string;
-
-  // Message details
-  sender: 'user' | 'ai';
-  messageText: string;
-  messageData?: {
-    attachments?: string[];
-    suggestedActions?: string[];
-    relatedResources?: string[];
-    followUpQuestions?: string[];
-  };
-
-  // AI response metadata (for AI messages)
-  aiModel?: string;
-  tokensUsed?: number;
-  responseTimeMs?: number;
-  confidence?: number;
-
-  // Message context
-  contextUsed?: {
-    sseScores?: boolean;
-    userHistory?: boolean;
-    sessionGoals?: boolean;
-    recentBehaviors?: boolean;
-  };
-
-  // User feedback (for AI messages)
-  userRating?: number;
-  userFeedback?: string;
-  wasHelpful?: boolean;
-
-  // Metadata
-  sentAt: Date;
+  role: 'user' | 'assistant';
+  content: string;
+  metadata?: MessageMetadata;
   createdAt: Date;
 }
 
-export interface MentorshipGoal {
-  id: string;
+export interface AIMentorResponse {
+  sessionId: string;
+  message: string;
+  confidence: number;
+  recommendations: string[];
+  followUpQuestions: string[];
+  actionItems: string[];
+  timestamp: Date;
+}
+
+export interface MentorshipRequest {
   userId: string;
-  sessionId?: string;
-
-  // Goal details
-  title: string;
-  description: string;
-  category: 'social' | 'sustainability' | 'economic' | 'career' | 'personal';
-  priority: 'high' | 'medium' | 'low';
-
-  // Goal metrics
-  targetValue?: number;
-  currentValue?: number;
-  unit?: string;
-
-  // Timeline
-  targetDate?: Date;
-  createdDate: Date;
-
-  // Progress tracking
-  status: 'not_started' | 'in_progress' | 'completed' | 'paused' | 'cancelled';
-  progressPercentage: number;
-  milestones: GoalMilestone[];
-
-  // AI assistance
-  aiRecommendations: string[];
-  suggestedActions: string[];
-
-  // Metadata
-  createdAt: Date;
-  updatedAt: Date;
+  sessionType: SessionType;
+  topic?: string;
+  aiPersonality?: AIPersonality;
+  sessionGoals?: string[];
+  focusAreas?: string[];
+  urgency?: 'low' | 'medium' | 'high';
+  context?: string;
 }
 
-export interface GoalMilestone {
-  id: string;
-  title: string;
+export interface ConversationContext {
+  sessionId: string;
+  recentMessages: AIMentorMessage[];
+  startupContext?: StartupContext;
+  behavioralAnalysis?: BehavioralAnalysis;
+  industryInsights?: IndustryInsights;
+}
+
+export interface StartupContext {
+  userName: string;
+  userRole: string;
+  organizationName?: string;
+  industry?: string;
+  stage?: string;
+  region?: string;
+  currentSSEScore?: {
+    overall?: number;
+    social?: number;
+    sustainability?: number;
+    economic?: number;
+  };
+  recentMetrics?: {
+    revenue?: number;
+    users?: number;
+    funding?: number;
+    employees?: number;
+  };
+  challenges?: string[];
+  goals?: string[];
+}
+
+export interface BehavioralAnalysis {
+  engagementLevel: 'low' | 'medium' | 'high';
+  responsePatterns: string[];
+  learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
+  decisionMakingStyle: 'analytical' | 'intuitive' | 'collaborative' | 'directive';
+  stressLevel: 'low' | 'medium' | 'high';
+  motivationFactors: string[];
+  communicationPreference: 'direct' | 'supportive' | 'detailed' | 'concise';
+}
+
+export interface IndustryInsights {
+  industry: string;
+  marketTrends: string[];
+  competitiveAnalysis: string[];
+  bestPractices: string[];
+  commonChallenges: string[];
+  successFactors: string[];
+  benchmarkMetrics: {
+    [key: string]: number;
+  };
+}
+
+export interface MessageMetadata {
+  messageType?: 'welcome' | 'question' | 'update' | 'request' | 'response';
+  personality?: AIPersonality;
+  confidence?: number;
+  recommendations?: string[];
+  actionItems?: string[];
+  sentiment?: 'positive' | 'neutral' | 'negative';
+  topics?: string[];
+  urgency?: 'low' | 'medium' | 'high';
+}
+
+export interface SessionAnalytics {
+  sessionId: string;
+  duration: number; // in minutes
+  messageCount: number;
+  userEngagement: number; // 0-1 score
+  topicsDiscussed: string[];
+  recommendationsGiven: number;
+  actionItemsCreated: number;
+  followUpQuestions: number;
+  userSatisfaction?: number; // 1-5 rating
+  outcomeAchieved: boolean;
+}
+
+export interface MentorPerformanceMetrics {
+  totalSessions: number;
+  averageSessionDuration: number;
+  averageUserSatisfaction: number;
+  responseTime: number; // in seconds
+  recommendationAccuracy: number; // 0-1 score
+  userRetention: number; // 0-1 score
+  successfulOutcomes: number;
+  topTopics: string[];
+}
+
+export interface AIPersonalityConfig {
+  name: AIPersonality;
   description: string;
-  targetDate: Date;
-  completedDate?: Date;
-  isCompleted: boolean;
-  progressPercentage: number;
+  traits: string[];
+  communicationStyle: string;
+  responsePatterns: {
+    greeting: string[];
+    encouragement: string[];
+    challenge: string[];
+    clarification: string[];
+    summary: string[];
+  };
+  expertise: string[];
+  limitations: string[];
+}
+
+export interface SessionGoal {
+  id: string;
+  description: string;
+  category: 'learning' | 'problem-solving' | 'planning' | 'decision-making';
+  priority: 'low' | 'medium' | 'high';
+  timeframe: string;
+  measurable: boolean;
+  completed: boolean;
+  completedAt?: Date;
 }
 
 export interface MentorshipInsight {
   id: string;
-  userId: string;
-  sessionId?: string;
-
-  // Insight details
-  type: 'pattern_recognition' | 'improvement_opportunity' | 'strength_identification' | 'risk_warning' | 'achievement_recognition';
-  category: 'social' | 'sustainability' | 'economic' | 'behavioral' | 'goal_progress';
-
-  // Insight content
-  title: string;
-  description: string;
-  significance: 'high' | 'medium' | 'low';
-
-  // Supporting data
-  dataPoints: any[];
-  confidence: number;
-
-  // Recommendations
-  actionableRecommendations: string[];
-  relatedResources: string[];
-
-  // User interaction
-  userAcknowledged: boolean;
-  userRating?: number;
-  userNotes?: string;
-
-  // Metadata
-  generatedAt: Date;
-  expiresAt?: Date;
-  createdAt: Date;
-}
-
-// Request/Response Types
-
-export interface StartMentorshipSessionRequest {
-  sessionType: 'goal_setting' | 'score_improvement' | 'career_guidance' | 'sustainability_advice' | 'general_chat';
-  topic?: string;
-  aiPersonality?: 'supportive' | 'challenging' | 'analytical' | 'creative' | 'professional';
-  sessionGoals?: string[];
-  focusAreas?: ('social' | 'sustainability' | 'economic')[];
-}
-
-export interface SendMentorshipMessageRequest {
   sessionId: string;
-  messageText: string;
-  attachments?: string[];
-  context?: {
-    includeSSEScores?: boolean;
-    includeRecentBehaviors?: boolean;
-    includeGoals?: boolean;
-  };
-}
-
-export interface MentorshipMessageResponse {
-  success: boolean;
-  message: string;
-  data: {
-    messageId: string;
-    aiResponse: AIMentorshipMessage;
-    suggestedActions?: string[];
-    followUpQuestions?: string[];
-    relatedInsights?: MentorshipInsight[];
-    sessionUpdated?: boolean;
-  };
-  timestamp: string;
-}
-
-export interface CreateGoalRequest {
+  type: 'recommendation' | 'warning' | 'opportunity' | 'trend';
   title: string;
   description: string;
-  category: 'social' | 'sustainability' | 'economic' | 'career' | 'personal';
-  priority: 'high' | 'medium' | 'low';
-  targetValue?: number;
-  unit?: string;
-  targetDate?: string;
-  milestones?: Array<{
-    title: string;
-    description: string;
-    targetDate: string;
-  }>;
+  confidence: number;
+  actionable: boolean;
+  priority: 'low' | 'medium' | 'high';
+  category: string;
+  createdAt: Date;
+  implementedAt?: Date;
+  outcome?: string;
 }
 
-export interface UpdateGoalProgressRequest {
-  goalId: string;
-  currentValue?: number;
-  progressPercentage?: number;
-  status?: 'not_started' | 'in_progress' | 'completed' | 'paused' | 'cancelled';
-  milestoneUpdates?: Array<{
-    milestoneId: string;
-    isCompleted: boolean;
-    progressPercentage: number;
-  }>;
-  notes?: string;
-}
-
-export interface GetMentorshipAnalyticsRequest {
-  userId: string;
-  timeRange?: {
-    startDate: Date;
-    endDate: Date;
-  };
-  includeGoalProgress?: boolean;
-  includeInsights?: boolean;
-  includeSessionMetrics?: boolean;
-}
-
-export interface MentorshipAnalytics {
-  userId: string;
-
-  // Session statistics
-  sessionStats: {
-    totalSessions: number;
-    activeSessions: number;
-    completedSessions: number;
-    totalDurationMinutes: number;
-    averageSessionDuration: number;
-    totalMessages: number;
-    averageMessagesPerSession: number;
-  };
-
-  // AI interaction metrics
-  aiMetrics: {
-    averageResponseTime: number;
-    averageUserSatisfaction: number;
-    mostUsedPersonality: string;
-    preferredSessionTypes: string[];
-    totalTokensUsed: number;
-  };
-
-  // Goal progress
-  goalProgress: {
-    totalGoals: number;
-    completedGoals: number;
-    inProgressGoals: number;
-    averageCompletionTime: number;
-    goalCompletionRate: number;
-    mostSuccessfulCategory: string;
-  };
-
-  // Insights and patterns
-  insights: {
-    totalInsights: number;
-    acknowledgedInsights: number;
-    highSignificanceInsights: number;
-    mostCommonInsightType: string;
-    averageInsightRating: number;
-  };
-
-  // Behavioral impact
-  behavioralImpact: {
-    sessionsWithScoreImprovement: number;
-    averageScoreImprovementPerSession: number;
-    mostImpactfulSessionType: string;
-    behaviorChangeFrequency: number;
-  };
-
-  // Recommendations
-  recommendations: string[];
+export interface ConversationSummary {
+  sessionId: string;
+  keyTopics: string[];
+  mainChallenges: string[];
+  recommendationsGiven: string[];
+  actionItemsCreated: string[];
   nextSteps: string[];
+  followUpRequired: boolean;
+  followUpDate?: Date;
+  overallSentiment: 'positive' | 'neutral' | 'negative';
+  progressMade: boolean;
 }
 
-// AI Configuration Types
-
-export interface AIModelConfig {
-  model: 'gpt-4' | 'gpt-4-turbo' | 'gpt-3.5-turbo';
-  temperature: number;
-  maxTokens: number;
-  topP: number;
-  frequencyPenalty: number;
-  presencePenalty: number;
+export interface AIKnowledgeBase {
+  startupBestPractices: {
+    [industry: string]: {
+      [stage: string]: string[];
+    };
+  };
+  industryBenchmarks: {
+    [industry: string]: {
+      [metric: string]: number;
+    };
+  };
+  commonChallenges: {
+    [stage: string]: {
+      challenge: string;
+      solutions: string[];
+      resources: string[];
+    }[];
+  };
+  successPatterns: {
+    pattern: string;
+    description: string;
+    indicators: string[];
+    recommendations: string[];
+  }[];
 }
 
-export interface AIPersonalityConfig {
-  personality: 'supportive' | 'challenging' | 'analytical' | 'creative' | 'professional';
-  systemPrompt: string;
-  responseStyle: string;
-  focusAreas: string[];
-  communicationTone: string;
+// Enums and Union Types
+export type SessionType =
+  | 'general_guidance'
+  | 'problem_solving'
+  | 'strategic_planning'
+  | 'funding_preparation'
+  | 'market_analysis'
+  | 'team_building'
+  | 'product_development'
+  | 'sales_marketing'
+  | 'operations'
+  | 'financial_planning'
+  | 'crisis_management'
+  | 'growth_strategy'
+  | 'exit_planning';
+
+export type AIPersonality =
+  | 'supportive'
+  | 'challenging'
+  | 'analytical'
+  | 'creative'
+  | 'professional';
+
+export type SessionStatus =
+  | 'active'
+  | 'paused'
+  | 'completed'
+  | 'cancelled'
+  | 'expired';
+
+export type MessageRole = 'user' | 'assistant' | 'system';
+
+export type ConversationTone =
+  | 'formal'
+  | 'casual'
+  | 'encouraging'
+  | 'direct'
+  | 'empathetic';
+
+export type MentorshipOutcome =
+  | 'problem_solved'
+  | 'decision_made'
+  | 'plan_created'
+  | 'insight_gained'
+  | 'action_taken'
+  | 'goal_achieved'
+  | 'incomplete'
+  | 'follow_up_needed';
+
+// Request/Response Interfaces
+export interface StartSessionRequest {
+  sessionType: SessionType;
+  topic?: string;
+  aiPersonality?: AIPersonality;
+  sessionGoals?: string[];
+  focusAreas?: string[];
+  urgency?: 'low' | 'medium' | 'high';
 }
 
-export interface MentorshipPromptTemplate {
+export interface SendMessageRequest {
+  sessionId: string;
+  message: string;
+  messageType?: 'question' | 'update' | 'request';
+}
+
+export interface GetSessionsRequest {
+  status?: 'active' | 'completed' | 'all';
+  limit?: number;
+  offset?: number;
+}
+
+export interface EndSessionRequest {
+  sessionId: string;
+  feedback?: string;
+  rating?: number;
+  outcome?: MentorshipOutcome;
+}
+
+export interface SessionListResponse {
+  sessions: AIMentorSession[];
+  total: number;
+  hasMore: boolean;
+}
+
+export interface ConversationHistoryResponse {
+  messages: AIMentorMessage[];
+  sessionInfo: AIMentorSession;
+  analytics?: SessionAnalytics;
+}
+
+// Database Schema Interfaces
+export interface AIMentorSessionDB {
   id: string;
-  name: string;
-  category: 'goal_setting' | 'score_improvement' | 'career_guidance' | 'sustainability_advice' | 'general_chat';
-  template: string;
-  variables: string[];
-  description: string;
-  isActive: boolean;
+  user_id: string;
+  session_type: SessionType;
+  topic?: string;
+  ai_personality: AIPersonality;
+  session_goals: string; // JSON string
+  focus_areas: string; // JSON string
+  startup_context: string; // JSON string
+  status: SessionStatus;
+  created_at: Date;
+  ended_at?: Date;
+  last_activity_at?: Date;
+  feedback?: string;
+  rating?: number;
 }
 
-// Webhook and Integration Types
-
-export interface MentorshipWebhook {
+export interface AIMentorMessageDB {
   id: string;
-  userId: string;
-
-  // Webhook details
-  eventType: 'session_started' | 'session_completed' | 'goal_achieved' | 'insight_generated' | 'milestone_reached';
-  url: string;
-  secret: string;
-
-  // Configuration
-  isActive: boolean;
-  retryAttempts: number;
-  timeoutSeconds: number;
-
-  // Metadata
-  createdAt: Date;
-  lastTriggeredAt?: Date;
-  successCount: number;
-  failureCount: number;
+  session_id: string;
+  role: MessageRole;
+  content: string;
+  metadata: string; // JSON string
+  created_at: Date;
 }
 
-export interface ExternalIntegration {
+export interface AIMentorAnalyticsDB {
   id: string;
-  userId: string;
-
-  // Integration details
-  platform: 'slack' | 'discord' | 'teams' | 'email' | 'calendar';
-  configuration: any;
-
-  // Integration settings
-  notificationTypes: string[];
-  isActive: boolean;
-
-  // Metadata
-  createdAt: Date;
-  lastSyncAt?: Date;
-  syncStatus: 'success' | 'error' | 'pending';
+  session_id: string;
+  user_id: string;
+  duration_minutes: number;
+  message_count: number;
+  user_engagement_score: number;
+  topics_discussed: string; // JSON string
+  recommendations_given: number;
+  action_items_created: number;
+  user_satisfaction?: number;
+  outcome_achieved: boolean;
+  created_at: Date;
 }

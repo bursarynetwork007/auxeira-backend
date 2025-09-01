@@ -1,4 +1,4 @@
-import { database } from '../config/database';
+import { pool } from '../config/database';
 import { redis } from '../config/redis';
 import { logger } from '../utils/logger';
 import {
@@ -853,7 +853,7 @@ export class SSEScoringService {
     // Queue score recalculation for later processing
     try {
       if (redis.isReady()) {
-        await redis.getClient().lpush('score_recalculation_queue', userId);
+        await redis.getClient().lPush('score_recalculation_queue', userId);
       }
     } catch (error) {
       logger.warn('Failed to queue score recalculation', {

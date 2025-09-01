@@ -1,479 +1,519 @@
-import { pool } from '../config/database';
-import { logger, loggers } from '../utils/logger';
-
 /**
- * Database Migration Script
- * This script automatically creates all necessary tables and indexes
- * when the backend starts up
+ * Database Migrations Manager
+ * Handles database schema migrations with proper versioning and rollback support
  */
 
-const migrations = [
-  {
-    version: '001',
-    name: 'Initial Schema',
-    sql: `
-      -- Enable UUID extensions
-      CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-      CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+import { Pool, PoolClient } from 'pg';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { logger } from '../utils/logger';
+import { performanceTimer } from '../utils/performance';
 
-      -- Users table
-      CREATE TABLE IF NOT EXISTS users (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        email VARCHAR(255) UNIQUE NOT NULL,
-        password_hash VARCHAR(255) NOT NULL,
-        first_name VARCHAR(100) NOT NULL,
-        last_name VARCHAR(100) NOT NULL,
-        role VARCHAR(20) NOT NULL DEFAULT 'student' CHECK (role IN ('student', 'founder', 'investor', 'admin')),
-        email_verified BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-      );
-
-      -- SSE Scores table
-      CREATE TABLE IF NOT EXISTS sse_scores (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        overall_score DECIMAL(5,2) NOT NULL,
-        social_score DECIMAL(5,2) NOT NULL,
-        sustainability_score DECIMAL(5,2) NOT NULL,
-        economic_score DECIMAL(5,2) NOT NULL,
-        calculated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-        version VARCHAR(10) DEFAULT '1.0',
-        metadata JSONB DEFAULT '{}'::jsonb,
-        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-      );
-
-      -- Daily Questions table
-      CREATE TABLE IF NOT EXISTS daily_questions (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        question_text TEXT NOT NULL,
-        question_type VARCHAR(20) NOT NULL CHECK (question_type IN ('multiple_choice', 'scale', 'boolean', 'text')),
-        category VARCHAR(20) NOT NULL CHECK (category IN ('social', 'sustainability', 'economic')),
-        subcategory VARCHAR(50),
-        options JSONB,
-        scale_min INTEGER,
-        scale_max INTEGER,
-        weight DECIMAL(3,2) DEFAULT 1.0,
-        is_active BOOLEAN DEFAULT TRUE,
-        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-      );
-
-      -- Question Responses table
-      CREATE TABLE IF NOT EXISTS question_responses (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        question_id UUID NOT NULL REFERENCES daily_questions(id) ON DELETE CASCADE,
-        response JSONB NOT NULL,
-        response_date DATE NOT NULL DEFAULT CURRENT_DATE,
-        impact_score DECIMAL(5,2) DEFAULT 0,
-        category VARCHAR(20) NOT NULL,
-        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-      );
-
-      -- Behavior Data table
-      CREATE TABLE IF NOT EXISTS behavior_data (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        behavior_type VARCHAR(100) NOT NULL,
-        category VARCHAR(20) NOT NULL CHECK (category IN ('social', 'sustainability', 'economic')),
-        impact VARCHAR(10) NOT NULL CHECK (impact IN ('positive', 'negative', 'neutral')),
-        magnitude DECIMAL(3,2) NOT NULL DEFAULT 1.0,
-        description TEXT,
-        recorded_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-        source VARCHAR(20) DEFAULT 'user_input' CHECK (source IN ('user_input', 'system_detected', 'ai_inferred')),
-        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-      );
-
-      -- SSE Insights table
-      CREATE TABLE IF NOT EXISTS sse_insights (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        type VARCHAR(20) NOT NULL CHECK (type IN ('strength', 'weakness', 'opportunity', 'trend', 'warning')),
-        category VARCHAR(20) NOT NULL CHECK (category IN ('social', 'sustainability', 'economic', 'overall')),
-        title VARCHAR(200) NOT NULL,
-        description TEXT NOT NULL,
-        impact VARCHAR(10) NOT NULL CHECK (impact IN ('high', 'medium', 'low')),
-        confidence DECIMAL(3,2) NOT NULL DEFAULT 0.5,
-        actionable BOOLEAN DEFAULT TRUE,
-        related_metrics JSONB DEFAULT '[]'::jsonb,
-        generated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-      );
-
-      -- SSE Recommendations table
-      CREATE TABLE IF NOT EXISTS sse_recommendations (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        category VARCHAR(20) NOT NULL CHECK (category IN ('social', 'sustainability', 'economic')),
-        priority VARCHAR(10) NOT NULL CHECK (priority IN ('high', 'medium', 'low')),
-        title VARCHAR(200) NOT NULL,
-        description TEXT NOT NULL,
-        action_steps JSONB DEFAULT '[]'::jsonb,
-        expected_impact DECIMAL(5,2) DEFAULT 0,
-        timeframe VARCHAR(20) DEFAULT 'medium_term' CHECK (timeframe IN ('immediate', 'short_term', 'medium_term', 'long_term')),
-        difficulty VARCHAR(15) DEFAULT 'moderate' CHECK (difficulty IN ('easy', 'moderate', 'challenging')),
-        resources JSONB DEFAULT '[]'::jsonb,
-        related_metrics JSONB DEFAULT '[]'::jsonb,
-        generated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-      );
-
-      -- Achievements table
-      CREATE TABLE IF NOT EXISTS achievements (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        type VARCHAR(30) NOT NULL CHECK (type IN ('score_milestone', 'streak', 'improvement', 'category_leader', 'behavior_change')),
-        title VARCHAR(200) NOT NULL,
-        description TEXT NOT NULL,
-        category VARCHAR(20) CHECK (category IN ('social', 'sustainability', 'economic')),
-        threshold DECIMAL(10,2) NOT NULL,
-        current_value DECIMAL(10,2) DEFAULT 0,
-        is_unlocked BOOLEAN DEFAULT FALSE,
-        unlocked_at TIMESTAMP WITH TIME ZONE,
-        badge_icon VARCHAR(100),
-        points INTEGER DEFAULT 0,
-        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-      );
-
-      -- Goals table
-      CREATE TABLE IF NOT EXISTS goals (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        type VARCHAR(30) NOT NULL CHECK (type IN ('score_target', 'behavior_change', 'metric_improvement', 'custom')),
-        category VARCHAR(20) NOT NULL CHECK (category IN ('social', 'sustainability', 'economic', 'overall')),
-        title VARCHAR(200) NOT NULL,
-        description TEXT NOT NULL,
-        target_value DECIMAL(10,2) NOT NULL,
-        current_value DECIMAL(10,2) DEFAULT 0,
-        deadline DATE,
-        status VARCHAR(15) DEFAULT 'active' CHECK (status IN ('active', 'completed', 'paused', 'cancelled')),
-        progress DECIMAL(5,2) DEFAULT 0,
-        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-      );
-
-      -- Milestones table
-      CREATE TABLE IF NOT EXISTS milestones (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        goal_id UUID NOT NULL REFERENCES goals(id) ON DELETE CASCADE,
-        title VARCHAR(200) NOT NULL,
-        description TEXT,
-        target_value DECIMAL(10,2) NOT NULL,
-        is_completed BOOLEAN DEFAULT FALSE,
-        completed_at TIMESTAMP WITH TIME ZONE,
-        order_index INTEGER NOT NULL DEFAULT 1,
-        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-      );
-    `
-  },
-  {
-    version: '002',
-    name: 'Create Indexes',
-    sql: `
-      -- Create indexes for better performance
-      CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-      CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
-      CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);
-
-      CREATE INDEX IF NOT EXISTS idx_sse_scores_user_id ON sse_scores(user_id);
-      CREATE INDEX IF NOT EXISTS idx_sse_scores_calculated_at ON sse_scores(calculated_at);
-      CREATE INDEX IF NOT EXISTS idx_sse_scores_overall_score ON sse_scores(overall_score);
-
-      CREATE INDEX IF NOT EXISTS idx_daily_questions_category ON daily_questions(category);
-      CREATE INDEX IF NOT EXISTS idx_daily_questions_is_active ON daily_questions(is_active);
-      CREATE INDEX IF NOT EXISTS idx_daily_questions_type ON daily_questions(question_type);
-
-      CREATE INDEX IF NOT EXISTS idx_question_responses_user_id ON question_responses(user_id);
-      CREATE INDEX IF NOT EXISTS idx_question_responses_question_id ON question_responses(question_id);
-      CREATE INDEX IF NOT EXISTS idx_question_responses_date ON question_responses(response_date);
-      CREATE INDEX IF NOT EXISTS idx_question_responses_category ON question_responses(category);
-
-      CREATE INDEX IF NOT EXISTS idx_behavior_data_user_id ON behavior_data(user_id);
-      CREATE INDEX IF NOT EXISTS idx_behavior_data_category ON behavior_data(category);
-      CREATE INDEX IF NOT EXISTS idx_behavior_data_recorded_at ON behavior_data(recorded_at);
-      CREATE INDEX IF NOT EXISTS idx_behavior_data_impact ON behavior_data(impact);
-
-      CREATE INDEX IF NOT EXISTS idx_sse_insights_user_id ON sse_insights(user_id);
-      CREATE INDEX IF NOT EXISTS idx_sse_insights_type ON sse_insights(type);
-      CREATE INDEX IF NOT EXISTS idx_sse_insights_category ON sse_insights(category);
-      CREATE INDEX IF NOT EXISTS idx_sse_insights_generated_at ON sse_insights(generated_at);
-
-      CREATE INDEX IF NOT EXISTS idx_sse_recommendations_user_id ON sse_recommendations(user_id);
-      CREATE INDEX IF NOT EXISTS idx_sse_recommendations_category ON sse_recommendations(category);
-      CREATE INDEX IF NOT EXISTS idx_sse_recommendations_priority ON sse_recommendations(priority);
-
-      CREATE INDEX IF NOT EXISTS idx_achievements_user_id ON achievements(user_id);
-      CREATE INDEX IF NOT EXISTS idx_achievements_type ON achievements(type);
-      CREATE INDEX IF NOT EXISTS idx_achievements_is_unlocked ON achievements(is_unlocked);
-
-      CREATE INDEX IF NOT EXISTS idx_goals_user_id ON goals(user_id);
-      CREATE INDEX IF NOT EXISTS idx_goals_status ON goals(status);
-      CREATE INDEX IF NOT EXISTS idx_goals_category ON goals(category);
-      CREATE INDEX IF NOT EXISTS idx_goals_deadline ON goals(deadline);
-
-      CREATE INDEX IF NOT EXISTS idx_milestones_goal_id ON milestones(goal_id);
-      CREATE INDEX IF NOT EXISTS idx_milestones_is_completed ON milestones(is_completed);
-    `
-  },
-  {
-    version: '003',
-    name: 'Insert Sample Data',
-    sql: `
-      -- Insert sample daily questions
-      INSERT INTO daily_questions (question_text, question_type, category, subcategory, weight, options) VALUES
-      ('How many hours did you volunteer for community service this week?', 'scale', 'social', 'community_engagement', 1.0, '{"scale_min": 0, "scale_max": 20}'),
-      ('Did you choose sustainable transportation today?', 'boolean', 'sustainability', 'carbon_footprint', 0.8, null),
-      ('How would you rate your work-life balance this week?', 'scale', 'economic', 'employee_wellbeing', 0.9, '{"scale_min": 1, "scale_max": 10}'),
-      ('Which sustainable practices did you implement today?', 'multiple_choice', 'sustainability', 'daily_practices', 1.0, '["Recycling", "Energy conservation", "Water saving", "Sustainable transport", "None"]'),
-      ('How many people from diverse backgrounds did you collaborate with this week?', 'scale', 'social', 'diversity_inclusion', 1.0, '{"scale_min": 0, "scale_max": 20}'),
-      ('Did you make any environmentally conscious purchasing decisions today?', 'boolean', 'sustainability', 'sustainable_consumption', 0.7, null),
-      ('How satisfied are you with your current financial planning?', 'scale', 'economic', 'financial_planning', 0.8, '{"scale_min": 1, "scale_max": 10}'),
-      ('What social impact initiative did you support this month?', 'multiple_choice', 'social', 'social_impact', 1.2, '["Education", "Healthcare", "Environment", "Poverty alleviation", "Human rights", "None"]'),
-      ('How many sustainable products did you choose over conventional ones this week?', 'scale', 'sustainability', 'sustainable_products', 0.9, '{"scale_min": 0, "scale_max": 10}'),
-      ('Did you contribute to any economic development in your community this month?', 'boolean', 'economic', 'community_development', 1.1, null)
-      ON CONFLICT DO NOTHING;
-
-      -- Create migration tracking table
-      CREATE TABLE IF NOT EXISTS schema_migrations (
-        version VARCHAR(10) PRIMARY KEY,
-        name VARCHAR(200) NOT NULL,
-        executed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-      );
-    `
-  }
-];
-
-/**
- * Check if a migration has been executed
- */
-async function isMigrationExecuted(version: string): Promise<boolean> {
-  try {
-    const result = await pool.query(
-      'SELECT version FROM schema_migrations WHERE version = $1',
-      [version]
-    );
-    return result.rows.length > 0;
-  } catch (error) {
-    // If table doesn't exist, migration hasn't been executed
-    return false;
-  }
+export interface Migration {
+  version: string;
+  description: string;
+  filename: string;
+  up: string;
+  down?: string;
+  checksum?: string;
 }
 
-/**
- * Mark migration as executed
- */
-async function markMigrationExecuted(version: string, name: string): Promise<void> {
-  try {
-    await pool.query(
-      'INSERT INTO schema_migrations (version, name) VALUES ($1, $2) ON CONFLICT (version) DO NOTHING',
-      [version, name]
-    );
-  } catch (error) {
-    loggers.errorWithContext(error as Error, 'MARK_MIGRATION_EXECUTED', { version, name });
-  }
+export interface MigrationResult {
+  version: string;
+  success: boolean;
+  executionTime: number;
+  error?: string;
 }
 
-/**
- * Execute a single migration
- */
-async function executeMigration(migration: { version: string; name: string; sql: string }): Promise<void> {
-  const client = await pool.connect();
+export class DatabaseMigrations {
+  private pool: Pool;
+  private migrationsPath: string;
 
-  try {
-    loggers.database(`Executing migration ${migration.version}: ${migration.name}`);
-
-    // Start transaction
-    await client.query('BEGIN');
-
-    // Execute migration SQL
-    await client.query(migration.sql);
-
-    // Mark migration as executed
-    await client.query(
-      'INSERT INTO schema_migrations (version, name) VALUES ($1, $2) ON CONFLICT (version) DO NOTHING',
-      [migration.version, migration.name]
-    );
-
-    // Commit transaction
-    await client.query('COMMIT');
-
-    loggers.database(`Migration ${migration.version} executed successfully`);
-  } catch (error) {
-    // Rollback transaction on error
-    await client.query('ROLLBACK');
-    loggers.errorWithContext(error as Error, 'EXECUTE_MIGRATION', {
-      version: migration.version,
-      name: migration.name
-    });
-    throw error;
-  } finally {
-    client.release();
+  constructor(pool: Pool, migrationsPath: string = __dirname) {
+    this.pool = pool;
+    this.migrationsPath = migrationsPath;
   }
-}
 
-/**
- * Run all pending migrations
- */
-export async function runMigrations(): Promise<void> {
-  try {
-    loggers.database('Starting database migrations...');
-
-    let migrationsExecuted = 0;
-
-    for (const migration of migrations) {
-      const isExecuted = await isMigrationExecuted(migration.version);
-
-      if (!isExecuted) {
-        await executeMigration(migration);
-        migrationsExecuted++;
-      } else {
-        loggers.database(`Migration ${migration.version} already executed, skipping`);
+  /**
+   * Get all available migrations
+   */
+  private getMigrations(): Migration[] {
+    return [
+      {
+        version: '001_initial_schema',
+        description: 'Initial database schema with core functionality',
+        filename: '001_initial_schema.sql',
+        up: this.loadMigrationFile('001_initial_schema.sql')
+      },
+      {
+        version: '002_blockchain_solana_chainlink',
+        description: 'Solana and Chainlink blockchain integration',
+        filename: '002_blockchain_solana_chainlink.sql',
+        up: this.loadMigrationFile('002_blockchain_solana_chainlink.sql')
       }
-    }
-
-    if (migrationsExecuted > 0) {
-      loggers.database(`Database migrations completed. ${migrationsExecuted} migrations executed.`);
-    } else {
-      loggers.database('Database is up to date. No migrations needed.');
-    }
-
-    // Verify database structure
-    await verifyDatabaseStructure();
-
-  } catch (error) {
-    loggers.errorWithContext(error as Error, 'RUN_MIGRATIONS');
-    throw new Error(`Database migration failed: ${error}`);
-  }
-}
-
-/**
- * Verify database structure is correct
- */
-async function verifyDatabaseStructure(): Promise<void> {
-  try {
-    const requiredTables = [
-      'users',
-      'sse_scores',
-      'daily_questions',
-      'question_responses',
-      'behavior_data',
-      'sse_insights',
-      'sse_recommendations',
-      'achievements',
-      'goals',
-      'milestones',
-      'schema_migrations'
+      // Add new migrations here as needed
     ];
+  }
 
-    for (const table of requiredTables) {
-      const result = await pool.query(
-        `SELECT EXISTS (
-          SELECT FROM information_schema.tables
-          WHERE table_schema = 'public'
-          AND table_name = $1
-        )`,
-        [table]
-      );
-
-      if (!result.rows[0].exists) {
-        throw new Error(`Required table '${table}' does not exist`);
-      }
+  /**
+   * Load migration file content
+   */
+  private loadMigrationFile(filename: string): string {
+    try {
+      const filePath = join(this.migrationsPath, filename);
+      return readFileSync(filePath, 'utf8');
+    } catch (error) {
+      logger.error('Failed to load migration file', {
+        filename,
+        error: (error as Error).message
+      });
+      throw new Error(`Migration file not found: ${filename}`);
     }
-
-    loggers.database('Database structure verification completed successfully');
-  } catch (error) {
-    loggers.errorWithContext(error as Error, 'VERIFY_DATABASE_STRUCTURE');
-    throw error;
   }
-}
 
-/**
- * Get migration status
- */
-export async function getMigrationStatus(): Promise<{
-  totalMigrations: number;
-  executedMigrations: number;
-  pendingMigrations: string[];
-  lastMigration?: { version: string; name: string; executedAt: Date };
-}> {
-  try {
-    const executedResult = await pool.query(
-      'SELECT version, name, executed_at FROM schema_migrations ORDER BY version DESC'
+  /**
+   * Calculate checksum for migration content
+   */
+  private calculateChecksum(content: string): string {
+    const crypto = require('crypto');
+    return crypto.createHash('sha256').update(content).digest('hex');
+  }
+
+  /**
+   * Ensure migrations table exists
+   */
+  private async ensureMigrationsTable(client: PoolClient): Promise<void> {
+    const createTableSQL = `
+      CREATE TABLE IF NOT EXISTS schema_migrations (
+        id SERIAL PRIMARY KEY,
+        version VARCHAR(100) NOT NULL UNIQUE,
+        description TEXT,
+        executed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        execution_time_ms INTEGER,
+        checksum VARCHAR(64)
+      );
+    `;
+
+    await client.query(createTableSQL);
+  }
+
+  /**
+   * Get executed migrations from database
+   */
+  private async getExecutedMigrations(client: PoolClient): Promise<Set<string>> {
+    try {
+      const result = await client.query(
+        'SELECT version FROM schema_migrations ORDER BY executed_at'
+      );
+      return new Set(result.rows.map(row => row.version));
+    } catch (error) {
+      // If table doesn't exist, return empty set
+      return new Set();
+    }
+  }
+
+  /**
+   * Record migration execution
+   */
+  private async recordMigration(
+    client: PoolClient,
+    migration: Migration,
+    executionTime: number
+  ): Promise<void> {
+    const checksum = this.calculateChecksum(migration.up);
+
+    await client.query(
+      `INSERT INTO schema_migrations (version, description, execution_time_ms, checksum)
+       VALUES ($1, $2, $3, $4)
+       ON CONFLICT (version) DO UPDATE SET
+         executed_at = CURRENT_TIMESTAMP,
+         execution_time_ms = EXCLUDED.execution_time_ms,
+         checksum = EXCLUDED.checksum`,
+      [migration.version, migration.description, executionTime, checksum]
     );
-
-    const executedVersions = executedResult.rows.map(row => row.version);
-    const pendingMigrations = migrations
-      .filter(migration => !executedVersions.includes(migration.version))
-      .map(migration => migration.version);
-
-    const lastMigration = executedResult.rows[0] ? {
-      version: executedResult.rows[0].version,
-      name: executedResult.rows[0].name,
-      executedAt: executedResult.rows[0].executed_at
-    } : undefined;
-
-    return {
-      totalMigrations: migrations.length,
-      executedMigrations: executedVersions.length,
-      pendingMigrations,
-      lastMigration
-    };
-  } catch (error) {
-    loggers.errorWithContext(error as Error, 'GET_MIGRATION_STATUS');
-    throw error;
-  }
-}
-
-/**
- * Reset database (WARNING: This will delete all data!)
- */
-export async function resetDatabase(): Promise<void> {
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('Database reset is not allowed in production environment');
   }
 
-  try {
-    loggers.database('WARNING: Resetting database - all data will be lost!');
-
-    const client = await pool.connect();
+  /**
+   * Execute a single migration
+   */
+  private async executeMigration(
+    client: PoolClient,
+    migration: Migration
+  ): Promise<MigrationResult> {
+    const timer = performanceTimer(`migration_${migration.version}`);
 
     try {
+      logger.info('Executing migration', {
+        version: migration.version,
+        description: migration.description
+      });
+
+      // Execute migration SQL
+      await client.query(migration.up);
+
+      const executionTime = timer.end();
+
+      // Record successful migration
+      await this.recordMigration(client, migration, executionTime);
+
+      logger.info('Migration completed successfully', {
+        version: migration.version,
+        executionTime
+      });
+
+      return {
+        version: migration.version,
+        success: true,
+        executionTime
+      };
+
+    } catch (error) {
+      timer.end();
+
+      logger.error('Migration failed', {
+        version: migration.version,
+        error: (error as Error).message
+      });
+
+      return {
+        version: migration.version,
+        success: false,
+        executionTime: 0,
+        error: (error as Error).message
+      };
+    }
+  }
+
+  /**
+   * Run all pending migrations
+   */
+  async runMigrations(): Promise<MigrationResult[]> {
+    const client = await this.pool.connect();
+    const results: MigrationResult[] = [];
+
+    try {
+      // Start transaction
       await client.query('BEGIN');
 
-      // Drop all tables
-      const dropTablesSQL = `
-        DROP TABLE IF EXISTS milestones CASCADE;
-        DROP TABLE IF EXISTS goals CASCADE;
-        DROP TABLE IF EXISTS achievements CASCADE;
-        DROP TABLE IF EXISTS sse_recommendations CASCADE;
-        DROP TABLE IF EXISTS sse_insights CASCADE;
-        DROP TABLE IF EXISTS behavior_data CASCADE;
-        DROP TABLE IF EXISTS question_responses CASCADE;
-        DROP TABLE IF EXISTS daily_questions CASCADE;
-        DROP TABLE IF EXISTS sse_scores CASCADE;
-        DROP TABLE IF EXISTS users CASCADE;
-        DROP TABLE IF EXISTS schema_migrations CASCADE;
-      `;
+      // Ensure migrations table exists
+      await this.ensureMigrationsTable(client);
 
-      await client.query(dropTablesSQL);
+      // Get executed migrations
+      const executedMigrations = await this.getExecutedMigrations(client);
+
+      // Get all available migrations
+      const allMigrations = this.getMigrations();
+
+      // Filter pending migrations
+      const pendingMigrations = allMigrations.filter(
+        migration => !executedMigrations.has(migration.version)
+      );
+
+      if (pendingMigrations.length === 0) {
+        logger.info('No pending migrations to execute');
+        await client.query('COMMIT');
+        return results;
+      }
+
+      logger.info('Running pending migrations', {
+        pendingCount: pendingMigrations.length,
+        migrations: pendingMigrations.map(m => m.version)
+      });
+
+      // Execute pending migrations in order
+      for (const migration of pendingMigrations) {
+        const result = await this.executeMigration(client, migration);
+        results.push(result);
+
+        // If migration failed, rollback and stop
+        if (!result.success) {
+          await client.query('ROLLBACK');
+          throw new Error(`Migration ${migration.version} failed: ${result.error}`);
+        }
+      }
+
+      // Commit all migrations
       await client.query('COMMIT');
 
-      loggers.database('Database reset completed');
+      logger.info('All migrations completed successfully', {
+        executedCount: results.length,
+        totalTime: results.reduce((sum, r) => sum + r.executionTime, 0)
+      });
+
+      return results;
+
     } catch (error) {
       await client.query('ROLLBACK');
+      logger.error('Migration process failed', {
+        error: (error as Error).message
+      });
       throw error;
+
     } finally {
       client.release();
     }
-
-    // Run migrations again
-    await runMigrations();
-
-  } catch (error) {
-    loggers.errorWithContext(error as Error, 'RESET_DATABASE');
-    throw error;
   }
+
+  /**
+   * Get migration status
+   */
+  async getMigrationStatus(): Promise<{
+    executed: string[];
+    pending: string[];
+    total: number;
+  }> {
+    const client = await this.pool.connect();
+
+    try {
+      await this.ensureMigrationsTable(client);
+
+      const executedMigrations = await this.getExecutedMigrations(client);
+      const allMigrations = this.getMigrations();
+
+      const executed = allMigrations
+        .filter(m => executedMigrations.has(m.version))
+        .map(m => m.version);
+
+      const pending = allMigrations
+        .filter(m => !executedMigrations.has(m.version))
+        .map(m => m.version);
+
+      return {
+        executed,
+        pending,
+        total: allMigrations.length
+      };
+
+    } finally {
+      client.release();
+    }
+  }
+
+  /**
+   * Validate migration checksums
+   */
+  async validateMigrations(): Promise<{
+    valid: boolean;
+    issues: Array<{
+      version: string;
+      issue: string;
+    }>;
+  }> {
+    const client = await this.pool.connect();
+    const issues: Array<{ version: string; issue: string }> = [];
+
+    try {
+      await this.ensureMigrationsTable(client);
+
+      // Get executed migrations with checksums
+      const result = await client.query(
+        'SELECT version, checksum FROM schema_migrations WHERE checksum IS NOT NULL'
+      );
+
+      const executedMigrations = new Map(
+        result.rows.map(row => [row.version, row.checksum])
+      );
+
+      // Check each migration
+      const allMigrations = this.getMigrations();
+
+      for (const migration of allMigrations) {
+        const storedChecksum = executedMigrations.get(migration.version);
+
+        if (storedChecksum) {
+          const currentChecksum = this.calculateChecksum(migration.up);
+
+          if (storedChecksum !== currentChecksum) {
+            issues.push({
+              version: migration.version,
+              issue: 'Migration content has changed after execution'
+            });
+          }
+        }
+      }
+
+      return {
+        valid: issues.length === 0,
+        issues
+      };
+
+    } finally {
+      client.release();
+    }
+  }
+
+  /**
+   * Reset database (DROP ALL TABLES - USE WITH CAUTION)
+   */
+  async resetDatabase(): Promise<void> {
+    const client = await this.pool.connect();
+
+    try {
+      logger.warn('Resetting database - dropping all tables');
+
+      await client.query('BEGIN');
+
+      // Drop all tables in the public schema
+      const dropTablesSQL = `
+        DO $$ DECLARE
+          r RECORD;
+        BEGIN
+          FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
+            EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
+          END LOOP;
+        END $$;
+      `;
+
+      await client.query(dropTablesSQL);
+
+      // Drop all sequences
+      const dropSequencesSQL = `
+        DO $$ DECLARE
+          r RECORD;
+        BEGIN
+          FOR r IN (SELECT sequencename FROM pg_sequences WHERE schemaname = 'public') LOOP
+            EXECUTE 'DROP SEQUENCE IF EXISTS ' || quote_ident(r.sequencename) || ' CASCADE';
+          END LOOP;
+        END $$;
+      `;
+
+      await client.query(dropSequencesSQL);
+
+      // Drop all functions
+      const dropFunctionsSQL = `
+        DO $$ DECLARE
+          r RECORD;
+        BEGIN
+          FOR r IN (SELECT proname, oidvectortypes(proargtypes) as argtypes
+                   FROM pg_proc INNER JOIN pg_namespace ns ON (pg_proc.pronamespace = ns.oid)
+                   WHERE ns.nspname = 'public') LOOP
+            EXECUTE 'DROP FUNCTION IF EXISTS ' || quote_ident(r.proname) || '(' || r.argtypes || ') CASCADE';
+          END LOOP;
+        END $$;
+      `;
+
+      await client.query(dropFunctionsSQL);
+
+      await client.query('COMMIT');
+
+      logger.info('Database reset completed');
+
+    } catch (error) {
+      await client.query('ROLLBACK');
+      logger.error('Database reset failed', {
+        error: (error as Error).message
+      });
+      throw error;
+
+    } finally {
+      client.release();
+    }
+  }
+
+  /**
+   * Create a new migration template
+   */
+  createMigrationTemplate(name: string): string {
+    const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const version = `${timestamp}_${name}`;
+
+    const template = `-- =====================================================
+-- AUXEIRA MIGRATION: ${name.toUpperCase()}
+-- =====================================================
+-- Migration: ${version}
+-- Created: ${new Date().toISOString().slice(0, 10)}
+-- =====================================================
+
+-- Add your migration SQL here
+
+-- Example:
+-- CREATE TABLE example_table (
+--     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+--     name VARCHAR(255) NOT NULL,
+--     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- CREATE INDEX idx_example_table_name ON example_table(name);
+
+-- Record migration
+INSERT INTO schema_migrations (version, description) VALUES
+('${version}', '${name.replace(/_/g, ' ')}');
+`;
+
+    logger.info('Migration template created', {
+      version,
+      filename: `${version}.sql`
+    });
+
+    return template;
+  }
+}
+
+// Export singleton instance
+export const migrations = new DatabaseMigrations(
+  new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  })
+);
+
+// CLI interface for running migrations
+if (require.main === module) {
+  const command = process.argv[2];
+
+  async function runCLI() {
+    try {
+      switch (command) {
+        case 'up':
+        case 'migrate':
+          const results = await migrations.runMigrations();
+          console.log('Migration results:', results);
+          break;
+
+        case 'status':
+          const status = await migrations.getMigrationStatus();
+          console.log('Migration status:', status);
+          break;
+
+        case 'validate':
+          const validation = await migrations.validateMigrations();
+          console.log('Migration validation:', validation);
+          break;
+
+        case 'reset':
+          if (process.env.NODE_ENV === 'production') {
+            console.error('Cannot reset database in production');
+            process.exit(1);
+          }
+          await migrations.resetDatabase();
+          console.log('Database reset completed');
+          break;
+
+        case 'create':
+          const migrationName = process.argv[3];
+          if (!migrationName) {
+            console.error('Please provide a migration name');
+            process.exit(1);
+          }
+          const template = migrations.createMigrationTemplate(migrationName);
+          console.log(template);
+          break;
+
+        default:
+          console.log('Available commands:');
+          console.log('  up|migrate  - Run pending migrations');
+          console.log('  status      - Show migration status');
+          console.log('  validate    - Validate migration checksums');
+          console.log('  reset       - Reset database (development only)');
+          console.log('  create <name> - Create migration template');
+          break;
+      }
+
+    } catch (error) {
+      console.error('Migration command failed:', error);
+      process.exit(1);
+    }
+  }
+
+  runCLI();
 }

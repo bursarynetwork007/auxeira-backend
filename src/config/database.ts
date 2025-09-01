@@ -12,24 +12,24 @@ const pool = new Pool({
 });
 
 // Redis client
-const redis = createClient({
+const redisClient = createClient({
   url: process.env.REDIS_URL || 'redis://localhost:6379',
 });
 
 // Redis event handlers
-redis.on('error', (err) => {
+redisClient.on('error', (err) => {
   logger.error('Redis connection error:', err);
 });
 
-redis.on('connect', () => {
+redisClient.on('connect', () => {
   logger.info('Connected to Redis successfully');
 });
 
-redis.on('ready', () => {
+redisClient.on('ready', () => {
   logger.info('Redis client ready');
 });
 
-redis.on('end', () => {
+redisClient.on('end', () => {
   logger.warn('Redis connection ended');
 });
 
@@ -55,12 +55,12 @@ export const initializeDatabase = async (): Promise<void> => {
     client.release();
 
     // Connect to Redis
-    if (!redis.isOpen) {
-      await redis.connect();
+    if (!redisClient.isOpen) {
+      await redisClient.connect();
     }
 
     // Test Redis connection
-    await redis.ping();
+    await redisClient.ping();
     logger.info('Redis connection successful');
 
     logger.info('All database connections initialized successfully');
@@ -76,8 +76,8 @@ export const closeDatabaseConnections = async (): Promise<void> => {
     await pool.end();
     logger.info('PostgreSQL pool closed');
 
-    if (redis.isOpen) {
-      await redis.quit();
+    if (redisClient.isOpen) {
+      await redisClient.quit();
       logger.info('Redis connection closed');
     }
 
@@ -124,13 +124,13 @@ export const checkDatabaseHealth = async (): Promise<{
 
   try {
     // Check Redis
-    if (redis.isOpen) {
-      await redis.ping();
+    if (redisClient.isOpen) {
+      await redisClient.ping();
       health.redis = true;
       health.details.redis = {
         status: 'connected',
-        isOpen: redis.isOpen,
-        isReady: redis.isReady
+        isOpen: redisClient.isOpen,
+        isReady: redisClient.isReady
       };
     } else {
       health.details.redis = {
@@ -153,7 +153,7 @@ export const checkDatabaseHealth = async (): Promise<{
 export const cacheHelpers = {
   async get(key: string): Promise<string | null> {
     try {
-      return await redis.get(key);
+      return await redisClient.get(key);
     } catch (error) {
       logger.error('Cache get error:', error);
       return null;
@@ -163,9 +163,9 @@ export const cacheHelpers = {
   async set(key: string, value: string, ttlSeconds?: number): Promise<boolean> {
     try {
       if (ttlSeconds) {
-        await redis.setEx(key, ttlSeconds, value);
+        await redisClient.setEx(key, ttlSeconds, value);
       } else {
-        await redis.set(key, value);
+        await redisClient.set(key, value);
       }
       return true;
     } catch (error) {
@@ -176,7 +176,7 @@ export const cacheHelpers = {
 
   async del(key: string): Promise<boolean> {
     try {
-      await redis.del(key);
+      await redisClient.del(key);
       return true;
     } catch (error) {
       logger.error('Cache delete error:', error);
@@ -186,7 +186,7 @@ export const cacheHelpers = {
 
   async exists(key: string): Promise<boolean> {
     try {
-      const result = await redis.exists(key);
+      const result = await redisClient.exists(key);
       return result === 1;
     } catch (error) {
       logger.error('Cache exists error:', error);
@@ -195,4 +195,4 @@ export const cacheHelpers = {
   }
 };
 
-export { pool, redis };
+export { pool, redisClient };

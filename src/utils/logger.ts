@@ -1,5 +1,13 @@
 import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
+import fs from 'fs';
+
+// Create logs directory if it doesn't exist
+const logDir = path.join(process.cwd(), 'logs');
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir, { recursive: true });
+}
 
 // Define log levels
 const levels = {
@@ -29,20 +37,28 @@ const level = () => {
   return isDevelopment ? 'debug' : 'warn';
 };
 
-// Define different log formats
+// Define log format for files
 const logFormat = winston.format.combine(
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
-  winston.format.errors({ stack: true }),
-  winston.format.colorize({ all: true }),
-  winston.format.printf(
-    (info) => `${info.timestamp} ${info.level}: ${info.message}${info.stack ? '\n' + info.stack : ''}`
-  )
-);
-
-const jsonFormat = winston.format.combine(
-  winston.format.timestamp(),
+  winston.format.timestamp({
+    format: 'YYYY-MM-DD HH:mm:ss'
+  }),
   winston.format.errors({ stack: true }),
   winston.format.json()
+);
+
+// Console format for development
+const consoleFormat = winston.format.combine(
+  winston.format.colorize(),
+  winston.format.timestamp({
+    format: 'HH:mm:ss'
+  }),
+  winston.format.printf(({ timestamp, level, message, ...meta }) => {
+    let msg = `${timestamp} [${level}]: ${message}`;
+    if (Object.keys(meta).length > 0) {
+      msg += ` ${JSON.stringify(meta)}`;
+    }
+    return msg;
+  })
 );
 
 // Define transports
@@ -50,7 +66,7 @@ const transports = [
   // Console transport
   new winston.transports.Console({
     level: level(),
-    format: logFormat,
+    format: process.env.NODE_ENV === 'production' ? logFormat : consoleFormat,
   }),
 ];
 
@@ -59,18 +75,27 @@ if (process.env.NODE_ENV === 'production') {
   transports.push(
     // Error log file
     new winston.transports.File({
-      filename: path.join(process.cwd(), 'logs', 'error.log'),
+      filename: path.join(logDir, 'error.log'),
       level: 'error',
-      format: jsonFormat,
+      format: logFormat,
       maxsize: 5242880, // 5MB
       maxFiles: 5,
-    }),
+    } as winston.transports.FileTransportOptions),
     // Combined log file
     new winston.transports.File({
-      filename: path.join(process.cwd(), 'logs', 'combined.log'),
-      format: jsonFormat,
+      filename: path.join(logDir, 'combined.log'),
+      format: logFormat,
       maxsize: 5242880, // 5MB
       maxFiles: 5,
+    } as winston.transports.FileTransportOptions),
+    // Daily rotate file for production
+    new DailyRotateFile({
+      filename: path.join(logDir, 'application-%DATE%.log'),
+      datePattern: 'YYYY-MM-DD',
+      zippedArchive: true,
+      maxSize: '20m',
+      maxFiles: '14d',
+      format: logFormat,
     })
   );
 }
@@ -79,9 +104,10 @@ if (process.env.NODE_ENV === 'production') {
 const logger = winston.createLogger({
   level: level(),
   levels,
-  format: jsonFormat,
+  format: logFormat,
   transports,
   exitOnError: false,
+  defaultMeta: { service: 'auxeira-backend' },
 });
 
 // Create specialized logging functions
@@ -228,3 +254,4 @@ export const logShutdown = (signal: string) => {
 
 export { logger };
 export default logger;
+
