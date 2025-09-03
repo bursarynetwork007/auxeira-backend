@@ -3,14 +3,26 @@
  * Defines all payment-related API endpoints
  */
 
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { paymentController } from '../controllers/payment.controller';
-import { authMiddleware } from '../middleware/auth.middleware';
-import { rateLimitMiddleware } from '../middleware/rate-limit.middleware';
-import { validateRequest } from '../middleware/validation.middleware';
-import { body, query, param } from 'express-validator';
+import { authenticateToken } from '../middleware/auth.middleware';
+import { body, query, param, validationResult } from 'express-validator';
 
 const router = Router();
+
+// Simple validation middleware
+const validateRequest = (req: Request, res: Response, next: NextFunction): void => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({
+      success: false,
+      message: 'Validation failed',
+      errors: errors.array()
+    });
+    return;
+  }
+  next();
+};
 
 // Validation schemas
 const createCustomerValidation = [

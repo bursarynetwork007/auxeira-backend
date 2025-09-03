@@ -5,9 +5,9 @@
 
 import { Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
-import { logger } from '../../utils/logger';
-import { performanceTimer } from '../../utils/performance';
-import { redisClient } from '../../config/database';
+import { logger } from '../utils/logger';
+import { performanceTimer } from '../utils/performance';
+import { pool } from '../config/database';
 
 export interface AuthenticatedSocket extends Socket {
   userId: string;

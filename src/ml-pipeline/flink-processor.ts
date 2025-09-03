@@ -221,7 +221,7 @@ export class FlinkMLProcessor {
       }
     };
 
-    return await this.jobManager.submitJob(jobConfig, async (stream) => {
+    return await this.jobManager.submitJob(jobConfig, async (stream: any) => {
       return stream
         // Parse SSE events
         .map((event: MLEvent) => this.parseSSEEvent(event))
@@ -275,7 +275,7 @@ export class FlinkMLProcessor {
       }
     };
 
-    return await this.jobManager.submitJob(jobConfig, async (stream) => {
+    return await this.jobManager.submitJob(jobConfig, async (stream: any) => {
       return stream
         // Parse behavior events
         .map((event: MLEvent) => this.parseBehaviorEvent(event))
@@ -331,7 +331,7 @@ export class FlinkMLProcessor {
       }
     };
 
-    return await this.jobManager.submitJob(jobConfig, async (stream) => {
+    return await this.jobManager.submitJob(jobConfig, async (stream: any) => {
       return stream
         // Parse performance events
         .map((event: MLEvent) => this.parsePerformanceEvent(event))
@@ -395,7 +395,7 @@ export class FlinkMLProcessor {
       }
     };
 
-    return await this.jobManager.submitJob(jobConfig, async (stream) => {
+    return await this.jobManager.submitJob(jobConfig, async (stream: any) => {
       return stream
         // Union multiple streams for comprehensive risk assessment
         .union(
@@ -455,7 +455,7 @@ export class FlinkMLProcessor {
       }
     };
 
-    return await this.jobManager.submitJob(jobConfig, async (stream) => {
+    return await this.jobManager.submitJob(jobConfig, async (stream: any) => {
       return stream
         // Process enriched features
         .map((features: ProcessedFeatures) => features)
@@ -515,7 +515,7 @@ export class FlinkMLProcessor {
       }
     };
 
-    return await this.jobManager.submitJob(jobConfig, async (stream) => {
+    return await this.jobManager.submitJob(jobConfig, async (stream: any) => {
       return stream
         // Union all processed streams
         .union(

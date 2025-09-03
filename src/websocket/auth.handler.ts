@@ -5,10 +5,10 @@
 
 import { Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
-import { logger } from '../../utils/logger';
-import { performanceTimer } from '../../utils/performance';
-import { WebSocketUser, WebSocketServer } from '../index';
-import { redisClient } from '../../config/database';
+import { logger } from '../utils/logger';
+import { performanceTimer } from '../utils/performance';
+import { WebSocketUser, WebSocketServer } from './index';
+import { pool } from '../config/database';
 
 export interface AuthenticationEvent {
   eventType: 'login' | 'logout' | 'token_refresh' | 'session_expired' | 'unauthorized';

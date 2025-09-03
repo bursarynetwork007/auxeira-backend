@@ -359,7 +359,7 @@ export class ModelServingEngine {
         const responses = await Promise.all(
           groupRequests.map(async (req, index) => {
             const prediction = predictions[index];
-            const confidence = await this.calculateConfidence(model, processedFeatures[index], prediction);
+            const confidence = await this.calculateConfidence(model, processedFeatures[index] || {} as any, prediction);
 
             return {
               requestId: req.requestId,

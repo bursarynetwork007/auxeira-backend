@@ -3,7 +3,26 @@
  * Handles streaming of startup data, SSE scores, and behavioral events to ML processing pipeline
  */
 
-import { Kafka, Producer, ProducerRecord, Message } from 'kafkajs';
+// Mock Kafka types since kafkajs is not installed
+interface Kafka {
+  producer(): Producer;
+}
+interface Producer {
+  connect(): Promise<void>;
+  disconnect(): Promise<void>;
+  send(record: ProducerRecord): Promise<any>;
+}
+interface ProducerRecord {
+  topic: string;
+  messages: Message[];
+}
+interface Message {
+  key?: string;
+  value: string;
+  partition?: number;
+  timestamp?: string;
+}
+
 import { logger } from '../utils/logger';
 import { performanceTimer } from '../utils/performance';
 

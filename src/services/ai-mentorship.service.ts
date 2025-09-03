@@ -146,22 +146,61 @@ export class AIMentorshipService {
 
     try {
       // Validate session
+      if (!request.sessionId) {
+        return {
+          sessionId: '',
+          message: 'Session ID is required',
+          confidence: 0,
+          recommendations: [],
+          followUpQuestions: [],
+          actionItems: [],
+          timestamp: new Date().toISOString(),
+          success: false,
+          data: {}
+        };
+      }
+
       const session = await this.getMentorshipSession(request.sessionId);
       if (!session || session.userId !== userId) {
         return {
-          success: false,
+          sessionId: request.sessionId,
           message: 'Session not found or access denied',
-          data: {} as any,
+          confidence: 0,
+          recommendations: [],
+          followUpQuestions: [],
+          actionItems: [],
           timestamp: new Date().toISOString(),
+          success: false,
+          data: {}
         };
       }
 
       if (session.status !== 'active') {
         return {
-          success: false,
+          sessionId: request.sessionId,
           message: 'Session is not active',
-          data: {} as any,
+          confidence: 0,
+          recommendations: [],
+          followUpQuestions: [],
+          actionItems: [],
           timestamp: new Date().toISOString(),
+          success: false,
+          data: {}
+        };
+      }
+
+      // Validate message
+      if (!request.message) {
+        return {
+          sessionId: request.sessionId,
+          message: 'Message is required',
+          confidence: 0,
+          recommendations: [],
+          followUpQuestions: [],
+          actionItems: [],
+          timestamp: new Date().toISOString(),
+          success: false,
+          data: {}
         };
       }
 
@@ -185,11 +224,17 @@ export class AIMentorshipService {
       );
 
       // Generate AI response
+      const contextObj: ConversationContext | undefined = request.context ? {
+        sessionId: request.sessionId!,
+        recentMessages: conversationHistory,
+        startupContext: typeof request.context === 'string' ? undefined : request.context
+      } : undefined;
+
       const aiResponse = await this.generateAIResponse(
-        request.message,
+        request.message!,
         session,
         conversationHistory,
-        request.context
+        contextObj
       );
 
       // Store AI response
@@ -201,16 +246,19 @@ export class AIMentorshipService {
       timer.end();
 
       return {
+        sessionId: request.sessionId,
+        message: aiResponse.content,
+        confidence: 0.8,
+        recommendations: (aiResponse.metadata as any)?.suggestions || [],
+        followUpQuestions: (aiResponse.metadata as any)?.followUpQuestions || [],
+        actionItems: (aiResponse.metadata as any)?.nextSteps || [],
+        timestamp: new Date().toISOString(),
         success: true,
-        message: 'Response generated successfully',
         data: {
           sessionId: request.sessionId,
           userMessage,
-          aiResponse,
-          suggestions: aiResponse.suggestions || [],
-          nextSteps: aiResponse.nextSteps || []
-        },
-        timestamp: new Date().toISOString()
+          aiResponse
+        }
       };
 
     } catch (error) {

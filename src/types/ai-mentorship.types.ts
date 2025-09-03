@@ -19,6 +19,8 @@ export interface AIMentorSession {
   messageCount?: number;
   feedback?: string;
   rating?: number;
+  startupContext?: any;
+  welcomeMessage?: string;
 }
 
 export interface AIMentorMessage {
@@ -37,7 +39,9 @@ export interface AIMentorResponse {
   recommendations: string[];
   followUpQuestions: string[];
   actionItems: string[];
-  timestamp: Date;
+  timestamp: string;
+  success?: boolean;
+  data?: any;
 }
 
 export interface MentorshipRequest {
@@ -49,6 +53,9 @@ export interface MentorshipRequest {
   focusAreas?: string[];
   urgency?: 'low' | 'medium' | 'high';
   context?: string;
+  sessionId?: string;
+  message?: string;
+  metadata?: any;
 }
 
 export interface ConversationContext {

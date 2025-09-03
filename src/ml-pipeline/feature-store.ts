@@ -4,7 +4,7 @@
  */
 
 import { Pool } from 'pg';
-import Redis from 'ioredis';
+import { createClient } from 'redis';
 import { logger } from '../utils/logger';
 import { performanceTimer } from '../utils/performance';
 
@@ -400,7 +400,7 @@ export class FeatureStore {
         const featureId = targetFeatures[i];
         const result = redisResults?.[i];
 
-        if (result && result[1]) {
+        if (result && result[1] && featureId) {
           try {
             const featureData = JSON.parse(result[1] as string);
             features[featureId] = featureData.value;
@@ -928,7 +928,7 @@ export class FeatureStore {
       if (!groups[fv.userId]) {
         groups[fv.userId] = [];
       }
-      groups[fv.userId].push(fv);
+      groups[fv.userId]?.push(fv);
       return groups;
     }, {} as Record<string, FeatureValue[]>);
   }

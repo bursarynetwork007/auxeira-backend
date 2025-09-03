@@ -3,14 +3,21 @@
  * Handles real-time communication for SSE updates, notifications, and live features
  */
 
-import { Server as SocketIOServer } from 'socket.io';
+import { Server as SocketIOServer, Socket } from 'socket.io';
 import { Server as HTTPServer } from 'http';
 import { logger } from '../utils/logger';
 import { performanceTimer } from '../utils/performance';
-import { authHandler } from './handlers/auth.handler';
-import { sseHandler } from './handlers/sse.handler';
-import { notificationHandler } from './handlers/notification.handler';
-import { authMiddleware } from './middleware/auth.middleware';
+import { authHandler } from './auth.handler';
+import { sseHandler } from './sse.handler';
+import { notificationHandler } from './notification.handler';
+import { authMiddleware } from './auth.middleware';
+
+// Extend Socket interface to include userId
+declare module 'socket.io' {
+  interface Socket {
+    userId?: string;
+  }
+}
 
 export interface WebSocketUser {
   userId: string;
@@ -239,16 +246,12 @@ export class WebSocketServer {
       socket.emit('heartbeat_ack', { serverTime: new Date() });
     });
 
-    socket.on('disconnect', (reason) => {
+    socket.on('disconnect', (reason: string) => {
       this.handleDisconnection(socket, user, reason);
     });
 
-    socket.on('error', (error) => {
-      logger.error('WebSocket error', {
-        socketId: socket.id,
-        userId: user.userId,
-        error: error.message
-      });
+    socket.on('error', (error: Error) => {
+      this.handleError(socket, user, error);
     });
   }
 

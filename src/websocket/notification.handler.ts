@@ -4,10 +4,10 @@
  */
 
 import { Socket } from 'socket.io';
-import { logger } from '../../utils/logger';
-import { performanceTimer } from '../../utils/performance';
-import { WebSocketUser, WebSocketServer } from '../index';
-import { redisClient } from '../../config/database';
+import { logger } from '../utils/logger';
+import { performanceTimer } from '../utils/performance';
+import { WebSocketUser, WebSocketServer } from './index';
+import { pool } from '../config/database';
 
 export interface NotificationEvent {
   notificationId: string;
