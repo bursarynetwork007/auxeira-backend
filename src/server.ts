@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import compression from 'compression';
 import { config } from 'dotenv';
-import { runMigrations } from './database/migrations';
+import { migrations } from './database/migrations';
 import { pool, redisClient } from './config/database';
 import { logger, loggers, logStartup, logShutdown, createRequestLogger } from './utils/logger';
 
@@ -17,7 +17,7 @@ import kpiRoutes from './routes/kpi';
 config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT || '3000', 10);
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Trust proxy for Railway deployment
@@ -260,10 +260,12 @@ app.use((error: any, req: express.Request, res: express.Response, next: express.
     ...(NODE_ENV === 'development' && { stack: error.stack }),
     timestamp: new Date().toISOString(),
   });
+
+  return; // Fix: Add return statement
 });
 
 // Graceful shutdown handler
-const gracefulShutdown = (signal: string) => {
+let gracefulShutdown = (signal: string) => {
   logShutdown(signal);
 
   const server = app.listen(PORT, () => {
@@ -327,7 +329,7 @@ async function startServer() {
 
     // Run database migrations
     loggers.database('Running database migrations...');
-    await runMigrations();
+    await migrations.runMigrations();
     loggers.database('Database migrations completed successfully');
 
     // Test database connection

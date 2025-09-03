@@ -1,12 +1,10 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import { body, validationResult } from 'express-validator';
 import { authController } from '../controllers/auth.controller';
-import { 
-  authenticateToken, 
-  optionalAuth, 
-  requireEmailVerified,
-  rateLimitByUser 
+import {
+  authenticateToken,
+  optionalAuth
 } from '../middleware/auth.middleware';
 import { logger } from '../utils/logger';
 
@@ -177,7 +175,7 @@ const refreshTokenValidation = [
  * @desc    Register a new user
  * @access  Public
  */
-router.post('/register', 
+router.post('/register',
   authRateLimit,
   registerValidation,
   handleValidationErrors,
@@ -205,7 +203,7 @@ router.post('/refresh',
   generalRateLimit,
   refreshTokenValidation,
   handleValidationErrors,
-  authController.refreshTokens.bind(authController)
+  authController.refreshToken.bind(authController)
 );
 
 /**
@@ -229,7 +227,7 @@ router.post('/password/confirm',
   authRateLimit,
   confirmPasswordResetValidation,
   handleValidationErrors,
-  authController.confirmPasswordReset.bind(authController)
+  authController.resetPassword.bind(authController)
 );
 
 /**
@@ -252,7 +250,7 @@ router.post('/email/verify',
 router.get('/check',
   generalRateLimit,
   optionalAuth,
-  authController.checkAuth.bind(authController)
+  authController.getProfile.bind(authController)
 );
 
 // =============================================================================
@@ -291,7 +289,12 @@ router.post('/password/change',
   authenticateToken,
   changePasswordValidation,
   handleValidationErrors,
-  authController.changePassword.bind(authController)
+  async (req: Request, res: Response) => {
+    res.status(501).json({
+      success: false,
+      message: 'Change password feature not yet implemented'
+    });
+  }
 );
 
 /**
@@ -302,8 +305,13 @@ router.post('/password/change',
 router.post('/email/resend',
   generalRateLimit,
   authenticateToken,
-  rateLimitByUser(3, 60 * 60 * 1000), // 3 requests per hour per user
-  authController.resendEmailVerification.bind(authController)
+  authRateLimit, // Use general rate limit instead
+  async (req: Request, res: Response) => {
+    res.status(501).json({
+      success: false,
+      message: 'Resend email verification feature not yet implemented'
+    });
+  }
 );
 
 /**
@@ -314,8 +322,12 @@ router.post('/email/resend',
 router.get('/sessions',
   generalRateLimit,
   authenticateToken,
-  requireEmailVerified,
-  authController.getSessions.bind(authController)
+  async (req: Request, res: Response) => {
+    res.status(501).json({
+      success: false,
+      message: 'Get sessions feature not yet implemented'
+    });
+  }
 );
 
 /**
@@ -326,8 +338,12 @@ router.get('/sessions',
 router.delete('/sessions/:sessionId',
   generalRateLimit,
   authenticateToken,
-  requireEmailVerified,
-  authController.revokeSession.bind(authController)
+  async (req: Request, res: Response) => {
+    res.status(501).json({
+      success: false,
+      message: 'Revoke session feature not yet implemented'
+    });
+  }
 );
 
 /**
@@ -338,8 +354,12 @@ router.delete('/sessions/:sessionId',
 router.delete('/sessions',
   generalRateLimit,
   authenticateToken,
-  requireEmailVerified,
-  authController.revokeAllSessions.bind(authController)
+  async (req: Request, res: Response) => {
+    res.status(501).json({
+      success: false,
+      message: 'Revoke all sessions feature not yet implemented'
+    });
+  }
 );
 
 // =============================================================================

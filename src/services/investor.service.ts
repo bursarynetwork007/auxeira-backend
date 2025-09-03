@@ -30,7 +30,7 @@ import {
   OpportunityStatus,
   InterestLevel,
   RiskLevel
-} from '../types/investor-dashboard.types';
+} from '../types/investor.types';
 
 export class InvestorDashboardService {
   // SSE Platform efficacy metrics from the evaluation study
@@ -758,7 +758,7 @@ export class InvestorDashboardService {
     const adjustedIndex = Math.max(0, Math.min(4,
       Math.round(currentIndex * multiplier)
     ));
-    return riskLevels[adjustedIndex];
+    return riskLevels[adjustedIndex] || originalLevel; // Fallback to original level
   }
 
   private calculateSSEEnhancedSuccessRate(portfolioCompanies: PortfolioCompany[]): number {

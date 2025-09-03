@@ -3,14 +3,26 @@
  * Defines all gamification and rewards API endpoints
  */
 
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { gamificationController } from '../controllers/gamification.controller';
-import { authMiddleware } from '../middleware/auth.middleware';
-import { rateLimitMiddleware } from '../middleware/rate-limit.middleware';
-import { validateRequest } from '../middleware/validation.middleware';
-import { body, query, param } from 'express-validator';
+import { authenticateToken } from '../middleware/auth.middleware';
+import { body, query, param, validationResult } from 'express-validator';
 
 const router = Router();
+
+// Simple validation middleware
+const validateRequest = (req: Request, res: Response, next: NextFunction): void => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({
+      success: false,
+      message: 'Validation failed',
+      errors: errors.array()
+    });
+    return;
+  }
+  next();
+};
 
 // Validation schemas
 const updatePreferencesValidation = [
@@ -118,8 +130,7 @@ const rewardsQueryValidation = [
  */
 router.get(
   '/profile',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   profileQueryValidation,
   validateRequest,
   gamificationController.getUserProfile
@@ -132,8 +143,7 @@ router.get(
  */
 router.put(
   '/preferences',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
+  authenticateToken,
   updatePreferencesValidation,
   validateRequest,
   gamificationController.updatePreferences
@@ -146,8 +156,7 @@ router.put(
  */
 router.post(
   '/achievements/check',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
+  authenticateToken,
   gamificationController.checkAchievements
 );
 
@@ -158,8 +167,7 @@ router.post(
  */
 router.get(
   '/challenges',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   challengesQueryValidation,
   validateRequest,
   gamificationController.getChallenges
@@ -172,8 +180,7 @@ router.get(
  */
 router.post(
   '/challenges/join',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
+  authenticateToken,
   joinChallengeValidation,
   validateRequest,
   gamificationController.joinChallenge
@@ -186,8 +193,7 @@ router.post(
  */
 router.get(
   '/challenges/my',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
+  authenticateToken,
   gamificationController.getUserChallenges
 );
 
@@ -198,8 +204,7 @@ router.get(
  */
 router.get(
   '/rewards',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   rewardsQueryValidation,
   validateRequest,
   gamificationController.getTokenRewards
@@ -212,8 +217,7 @@ router.get(
  */
 router.post(
   '/rewards/redeem',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 10 }), // 10 requests per 15 minutes
+  authenticateToken,
   redeemTokensValidation,
   validateRequest,
   gamificationController.redeemTokens
@@ -226,8 +230,7 @@ router.post(
  */
 router.get(
   '/tokens/history',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
+  authenticateToken,
   tokenHistoryQueryValidation,
   validateRequest,
   gamificationController.getTokenHistory
@@ -240,8 +243,7 @@ router.get(
  */
 router.get(
   '/leaderboards',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   leaderboardQueryValidation,
   validateRequest,
   gamificationController.getLeaderboards
@@ -254,8 +256,7 @@ router.get(
  */
 router.post(
   '/streak',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
+  authenticateToken,
   updateStreakValidation,
   validateRequest,
   gamificationController.updateStreak
@@ -268,8 +269,7 @@ router.post(
  */
 router.get(
   '/dashboard',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
+  authenticateToken,
   gamificationController.getDashboard
 );
 
@@ -282,9 +282,8 @@ router.get(
  */
 router.post(
   '/experience',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
   awardExperienceValidation,
   validateRequest,
   gamificationController.awardExperience
@@ -297,9 +296,8 @@ router.post(
  */
 router.post(
   '/tokens/award',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
   awardTokensValidation,
   validateRequest,
   gamificationController.awardTokens
@@ -312,9 +310,8 @@ router.post(
  */
 router.post(
   '/challenges',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
   createChallengeValidation,
   validateRequest,
   gamificationController.createChallenge
@@ -327,9 +324,8 @@ router.post(
  */
 router.get(
   '/admin/engagement/:userId',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
   [
     param('userId').isUUID().withMessage('Valid user ID is required'),
     query('period').optional().matches(/^\d{4}-\d{2}$/).withMessage('Period must be in YYYY-MM format')
@@ -345,9 +341,8 @@ router.get(
  */
 router.get(
   '/admin/stats',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
   [
     query('period').optional().matches(/^\d{4}-\d{2}$/).withMessage('Period must be in YYYY-MM format'),
     query('metric').optional().isIn(['engagement', 'tokens', 'achievements', 'challenges', 'retention']).withMessage('Invalid metric')
@@ -365,9 +360,8 @@ router.get(
  */
 router.post(
   '/admin/achievements',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
   [
     body('name').isLength({ min: 3, max: 200 }).withMessage('Name must be between 3 and 200 characters'),
     body('description').isLength({ min: 10, max: 1000 }).withMessage('Description must be between 10 and 1000 characters'),
@@ -378,7 +372,7 @@ router.post(
     body('rarity').isIn(['common', 'uncommon', 'rare', 'epic', 'legendary']).withMessage('Valid rarity is required')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement achievement creation endpoint
     res.json({
       success: true,
@@ -396,9 +390,8 @@ router.post(
  */
 router.post(
   '/admin/rewards',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
   [
     body('name').isLength({ min: 3, max: 200 }).withMessage('Name must be between 3 and 200 characters'),
     body('description').isLength({ min: 10, max: 1000 }).withMessage('Description must be between 10 and 1000 characters'),
@@ -409,7 +402,7 @@ router.post(
     body('availability').isObject().withMessage('Availability object is required')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement reward creation endpoint
     res.json({
       success: true,
@@ -427,15 +420,14 @@ router.post(
  */
 router.post(
   '/admin/leaderboards/update',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 10 }), // 10 requests per 15 minutes
   [
     body('leaderboardIds').optional().isArray().withMessage('Leaderboard IDs must be an array'),
     body('forceUpdate').optional().isBoolean().withMessage('Force update must be a boolean')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement leaderboard update endpoint
     res.json({
       success: true,
@@ -454,9 +446,8 @@ router.post(
  */
 router.get(
   '/admin/export',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 5 }), // 5 requests per 15 minutes
   [
     query('type').isIn(['users', 'achievements', 'challenges', 'tokens', 'leaderboards']).withMessage('Valid export type is required'),
     query('format').isIn(['csv', 'xlsx', 'json']).withMessage('Format must be csv, xlsx, or json'),
@@ -464,7 +455,7 @@ router.get(
     query('endDate').optional().isISO8601().withMessage('End date must be valid ISO8601 date')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement export endpoint
     res.json({
       success: true,

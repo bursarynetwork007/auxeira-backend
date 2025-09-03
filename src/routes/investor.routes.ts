@@ -3,14 +3,26 @@
  * Defines all investor dashboard API endpoints with SSE-enhanced analytics
  */
 
-import { Router } from 'express';
-import { investorDashboardController } from '../controllers/investor-dashboard.controller';
-import { authMiddleware } from '../middleware/auth.middleware';
-import { rateLimitMiddleware } from '../middleware/rate-limit.middleware';
-import { validateRequest } from '../middleware/validation.middleware';
-import { body, query, param } from 'express-validator';
+import { Router, Request, Response, NextFunction } from 'express';
+import { investorDashboardController } from '../controllers/investor.controller';
+import { authenticateToken } from '../middleware/auth.middleware';
+import { body, query, param, validationResult } from 'express-validator';
 
 const router = Router();
+
+// Simple validation middleware
+const validateRequest = (req: Request, res: Response, next: NextFunction): void => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({
+      success: false,
+      message: 'Validation failed',
+      errors: errors.array()
+    });
+    return;
+  }
+  next();
+};
 
 // Validation schemas
 const createProfileValidation = [
@@ -93,8 +105,7 @@ const opportunitiesQueryValidation = [
  */
 router.post(
   '/profile',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 5 }), // 5 requests per 15 minutes
+  authenticateToken,
   createProfileValidation,
   validateRequest,
   investorDashboardController.createProfile
@@ -107,9 +118,8 @@ router.post(
  */
 router.get(
   '/profile',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
-  async (req, res) => {
+  authenticateToken,
+  async (req: Request, res: Response) => {
     // TODO: Implement get profile endpoint
     res.json({
       success: true,
@@ -127,11 +137,10 @@ router.get(
  */
 router.put(
   '/profile',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
+  authenticateToken,
   updateProfileValidation,
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement update profile endpoint
     res.json({
       success: true,
@@ -149,8 +158,7 @@ router.put(
  */
 router.get(
   '/dashboard',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
+  authenticateToken,
   investorDashboardController.getDashboard
 );
 
@@ -165,8 +173,7 @@ router.get(
  */
 router.get(
   '/opportunities',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   opportunitiesQueryValidation,
   validateRequest,
   investorDashboardController.getOpportunities
@@ -179,11 +186,10 @@ router.get(
  */
 router.get(
   '/opportunities/:opportunityId',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   [param('opportunityId').isUUID().withMessage('Valid opportunity ID is required')],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement get opportunity details endpoint
     res.json({
       success: true,
@@ -202,8 +208,7 @@ router.get(
  */
 router.get(
   '/opportunities/:opportunityId/sse-analysis',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
+  authenticateToken,
   [param('opportunityId').isUUID().withMessage('Valid opportunity ID is required')],
   validateRequest,
   investorDashboardController.getSSEAnalysis
@@ -216,8 +221,7 @@ router.get(
  */
 router.post(
   '/opportunities/:opportunityId/interest',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
+  authenticateToken,
   [
     param('opportunityId').isUUID().withMessage('Valid opportunity ID is required'),
     ...expressInterestValidation
@@ -233,14 +237,13 @@ router.post(
  */
 router.put(
   '/interests/:interestId',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
+  authenticateToken,
   [
     param('interestId').isUUID().withMessage('Valid interest ID is required'),
     ...updateInterestValidation
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement update interest endpoint
     res.json({
       success: true,
@@ -263,8 +266,7 @@ router.put(
  */
 router.get(
   '/portfolio',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   [
     query('status').optional().isIn(['active', 'monitoring', 'at_risk', 'exited', 'written_off']).withMessage('Invalid status'),
     query('sortBy').optional().isIn(['investment_date', 'valuation', 'sse_score', 'performance']).withMessage('Invalid sort field'),
@@ -273,7 +275,7 @@ router.get(
     query('offset').optional().isInt({ min: 0 }).withMessage('Offset must be non-negative')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement get portfolio endpoint
     res.json({
       success: true,
@@ -293,8 +295,7 @@ router.get(
  */
 router.get(
   '/portfolio/performance',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
+  authenticateToken,
   [
     query('period').optional().matches(/^\d{4}-\d{2}$/).withMessage('Period must be in YYYY-MM format'),
     query('includeProjections').optional().isBoolean().withMessage('Include projections must be a boolean'),
@@ -311,8 +312,7 @@ router.get(
  */
 router.get(
   '/portfolio/sse-optimization',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
+  authenticateToken,
   investorDashboardController.getPortfolioOptimization
 );
 
@@ -323,11 +323,10 @@ router.get(
  */
 router.get(
   '/portfolio/:companyId',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   [param('companyId').isUUID().withMessage('Valid company ID is required')],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement get portfolio company details endpoint
     res.json({
       success: true,
@@ -350,8 +349,7 @@ router.get(
  */
 router.get(
   '/startup/investor-view',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
+  authenticateToken,
   investorDashboardController.getStartupInvestorView
 );
 
@@ -362,11 +360,10 @@ router.get(
  */
 router.post(
   '/startup/investment-opportunity',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 10 }), // 10 requests per 15 minutes
+  authenticateToken,
   createOpportunityValidation,
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement create opportunity endpoint
     res.json({
       success: true,
@@ -384,8 +381,7 @@ router.post(
  */
 router.put(
   '/startup/investment-opportunity/:opportunityId',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
+  authenticateToken,
   [
     param('opportunityId').isUUID().withMessage('Valid opportunity ID is required'),
     body('title').optional().isLength({ min: 10, max: 200 }).withMessage('Title must be between 10 and 200 characters'),
@@ -399,7 +395,7 @@ router.put(
     body('status').optional().isIn(['draft', 'review', 'active', 'paused', 'closed', 'funded', 'cancelled']).withMessage('Invalid status')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement update opportunity endpoint
     res.json({
       success: true,
@@ -422,8 +418,7 @@ router.put(
  */
 router.get(
   '/analytics/sse-impact',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
+  authenticateToken,
   investorDashboardController.getSSEImpactAnalysis
 );
 
@@ -434,8 +429,7 @@ router.get(
  */
 router.get(
   '/analytics/market-trends',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
+  authenticateToken,
   [
     query('industry').optional().isLength({ min: 2, max: 100 }).withMessage('Invalid industry'),
     query('region').optional().isLength({ min: 2, max: 100 }).withMessage('Invalid region'),
@@ -443,7 +437,7 @@ router.get(
     query('includeSSEData').optional().isBoolean().withMessage('Include SSE data must be a boolean')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement market trends endpoint
     res.json({
       success: true,
@@ -468,15 +462,14 @@ router.get(
  */
 router.get(
   '/analytics/roi-projections',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 30 }), // 30 requests per 15 minutes
+  authenticateToken,
   [
     query('timeHorizon').optional().isInt({ min: 1, max: 10 }).withMessage('Time horizon must be between 1 and 10 years'),
     query('riskProfile').optional().isIn(['conservative', 'moderate', 'aggressive']).withMessage('Invalid risk profile'),
     query('includeSSEEnhancement').optional().isBoolean().withMessage('Include SSE enhancement must be a boolean')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement ROI projections endpoint
     res.json({
       success: true,
@@ -501,15 +494,14 @@ router.get(
  */
 router.get(
   '/recommendations',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
+  authenticateToken,
   [
     query('limit').optional().isInt({ min: 1, max: 50 }).withMessage('Limit must be between 1 and 50'),
     query('minSSEScore').optional().isFloat({ min: 0, max: 100 }).withMessage('Minimum SSE score must be between 0 and 100'),
     query('riskTolerance').optional().isIn(['low', 'medium', 'high']).withMessage('Invalid risk tolerance')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement recommendations endpoint
     res.json({
       success: true,
@@ -531,15 +523,14 @@ router.get(
  */
 router.get(
   '/matching/startups',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
+  authenticateToken,
   [
     query('limit').optional().isInt({ min: 1, max: 50 }).withMessage('Limit must be between 1 and 50'),
     query('minMatchScore').optional().isFloat({ min: 0, max: 100 }).withMessage('Minimum match score must be between 0 and 100'),
     query('includeSSEAnalysis').optional().isBoolean().withMessage('Include SSE analysis must be a boolean')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement startup matching endpoint
     res.json({
       success: true,
@@ -565,8 +556,7 @@ router.get(
  */
 router.get(
   '/interests',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   [
     query('status').optional().isIn(['pending', 'under_review', 'due_diligence', 'term_sheet', 'legal_review', 'completed', 'declined', 'withdrawn']).withMessage('Invalid status'),
     query('sortBy').optional().isIn(['created_at', 'investment_amount', 'interest_level']).withMessage('Invalid sort field'),
@@ -575,7 +565,7 @@ router.get(
     query('offset').optional().isInt({ min: 0 }).withMessage('Offset must be non-negative')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement get interests endpoint
     res.json({
       success: true,
@@ -595,8 +585,7 @@ router.get(
  */
 router.get(
   '/transactions',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   [
     query('status').optional().isIn(['pending', 'processing', 'completed', 'failed', 'cancelled', 'disputed']).withMessage('Invalid status'),
     query('transactionType').optional().isIn(['initial_investment', 'follow_on', 'bridge_round', 'exit_partial', 'exit_full']).withMessage('Invalid transaction type'),
@@ -606,7 +595,7 @@ router.get(
     query('offset').optional().isInt({ min: 0 }).withMessage('Offset must be non-negative')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement get transactions endpoint
     res.json({
       success: true,
@@ -630,8 +619,7 @@ router.get(
  */
 router.get(
   '/notifications',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   [
     query('type').optional().isIn(['new_opportunity', 'opportunity_update', 'interest_response', 'due_diligence_request', 'meeting_scheduled', 'term_sheet_ready', 'investment_completed', 'portfolio_update', 'milestone_achieved', 'risk_alert', 'performance_report']).withMessage('Invalid notification type'),
     query('priority').optional().isIn(['low', 'medium', 'high', 'urgent']).withMessage('Invalid priority'),
@@ -640,7 +628,7 @@ router.get(
     query('offset').optional().isInt({ min: 0 }).withMessage('Offset must be non-negative')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement get notifications endpoint
     res.json({
       success: true,
@@ -661,11 +649,10 @@ router.get(
  */
 router.put(
   '/notifications/:notificationId/read',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   [param('notificationId').isUUID().withMessage('Valid notification ID is required')],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement mark notification as read endpoint
     res.json({
       success: true,
@@ -688,15 +675,14 @@ router.put(
  */
 router.get(
   '/admin/analytics',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
   [
     query('period').optional().matches(/^\d{4}-\d{2}$/).withMessage('Period must be in YYYY-MM format'),
     query('includeSSEMetrics').optional().isBoolean().withMessage('Include SSE metrics must be a boolean')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement admin analytics endpoint
     res.json({
       success: true,
@@ -723,10 +709,9 @@ router.get(
  */
 router.get(
   '/admin/sse-efficacy-report',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 10 }), // 10 requests per 15 minutes
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     const efficacyReport = {
       studyOverview: {
         methodology: 'Simulated Randomized Controlled Trial (RCT)',
@@ -814,8 +799,7 @@ router.get(
  */
 router.get(
   '/search/opportunities',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   [
     query('q').optional().isLength({ min: 2, max: 200 }).withMessage('Search query must be between 2 and 200 characters'),
     query('filters').optional().isJSON().withMessage('Filters must be valid JSON'),
@@ -824,7 +808,7 @@ router.get(
     query('offset').optional().isInt({ min: 0 }).withMessage('Offset must be non-negative')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement search opportunities endpoint
     res.json({
       success: true,
@@ -848,11 +832,10 @@ router.get(
  */
 router.get(
   '/reports/due-diligence/:opportunityId',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 10 }), // 10 requests per 15 minutes
+  authenticateToken,
   [param('opportunityId').isUUID().withMessage('Valid opportunity ID is required')],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement due diligence report generation
     res.json({
       success: true,

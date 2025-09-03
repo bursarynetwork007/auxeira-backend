@@ -301,6 +301,23 @@ export interface GovernanceVote {
   transactionHash: string;
 }
 
+// Missing type definitions for compilation fixes
+export type UnifiedWallet = SolanaWallet | EthereumWallet;
+
+export type StakingPosition = SolanaStakingAccount;
+
+export interface TokenPrice {
+  symbol: string;
+  name: string;
+  price: number;
+  priceChange24h: number;
+  marketCap?: number;
+  volume24h?: number;
+  lastUpdated: Date;
+}
+
+export type TokenBalance = SolanaTokenAccount | EthereumTokenBalance;
+
 export interface GovernanceDelegate {
   delegator: string;
   delegate: string;

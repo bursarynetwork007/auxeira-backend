@@ -3,14 +3,26 @@
  * Defines all advanced statistical modeling API endpoints
  */
 
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { statisticalModelsController } from '../controllers/statistical-models.controller';
-import { authMiddleware } from '../middleware/auth.middleware';
-import { rateLimitMiddleware } from '../middleware/rate-limit.middleware';
-import { validateRequest } from '../middleware/validation.middleware';
-import { body, query, param } from 'express-validator';
+import { authenticateToken } from '../middleware/auth.middleware';
+import { body, query, param, validationResult } from 'express-validator';
 
 const router = Router();
+
+// Simple validation middleware
+const validateRequest = (req: Request, res: Response, next: NextFunction): void => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({
+      success: false,
+      message: 'Validation failed',
+      errors: errors.array()
+    });
+    return;
+  }
+  next();
+};
 
 // Validation schemas
 const trainModelValidation = [
@@ -91,8 +103,7 @@ const predictionQueryValidation = [
  */
 router.get(
   '/',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   modelsQueryValidation,
   validateRequest,
   statisticalModelsController.getModels
@@ -105,8 +116,7 @@ router.get(
  */
 router.get(
   '/:modelId',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   [param('modelId').isUUID().withMessage('Valid model ID is required')],
   validateRequest,
   statisticalModelsController.getModelById
@@ -119,8 +129,7 @@ router.get(
  */
 router.post(
   '/:modelId/predict',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
+  authenticateToken,
   [
     param('modelId').isUUID().withMessage('Valid model ID is required'),
     ...predictValidation
@@ -136,8 +145,7 @@ router.post(
  */
 router.get(
   '/:modelId/feature-importance',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
+  authenticateToken,
   [
     param('modelId').isUUID().withMessage('Valid model ID is required'),
     ...featureImportanceQueryValidation
@@ -153,8 +161,7 @@ router.get(
  */
 router.post(
   '/:modelId/evaluate',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
+  authenticateToken,
   [
     param('modelId').isUUID().withMessage('Valid model ID is required'),
     ...evaluateModelValidation
@@ -170,8 +177,7 @@ router.post(
  */
 router.get(
   '/predictions/my',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   predictionQueryValidation,
   validateRequest,
   statisticalModelsController.getUserPredictions
@@ -184,8 +190,7 @@ router.get(
  */
 router.get(
   '/startup-success',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
+  authenticateToken,
   [query('timeHorizon').optional().isInt({ min: 1, max: 1095 }).withMessage('Time horizon must be between 1 and 1095 days')],
   validateRequest,
   statisticalModelsController.getStartupSuccessPrediction
@@ -198,8 +203,7 @@ router.get(
  */
 router.get(
   '/sse-trends',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
+  authenticateToken,
   [query('forecastDays').optional().isInt({ min: 1, max: 365 }).withMessage('Forecast days must be between 1 and 365')],
   validateRequest,
   statisticalModelsController.getSSETrendsAnalysis
@@ -212,8 +216,7 @@ router.get(
  */
 router.get(
   '/training/:jobId',
-  authMiddleware,
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
+  authenticateToken,
   [param('jobId').isUUID().withMessage('Valid job ID is required')],
   validateRequest,
   statisticalModelsController.getTrainingJobStatus
@@ -228,9 +231,8 @@ router.get(
  */
 router.post(
   '/train',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 10 }), // 10 requests per 15 minutes
   trainModelValidation,
   validateRequest,
   statisticalModelsController.trainModel
@@ -243,9 +245,8 @@ router.post(
  */
 router.post(
   '/survival-analysis',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
   survivalAnalysisValidation,
   validateRequest,
   statisticalModelsController.performSurvivalAnalysis
@@ -258,9 +259,8 @@ router.post(
  */
 router.post(
   '/hierarchical',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
   hierarchicalModelValidation,
   validateRequest,
   statisticalModelsController.buildHierarchicalModel
@@ -273,9 +273,8 @@ router.post(
  */
 router.post(
   '/compare',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
   compareModelsValidation,
   validateRequest,
   statisticalModelsController.compareModels
@@ -288,9 +287,8 @@ router.post(
  */
 router.get(
   '/admin/training-jobs',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 100 }), // 100 requests per 15 minutes
   [
     query('status').optional().isIn(['pending', 'running', 'completed', 'failed', 'cancelled', 'paused']).withMessage('Invalid status'),
     query('modelType').optional().isIn(['cox_survival', 'hierarchical_linear', 'hierarchical_logistic', 'time_series', 'classification', 'regression', 'clustering', 'anomaly_detection', 'ensemble']).withMessage('Invalid model type'),
@@ -308,9 +306,8 @@ router.get(
  */
 router.get(
   '/admin/performance',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
   [
     query('modelType').optional().isIn(['cox_survival', 'hierarchical_linear', 'hierarchical_logistic', 'time_series', 'classification', 'regression', 'clustering', 'anomaly_detection', 'ensemble']).withMessage('Invalid model type'),
     query('category').optional().isIn(['sse_prediction', 'churn_prediction', 'growth_forecasting', 'risk_assessment', 'performance_optimization', 'market_analysis', 'user_behavior', 'financial_modeling']).withMessage('Invalid category'),
@@ -327,9 +324,8 @@ router.get(
  */
 router.post(
   '/admin/retrain/:modelId',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 10 }), // 10 requests per 15 minutes
   [
     param('modelId').isUUID().withMessage('Valid model ID is required'),
     body('datasetId').optional().isUUID().withMessage('Dataset ID must be a valid UUID'),
@@ -337,7 +333,7 @@ router.post(
     body('forceRetrain').optional().isBoolean().withMessage('Force retrain must be a boolean')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement model retraining endpoint
     res.json({
       success: true,
@@ -356,12 +352,11 @@ router.post(
  */
 router.delete(
   '/admin/:modelId',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 20 }), // 20 requests per 15 minutes
   [param('modelId').isUUID().withMessage('Valid model ID is required')],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement model deletion endpoint
     res.json({
       success: true,
@@ -380,9 +375,8 @@ router.delete(
  */
 router.post(
   '/admin/deploy/:modelId',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 10 }), // 10 requests per 15 minutes
   [
     param('modelId').isUUID().withMessage('Valid model ID is required'),
     body('environment').isIn(['staging', 'production']).withMessage('Environment must be staging or production'),
@@ -390,7 +384,7 @@ router.post(
     body('monitoringConfig').optional().isObject().withMessage('Monitoring config must be an object')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement model deployment endpoint
     res.json({
       success: true,
@@ -410,16 +404,15 @@ router.post(
  */
 router.get(
   '/admin/pipelines',
-  authMiddleware,
+  authenticateToken,
   // TODO: Add admin authorization middleware
-  rateLimitMiddleware({ windowMs: 15 * 60 * 1000, max: 50 }), // 50 requests per 15 minutes
   [
     query('status').optional().isIn(['active', 'inactive', 'running', 'failed', 'maintenance']).withMessage('Invalid status'),
     query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
     query('offset').optional().isInt({ min: 0 }).withMessage('Offset must be non-negative')
   ],
   validateRequest,
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     // TODO: Implement pipeline management endpoint
     res.json({
       success: true,

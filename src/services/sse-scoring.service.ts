@@ -529,7 +529,7 @@ export class SSEScoringService {
       timeRange?.endDate || null,
     ];
 
-    const result = await database.query(query, values);
+    const result = await pool.query(query, values);
 
     // Group metrics by category
     const metrics = {
@@ -539,7 +539,10 @@ export class SSEScoringService {
     };
 
     result.rows.forEach((row: any) => {
-      metrics[row.metric_category as keyof typeof metrics][row.metric_code] = row.value;
+      const category = row.metric_category as keyof typeof metrics;
+      if (category in metrics) {
+        (metrics[category] as any)[row.metric_code] = row.value;
+      }
     });
 
     return metrics;
@@ -671,7 +674,7 @@ export class SSEScoringService {
       LIMIT 30
     `;
 
-    const result = await database.query(query, [userId, organizationId || null]);
+    const result = await pool.query(query, [userId, organizationId || null]);
 
     return result.rows.map((row: any) => ({
       date: row.calculated_at,
@@ -733,10 +736,10 @@ export class SSEScoringService {
       score.version,
     ];
 
-    await database.query(query, values);
+    await pool.query(query, values);
   }
 
-  private async getPreviousScore(userId: string, organizationId?: string): Promise<SSEScore | null> {
+  private async getPreviousScore(userId: string, organizationId?: string): Promise<SSEScore | undefined> {
     const query = `
       SELECT * FROM sse_scores
       WHERE user_id = $1
@@ -745,8 +748,8 @@ export class SSEScoringService {
       LIMIT 1 OFFSET 1
     `;
 
-    const result = await database.query(query, [userId, organizationId || null]);
-    return result.rows[0] || null;
+    const result = await pool.query(query, [userId, organizationId || null]);
+    return result.rows[0] || undefined;
   }
 
   private async cacheSSEScore(userId: string, score: SSEScore): Promise<void> {
@@ -768,7 +771,7 @@ export class SSEScoringService {
       WHERE id = $1 AND is_active = true
     `;
 
-    const result = await database.query(query, [questionId]);
+    const result = await pool.query(query, [questionId]);
     return result.rows[0] || null;
   }
 
@@ -792,7 +795,7 @@ export class SSEScoringService {
       response.respondedAt,
     ];
 
-    await database.query(query, values);
+    await pool.query(query, values);
   }
 
   private async saveBehavior(behavior: UserBehavior): Promise<void> {
@@ -815,7 +818,7 @@ export class SSEScoringService {
       behavior.occurredAt,
     ];
 
-    await database.query(query, values);
+    await pool.query(query, values);
   }
 
   private async updateRealTimeScoreImpact(
@@ -876,7 +879,7 @@ export class SSEScoringService {
 
     const improvements = scoreProgression.slice(0, -1).map((current, index) => {
       const previous = scoreProgression[index + 1];
-      return current.overallScore - previous.overallScore;
+      return previous ? current.overallScore - previous.overallScore : 0;
     });
 
     const averageMonthlyImprovement = improvements.reduce((sum, imp) => sum + imp, 0) / improvements.length;

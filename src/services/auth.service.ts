@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { pool, cacheHelpers } from '../config/database';
-import { logger, loggers } from '../utils/logger';
+import { logger, loggers, performanceTimer } from '../utils/logger';
 
 export interface User {
   id: string;
@@ -55,7 +55,7 @@ export class AuthService {
    * Register a new user
    */
   async register(userData: RegisterData): Promise<AuthResult> {
-    const timer = logger.time?.('auth_register') || { end: () => {} };
+    const timer = performanceTimer('auth_register');
 
     try {
       const { email, password, firstName, lastName, role = 'student' } = userData;
@@ -176,7 +176,7 @@ export class AuthService {
    * Login user
    */
   async login(loginData: LoginData): Promise<AuthResult> {
-    const timer = logger.time?.('auth_login') || { end: () => {} };
+    const timer = performanceTimer('auth_login');
 
     try {
       const { email, password } = loginData;

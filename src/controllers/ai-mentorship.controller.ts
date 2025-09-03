@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
 import { aiMentorshipService } from '../services/ai-mentorship.service';
-import { logger, logUserActivity } from '../utils/logger';
+import { logger } from '../utils/logger';
 import {
-  StartMentorshipSessionRequest,
-  SendMentorshipMessageRequest,
-  CreateGoalRequest,
-  UpdateGoalProgressRequest,
+  StartSessionRequest,
+  SendMessageRequest,
+  MentorshipRequest,
 } from '../types/ai-mentorship.types';
 
 /**
@@ -45,7 +44,7 @@ export class AIMentorshipController {
         return;
       }
 
-      const request: StartMentorshipSessionRequest = {
+      const request = {
         sessionType,
         topic,
         aiPersonality,
@@ -53,26 +52,24 @@ export class AIMentorshipController {
         focusAreas,
       };
 
-      const result = await aiMentorshipService.startMentorshipSession(req.user.id, request);
+      const result = await aiMentorshipService.startSession(
+        req.user.id,
+        request.sessionType,
+        request.topic,
+        request.aiPersonality,
+        request.sessionGoals,
+        request.focusAreas
+      );
 
-      if (result.success) {
-        res.status(201).json({
-          success: true,
-          message: result.message,
-          data: {
-            session: result.session,
-            welcomeMessage: 'Session started successfully! Your AI mentor is ready to help.',
-          },
-          timestamp: new Date().toISOString(),
-        });
-      } else {
-        res.status(400).json({
-          success: false,
-          message: result.message,
-          error: 'SESSION_START_FAILED',
-          timestamp: new Date().toISOString(),
-        });
-      }
+      res.status(201).json({
+        success: true,
+        message: 'Session started successfully',
+        data: {
+          session: result,
+          welcomeMessage: 'Session started successfully! Your AI mentor is ready to help.',
+        },
+        timestamp: new Date().toISOString(),
+      });
     } catch (error) {
       logger.error('Start mentorship session controller error', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -121,16 +118,20 @@ export class AIMentorshipController {
         return;
       }
 
-      const request: SendMentorshipMessageRequest = {
+      const request: any = {
         sessionId,
-        messageText,
-        attachments,
+        message: messageText,
+        metadata: { attachments },
         context,
       };
 
-      const result = await aiMentorshipService.sendMentorshipMessage(req.user.id, request);
+      const result = await aiMentorshipService.processMessage(req.user.id, request);
 
-      res.status(result.success ? 200 : 400).json(result);
+      res.status(200).json({
+        success: true,
+        data: result,
+        timestamp: new Date().toISOString(),
+      });
     } catch (error) {
       logger.error('Send mentorship message controller error', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -318,8 +319,8 @@ export class AIMentorshipController {
       // TODO: Implement endSession in service
       // For now, return success response
 
-      // Log session end
-      await logUserActivity(req.user.id, 'mentorship_session_ended', 'mentorship', {
+      // Log session end - TODO: Implement proper logging
+      logger.info('Session ended', {
         sessionId,
         userSatisfactionRating,
         feedback: feedback ? 'provided' : 'not_provided',
@@ -388,7 +389,7 @@ export class AIMentorshipController {
         return;
       }
 
-      const request: CreateGoalRequest = {
+      const request = {
         title,
         description,
         category,
@@ -399,26 +400,12 @@ export class AIMentorshipController {
         milestones,
       };
 
-      const result = await aiMentorshipService.createGoal(req.user.id, request);
-
-      if (result.success) {
-        res.status(201).json({
-          success: true,
-          message: 'Goal created successfully',
-          data: {
-            goal: result.goal,
-            message: 'Your goal has been created with AI-generated recommendations!',
-          },
-          timestamp: new Date().toISOString(),
-        });
-      } else {
-        res.status(400).json({
-          success: false,
-          message: 'Failed to create goal',
-          error: 'GOAL_CREATION_FAILED',
-          timestamp: new Date().toISOString(),
-        });
-      }
+      // TODO: Implement goal creation in AI mentorship service
+      res.status(501).json({
+        success: false,
+        message: 'Goal creation feature not yet implemented',
+        timestamp: new Date().toISOString(),
+      });
     } catch (error) {
       logger.error('Create goal controller error', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -469,7 +456,7 @@ export class AIMentorshipController {
         return;
       }
 
-      const request: UpdateGoalProgressRequest = {
+      const request = {
         goalId,
         currentValue,
         progressPercentage,
@@ -478,27 +465,12 @@ export class AIMentorshipController {
         notes,
       };
 
-      const result = await aiMentorshipService.updateGoalProgress(req.user.id, request);
-
-      if (result.success) {
-        res.status(200).json({
-          success: true,
-          message: 'Goal progress updated successfully',
-          data: {
-            goal: result.goal,
-            insights: result.insights,
-            message: 'Great progress! Keep up the momentum.',
-          },
-          timestamp: new Date().toISOString(),
-        });
-      } else {
-        res.status(400).json({
-          success: false,
-          message: 'Failed to update goal progress',
-          error: 'GOAL_UPDATE_FAILED',
-          timestamp: new Date().toISOString(),
-        });
-      }
+      // TODO: Implement goal progress update in AI mentorship service
+      res.status(501).json({
+        success: false,
+        message: 'Goal progress update feature not yet implemented',
+        timestamp: new Date().toISOString(),
+      });
     } catch (error) {
       logger.error('Update goal progress controller error', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -616,12 +588,10 @@ export class AIMentorshipController {
         return;
       }
 
-      const analytics = await aiMentorshipService.getMentorshipAnalytics(req.user.id);
-
-      res.status(200).json({
-        success: true,
-        message: 'Mentorship analytics retrieved successfully',
-        data: analytics,
+      // TODO: Implement mentorship analytics in AI mentorship service
+      res.status(501).json({
+        success: false,
+        message: 'Mentorship analytics feature not yet implemented',
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
@@ -758,8 +728,8 @@ export class AIMentorshipController {
       // TODO: Implement acknowledgeInsight in service
       // For now, return success response
 
-      // Log insight acknowledgment
-      await logUserActivity(req.user.id, 'mentorship_insight_acknowledged', 'insight', {
+      // Log insight acknowledgment - TODO: Implement proper logging
+      logger.info('Insight acknowledged', {
         insightId,
         rating,
         hasNotes: !!notes,
