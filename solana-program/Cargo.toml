@@ -1,0 +1,14 @@
+[workspace]
+members = [
+    "programs/sse-platform",
+]
+exclude = [
+    "target",
+]
+
+[profile.release]
+lto = true
+overflow-checks = true
+
+[profile.dev]
+overflow-checks = true

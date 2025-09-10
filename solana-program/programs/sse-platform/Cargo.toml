@@ -1,0 +1,14 @@
+[package]
+name = "sse-platform"
+version = "0.1.0"
+description = "SSE Platform Solana Program"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "sse_platform"
+
+[dependencies]
+anchor-lang = "0.29.0"
+anchor-spl = "0.29.0"
+ed25519-dalek = { version = "1.0.1", default-features = false, features = ["alloc"] }

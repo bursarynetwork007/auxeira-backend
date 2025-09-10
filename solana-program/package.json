@@ -1,0 +1,15 @@
+{
+  "name": "sse-platform",
+  "version": "0.1.0",
+  "description": "SSE Platform Solana Program",
+  "main": "index.js",
+  "scripts": {
+    "test": "anchor test"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.29.0"
+  },
+  "devDependencies": {
+    "mocha": "^10.8.2"
+  }
+}

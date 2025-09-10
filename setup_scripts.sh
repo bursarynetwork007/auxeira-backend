@@ -381,7 +381,7 @@ create_basic_server() {
     if [ ! -f "src/server.ts" ]; then
         print_status "Creating basic server file..."
         mkdir -p src
-        cat > src/server.ts << 'EOF'
+        cat > src/server.js << 'EOF'
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';

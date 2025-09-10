@@ -104,7 +104,7 @@
     "prettier": "^3.0.3",
     "typedoc": "^0.25.4",
     "husky": "^8.0.3",
-    "lint-staged": "^15.0.2"
+    "lint-staged": "^15.0.2",
   },
   "engines": {
     "node": ">=18.0.0",
@@ -117,5 +117,5 @@
   "bugs": {
     "url": "https://github.com/bursarynetwork007/auxeira-backend/issues"
   },
-  "homepage": "https://auxeira.com"
+  "homepage": "https://auxeira.com",
 }
