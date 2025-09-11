@@ -1,14 +1,22 @@
 [package]
 name = "sse-platform"
 version = "0.1.0"
-description = "SSE Platform Solana Program"
+description = "Created with Anchor"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
 name = "sse_platform"
 
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
 [dependencies]
-anchor-lang = "0.29.0"
-anchor-spl = "0.29.0"
-ed25519-dalek = { version = "1.0.1", default-features = false, features = ["alloc"] }
+anchor-lang = "0.31.1"
+anchor-spl = "0.31.1"
+
+
