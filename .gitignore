@@ -1,0 +1,24 @@
+# Build artifacts
+target/
+build/
+dist/
+*.so
+*.rlib
+
+# Solana binaries
+solana-release/
+*.tar.bz2
+
+# Dependencies
+node_modules/
+
+# Environment
+.env*
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+*.log
