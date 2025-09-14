@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SSE Platform Serverless API
+
+Globals:
+  Function:
+    Runtime: nodejs18.x
+    Timeout: 30
+    Environment:
+      Variables:
+        PROGRAM_ID: J26bKBS2G41XUAKXFc8JXQSR1op2qwkhYojjvBNsSTeC
+        AUX_MINT_ADDRESS: 8C2V7JmNbmebeZR1pFhJjKVPgUFvrN22CMcqj92UutSg
+        SOLANA_NETWORK: devnet
+
+Resources:
+  # API Gateway
+  SseApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+        AllowOrigin: "'*'"
+
+  # KPI Validation Function
+  ValidateKpiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: aws-lambda/functions/
+      Handler: validate-kpi.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SseApi
+            Path: /api/validate/{founder}
+            Method: GET
+
+  # Health Check Function
+  HealthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: aws-lambda/functions/
+      Handler: health.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SseApi
+            Path: /health
+            Method: GET
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${SseApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"

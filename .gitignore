@@ -38,3 +38,10 @@ target/
 # Environment files
 .env
 *.log
+
+# AWS SAM
+.aws-sam/
+samconfig.toml
+
+# Deployment
+deploy.sh
