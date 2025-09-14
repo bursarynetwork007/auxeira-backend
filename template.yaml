@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: SSE Platform Serverless API
+Description: SSE Platform Serverless API - Simplified
 
 Globals:
   Function:
@@ -30,21 +30,21 @@ Resources:
       CodeUri: aws-lambda/functions/
       Handler: validate-kpi.handler
       Events:
-        Api:
+        ValidateKpiApi:
           Type: Api
           Properties:
             RestApiId: !Ref SseApi
             Path: /api/validate/{founder}
             Method: GET
 
-  # Health Check Function
+  # Health Check Function  
   HealthFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: aws-lambda/functions/
       Handler: health.handler
       Events:
-        Api:
+        HealthApi:
           Type: Api
           Properties:
             RestApiId: !Ref SseApi
@@ -55,3 +55,11 @@ Outputs:
   ApiUrl:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${SseApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+  
+  HealthEndpoint:
+    Description: "Health check endpoint"
+    Value: !Sub "https://${SseApi}.execute-api.${AWS::Region}.amazonaws.com/prod/health"
+    
+  ValidateEndpoint:
+    Description: "KPI validation endpoint"
+    Value: !Sub "https://${SseApi}.execute-api.${AWS::Region}.amazonaws.com/prod/api/validate/{founder}"

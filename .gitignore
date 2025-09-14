@@ -45,3 +45,12 @@ samconfig.toml
 
 # Deployment
 deploy.sh
+
+# AWS SAM
+.aws-sam/
+samconfig.toml
+
+# Old Railway files
+railway.json
+nixpacks.toml
+docker-compose.yml
