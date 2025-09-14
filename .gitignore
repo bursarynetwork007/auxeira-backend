@@ -22,3 +22,19 @@ node_modules/
 # OS
 .DS_Store
 *.log
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Solana binaries
+solana-release*/
+*.tar.bz2
+*.tar.gz
+
+# Build artifacts
+target/
+**target/
+
+# Environment files
+.env
+*.log
