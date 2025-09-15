@@ -1,0 +1,2896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira | The Bloomberg Terminal for Entrepreneurship</title>
+    <meta name="description" content="Autonomous AI-blockchain platform transforming startup success rates through verified performance data and strategic partnerships. 85.7% success prediction accuracy.">
+    <meta name="keywords" content="startup success, behavioral economics, AI platform, blockchain, entrepreneurship, venture capital, predictive analytics">
+    <meta property="og:title" content="Auxeira | The Bloomberg Terminal for Entrepreneurship">
+    <meta property="og:description" content="Transform startup success through verified performance intelligence. 85.7% prediction accuracy.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://auxeira.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Strategic Design System - Enhanced Bloomberg Terminal Aesthetic */
+        :root {
+            --bloomberg-dark: #0d1117;
+            --bloomberg-charcoal: #161b22;
+            --bloomberg-blue: #007bff;
+            --bloomberg-accent: #ffd700;
+            --bloomberg-text: #f0f6fc;
+            --bloomberg-text-secondary: #8b949e;
+            --bloomberg-gray: #30363d;
+            --bloomberg-success: #28a745;
+            --bloomberg-warning: #ffc107;
+            --bloomberg-danger: #dc3545;
+            --border-radius: 8px;
+            --border-radius-lg: 12px;
+            --border-radius-xl: 16px;
+            --border-radius-2xl: 20px;
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
+            --shadow-xl: 0 15px 35px rgba(0, 0, 0, 0.25);
+            --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.35);
+            --font-mono: 'JetBrains Mono', monospace;
+            --glass-bg: rgba(13, 17, 23, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --gradient-primary: linear-gradient(135deg, var(--bloomberg-blue) 0%, var(--bloomberg-accent) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--bloomberg-dark) 0%, var(--bloomberg-charcoal) 100%);
+            --gradient-hero: linear-gradient(135deg, var(--bloomberg-dark) 0%, var(--bloomberg-charcoal) 50%, var(--bloomberg-dark) 100%);
+            --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --spacing-3xl: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--bloomberg-text);
+            background-color: var(--bloomberg-dark);
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(0, 123, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(0, 123, 255, 0.05) 0%, transparent 50%);
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Strategic Header Design */
+        .header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: var(--transition-smooth);
+        }
+
+        .header.scrolled {
+            box-shadow: var(--shadow-2xl);
+            background: rgba(13, 17, 23, 0.95);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+            transition: var(--transition-smooth);
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .brand-text {
+            font-weight: 800;
+            font-size: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: var(--bloomberg-text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            color: var(--bloomberg-blue);
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            font-family: 'Inter', sans-serif;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border-color: var(--bloomberg-blue);
+            color: var(--bloomberg-blue);
+        }
+
+        .btn-outline:hover {
+            background: var(--bloomberg-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary {
+            background: var(--bloomberg-blue);
+            border-color: var(--bloomberg-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--bloomberg-accent);
+            border-color: var(--bloomberg-accent);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 25px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .mobile-menu-btn span {
+            width: 100%;
+            height: 2px;
+            background-color: var(--bloomberg-text);
+            transition: var(--transition-smooth);
+        }
+
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            z-index: 999;
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            color: var(--bloomberg-text);
+            text-decoration: none;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--glass-border);
+            transition: var(--transition-smooth);
+        }
+
+        .mobile-menu a:hover {
+            color: var(--bloomberg-blue);
+            transform: translateX(10px);
+        }
+
+        .mobile-menu .btn {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        /* Strategic Hero Section */
+        .hero {
+            background: var(--gradient-hero);
+            padding: 10rem 0 8rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" opacity="0.03"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            z-index: 1;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle, rgba(0, 123, 255, 0.1) 0%, transparent 70%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            padding: 0.75rem 2rem;
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .badge-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--bloomberg-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-text::before {
+            content: '⚡';
+            font-size: 1.2rem;
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            font-weight: 900;
+            margin-bottom: 2rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.4rem;
+            color: var(--bloomberg-text-secondary);
+            max-width: 800px;
+            margin: 0 auto 4rem;
+            line-height: 1.6;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-xl);
+            padding: 2rem;
+            text-align: center;
+            transition: var(--transition-bounce);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 123, 255, 0.1) 0%, rgba(255, 215, 0, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: var(--shadow-2xl);
+            border-color: var(--bloomberg-blue);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--bloomberg-blue);
+            margin-bottom: 0.5rem;
+            font-family: var(--font-mono);
+            transition: var(--transition-smooth);
+        }
+
+        .stat-card:hover .stat-number {
+            color: var(--bloomberg-accent);
+            transform: scale(1.1);
+        }
+
+        .stat-label {
+            color: var(--bloomberg-text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .stat-trend {
+            font-size: 0.8rem;
+            color: var(--bloomberg-success);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.8s both;
+        }
+
+        .btn-hero-primary, .btn-hero-secondary {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.25rem 2.5rem;
+            border-radius: var(--border-radius-lg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-spring);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            font-size: 1.1rem;
+        }
+
+        .btn-hero-primary::before,
+        .btn-hero-secondary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-hero-primary:hover::before,
+        .btn-hero-secondary:hover::before {
+            left: 100%;
+        }
+
+        .btn-hero-primary {
+            background: var(--bloomberg-blue);
+            color: white;
+            border-color: var(--bloomberg-blue);
+        }
+
+        .btn-hero-primary:hover {
+            background: var(--bloomberg-accent);
+            border-color: var(--bloomberg-accent);
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .btn-hero-secondary {
+            background: transparent;
+            border-color: var(--bloomberg-blue);
+            color: var(--bloomberg-blue);
+        }
+
+        .btn-hero-secondary:hover {
+            background: var(--bloomberg-blue);
+            color: white;
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .hero-statement {
+            color: var(--bloomberg-text-secondary);
+            font-size: 0.9rem;
+            animation: fadeInUp 0.8s ease-out 1s both;
+        }
+
+        /* Section Styles */
+        section {
+            padding: 6rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 5rem;
+        }
+
+        .section-badge {
+            display: inline-block;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 0.5rem 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--bloomberg-blue);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--bloomberg-text);
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: var(--bloomberg-text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Status Quo Section */
+        .status-quo {
+            background: var(--bloomberg-charcoal);
+        }
+
+        .problem-solution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 3rem;
+        }
+
+        .problem-card, .solution-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-xl);
+            padding: 3rem;
+            transition: var(--transition-bounce);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-card::before,
+        .solution-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 0;
+        }
+
+        .problem-card::before {
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.1) 0%, rgba(255, 71, 87, 0.05) 100%);
+        }
+
+        .solution-card::before {
+            background: linear-gradient(135deg, rgba(0, 123, 255, 0.1) 0%, rgba(255, 215, 0, 0.1) 100%);
+        }
+
+        .problem-card:hover, .solution-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .problem-card:hover::before,
+        .solution-card:hover::before {
+            opacity: 1;
+        }
+
+        .problem-card > *,
+        .solution-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .problem-card {
+            border-left: 6px solid #ff4757;
+        }
+
+        .solution-card {
+            border-left: 6px solid var(--bloomberg-blue);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2.5rem;
+        }
+
+        .card-header h3 {
+            font-size: 1.8rem;
+            color: var(--bloomberg-text);
+            font-weight: 700;
+        }
+
+        .crisis-value, .solution-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            text-align: right;
+        }
+
+        .crisis-value {
+            color: #ff4757;
+        }
+
+        .solution-value {
+            color: var(--bloomberg-blue);
+        }
+
+        .solution-subtitle {
+            font-size: 0.9rem;
+            color: var(--bloomberg-text-secondary);
+            text-align: right;
+            margin-top: 0.5rem;
+        }
+
+        .problem-points, .solution-points {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .problem-point, .solution-point {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .bullet {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .bullet.red {
+            background: #ff4757;
+            color: white;
+        }
+
+        .bullet.red::before {
+            content: '✕';
+        }
+
+        .checkmark {
+            color: var(--bloomberg-blue);
+            font-weight: bold;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            margin-top: 0.25rem;
+        }
+
+        .point-content strong {
+            color: var(--bloomberg-text);
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .point-content p {
+            color: var(--bloomberg-text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Value Props Section */
+        .value-props {
+            background: var(--bloomberg-dark);
+        }
+
+        .value-props-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .value-prop-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-xl);
+            overflow: hidden;
+            transition: var(--transition-bounce);
+            position: relative;
+        }
+
+        .value-prop-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 123, 255, 0.1) 0%, rgba(255, 215, 0, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .value-prop-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-2xl);
+            border-color: var(--bloomberg-blue);
+        }
+
+        .value-prop-card:hover::before {
+            opacity: 1;
+        }
+
+        .value-prop-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .investor-card {
+            border-top: 6px solid var(--bloomberg-blue);
+        }
+
+        .partner-card {
+            border-top: 6px solid var(--bloomberg-accent);
+        }
+
+        .startup-card {
+            border-top: 6px solid var(--bloomberg-success);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition-smooth);
+        }
+
+        .value-prop-card:hover .card-icon {
+            transform: scale(1.2);
+        }
+
+        .card-header h3 {
+            font-size: 1.6rem;
+            color: var(--bloomberg-text);
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+
+        .card-header p {
+            color: var(--bloomberg-text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .performance-badge {
+            display: inline-block;
+            background: rgba(0, 123, 255, 0.2);
+            color: var(--bloomberg-blue);
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .card-content {
+            padding: 2.5rem;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--bloomberg-text-secondary);
+            transition: var(--transition-smooth);
+        }
+
+        .benefit-item:hover {
+            color: var(--bloomberg-text);
+            transform: translateX(5px);
+        }
+
+        .benefit-icon {
+            font-size: 1.3rem;
+            color: var(--bloomberg-blue);
+        }
+
+        /* Platform Preview Section */
+        .platform-preview {
+            background: var(--bloomberg-charcoal);
+        }
+
+        .platform-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .platform-features {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            transition: var(--transition-bounce);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 123, 255, 0.1) 0%, rgba(255, 215, 0, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateX(10px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--bloomberg-blue);
+        }
+
+        .feature-item:hover::before {
+            opacity: 1;
+        }
+
+        .feature-item > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            flex-shrink: 0;
+            transition: var(--transition-smooth);
+        }
+
+        .feature-item:hover .feature-icon {
+            transform: scale(1.2);
+        }
+
+        .feature-text {
+            flex: 1;
+        }
+
+        .feature-text h3 {
+            font-size: 1.2rem;
+            color: var(--bloomberg-text);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .feature-text p {
+            color: var(--bloomberg-text-secondary);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .feature-metric {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--bloomberg-blue);
+            font-family: var(--font-mono);
+            margin-top: 0.5rem;
+        }
+
+        .platform-metrics {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-xl);
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .platform-metrics::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 123, 255, 0.05) 0%, rgba(255, 215, 0, 0.05) 100%);
+            z-index: 0;
+        }
+
+        .platform-metrics > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .platform-metrics h3 {
+            font-size: 1.8rem;
+            color: var(--bloomberg-text);
+            margin-bottom: 2rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--bloomberg-charcoal);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            transition: var(--transition-smooth);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--bloomberg-text-secondary);
+            font-weight: 500;
+        }
+
+        .metric-trend {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .metric-trend.positive {
+            color: var(--bloomberg-success);
+        }
+
+        .metric-trend.stable {
+            color: var(--bloomberg-accent);
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            transition: var(--transition-smooth);
+        }
+
+        .metric-card:hover .metric-value {
+            transform: scale(1.1);
+        }
+
+        .metric-value.green {
+            color: var(--bloomberg-success);
+        }
+
+        .metric-value.blue {
+            color: var(--bloomberg-blue);
+        }
+
+        .metric-value.purple {
+            color: #a371f7;
+        }
+
+        .metric-value.yellow {
+            color: var(--bloomberg-accent);
+        }
+
+        /* Partnership Section Styling - Bloomberg Terminal Aesthetic */
+        .investment {
+            background: var(--bloomberg-charcoal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .investment::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 102, 204, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(0, 212, 170, 0.05) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .investment .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .investment-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .investment-card {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-lg);
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .investment-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 0;
+        }
+
+        .investment-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            border-color: var(--bloomberg-blue);
+        }
+
+        .investment-card:hover::before {
+            opacity: 1;
+        }
+
+        .investment-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Strategic Color Coding for Partnership Tiers */
+        .investment-card.blue-border {
+            border-top: 6px solid var(--bloomberg-blue);
+            background: rgba(0, 102, 204, 0.05);
+        }
+
+        .investment-card.blue-border:hover {
+            border-color: var(--bloomberg-blue);
+            box-shadow: 0 25px 50px rgba(0, 102, 204, 0.3);
+        }
+
+        .investment-card.green-border {
+            border-top: 6px solid var(--bloomberg-success);
+            background: rgba(0, 204, 102, 0.05);
+        }
+
+        .investment-card.green-border:hover {
+            border-color: var(--bloomberg-success);
+            box-shadow: 0 25px 50px rgba(0, 204, 102, 0.3);
+        }
+
+        .investment-card.red-border {
+            border-top: 6px solid #FF6B35;
+            background: rgba(255, 107, 53, 0.05);
+        }
+
+        .investment-card.red-border:hover {
+            border-color: #FF6B35;
+            box-shadow: 0 25px 50px rgba(255, 107, 53, 0.3);
+        }
+
+        .investment-value {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            font-family: var(--font-mono);
+            transition: all 0.3s ease;
+        }
+
+        .investment-card:hover .investment-value {
+            transform: scale(1.1);
+        }
+
+        .investment-value.blue {
+            color: var(--bloomberg-blue);
+            text-shadow: 0 0 20px rgba(0, 102, 204, 0.5);
+        }
+
+        .investment-value.green {
+            color: var(--bloomberg-success);
+            text-shadow: 0 0 20px rgba(0, 204, 102, 0.5);
+        }
+
+        .investment-value.red {
+            color: #FF6B35;
+            text-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+        }
+
+        .investment-card h3 {
+            font-size: 1.5rem;
+            color: var(--bloomberg-text);
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+
+        .investment-card p {
+            color: var(--bloomberg-text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .investment-trend {
+            font-size: 0.9rem;
+            color: var(--bloomberg-text-secondary);
+            margin-bottom: 1.5rem;
+            font-family: var(--font-mono);
+        }
+
+        /* Partnership CTA Section */
+        .investment .container > div:last-child {
+            background: rgba(26, 26, 26, 0.9);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: var(--border-radius-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .investment .container > div:last-child::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 102, 204, 0.1) 0%, rgba(0, 212, 170, 0.1) 100%);
+            z-index: 0;
+        }
+
+        .investment .container > div:last-child > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Pricing Section */
+        .pricing {
+            background: var(--bloomberg-charcoal);
+        }
+
+        .pricing-note {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+
+        .note-icon {
+            font-size: 1.8rem;
+            color: var(--bloomberg-accent);
+        }
+
+        .pricing-note p {
+            color: var(--bloomberg-text-secondary);
+            line-height: 1.6;
+        }
+
+        .pricing-note strong {
+            color: var(--bloomberg-text);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .pricing-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-xl);
+            overflow: hidden;
+            transition: var(--transition-bounce);
+            position: relative;
+        }
+
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 123, 255, 0.1) 0%, rgba(255, 215, 0, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-2xl);
+            border-color: var(--bloomberg-blue);
+        }
+
+        .pricing-card:hover::before {
+            opacity: 1;
+        }
+
+        .pricing-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .pricing-header {
+            padding: 2.5rem;
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .tier-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--bloomberg-blue);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+        }
+
+        .pricing-header h3 {
+            font-size: 1.6rem;
+            color: var(--bloomberg-text);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--bloomberg-text);
+            margin-bottom: 0.5rem;
+            font-family: var(--font-mono);
+        }
+
+        .period {
+            font-size: 1rem;
+            color: var(--bloomberg-text-secondary);
+            font-weight: normal;
+        }
+
+        .annual-price {
+            font-size: 0.9rem;
+            color: var(--bloomberg-text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .tier-description {
+            font-size: 1rem;
+            color: var(--bloomberg-text);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .tier-criteria {
+            font-size: 0.8rem;
+            color: var(--bloomberg-text-secondary);
+        }
+
+        .pricing-features {
+            padding: 2.5rem;
+        }
+
+        .feature-list {
+            margin-bottom: 2rem;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            color: var(--bloomberg-text-secondary);
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            color: var(--bloomberg-success);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .btn-pricing {
+            width: 100%;
+            padding: 1.25rem;
+            background: var(--bloomberg-blue);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-lg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            font-size: 1.1rem;
+        }
+
+        .btn-pricing:hover {
+            background: var(--bloomberg-accent);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Compact Disclaimer Section Styling */
+        .disclaimer-section {
+            background: var(--bloomberg-charcoal);
+            border-top: 1px solid var(--bloomberg-gray);
+            padding: var(--spacing-xl) 0;
+            margin-top: var(--spacing-2xl);
+        }
+
+        .disclaimer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius);
+        }
+
+        .disclaimer-header:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .disclaimer-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--bloomberg-text);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin: 0;
+        }
+
+        .disclaimer-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .disclaimer-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+
+        .disclaimer-content.expanded {
+            max-height: 500px;
+        }
+
+        .disclaimer-text {
+            color: var(--bloomberg-text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.6;
+            padding: var(--spacing-md) 0;
+        }
+
+        .disclaimer-text p {
+            margin: 0;
+        }
+
+        .disclaimer-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+        }
+
+        .disclaimer-point {
+            background: rgba(42, 42, 42, 0.5);
+            border-left: 3px solid #FF6B35;
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+        }
+
+        .disclaimer-point:hover {
+            background: rgba(42, 42, 42, 0.8);
+            transform: translateX(2px);
+        }
+
+        .disclaimer-point h4 {
+            font-size: 0.875rem;
+            color: var(--bloomberg-text);
+            margin-bottom: var(--spacing-xs);
+            font-weight: 600;
+        }
+
+        .disclaimer-point p {
+            font-size: 0.75rem;
+            color: var(--bloomberg-text-secondary);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .disclaimer-contact {
+            text-align: center;
+            margin-top: var(--spacing-md);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--bloomberg-gray);
+        }
+
+        .disclaimer-contact p {
+            font-size: 0.75rem;
+            color: var(--bloomberg-text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .disclaimer-contact a {
+            color: var(--bloomberg-blue);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .disclaimer-contact a:hover {
+            color: var(--bloomberg-accent);
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            padding: 5rem 0 2rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer-logo {
+            height: 40px;
+            width: auto;
+            margin-bottom: 1rem;
+        }
+
+        .footer h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .footer p {
+            color: var(--bloomberg-text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--bloomberg-charcoal);
+            color: var(--bloomberg-text);
+            transition: var(--transition-smooth);
+        }
+
+        .social-links a:hover {
+            background: var(--bloomberg-blue);
+          border-top: 1px solid var(--bloomberg-gray);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .footer-sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer-section h4 {
+            font-size: 1.2rem;
+            color: var(--bloomberg-text);
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .footer-section h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 30px;
+            height: 2px;
+            background: var(--bloomberg-blue);
+        }
+
+        .footer-section a {
+            color: var(--bloomberg-text-secondary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-section a:hover {
+            color: var(--bloomberg-blue);
+            transform: translateX(5px);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--bloomberg-gray);
+            flex-wrap: wrap;
+        }
+
+        .footer-legal {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-legal a {
+            color: var(--bloomberg-text-secondary);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-legal a:hover {
+            color: var(--bloomberg-blue);
+        }
+
+        .footer-legal span {
+            color: var(--bloomberg-text-secondary);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            display: block;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            margin: 5% auto;
+            width: 90%;
+            max-width: 600px;
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-2xl);
+            position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: var(--bloomberg-text-secondary);
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .close:hover {
+            color: var(--bloomberg-text);
+            transform: scale(1.1);
+        }
+
+        #authContent {
+            padding: 3rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Scroll Reveal */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero-title {
+                font-size: 3.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .section-header h2 {
+                font-size: 2.5rem;
+            }
+
+            .investment-metrics {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 2rem;
+            }
+            
+            .investment-card {
+                padding: 2rem;
+            }
+            
+            .investment-value {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .nav-buttons {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            .hero {
+                padding: 8rem 0 6rem;
+            }
+            
+            .hero-title {
+                font-size: 2.8rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .section-header p {
+                font-size: 1.1rem;
+            }
+
+            .problem-solution-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .value-props-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .platform-content {
+                grid-template-columns: 1fr;
+            }
+
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .investment-metrics {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .investment-card {
+                padding: 1.5rem;
+                margin: 0 1rem;
+            }
+            
+            .investment-value {
+                font-size: 2rem;
+            }
+            
+            .investment-card h3 {
+                font-size: 1.25rem;
+            }
+            
+            .investment .container > div:last-child {
+                margin: 0 1rem;
+                padding: 1.5rem;
+            }
+            
+            .investment .container > div:last-child > div:last-child {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-sections {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .footer-legal {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .disclaimer-points {
+                grid-template-columns: 1fr;
+            }
+            
+            .disclaimer-header h2 {
+                font-size: 1.125rem;
+            }
+            
+            .disclaimer-section {
+                padding: var(--spacing-lg) 0;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero {
+                padding: 6rem 0 4rem;
+            }
+            
+            .hero-title {
+                font-size: 2.2rem;
+            }
+            
+            .hero-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header h2 {
+                font-size: 1.8rem;
+            }
+
+            .footer-sections {
+                grid-template-columns: 1fr;
+            }
+
+            .problem-solution-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .problem-card, .solution-card {
+                padding: 2rem;
+            }
+
+            .investment-card {
+                margin: 0 0.5rem;
+                padding: 1rem;
+            }
+            
+            .investment-value {
+                font-size: 1.75rem;
+            }
+            
+            .investment-card h3 {
+                font-size: 1.125rem;
+            }
+            
+            .investment .container > div:last-child {
+                margin: 0 0.5rem;
+                padding: 1rem;
+            }
+
+            .disclaimer-header {
+                padding: var(--spacing-xs);
+            }
+            
+            .disclaimer-text {
+                font-size: 0.8125rem;
+            }
+            
+            .disclaimer-point {
+                padding: var(--spacing-xs);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <img src="auxeira-logo.png" alt="Auxeira Logo" class="logo">
+                <span class="brand-text">Auxeira</span>
+            </div>
+           
+            <ul class="nav-menu">
+                <li><a href="#platform">Platform</a></li>
+                <li><a href="#investors">For Investors</a></li>
+                <li><a href="partners.html">Partners</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+            </ul>
+
+            <div class="nav-buttons">
+                <button class="btn btn-outline" onclick="openAuthModal('login')">Login</button>
+                <button class="btn btn-primary" onclick="openAuthModal('signup')">Get Started</button>
+            </div>
+
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="#platform">Platform</a>
+            <a href="#investors">For Investors</a>
+            <a href="#partners">Partners</a>
+            <a href="#pricing">Pricing</a>
+            <button class="btn btn-outline" onclick="openAuthModal('login')">Login</button>
+            <button class="btn btn-primary" onclick="openAuthModal('signup')">Get Started</button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge-text">Bloomberg Terminal for Entrepreneurship</span>
+            </div>
+            <h1 class="hero-title">Transform Startup Success Through Verified Performance Intelligence</h1>
+            <p class="hero-subtitle">
+                Autonomous AI-blockchain platform reducing startup failure rates by 50% through behavioral economics, 
+                verified performance data, and strategic ecosystem partnerships
+            </p>
+           
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <div class="stat-number">85.7%</div>
+                    <div class="stat-label">Success Prediction Accuracy</div>
+                    <div class="stat-trend">↗ +12.3% vs industry</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">$847K</div>
+                    <div class="stat-label">Average Value Unlocked</div>
+                    <div class="stat-trend">↗ +34% YoY growth</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Startups Tracked*</div>
+                    <div class="stat-trend">↗ 152% growth rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">32</div>
+                    <div class="stat-label">Elite Partners</div>
+                    <div class="stat-trend">↗ Y Combinator, Stripe, AWS</div>
+                </div>
+            </div>
+
+            <div class="hero-buttons">
+                <button class="btn-hero-primary" onclick="openAuthModal('startup')">
+                    <span class="btn-icon">🚀</span>
+                    Join the Founding 500
+                    <span class="arrow">→</span>
+                </button>
+                <button class="btn-hero-secondary" onclick="openAuthModal('investor')">
+                    <span class="btn-icon">📊</span>
+                    Investor Access
+                    <span class="arrow">→</span>
+                </button>
+            </div>
+
+            <p class="hero-statement">*Projected based on current trajectory and partner integrations</p>
+        </div>
+    </section>
+
+    <!-- Status Quo Section -->
+    <section class="status-quo scroll-reveal" id="platform">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">The Crisis</div>
+                <h2>The $1 Trillion Startup Failure Crisis</h2>
+                <p>90% of startups fail not from lack of talent or capital, but from systematic behavioral blind spots that prevent optimal decision-making</p>
+            </div>
+            
+            <div class="problem-solution-grid">
+                <div class="problem-card">
+                    <div class="card-header">
+                        <h3>Current Reality</h3>
+                        <div>
+                            <div class="crisis-value">$1T+</div>
+                        </div>
+                    </div>
+                    <div class="problem-points">
+                        <div class="problem-point">
+                            <div class="bullet red"></div>
+                            <div class="point-content">
+                                <strong>90% Failure Rate</strong>
+                                <p>Despite unprecedented access to capital and resources, startup failure rates remain catastrophically high</p>
+                            </div>
+                        </div>
+                        <div class="problem-point">
+                            <div class="bullet red"></div>
+                            <div class="point-content">
+                                <strong>Behavioral Blind Spots</strong>
+                                <p>Founders make predictably irrational decisions due to cognitive biases, overconfidence, and lack of systematic feedback</p>
+                            </div>
+                        </div>
+                        <div class="problem-point">
+                            <div class="bullet red"></div>
+                            <div class="point-content">
+                                <strong>Fragmented Ecosystem</strong>
+                                <p>No unified platform connects performance data, behavioral insights, and strategic partnerships</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="solution-card">
+                    <div class="card-header">
+                        <h3>Auxeira Solution</h3>
+                        <div>
+                            <div class="solution-value">85.7%</div>
+                            <div class="solution-subtitle">Success Prediction Accuracy</div>
+                        </div>
+                    </div>
+                    <div class="solution-points">
+                        <div class="solution-point">
+                            <div class="checkmark">✓</div>
+                            <div class="point-content">
+                                <strong>Behavioral Science Integration</strong>
+                                <p>Apply Thaler, Ariely, and Kahneman principles through AI-powered nudges and systematic intervention</p>
+                            </div>
+                        </div>
+                        <div class="solution-point">
+                            <div class="checkmark">✓</div>
+                            <div class="point-content">
+                                <strong>Verified Performance Data</strong>
+                                <p>Blockchain-verified metrics across 150+ KPIs provide transparent, tamper-proof performance tracking</p>
+                            </div>
+                        </div>
+                        <div class="solution-point">
+                            <div class="checkmark">✓</div>
+                            <div class="point-content">
+                                <strong>Strategic Ecosystem</strong>
+                                <p>Direct integration with our prospects Y Combinator, Stripe, AWS, and 32 elite partners for systematic support</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Value Props Section -->
+    <section class="value-props scroll-reveal">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">Value Proposition</div>
+                <h2>Three Stakeholders, One Platform</h2>
+                <p>Auxeira creates value for investors, partners, and startups through verified performance intelligence and behavioral optimization</p>
+            </div>
+            
+            <div class="value-props-grid">
+                <div class="value-prop-card investor-card">
+                    <div class="card-header">
+                        <div class="card-icon">📊</div>
+                        <h3>For Investors</h3>
+                        <p>Make data-driven investment decisions with unprecedented transparency and predictive accuracy</p>
+                        <div class="performance-badge">85.7% Success Prediction</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="benefits-grid">
+                            <div class="benefit-item">
+                                <div class="benefit-icon">🎯</div>
+                                <span>Verified Performance Data</span>
+                            </div>
+                            <div class="benefit-item">
+                                <div class="benefit-icon">📈</div>
+                                <span>Predictive Analytics</span>
+                            </div>
+                            <div class="benefit-item">
+                                <div class="benefit-icon">🔍</div>
+                                <span>Real-time Monitoring</span>
+                            </div>
+                            <div class="benefit-item">
+                                <div class="benefit-icon">⚡</div>
+                                <span>Early Warning System</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="value-prop-card partner-card">
+                    <div class="card-header">
+                        <div class="card-icon">🤝</div>
+                        <h3>For Partners</h3>
+                        <p>Optimize customer success and reduce churn through behavioral insights and performance tracking</p>
+                        <div class="performance-badge">$847K Average Value</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="benefits-grid">
+                            <div class="benefit-item">
+                                <div class="benefit-icon">📊</div>
+                                <span>Customer Intelligence</span>
+                            </div>
+                            <div class="benefit-item">
+                                <div class="benefit-icon">🎯</div>
+                                <span>Churn Prediction</span>
+                            </div>
+                            <div class="benefit-item">
+                                <div class="benefit-icon">💡</div>
+                                <span>Behavioral Insights</span>
+                            </div>
+                            <div class="benefit-item">
+                                <div class="benefit-icon">🚀</div>
+                                <span>Growth Optimization</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="value-prop-card startup-card">
+                    <div class="card-header">
+                        <div class="card-icon">🚀</div>
+                        <h3>For Startups</h3>
+                        <p>Systematic behavioral coaching and performance optimization to dramatically improve success rates</p>
+                        <div class="performance-badge">50% Failure Reduction</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="benefits-grid">
+                            <div class="benefit-item">
+                                <div class="benefit-icon">🧠</div>
+                                <span>Behavioral Coaching</span>
+                            </div>
+                            <div class="benefit-item">
+                                <div class="benefit-icon">📈</div>
+                                <span>Performance Tracking</span>
+                            </div>
+                            <div class="benefit-item">
+                                <div class="benefit-icon">🎯</div>
+                                <span>Strategic Guidance</span>
+                            </div>
+                            <div class="benefit-item">
+                                <div class="benefit-icon">🤝</div>
+                                <span>Partner Access</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Platform Preview Section -->
+    <section class="platform-preview scroll-reveal">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">Platform</div>
+                <h2>The Bloomberg Terminal for Entrepreneurship</h2>
+                <p>Real-time behavioral analytics, verified performance data, and AI-powered insights in one comprehensive platform</p>
+            </div>
+            
+            <div class="platform-content">
+                <div class="platform-features">
+                    <div class="feature-item">
+                        <div class="feature-icon">🧠</div>
+                        <div class="feature-text">
+                            <h3>Behavioral Analytics Engine</h3>
+                            <p>AI-powered analysis of founder decision patterns using Nobel Prize-winning behavioral economics principles</p>
+                            <div class="feature-metric">85.7% prediction accuracy</div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">⛓️</div>
+                        <div class="feature-text">
+                            <h3>Blockchain Verification</h3>
+                            <p>Tamper-proof performance data across 150+ KPIs with smart contract-based achievement verification</p>
+                            <div class="feature-metric">100% data integrity</div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">🤖</div>
+                        <div class="feature-text">
+                            <h3>Autonomous Intervention</h3>
+                            <p>Real-time nudges and behavioral coaching based on predictive models and performance anomalies</p>
+                            <div class="feature-metric">24/7 monitoring</div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">🌐</div>
+                        <div class="feature-text">
+                            <h3>Partner Ecosystem</h3>
+                            <p>Direct integration with Y Combinator, Stripe, AWS, and 32 elite partners for systematic support</p>
+                            <div class="feature-metric">32 elite partners</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="platform-metrics">
+                    <h3>Live Platform Metrics</h3>
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span class="metric-label">Active Startups</span>
+                                <span class="metric-trend positive">↗ +23%</span>
+                            </div>
+                            <div class="metric-value green">2,847</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span class="metric-label">Success Rate</span>
+                                <span class="metric-trend positive">↗ +12%</span>
+                            </div>
+                            <div class="metric-value blue">85.7%</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span class="metric-label">Interventions</span>
+                                <span class="metric-trend stable">→ Stable</span>
+                            </div>
+                            <div class="metric-value purple">15.2K</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span class="metric-label">Value Created</span>
+                                <span class="metric-trend positive">↗ +34%</span>
+                            </div>
+                            <div class="metric-value yellow">$847K</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partnership Opportunity -->
+    <section class="investment" id="partners">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">Partnership Opportunity</div>
+                <h2>Join the Elite Partner Ecosystem</h2>
+                <p>Partner with Auxeira to transform startup success rates while growing your business through our verified performance intelligence platform.</p>
+            </div>
+
+            <div class="investment-metrics">
+                <div class="investment-card blue-border">
+                    <div class="investment-value blue">Tier 1</div>
+                    <h3>Strategic Partners</h3>
+                    <p>Y Combinator, Stripe, AWS level partnerships</p>
+                    <div class="investment-trend">Deep platform integration</div>
+                    <button class="btn btn-primary" onclick="window.location.href='partners.html'" style="margin-top: 1rem; width: 100%; padding: 0.75rem;">Apply for Tier 1</button>
+                </div>
+                <div class="investment-card green-border">
+                    <div class="investment-value green">Tier 2</div>
+                    <h3>Growth Partners</h3>
+                    <p>Established SaaS and service providers</p>
+                    <div class="investment-trend">Revenue sharing opportunities</div>
+                    <button class="btn btn-primary" onclick="window.location.href='partners.html'" style="margin-top: 1rem; width: 100%; padding: 0.75rem;">Join Tier 2</button>
+                </div>
+                <div class="investment-card red-border">
+                    <div class="investment-value red">Tier 3</div>
+                    <h3>Emerging Partners</h3>
+                    <p>Startups and emerging service providers</p>
+                    <div class="investment-trend">Mutual growth ecosystem</div>
+                    <button class="btn btn-primary" onclick="openAuthModal('partner')" style="margin-top: 1rem; width: 100%; padding: 0.75rem;">Start as Tier 3</button>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 3rem; padding: 2rem; background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: var(--border-radius-lg);">
+                <h3 style="color: var(--bloomberg-text); margin-bottom: 1rem;">Ready to Transform Startup Success Together?</h3>
+                <p style="color: var(--bloomberg-text-secondary); margin-bottom: 2rem;">Join our partner ecosystem and help reduce startup failure rates by 50% while growing your business.</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="window.location.href='partners.html'">Explore Partnership Tiers</button>
+                    <button class="btn btn-outline" onclick="openAuthModal('partner')">Apply to Partner</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+  
+  
+  
+  
+  
+  
+  
+  
+  
+ <!-- Pricing Section -->
+<section class="pricing scroll-reveal" id="pricing">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-badge">Pricing</div>
+            <h2>Pricing That Pays You Back</h2>
+            <p>Join 10,000+ startups saving an average of $50K annually through our partner network</p>
+        </div>
+
+        <!-- Value Props Bar -->
+        <div style="display: flex; justify-content: center; gap: 2rem; margin-bottom: 3rem; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--bloomberg-success);">
+                <span style="font-size: 1.2rem;">✓</span>
+                <span>50+ Partner Discounts</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--bloomberg-success);">
+                <span style="font-size: 1.2rem;">✓</span>
+                <span>Real-time KPI Tracking</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--bloomberg-success);">
+                <span style="font-size: 1.2rem;">✓</span>
+                <span>AUX Token Rewards</span>
+            </div>
+        </div>
+
+        <!-- Billing Toggle -->
+        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 3rem;">
+            <div style="display: flex; align-items: center; gap: 1rem; background: var(--glass-bg); backdrop-filter: blur(10px); padding: 0.5rem 1.5rem; border-radius: 50px; border: 1px solid var(--glass-border);">
+                <span style="color: var(--bloomberg-text);">Monthly</span>
+                <div id="billingToggle" style="width: 60px; height: 30px; background: var(--bloomberg-gray); border-radius: 30px; cursor: pointer; position: relative; transition: background 0.3s;">
+                    <div style="width: 24px; height: 24px; background: white; border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: transform 0.3s;"></div>
+                </div>
+                <span style="color: var(--bloomberg-text);">Annual <span style="color: var(--bloomberg-success); font-size: 0.8rem;">Save 20%</span></span>
+            </div>
+        </div>
+        
+        <div class="pricing-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+            <!-- Founder Tier (FREE) -->
+            <div class="pricing-card" style="position: relative;">
+                <div class="pricing-header">
+                    <h3>Founder</h3>
+                    <div class="price" style="font-size: 2.5rem;">FREE</div>
+                    <div class="tier-description">Bootstrap & Pre-revenue</div>
+                    <div class="tier-criteria">&lt;$5K MRR, &lt;3 employees</div>
+                    <div style="background: rgba(0, 123, 255, 0.1); border: 1px solid var(--bloomberg-blue); border-radius: 8px; padding: 0.75rem; margin-top: 1rem;">
+                        <div style="font-size: 0.8rem; color: var(--bloomberg-blue); text-transform: uppercase; font-weight: 600;">Typical Monthly Savings</div>
+                        <div style="font-size: 1.2rem; color: var(--bloomberg-blue); font-weight: 700;">$300-500</div>
+                    </div>
+                </div>
+                <div class="pricing-features">
+                    <ul class="feature-list">
+                        <li>3 partner perks/month</li>
+                        <li>Core KPI tracking</li>
+                        <li>SSE scoring system</li>
+                        <li>Community access</li>
+                        <li>Basic AI insights</li>
+                    </ul>
+                    <button class="btn-pricing" onclick="openAuthModal('signup')" style="background: transparent; border: 2px solid var(--bloomberg-blue); color: var(--bloomberg-blue);">Start Free</button>
+                </div>
+            </div>
+
+            <!-- Startup Tier -->
+            <div class="pricing-card" style="position: relative;">
+                <div class="pricing-header">
+                    <h3>Startup</h3>
+                    <div class="price">$149<span class="period">/mo</span></div>
+                    <div class="annual-price">$119/mo billed annually</div>
+                    <div class="tier-description">Pre-Seed to Seed Stage</div>
+                    <div class="tier-criteria">$10K-$500K raised</div>
+                    <div style="background: rgba(40, 167, 69, 0.1); border: 1px solid var(--bloomberg-success); border-radius: 8px; padding: 0.75rem; margin-top: 1rem;">
+                        <div style="font-size: 0.8rem; color: var(--bloomberg-success); text-transform: uppercase; font-weight: 600;">Net Monthly Benefit</div>
+                        <div style="font-size: 1.2rem; color: var(--bloomberg-success); font-weight: 700;">+$351 profit</div>
+                    </div>
+                </div>
+                <div class="pricing-features">
+                    <ul class="feature-list">
+                        <li>Unlimited partner perks</li>
+                        <li>20% partner discounts</li>
+                        <li>AI recommendations</li>
+                        <li>$5K AUX tokens/year</li>
+                        <li>Monthly investor reports</li>
+                        <li>API access (read-only)</li>
+                    </ul>
+                    <button class="btn-pricing" onclick="openAuthModal('signup')">Get Started</button>
+                </div>
+            </div>
+
+            <!-- Growth Tier (Most Popular) -->
+            <div class="pricing-card" style="position: relative; transform: scale(1.05); border: 2px solid var(--bloomberg-blue);">
+                <div class="tier-badge" style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, var(--bloomberg-blue), var(--bloomberg-accent)); padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: white;">MOST POPULAR</div>
+                <div class="pricing-header">
+                    <h3>Growth</h3>
+                    <div class="price">$499<span class="period">/mo</span></div>
+                    <div class="annual-price">$399/mo billed annually</div>
+                    <div class="tier-description">Series A Companies</div>
+                    <div class="tier-criteria">$500K-$5M raised</div>
+                    <div style="background: rgba(40, 167, 69, 0.1); border: 1px solid var(--bloomberg-success); border-radius: 8px; padding: 0.75rem; margin-top: 1rem;">
+                        <div style="font-size: 0.8rem; color: var(--bloomberg-success); text-transform: uppercase; font-weight: 600;">Net Monthly Benefit</div>
+                        <div style="font-size: 1.2rem; color: var(--bloomberg-success); font-weight: 700;">+$2,501 profit</div>
+                    </div>
+                </div>
+                <div class="pricing-features">
+                    <ul class="feature-list">
+                        <li>30% partner discounts</li>
+                        <li>Priority support</li>
+                        <li>$15K AUX tokens/year</li>
+                        <li>Warm investor intros</li>
+                        <li>Advanced analytics</li>
+                        <li>Custom integrations</li>
+                        
+                    </ul>
+                    <button class="btn-pricing" onclick="openAuthModal('signup')">Get Started</button>
+                </div>
+            </div>
+
+            <!-- Scale Tier -->
+            <div class="pricing-card" style="position: relative;">
+                <div class="pricing-header">
+                    <h3>Scale</h3>
+                    <div class="price">$999<span class="period">/mo</span></div>
+                    <div class="annual-price">$799/mo billed annually</div>
+                    <div class="tier-description">Series B+ Companies</div>
+                    <div class="tier-criteria">$5M+ raised</div>
+                    <div style="background: rgba(255, 215, 0, 0.1); border: 1px solid var(--bloomberg-accent); border-radius: 8px; padding: 0.75rem; margin-top: 1rem;">
+                        <div style="font-size: 0.8rem; color: var(--bloomberg-success); text-transform: uppercase; font-weight: 600;">Net Monthly Benefit</div>
+                        <div style="font-size: 0.8rem; color: var(--bloomberg-accent); text-transform: uppercase; font-weight: 600;">+$9,001 profit</div>
+                    </div>
+                </div>
+                <div class="pricing-features">
+                    <ul class="feature-list">
+                        <li>40% partner discounts</li>
+                        <li>Dedicated success manager</li>
+                        <li>$30K AUX tokens/year</li>
+                        <li>Board-ready reports</li>
+                        <li>Custom ML models</li>
+                        <li>White-label options</li>
+                        <li>SLA guarantees</li>
+                    </ul>
+                    <button class="btn-pricing" onclick="openAuthModal('signup')">Get Started</button>
+                </div>
+            </div>
+
+</section>
+
+      
+    <!-- Compact Disclaimer Section -->
+    <section class="disclaimer-section">
+        <div class="container">
+            <div class="disclaimer-header" onclick="toggleDisclaimer()">
+                <h2>
+                    <span class="disclaimer-icon">📄</span>
+                    Important Disclosures
+                </h2>
+                <span class="disclaimer-icon" id="disclaimer-chevron">▼</span>
+            </div>
+            
+            <div class="disclaimer-content" id="disclaimer-content">
+                <div class="disclaimer-text">
+                    <p>Auxeira is a startup seeking institutional partners/clients for platform validation. Platform projections are based on simulation studies (n=10,000 startups), not empirical results from actual users. All assumptions are public and the protocol is registered on <a href="https://socialscienceregistry.org/rct/auxeira-sse" target="_blank" style="color: var(--bloomberg-blue);">socialscienceregistry.org/rct/auxeira-sse</a> for transparency. <strong>Live pilot launching 2026.</strong></p>
+                </div>
+                
+                <div class="disclaimer-points">
+                    <div class="disclaimer-point">
+                        <h4>Forward-Looking Statements</h4>
+                        <p>Results based on simulation study designed to mirror real-world benchmarks (CB Insights, World Bank, web sentiment data).</p>
+                    </div>
+                    <div class="disclaimer-point">
+                        <h4>Development Stage</h4>
+                        <p>Pricing and feature sets subject to change based on development program feedback.</p>
+                    </div>
+                    <div class="disclaimer-point">
+                        <h4>No Investment Advice</h4>
+                        <p>Platform projections do not constitute investment advice. Institutional partners should conduct independent due diligence.</p>
+                    </div>
+                    <div class="disclaimer-point">
+                        <h4>Risk Factors</h4>
+                        <p>Startup investments carry inherent risk of total loss. Platform effectiveness subject to market conditions and individual execution.</p>
+                    </div>
+                </div>
+                
+                <div class="disclaimer-contact">
+                    <p>For complete disclosures, please contact us at</p>
+                    <a href="mailto:info@auxeira.com" style="color: var(--bloomberg-blue); font-size: 0.75rem;">info@auxeira.com</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="auxeira-logo.png" alt="Auxeira Logo" class="footer-logo">
+                    <h3>Auxeira</h3>
+                    <p>The Bloomberg Terminal for Entrepreneurship</p>
+                    <div class="social-links">
+                        <a href="https://x.com/auxeira" target="_blank" aria-label="Follow us on X">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                        </a>
+                        <a href="https://instagram.com/auxeira" target="_blank" aria-label="Follow us on Instagram">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-sections">
+                    <div class="footer-section">
+                        <h4>Platform</h4>
+                        <a href="demo.html">Dashboard Demo</a>
+                        <a href="api.html">API Documentation</a>
+                        <a href="partners.html">Partner Network</a>
+                        <a href="insights.html">Data Insights</a>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Research</h4>
+                        <a href="whitepaper.html">White-Paper</a>
+                        <a href="studies.html">Case Studies</a>
+                        <a href="reports.html">Industry Reports</a>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Company</h4>
+                        <a href="about.html">About Auxeira</a>
+                        <a href="team.html">Leadership Team</a>
+                        <a href="careers.html">Careers</a>
+                        <a href="press.html">Press Kit</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="footer-legal">
+                    <a href="terms.html">Terms of Service</a>
+                    <a href="privacy.html">Privacy Policy</a>
+                    <span>© 2025 Auxeira. All rights reserved.</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Authentication Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAuthModal()">&times;</span>
+            <div id="authContent">
+                <!-- Content will be dynamically loaded -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced strategic interactions and animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Header scroll effect
+            const header = document.getElementById('header');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 100) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+            // Scroll reveal animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all scroll reveal elements
+            document.querySelectorAll('.scroll-reveal').forEach(element => {
+                observer.observe(element);
+            });
+
+            // Enhanced hover effects for cards
+            document.querySelectorAll('.stat-card, .value-prop-card, .investment-card, .pricing-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-15px) scale(1.05)';
+                    this.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Parallax effect for hero section
+            window.addEventListener('scroll', function() {
+                const scrolled = window.pageYOffset;
+                const hero = document.querySelector('.hero');
+                if (hero) {
+                    hero.style.transform = `translateY(${scrolled * 0.2}px)`;
+                }
+            });
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Counter animation for hero stats
+            function animateCounters() {
+                const counters = document.querySelectorAll('.stat-number');
+                counters.forEach(counter => {
+                    const target = counter.textContent.includes('K') ? 
+                        parseInt(counter.textContent.replace(/[^\d]/g, '')) : 
+                        parseFloat(counter.textContent.replace(/[^\d.]/g, ''));
+                    const increment = target / 50;
+                    let current = 0;
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            counter.textContent = counter.textContent.replace(/[\d.]+/, target);
+                            clearInterval(timer);
+                        } else {
+                            const value = counter.textContent.includes('.') ? 
+                                current.toFixed(1) : Math.floor(current);
+                            counter.textContent = counter.textContent.replace(/[\d.]+/, value);
+                        }
+                    }, 30);
+                });
+            }
+
+            // Trigger counter animation when hero stats are visible
+            const statsObserver = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateCounters();
+                        statsObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            const heroStats = document.querySelector('.hero-stats');
+            if (heroStats) {
+                statsObserver.observe(heroStats);
+            }
+
+            // Initialize disclaimer as collapsed
+            const disclaimerContent = document.getElementById('disclaimer-content');
+            if (disclaimerContent) {
+                disclaimerContent.classList.remove('expanded');
+            }
+        });
+
+        // Mobile menu functionality
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Disclaimer toggle functionality
+        function toggleDisclaimer() {
+            const content = document.getElementById('disclaimer-content');
+            const chevron = document.getElementById('disclaimer-chevron');
+            
+            content.classList.toggle('expanded');
+            
+            if (content.classList.contains('expanded')) {
+                chevron.textContent = '▲';
+            } else {
+                chevron.textContent = '▼';
+            }
+        }
+
+        // Modal functionality
+        function openAuthModal(type) {
+            const modal = document.getElementById('authModal');
+            const content = document.getElementById('authContent');
+            
+            let modalContent = '';
+            
+            switch(type) {
+                case 'login':
+                    modalContent = `
+                        <h2 style="color: var(--bloomberg-text); margin-bottom: 1.5rem;">Login to Auxeira</h2>
+                        <form style="display: flex; flex-direction: column; gap: 1rem;">
+                            <input type="email" placeholder="Email" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <input type="password" placeholder="Password" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <button type="submit" class="btn btn-primary" style="padding: 1rem; margin-top: 1rem;">Login</button>
+                        </form>
+                    `;
+                    break;
+                case 'signup':
+                    modalContent = `
+                        <h2 style="color: var(--bloomberg-text); margin-bottom: 1.5rem;">Get Started with Auxeira</h2>
+                        <form style="display: flex; flex-direction: column; gap: 1rem;">
+                            <input type="text" placeholder="Full Name" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <input type="email" placeholder="Email" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <input type="text" placeholder="Company Name" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <select required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                                <option value="">Select Stage</option>
+                                <option value="seed">Seed Stage (< $100K ARR)</option>
+                                <option value="growth">Growth Stage ($100K - $1M ARR)</option>
+                                <option value="enterprise">Enterprise (> $1M ARR)</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary" style="padding: 1rem; margin-top: 1rem;">Start Free Trial</button>
+                        </form>
+                    `;
+                    break;
+                case 'startup':
+                    modalContent = `
+                        <h2 style="color: var(--bloomberg-text); margin-bottom: 1.5rem;">Join the Founding 500</h2>
+                        <p style="color: var(--bloomberg-text-secondary); margin-bottom: 1.5rem;">Be among the first 500 startups to experience systematic behavioral optimization.</p>
+                        <form style="display: flex; flex-direction: column; gap: 1rem;">
+                            <input type="text" placeholder="Founder Name" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <input type="email" placeholder="Email" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <input type="text" placeholder="Startup Name" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <textarea placeholder="Brief description of your startup" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text); min-height: 100px;"></textarea>
+                            <button type="submit" class="btn btn-primary" style="padding: 1rem; margin-top: 1rem;">Apply Now</button>
+                        </form>
+                    `;
+                    break;
+                case 'investor':
+                    modalContent = `
+                        <h2 style="color: var(--bloomberg-text); margin-bottom: 1.5rem;">Investor Access</h2>
+                        <p style="color: var(--bloomberg-text-secondary); margin-bottom: 1.5rem;">Get exclusive access to verified performance data and predictive analytics.</p>
+                        <form style="display: flex; flex-direction: column; gap: 1rem;">
+                            <input type="text" placeholder="Full Name" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <input type="email" placeholder="Email" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <input type="text" placeholder="Fund/Organization" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <input type="text" placeholder="AUM (Assets Under Management)" style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <button type="submit" class="btn btn-primary" style="padding: 1rem; margin-top: 1rem;">Request Access</button>
+                        </form>
+                    `;
+                    break;
+                case 'partner':
+                    modalContent = `
+                        <h2 style="color: var(--bloomberg-text); margin-bottom: 1.5rem;">Partner Application</h2>
+                        <p style="color: var(--bloomberg-text-secondary); margin-bottom: 1.5rem;">Join our partner ecosystem and help transform startup success rates.</p>
+                        <form style="display: flex; flex-direction: column; gap: 1rem;">
+                            <input type="text" placeholder="Full Name" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <input type="email" placeholder="Email" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <input type="text" placeholder="Company Name" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <select required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                                <option value="">Select Partnership Tier</option>
+                                <option value="tier3">Tier 3 - Emerging Partners</option>
+                                <option value="tier2">Tier 2 - Growth Partners</option>
+                                <option value="tier1">Tier 1 - Strategic Partners</option>
+                            </select>
+                            <textarea placeholder="Partnership goals and how we can help each other grow" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text); min-height: 100px;"></textarea>
+                            <button type="submit" class="btn btn-primary" style="padding: 1rem; margin-top: 1rem;">Submit Application</button>
+                        </form>
+                    `;
+                    break;
+                case 'enterprise':
+                    modalContent = `
+                        <h2 style="color: var(--bloomberg-text); margin-bottom: 1.5rem;">Enterprise Sales</h2>
+                        <p style="color: var(--bloomberg-text-secondary); margin-bottom: 1.5rem;">Let's discuss how Auxeira can transform your organization's success rates.</p>
+                        <form style="display: flex; flex-direction: column; gap: 1rem;">
+                            <input type="text" placeholder="Full Name" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <input type="email" placeholder="Email" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <input type="text" placeholder="Company" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <input type="text" placeholder="Title" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text);">
+                            <textarea placeholder="Tell us about your needs" required style="padding: 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bloomberg-charcoal); color: var(--bloomberg-text); min-height: 100px;"></textarea>
+                            <button type="submit" class="btn btn-primary" style="padding: 1rem; margin-top: 1rem;">Schedule Demo</button>
+                        </form>
+                    `;
+                    break;
+            }
+            
+            content.innerHTML = modalContent;
+            modal.classList.add('show');
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('authModal');
+            modal.classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('authModal');
+            if (event.target === modal) {
+                modal.classList.remove('show');
+            }
+        });
+
+        // Add floating animation to some elements
+        document.querySelectorAll('.hero-badge, .section-badge').forEach(element => {
+            element.classList.add('float');
+        });
+    </script>
+</body>
+</html>
+
