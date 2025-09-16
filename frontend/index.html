@@ -590,6 +590,24 @@
             line-height: 1.6;
         }
 
+        /* FIXED: Scroll reveal animation - ensuring content is visible by default */
+        .scroll-reveal {
+            opacity: 1; /* Changed from 0 to 1 to ensure visibility */
+            transform: translateY(0); /* Changed from translateY(50px) to 0 */
+            transition: all 0.8s ease-out;
+        }
+
+        /* Enhanced animation when JavaScript is available */
+        .js-enabled .scroll-reveal {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .js-enabled .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         /* Status Quo Section */
         .status-quo {
             background: var(--bloomberg-charcoal);
@@ -2392,17 +2410,6 @@
             }
         }
 
-        .scroll-reveal {
-            opacity: 0;
-            transform: translateY(50px);
-            transition: all 0.8s ease-out;
-        }
-
-        .scroll-reveal.revealed {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
         /* Responsive Design */
         @media (max-width: 768px) {
             .nav-menu, .nav-buttons {
@@ -2919,6 +2926,9 @@
     </style>
 </head>
 <body>
+    <!-- Mark body as JS-enabled when JavaScript is available -->
+    <script>document.body.classList.add('js-enabled');</script>
+    
     <!-- Header -->
     <header class="header" id="header">
         <nav class="nav container">
@@ -3304,7 +3314,7 @@
                             <i class="fas fa-chevron-down"></i>
                         </div>
                     </div>
-                    <div class="tier-content" id="institutional-content" style="display: none;">
+                    <div class="tier-content" id="institutional-content">
                         <div class="target">
                             <p>Target: 3-5 visionary institutions</p>
                             <div class="progress-bar">
@@ -3344,7 +3354,7 @@
                             <i class="fas fa-chevron-down"></i>
                         </div>
                     </div>
-                    <div class="tier-content" id="enterprise-content" style="display: none;">
+                    <div class="tier-content" id="enterprise-content">
                         <div class="target">
                             <p>Target: 10-15 enterprise partners</p>
                             <div class="progress-bar">
@@ -3384,7 +3394,7 @@
                             <i class="fas fa-chevron-down"></i>
                         </div>
                     </div>
-                    <div class="tier-content" id="strategic-content" style="display: none;">
+                    <div class="tier-content" id="strategic-content">
                         <div class="target">
                             <p>Target: 20-30 strategic partners</p>
                             <div class="progress-bar">
@@ -3414,14 +3424,14 @@
                 <p>Be the first to join our exclusive pilot program, unlocking 5-10x ROI with actuarial intelligence and real-time dashboards for reward issuers.</p>
                 
                 <div class="buttons">
-                    <a href="partners.html" class="btn btn-secondary">
+                    <button class="btn btn-primary" onclick="openAuthModal('partner')">
                         <i class="fas fa-handshake"></i>
                         Explore Partnership
                         <i class="fas fa-chevron-right" style="margin-left: 0.5rem;"></i>
                     </button>
-                    <button class="btn btn-secondary" onclick="openAuthModal('signup')">
+                    <button class="btn btn-secondary" onclick="openAuthModal('partner')">
                         <i class="fas fa-chart-bar"></i>
-                        Join Now
+                        Book a Demo
                         <i class="fas fa-chevron-right" style="margin-left: 0.5rem;"></i>
                     </button>
                 </div>
@@ -3959,7 +3969,7 @@
                 }
             });
 
-            // Scroll reveal animations
+            // Improved scroll reveal animations with better performance
             const observerOptions = {
                 threshold: 0.1,
                 rootMargin: '0px 0px -50px 0px'
@@ -3969,14 +3979,17 @@
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('revealed');
+                        observer.unobserve(entry.target); // Stop observing once revealed for better performance
                     }
                 });
             }, observerOptions);
 
-            // Observe all scroll reveal elements
-            document.querySelectorAll('.scroll-reveal').forEach(element => {
-                observer.observe(element);
-            });
+            // Only observe scroll reveal elements if JavaScript is enabled
+            if (document.body.classList.contains('js-enabled')) {
+                document.querySelectorAll('.scroll-reveal').forEach(element => {
+                    observer.observe(element);
+                });
+            }
 
             // Enhanced hover effects for cards
             document.querySelectorAll('.stat-card, .value-prop-card, .investment-card, .pricing-card').forEach(card => {
@@ -4078,234 +4091,62 @@
             }
         }
 
-        // AUXEIRA AUTHENTICATION MODAL v3 - COMPREHENSIVE JAVASCRIPT
-        // ============================================================
-
-        // Configuration
-        const CONFIG = {
-            trialDays: 30,
-            supportEmail: 'support@auxeira.com',
-            oauthEndpoints: {
-                google: '/auth/google',
-                linkedin: '/auth/linkedin'
-            }
-        };
-
-        // Security utilities
-        const security = {
-            sessionId: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+        // Partnership Tiers Toggle Function
+        function toggleTier(tier) {
+            const content = document.getElementById(`${tier}-content`);
+            const chevron = content.previousElementSibling.querySelector('.chevron i');
             
-            sanitizeInput: function(input) {
-                const div = document.createElement('div');
-                div.textContent = input;
-                return div.innerHTML;
-            }
-        };
-
-        // Authentication service
-        class AuxeiraAuth {
-            constructor() {
-                this.baseUrl = '/api/auth';
-                this.token = localStorage.getItem('auxeira_token');
-            }
-
-            async login(credentials) {
-                try {
-                    const response = await fetch(`${this.baseUrl}/login`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Session-ID': security.sessionId
-                        },
-                        body: JSON.stringify(credentials)
-                    });
-
-                    if (!response.ok) {
-                        const error = await response.json();
-                        throw new Error(error.message || 'Login failed');
-                    }
-
-                    const data = await response.json();
-                    this.token = data.token;
-                    localStorage.setItem('auxeira_token', this.token);
-                    
-                    return data;
-                } catch (error) {
-                    console.error('Login error:', error);
-                    throw error;
-                }
-            }
-
-            async register(userData) {
-                try {
-                    const response = await fetch(`${this.baseUrl}/register`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Session-ID': security.sessionId
-                        },
-                        body: JSON.stringify(userData)
-                    });
-
-                    if (!response.ok) {
-                        const error = await response.json();
-                        throw new Error(error.message || 'Registration failed');
-                    }
-
-                    const data = await response.json();
-                    this.token = data.token;
-                    localStorage.setItem('auxeira_token', this.token);
-                    
-                    return data;
-                } catch (error) {
-                    console.error('Registration error:', error);
-                    throw error;
-                }
-            }
-
-            redirectToDashboard(userType = null) {
-                const dashboardUrl = userType ? `/dashboard?type=${userType}` : '/dashboard';
-                window.location.href = dashboardUrl;
+            if (content.style.display === 'none' || content.style.display === '') {
+                content.style.display = 'block';
+                chevron.classList.remove('fa-chevron-down');
+                chevron.classList.add('fa-chevron-up');
+            } else {
+                content.style.display = 'none';
+                chevron.classList.remove('fa-chevron-up');
+                chevron.classList.add('fa-chevron-down');
             }
         }
 
-        // Validation manager
-        class ValidationManager {
-            constructor() {
-                this.rules = {
-                    required: (value) => value && value.trim().length > 0,
-                    email: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
-                    password: (value) => value && value.length >= 8,
-                    phone: (value) => /^[\+]?[1-9][\d]{0,15}$/.test(value)
-                };
-                
-                this.messages = {
-                    required: 'This field is required',
-                    email: 'Please enter a valid email address',
-                    password: 'Password must be at least 8 characters',
-                    phone: 'Please enter a valid phone number'
-                };
-            }
+        // Modal functionality
+        function openAuthModal(type = 'signin') {
+            const modal = document.getElementById('authModal');
+            modal.classList.add('show');
+            
+            modal.setAttribute('aria-modal', 'true');
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-labelledby', 'modal-title');
+            
+            switchAuthTab(type);
+        }
 
-            validateField(fieldId, value, rules) {
-                const errors = [];
-                
-                rules.forEach(rule => {
-                    if (this.rules[rule] && !this.rules[rule](value)) {
-                        errors.push(this.messages[rule]);
-                    }
-                });
+        function closeAuthModal() {
+            const modal = document.getElementById('authModal');
+            modal.classList.remove('show');
+            modal.removeAttribute('aria-modal');
+        }
 
-                return {
-                    isValid: errors.length === 0,
-                    errors: errors
-                };
-            }
-
-            showFieldValidation(fieldId, isValid, errors = []) {
-                const field = document.getElementById(fieldId);
-                const errorElement = document.getElementById(`${fieldId}Error`);
-                
-                if (field) {
-                    if (isValid) {
-                        field.classList.remove('error');
-                    } else {
-                        field.classList.add('error');
-                    }
-                }
-                
-                if (errorElement) {
-                    if (!isValid && errors.length > 0) {
-                        errorElement.querySelector('span').textContent = errors[0];
-                        errorElement.classList.add('show');
-                    } else {
-                        errorElement.classList.remove('show');
-                    }
-                }
+        function switchAuthTab(type) {
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.form-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            if (type === 'signin' || type === 'login') {
+                document.querySelector('[onclick*="signin"]').classList.add('active');
+                document.getElementById('signinForm').classList.add('active');
+            } else {
+                document.querySelector('[onclick*="signup"]').classList.add('active');
+                document.getElementById('signupStep1').classList.add('active');
             }
         }
 
-        // Notification system
-        function showNotification(message, type = 'info', duration = 5000) {
-            const container = document.getElementById('notificationContainer') || createNotificationContainer();
-            
-            const notification = document.createElement('div');
-            notification.className = `notification notification-${type}`;
-            
-            const iconMap = {
-                success: '✓',
-                error: '✕',
-                warning: '⚠',
-                info: 'ℹ'
-            };
-            
-            notification.innerHTML = `
-                <div class="notification-content">
-                    <div class="notification-icon">${iconMap[type] || iconMap.info}</div>
-                    <div class="notification-message">${message}</div>
-                </div>
-            `;
-            
-            container.appendChild(notification);
-            
-            // Show notification
-            setTimeout(() => notification.classList.add('show'), 100);
-            
-            // Auto remove
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }, duration);
-        }
-
-        function createNotificationContainer() {
-            const container = document.createElement('div');
-            container.id = 'notificationContainer';
-            container.style.cssText = `
-                position: fixed;
-                top: 2rem;
-                right: 2rem;
-                z-index: 10002;
-                pointer-events: none;
-            `;
-            document.body.appendChild(container);
-            return container;
-        }
-
-        // User type utilities
-        function getUserTypeInfo(userType) {
-            const userTypes = {
-                startup_founder: { isPaidUser: true, tier: 'startup' },
-                corporate_partner: { isPaidUser: true, tier: 'growth' },
-                venture_capital: { isPaidUser: true, tier: 'scale' },
-                angel_investor: { isPaidUser: true, tier: 'growth' },
-                esg_funder: { isPaidUser: true, tier: 'growth' },
-                impact_investor: { isPaidUser: true, tier: 'growth' },
-                government: { isPaidUser: false, tier: 'founder' }
-            };
-            
-            return userTypes[userType] || { isPaidUser: false, tier: 'founder' };
-        }
-
-        // Form field helpers
-        function showFieldError(fieldId, message) {
-            const errorElement = document.getElementById(`${fieldId}Error`);
-            if (errorElement) {
-                errorElement.querySelector('span').textContent = message;
-                errorElement.classList.add('show');
-            }
-        }
-
-        function hideFieldError(fieldId) {
-            const errorElement = document.getElementById(`${fieldId}Error`);
-            if (errorElement) {
-                errorElement.classList.remove('show');
-            }
-        }
+        // Global variables for form state
+        let currentStep = 1;
+        let selectedUserType = null;
+        let signupData = {};
 
         // User type selection
         function selectQuickUserType(type) {
@@ -4320,9 +4161,6 @@
             if (selectedOption) {
                 selectedOption.classList.add('selected');
             }
-            
-            // Update dynamic fields for step 2
-            updateDynamicFields(type);
             
             // Validate step 1
             validateStep1();
@@ -4343,351 +4181,48 @@
             });
             
             // Show target step
-            if (step === 1) {
-                document.getElementById('signinForm').classList.add('active');
-            } else if (step === 2) {
+            if (step === 2) {
                 document.getElementById('signupStep2').classList.add('active');
             }
         }
 
-        // Dynamic field generation
-        function updateDynamicFields(userType) {
-            const container = document.getElementById('dynamicQuickFields');
-            if (!container) return;
-            
-            let fieldsHTML = '';
-            
-            switch (userType) {
-                case 'startup_founder':
-                    fieldsHTML = `
-                        <div class="form-group">
-                            <label for="fundingStage">Funding Stage</label>
-                            <select id="fundingStage" name="fundingStage">
-                                <option value="">Select Stage</option>
-                                <option value="idea">Idea Stage</option>
-                                <option value="pre_seed">Pre-Seed</option>
-                                <option value="seed">Seed</option>
-                                <option value="series_a">Series A</option>
-                                <option value="series_b_plus">Series B+</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="industry">Industry</label>
-                            <select id="industry" name="industry">
-                                <option value="">Select Industry</option>
-                                <option value="fintech">FinTech</option>
-                                <option value="healthtech">HealthTech</option>
-                                <option value="edtech">EdTech</option>
-                                <option value="saas">SaaS</option>
-                                <option value="ecommerce">E-commerce</option>
-                                <option value="ai_ml">AI/ML</option>
-                                <option value="blockchain">Blockchain</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                    `;
-                    break;
-
-                case 'corporate_partner':
-                    fieldsHTML = `
-                        <div class="form-group">
-                            <label for="partnershipInterest">Partnership Interest</label>
-                            <select id="partnershipInterest" name="partnershipInterest">
-                                <option value="">Select Interest</option>
-                                <option value="technology">Technology Integration</option>
-                                <option value="investment">Strategic Investment</option>
-                                <option value="innovation">Innovation Lab</option>
-                                <option value="procurement">Procurement</option>
-                                <option value="distribution">Distribution Partnership</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="companySize">Company Size</label>
-                            <select id="companySize" name="companySize">
-                                <option value="">Select Size</option>
-                                <option value="startup">Startup (1-50)</option>
-                                <option value="sme">SME (51-250)</option>
-                                <option value="large">Large (251-1000)</option>
-                                <option value="enterprise">Enterprise (1000+)</option>
-                            </select>
-                        </div>
-                    `;
-                    break;
-
-                case 'venture_capital':
-                    fieldsHTML = `
-                        <div class="form-group">
-                            <label for="investmentFocus">Investment Focus</label>
-                            <select id="investmentFocus" name="investmentFocus">
-                                <option value="">Select Focus</option>
-                                <option value="early_stage">Early Stage (Pre-Seed, Seed)</option>
-                                <option value="growth_stage">Growth Stage (Series A, B)</option>
-                                <option value="late_stage">Late Stage (Series C+)</option>
-                                <option value="sector_specific">Sector Specific</option>
-                                <option value="generalist">Generalist</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="investmentRange">Typical Investment Range</label>
-                            <select id="investmentRange" name="investmentRange">
-                                <option value="">Select Range</option>
-                                <option value="250k-1m">$250K - $1M</option>
-                                <option value="1m-5m">$1M - $5M</option>
-                                <option value="5m-25m">$5M - $25M</option>
-                                <option value="25m+">$25M+</option>
-                            </select>
-                        </div>
-                    `;
-                    break;
-
-                case 'angel_investor':
-                    fieldsHTML = `
-                        <div class="form-group">
-                            <label for="investmentExperience">Investment Experience</label>
-                            <select id="investmentExperience" name="investmentExperience">
-                                <option value="">Select Experience</option>
-                                <option value="new">New to Angel Investing</option>
-                                <option value="1-5">1-5 investments</option>
-                                <option value="6-15">6-15 investments</option>
-                                <option value="15+">15+ investments</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="investmentRange">Typical Investment Range</label>
-                            <select id="investmentRange" name="investmentRange">
-                                <option value="">Select Range</option>
-                                <option value="5k-25k">$5K - $25K</option>
-                                <option value="25k-100k">$25K - $100K</option>
-                                <option value="100k-500k">$100K - $500K</option>
-                                <option value="500k+">$500K+</option>
-                            </select>
-                        </div>
-                    `;
-                    break;
-
-                case 'esg_funder':
-                    fieldsHTML = `
-                        <div class="form-group">
-                            <label for="esgFocus">ESG Focus Areas</label>
-                            <select id="esgFocus" name="esgFocus">
-                                <option value="">Select Focus</option>
-                                <option value="environmental">Environmental</option>
-                                <option value="social">Social Impact</option>
-                                <option value="governance">Governance</option>
-                                <option value="all_three">All Three (ESG)</option>
-                                <option value="climate">Climate Tech</option>
-                                <option value="sustainability">Sustainability</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="investmentRange">Investment Range</label>
-                            <select id="investmentRange" name="investmentRange">
-                                <option value="">Select Range</option>
-                                <option value="100k-500k">$100K - $500K</option>
-                                <option value="500k-2m">$500K - $2M</option>
-                                <option value="2m-10m">$2M - $10M</option>
-                                <option value="10m+">$10M+</option>
-                            </select>
-                        </div>
-                    `;
-                    break;
-
-                case 'impact_investor':
-                    fieldsHTML = `
-                        <div class="form-group">
-                            <label for="impactFocus">Impact Focus Areas</label>
-                            <select id="impactFocus" name="impactFocus">
-                                <option value="">Select Focus</option>
-                                <option value="education">Education</option>
-                                <option value="healthcare">Healthcare</option>
-                                <option value="financial_inclusion">Financial Inclusion</option>
-                                <option value="clean_energy">Clean Energy</option>
-                                <option value="agriculture">Agriculture</option>
-                                <option value="poverty_alleviation">Poverty Alleviation</option>
-                                <option value="gender_equality">Gender Equality</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="investmentRange">Investment Range</label>
-                            <select id="investmentRange" name="investmentRange">
-                                <option value="">Select Range</option>
-                                <option value="50k-250k">$50K - $250K</option>
-                                <option value="250k-1m">$250K - $1M</option>
-                                <option value="1m-5m">$1M - $5M</option>
-                                <option value="5m+">$5M+</option>
-                            </select>
-                        </div>
-                    `;
-                    break;
-
-                case 'government':
-                    fieldsHTML = `
-                        <div class="form-group">
-                            <label for="governmentLevel">Government Level</label>
-                            <select id="governmentLevel" name="governmentLevel">
-                                <option value="">Select Level</option>
-                                <option value="local">Local Government</option>
-                                <option value="regional">Regional/State</option>
-                                <option value="national">National</option>
-                                <option value="international">International</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="policyFocus">Policy Focus</label>
-                            <select id="policyFocus" name="policyFocus">
-                                <option value="">Select Focus</option>
-                                <option value="economic_development">Economic Development</option>
-                                <option value="innovation_policy">Innovation Policy</option>
-                                <option value="startup_support">Startup Support</option>
-                                <option value="regulatory_framework">Regulatory Framework</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                    `;
-                    break;
-
-                default:
-                    fieldsHTML = `
-                        <div class="form-group">
-                            <label for="primaryInterest">Primary Interest</label>
-                            <select id="primaryInterest" name="primaryInterest">
-                                <option value="">Select Interest</option>
-                                <option value="market_research">Market Research</option>
-                                <option value="investment_opportunities">Investment Opportunities</option>
-                                <option value="partnership_opportunities">Partnership Opportunities</option>
-                                <option value="policy_insights">Policy Insights</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                    `;
-                    break;
-            }
-
-            container.innerHTML = fieldsHTML;
-        }
-
-        // Initialize reCAPTCHA
-        function initializeRecaptcha() {
-            if (typeof grecaptcha !== 'undefined' && grecaptcha.ready) {
-                grecaptcha.ready(function() {
-                    console.log('reCAPTCHA v3 initialized');
-                });
-            }
-        }
-
-        // Authentication handlers
-        async function handleSignIn(event) {
-            event.preventDefault();
-            
-            const form = event.target;
+        // Form validation
+        function validateStep1() {
+            const form = document.getElementById('signupStep1Form');
             const formData = new FormData(form);
-            const submitBtn = document.getElementById('signinBtnText');
-            const loader = document.getElementById('signinLoader');
-            
-            submitBtn.style.display = 'none';
-            loader.classList.add('show');
-            
-            try {
-                const credentials = {
-                    email: formData.get('email'),
-                    password: formData.get('password')
-                };
-                
-                const response = await auth.login(credentials);
-                
-                showNotification('Sign in successful! Redirecting to dashboard...', 'success');
-                
-                setTimeout(() => {
-                    closeAuthModal();
-                    auth.redirectToDashboard();
-                }, 1500);
-                
-            } catch (error) {
-                showNotification(error.message || 'Sign in failed. Please try again.', 'error');
-            } finally {
-                submitBtn.style.display = 'inline';
-                loader.classList.remove('show');
-            }
-        }
+            let isValid = true;
 
-        async function handleSignUp(event) {
-            event.preventDefault();
+            const requiredFields = ['firstName', 'lastName', 'email', 'password'];
             
-            const form = event.target;
-            const formData = new FormData(form);
-            const submitBtn = document.getElementById('signupBtnText');
-            const loader = document.getElementById('signupLoader');
+            requiredFields.forEach(fieldName => {
+                const value = formData.get(fieldName);
+                if (!value || value.trim() === '') {
+                    isValid = false;
+                }
+            });
+
+            if (!selectedUserType) {
+                isValid = false;
+            }
+
+            if (!formData.get('termsAccepted')) {
+                isValid = false;
+            }
+
+            const submitBtn = document.getElementById('step1NextBtn');
+            submitBtn.disabled = !isValid;
             
-            submitBtn.style.display = 'none';
-            loader.classList.add('show');
-            
-            try {
-                const userTypeInfo = getUserTypeInfo(selectedUserType);
-                
-                const userData = {
-                    ...signupData,
+            if (isValid) {
+                signupData = {
                     ...Object.fromEntries(formData),
-                    role: selectedUserType,
-                    accountType: userTypeInfo.isPaidUser ? 'trial' : 'free',
-                    trialStartDate: userTypeInfo.isPaidUser ? new Date().toISOString() : null,
-                    trialDays: userTypeInfo.isPaidUser ? CONFIG.trialDays : null
+                    userType: selectedUserType
                 };
-                
-                const response = await auth.register(userData);
-                
-                const successMessage = userTypeInfo.isPaidUser 
-                    ? `Account created successfully! Welcome to your ${CONFIG.trialDays}-day free trial - no payment required!`
-                    : 'Account created successfully! Welcome to Auxeira!';
-                
-                showNotification(successMessage, 'success');
-                
-                setTimeout(() => {
-                    closeAuthModal();
-                    auth.redirectToDashboard(selectedUserType);
-                }, 1500);
-                
-            } catch (error) {
-                showNotification(error.message || 'Registration failed. Please try again.', 'error');
-            } finally {
-                submitBtn.style.display = 'inline';
-                loader.classList.remove('show');
             }
+
+            return isValid;
         }
 
-        // Skip to signup (minimal data) with proper billing handling
-        function skipToSignup() {
-            if (validateStep1()) {
-                const userTypeInfo = getUserTypeInfo(selectedUserType);
-                const submitBtn = document.getElementById('signupBtnText');
-                
-                const originalText = submitBtn.textContent;
-                submitBtn.textContent = userTypeInfo.isPaidUser ? 'Starting Trial...' : 'Creating Account...';
-                
-                handleSignUp({ preventDefault: () => {} });
-                
-                setTimeout(() => {
-                    submitBtn.textContent = originalText;
-                }, 3000);
-            }
-        }
-
-        // Social login handlers
-        function socialLogin(provider) {
-            const oauthUrl = CONFIG.oauthEndpoints[provider];
-            if (oauthUrl) {
-                sessionStorage.setItem('auxeira_oauth_return', window.location.href);
-                window.location.href = `${oauthUrl}?session_id=${security.sessionId}`;
-            } else {
-                showNotification(`${provider} login will be available soon!`, 'info');
-            }
-        }
-
-        function showForgotPassword() {
-            showNotification(`For password reset assistance, please contact ${CONFIG.supportEmail}`, 'info');
-        }
-
-        // Password strength checker
+        // Password strength validation
         function validatePasswordStrength(input) {
             const password = input.value;
             const strengthIndicator = document.getElementById('passwordStrength');
@@ -4701,52 +4236,22 @@
             strengthIndicator.classList.add('show');
             
             let score = 0;
-            let feedback = [];
-
             if (password.length >= 8) score++;
-            else feedback.push('8+ characters');
-
             if (/[a-z]/.test(password)) score++;
-            else feedback.push('lowercase letter');
-
             if (/[A-Z]/.test(password)) score++;
-            else feedback.push('uppercase letter');
-
             if (/\d/.test(password)) score++;
-            else feedback.push('number');
-
             if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score++;
-            else feedback.push('special character');
 
             strengthIndicator.classList.remove('weak', 'fair', 'good', 'strong');
             
             let strengthLevel = '';
-            let strengthMessage = '';
-
-            if (score <= 2) {
-                strengthLevel = 'weak';
-                strengthMessage = 'Weak password';
-            } else if (score === 3) {
-                strengthLevel = 'fair';
-                strengthMessage = 'Fair password';
-            } else if (score === 4) {
-                strengthLevel = 'good';
-                strengthMessage = 'Good password';
-            } else {
-                strengthLevel = 'strong';
-                strengthMessage = 'Strong password';
-            }
+            if (score <= 2) strengthLevel = 'weak';
+            else if (score === 3) strengthLevel = 'fair';
+            else if (score === 4) strengthLevel = 'good';
+            else strengthLevel = 'strong';
 
             strengthIndicator.classList.add(strengthLevel);
-            
-            if (feedback.length > 0 && score < 4) {
-                strengthText.textContent = `${strengthMessage} - Add: ${feedback.join(', ')}`;
-            } else {
-                strengthText.textContent = strengthMessage;
-            }
-
-            const validation = validator.validateField(input.id, password, ['required', 'password']);
-            validator.showFieldValidation(input.id, validation.isValid, validation.errors);
+            strengthText.textContent = `Password strength: ${strengthLevel}`;
         }
 
         // Password visibility toggle
@@ -4758,1720 +4263,37 @@
             if (field.type === 'password') {
                 field.type = 'text';
                 icon.className = 'fas fa-eye-slash';
-                toggle.setAttribute('aria-label', 'Hide password');
             } else {
                 field.type = 'password';
                 icon.className = 'fas fa-eye';
-                toggle.setAttribute('aria-label', 'Show password');
             }
         }
 
-        // Initialize validation manager
-        const validator = new ValidationManager();
-
-        // Real-time validation event listeners
-        document.addEventListener('input', function(event) {
-            const field = event.target;
-            if (!field.matches('input, select, textarea')) return;
-
-            const fieldId = field.id;
-            const value = field.value;
-            let rules = [];
-
-            if (field.hasAttribute('required')) rules.push('required');
-            if (field.type === 'email') rules.push('email');
-            if (field.type === 'password' && fieldId !== 'confirmPassword') rules.push('password');
-
-            if (fieldId === 'confirmPassword') {
-                const passwordField = document.getElementById('password');
-                const isValid = value === passwordField?.value;
-                const errors = isValid ? [] : ['Passwords do not match'];
-                validator.showFieldValidation(fieldId, isValid, errors);
-                return;
-            }
-
-            const validation = validator.validateField(fieldId, value, rules);
-            validator.showFieldValidation(fieldId, validation.isValid, validation.errors);
-
-            if (field.form && field.form.id === 'signupStep1Form') {
-                validateStep1();
-            }
-        });
-
-        // Enhanced form validation with better UX
-        function validateStep1() {
-            const form = document.getElementById('signupStep1Form');
-            const formData = new FormData(form);
-            let isValid = true;
-
-            const requiredFields = [
-                { id: 'firstName', rules: ['required'] },
-                { id: 'lastName', rules: ['required'] },
-                { id: 'email', rules: ['required', 'email'] },
-                { id: 'password', rules: ['required', 'password'] }
-            ];
-
-            requiredFields.forEach(({ id, rules }) => {
-                const value = formData.get(id);
-                const validation = validator.validateField(id, value, rules);
-                
-                if (!validation.isValid) {
-                    isValid = false;
-                    validator.showFieldValidation(id, false, validation.errors);
-                } else {
-                    validator.showFieldValidation(id, true);
-                }
-            });
-
-            if (!selectedUserType) {
-                showFieldError('userType', 'Please select your role');
-                isValid = false;
-            } else {
-                hideFieldError('userType');
-            }
-
-            if (!formData.get('termsAccepted')) {
-                isValid = false;
-            }
-
-            const submitBtn = document.getElementById('step1NextBtn');
-            submitBtn.disabled = !isValid;
-            
-            if (isValid) {
-                submitBtn.setAttribute('aria-describedby', '');
-                signupData = {
-                    ...Object.fromEntries(formData),
-                    userType: selectedUserType
-                };
-            } else {
-                submitBtn.setAttribute('aria-describedby', 'Please complete all required fields');
-            }
-
-            return isValid;
-        }
-
-        // Focus management for accessibility
-        function openAuthModal(type = 'signin') {
-            const modal = document.getElementById('authModal');
-            modal.classList.add('show');
-            
-            modal.setAttribute('aria-modal', 'true');
-            modal.setAttribute('role', 'dialog');
-            modal.setAttribute('aria-labelledby', 'modal-title');
-            
-            modal.setAttribute('data-focus-restore', document.activeElement?.id || '');
-            
-            switchAuthTab(type);
-            
-            setTimeout(() => {
-                const firstInput = modal.querySelector('input:not([disabled]), button:not([disabled])');
-                if (firstInput) {
-                    firstInput.focus();
-                }
-                initializeRecaptcha();
-            }, 100);
-        }
-
-        function closeAuthModal() {
-            const modal = document.getElementById('authModal');
-            
-            const restoreFocusId = modal.getAttribute('data-focus-restore');
-            if (restoreFocusId) {
-                const restoreElement = document.getElementById(restoreFocusId);
-                if (restoreElement) {
-                    restoreElement.focus();
-                }
-            }
-            
-            modal.classList.remove('show');
-            modal.removeAttribute('aria-modal');
-            resetForm();
-        }
-
-        // Trap focus within modal for accessibility
-        document.addEventListener('keydown', function(event) {
-            const modal = document.getElementById('authModal');
-            
-            if (event.key === 'Escape' && modal.classList.contains('show')) {
-                closeAuthModal();
-                return;
-            }
-            
-            if (event.key === 'Tab' && modal.classList.contains('show')) {
-                const focusableElements = modal.querySelectorAll(
-                    'input:not([disabled]), button:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-                );
-                
-                const firstElement = focusableElements[0];
-                const lastElement = focusableElements[focusableElements.length - 1];
-                
-                if (event.shiftKey) {
-                    if (document.activeElement === firstElement) {
-                        event.preventDefault();
-                        lastElement.focus();
-                    }
-                } else {
-                    if (document.activeElement === lastElement) {
-                        event.preventDefault();
-                        firstElement.focus();
-                    }
-                }
-            }
-        });
-
-        // Initialize auth with accessibility enhancements
-        const auth = new AuxeiraAuth();
-
-        // Global state
-        let currentStep = 1;
-        let selectedUserType = null;
-        let signupData = {};
-
-        function switchAuthTab(type) {
-            document.querySelectorAll('.auth-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            document.querySelectorAll('.form-step').forEach(step => {
-                step.classList.remove('active');
-            });
-            
-            if (type === 'signin') {
-                document.querySelector('[onclick*="signin"]').classList.add('active');
-                document.getElementById('signinForm').classList.add('active');
-            } else {
-                document.querySelector('[onclick*="signup"]').classList.add('active');
-                document.getElementById('signupStep1').classList.add('active');
-            }
-        }
-
-        function resetForm() {
-            currentStep = 1;
-            selectedUserType = null;
-            signupData = {};
-            
-            document.querySelectorAll('form').forEach(form => form.reset());
-            document.querySelectorAll('.error-message').forEach(error => error.classList.remove('show'));
-            document.querySelectorAll('input, select').forEach(input => input.classList.remove('error'));
-            document.querySelectorAll('.user-type-option').forEach(option => option.classList.remove('selected'));
-            
-            const submitBtn = document.getElementById('step1NextBtn');
-            if (submitBtn) submitBtn.disabled = true;
-        }
-
-        // Close modal when clicking outside
-        window.addEventListener('click', function(event) {
-            const modal = document.getElementById('authModal');
-            if (event.target === modal) {
-                closeAuthModal();
-            }
-        });
-
-        // Partnership Tiers Toggle Function
-        function toggleTier(tier) {
-            const content = document.getElementById(`${tier}-content`);
-            const chevron = content.previousElementSibling.querySelector('.chevron i');
-            
-            if (content.style.display === 'none' || !content.style.display) {
-                content.style.display = 'block';
-                chevron.classList.remove('fa-chevron-down');
-                chevron.classList.add('fa-chevron-up');
-            } else {
-                content.style.display = 'none';
-                chevron.classList.remove('fa-chevron-up');
-                chevron.classList.add('fa-chevron-down');
-            }
-        }
-
-        // SecurityManager Class - Comprehensive Security Implementation
-        class SecurityManager {
-            constructor() {
-                this.csrfToken = null;
-                this.sessionId = null;
-                this.sessionTimeout = 30 * 60 * 1000; // 30 minutes
-                this.maxLoginAttempts = 5;
-                this.rateLimitWindow = 15 * 60 * 1000; // 15 minutes
-                this.loginAttempts = new Map();
-                this.init();
-            }
-
-            // Initialize security manager
-            init() {
-                this.generateCSRFToken();
-                this.initializeSession();
-                this.setupSecurityHeaders();
-                this.startSessionMonitoring();
-                this.cleanupExpiredAttempts();
-            }
-
-            // Generate CSRF token
-            generateCSRFToken() {
-                const array = new Uint8Array(32);
-                crypto.getRandomValues(array);
-                this.csrfToken = Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
-                
-                // Store in sessionStorage (primary) and localStorage (backup)
-                try {
-                    sessionStorage.setItem('csrf_token', this.csrfToken);
-                    localStorage.setItem('csrf_token_backup', this.csrfToken);
-                } catch (error) {
-                    console.warn('Storage not available, using memory-only CSRF token');
-                }
-                
-                return this.csrfToken;
-            }
-
-            // Get CSRF token
-            getCSRFToken() {
-                if (!this.csrfToken) {
-                    // Try to retrieve from storage
-                    try {
-                        this.csrfToken = sessionStorage.getItem('csrf_token') || 
-                                       localStorage.getItem('csrf_token_backup');
-                    } catch (error) {
-                        console.warn('Could not retrieve CSRF token from storage');
-                    }
-                    
-                    if (!this.csrfToken) {
-                        this.generateCSRFToken();
-                    }
-                }
-                return this.csrfToken;
-            }
-
-            // Initialize session
-            initializeSession() {
-                this.sessionId = this.generateSessionId();
-                const sessionData = {
-                    id: this.sessionId,
-                    created: Date.now(),
-                    lastActivity: Date.now(),
-                    userAgent: navigator.userAgent,
-                    fingerprint: this.generateFingerprint()
-                };
-                
-                try {
-                    sessionStorage.setItem('session_data', JSON.stringify(sessionData));
-                } catch (error) {
-                    console.warn('Session storage not available');
-                }
-            }
-
-            // Generate session ID
-            generateSessionId() {
-                const timestamp = Date.now().toString(36);
-                const randomPart = Math.random().toString(36).substring(2);
-                return `sess_${timestamp}_${randomPart}`;
-            }
-
-            // Generate browser fingerprint
-            generateFingerprint() {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                ctx.textBaseline = 'top';
-                ctx.font = '14px Arial';
-                ctx.fillText('Security fingerprint', 2, 2);
-                
-                const fingerprint = {
-                    screen: `${screen.width}x${screen.height}`,
-                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    language: navigator.language,
-                    platform: navigator.platform,
-                    canvas: canvas.toDataURL().slice(-50),
-                    cookieEnabled: navigator.cookieEnabled
-                };
-                
-                return btoa(JSON.stringify(fingerprint)).slice(0, 32);
-            }
-
-            // Validate session
-            validateSession() {
-                try {
-                    const sessionData = JSON.parse(sessionStorage.getItem('session_data') || '{}');
-                    const now = Date.now();
-                    
-                    if (!sessionData.id || !sessionData.created) {
-                        return false;
-                    }
-                    
-                    // Check session timeout
-                    if (now - sessionData.lastActivity > this.sessionTimeout) {
-                        this.clearSession();
-                        return false;
-                    }
-                    
-                    // Validate fingerprint
-                    if (sessionData.fingerprint !== this.generateFingerprint()) {
-                        console.warn('Session fingerprint mismatch');
-                        this.clearSession();
-                        return false;
-                    }
-                    
-                    // Update last activity
-                    sessionData.lastActivity = now;
-                    sessionStorage.setItem('session_data', JSON.stringify(sessionData));
-                    
-                    return true;
-                } catch (error) {
-                    console.error('Session validation error:', error);
-                    return false;
-                }
-            }
-
-            // Clear session
-            clearSession() {
-                try {
-                    sessionStorage.removeItem('session_data');
-                    sessionStorage.removeItem('csrf_token');
-                    localStorage.removeItem('csrf_token_backup');
-                } catch (error) {
-                    console.warn('Could not clear session storage');
-                }
-                this.sessionId = null;
-                this.csrfToken = null;
-            }
-
-            // Rate limiting for login attempts
-            checkRateLimit(identifier) {
-                const now = Date.now();
-                const attempts = this.loginAttempts.get(identifier) || [];
-                
-                // Remove old attempts outside the window
-                const recentAttempts = attempts.filter(time => now - time < this.rateLimitWindow);
-                
-                if (recentAttempts.length >= this.maxLoginAttempts) {
-                    const oldestAttempt = Math.min(...recentAttempts);
-                    const timeRemaining = this.rateLimitWindow - (now - oldestAttempt);
-                    return {
-                        allowed: false,
-                        timeRemaining: Math.ceil(timeRemaining / 1000 / 60) // minutes
-                    };
-                }
-                
-                return { allowed: true };
-            }
-
-            // Record login attempt
-            recordLoginAttempt(identifier) {
-                const attempts = this.loginAttempts.get(identifier) || [];
-                attempts.push(Date.now());
-                this.loginAttempts.set(identifier, attempts);
-            }
-
-            // Setup security headers for requests
-            setupSecurityHeaders() {
-                // Override fetch to include security headers
-                const originalFetch = window.fetch;
-                window.fetch = (url, options = {}) => {
-                    options.headers = {
-                        ...options.headers,
-                        'X-CSRF-Token': this.getCSRFToken(),
-                        'X-Session-ID': this.sessionId,
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-Content-Type-Options': 'nosniff',
-                        'X-Frame-Options': 'DENY'
-                    };
-                    
-                    // Add CSRF token to POST requests
-                    if (options.method === 'POST' && options.body) {
-                        try {
-                            const body = JSON.parse(options.body);
-                            body.csrf_token = this.getCSRFToken();
-                            body.session_id = this.sessionId;
-                            options.body = JSON.stringify(body);
-                        } catch (error) {
-                            console.warn('Could not add CSRF token to request body');
-                        }
-                    }
-                    
-                    return originalFetch(url, options);
-                };
-            }
-
-            // Start session monitoring
-            startSessionMonitoring() {
-                // Monitor for session activity
-                const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
-                
-                activityEvents.forEach(event => {
-                    document.addEventListener(event, () => {
-                        this.updateSessionActivity();
-                    }, { passive: true });
-                });
-
-                // Periodic session validation
-                setInterval(() => {
-                    if (!this.validateSession()) {
-                        this.handleSessionExpiry();
-                    }
-                }, 60000); // Check every minute
-
-                // Handle page visibility changes
-                document.addEventListener('visibilitychange', () => {
-                    if (document.visibilityState === 'visible') {
-                        this.validateSession();
-                    }
-                });
-            }
-
-            // Update session activity
-            updateSessionActivity() {
-                try {
-                    const sessionData = JSON.parse(sessionStorage.getItem('session_data') || '{}');
-                    if (sessionData.id) {
-                        sessionData.lastActivity = Date.now();
-                        sessionStorage.setItem('session_data', JSON.stringify(sessionData));
-                    }
-                } catch (error) {
-                    console.warn('Could not update session activity');
-                }
-            }
-
-            // Handle session expiry
-            handleSessionExpiry() {
-                this.clearSession();
-                showNotification('Your session has expired. Please sign in again.', 'warning');
-                
-                // Close any open modals
-                const modal = document.getElementById('authModal');
-                if (modal && modal.style.display === 'block') {
-                    closeAuthModal();
-                }
-            }
-
-            // Clean up expired login attempts
-            cleanupExpiredAttempts() {
-                setInterval(() => {
-                    const now = Date.now();
-                    for (const [identifier, attempts] of this.loginAttempts.entries()) {
-                        const recentAttempts = attempts.filter(time => now - time < this.rateLimitWindow);
-                        if (recentAttempts.length === 0) {
-                            this.loginAttempts.delete(identifier);
-                        } else {
-                            this.loginAttempts.set(identifier, recentAttempts);
-                        }
-                    }
-                }, 5 * 60 * 1000); // Clean up every 5 minutes
-            }
-
-            // Secure form data sanitization
-            sanitizeFormData(data) {
-                const sanitized = {};
-                for (const [key, value] of Object.entries(data)) {
-                    if (typeof value === 'string') {
-                        // Basic XSS prevention
-                        sanitized[key] = value
-                            .replace(/[<>]/g, '')
-                            .replace(/javascript:/gi, '')
-                            .replace(/on\w+=/gi, '')
-                            .trim();
-                    } else {
-                        sanitized[key] = value;
-                    }
-                }
-                return sanitized;
-            }
-
-            // Validate email format
-            validateEmail(email) {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                return emailRegex.test(email) && email.length <= 254;
-            }
-
-            // Validate password strength
-            validatePassword(password) {
-                const minLength = 8;
-                const hasUpperCase = /[A-Z]/.test(password);
-                const hasLowerCase = /[a-z]/.test(password);
-                const hasNumbers = /\d/.test(password);
-                const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-                
-                return {
-                    valid: password.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers,
-                    strength: this.calculatePasswordStrength(password),
-                    requirements: {
-                        length: password.length >= minLength,
-                        uppercase: hasUpperCase,
-                        lowercase: hasLowerCase,
-                        numbers: hasNumbers,
-                        special: hasSpecialChar
-                    }
-                };
-            }
-
-            // Calculate password strength
-            calculatePasswordStrength(password) {
-                let score = 0;
-                if (password.length >= 8) score++;
-                if (password.length >= 12) score++;
-                if (/[a-z]/.test(password)) score++;
-                if (/[A-Z]/.test(password)) score++;
-                if (/[0-9]/.test(password)) score++;
-                if (/[^A-Za-z0-9]/.test(password)) score++;
-                if (password.length >= 16) score++;
-                
-                if (score < 3) return 'weak';
-                if (score < 5) return 'medium';
-                return 'strong';
-            }
-        }
-
-        // Initialize Security Manager
-        const securityManager = new SecurityManager();
-
-        // ValidationManager Class - Real-Time Validation & Feedback
-        class ValidationManager {
-            constructor() {
-                this.validators = new Map();
-                this.fieldStates = new Map();
-                this.debounceTimers = new Map();
-                this.init();
-            }
-
-            // Initialize validation manager
-            init() {
-                this.setupValidationRules();
-                this.addValidationStyles();
-                this.bindEventListeners();
-            }
-
-            // Setup validation rules for different field types
-            setupValidationRules() {
-                this.validators.set('email', {
-                    validate: (value) => {
-                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                        const isValid = emailRegex.test(value) && value.length <= 254;
-                        return {
-                            valid: isValid,
-                            message: isValid ? 'Valid email address' : 'Please enter a valid email address'
-                        };
-                    },
-                    required: true
-                });
-
-                this.validators.set('password', {
-                    validate: (value) => {
-                        const requirements = this.getPasswordRequirements(value);
-                        const strength = this.calculatePasswordStrength(value);
-                        const isValid = requirements.length >= 8 && requirements.uppercase && 
-                                       requirements.lowercase && requirements.numbers;
-                        
-                        return {
-                            valid: isValid,
-                            strength: strength,
-                            requirements: requirements,
-                            message: this.getPasswordMessage(requirements, strength)
-                        };
-                    },
-                    required: true
-                });
-
-                this.validators.set('name', {
-                    validate: (value) => {
-                        const isValid = value.trim().length >= 2 && /^[a-zA-Z\s'-]+$/.test(value);
-                        return {
-                            valid: isValid,
-                            message: isValid ? 'Valid name' : 'Name must be at least 2 characters and contain only letters'
-                        };
-                    },
-                    required: true
-                });
-
-                this.validators.set('required', {
-                    validate: (value) => {
-                        const isValid = value.trim().length > 0;
-                        return {
-                            valid: isValid,
-                            message: isValid ? 'Field completed' : 'This field is required'
-                        };
-                    },
-                    required: true
-                });
-            }
-
-            // Get password requirements analysis
-            getPasswordRequirements(password) {
-                return {
-                    length: password.length >= 8,
-                    minLength: password.length,
-                    uppercase: /[A-Z]/.test(password),
-                    lowercase: /[a-z]/.test(password),
-                    numbers: /\d/.test(password),
-                    special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-                    longLength: password.length >= 12
-                };
-            }
-
-            // Calculate password strength
-            calculatePasswordStrength(password) {
-                let score = 0;
-                const requirements = this.getPasswordRequirements(password);
-                
-                if (requirements.length) score += 1;
-                if (requirements.longLength) score += 1;
-                if (requirements.uppercase) score += 1;
-                if (requirements.lowercase) score += 1;
-                if (requirements.numbers) score += 1;
-                if (requirements.special) score += 1;
-                if (password.length >= 16) score += 1;
-                
-                if (score < 3) return 'weak';
-                if (score < 5) return 'fair';
-                if (score < 6) return 'good';
-                return 'strong';
-            }
-
-            // Get password validation message
-            getPasswordMessage(requirements, strength) {
-                const missing = [];
-                if (!requirements.length) missing.push('at least 8 characters');
-                if (!requirements.uppercase) missing.push('uppercase letter');
-                if (!requirements.lowercase) missing.push('lowercase letter');
-                if (!requirements.numbers) missing.push('number');
-                
-                if (missing.length > 0) {
-                    return `Add: ${missing.join(', ')}`;
-                }
-                
-                const strengthMessages = {
-                    weak: 'Weak password - consider adding special characters',
-                    fair: 'Fair password - add more characters for better security',
-                    good: 'Good password - very secure',
-                    strong: 'Strong password - excellent security'
-                };
-                
-                return strengthMessages[strength] || 'Password meets requirements';
-            }
-
-            // Validate field in real-time
-            validateField(field, showFeedback = true) {
-                const fieldType = this.getFieldType(field);
-                const validator = this.validators.get(fieldType);
-                
-                if (!validator) return { valid: true };
-                
-                const value = field.value;
-                const result = validator.validate(value);
-                
-                // Store field state
-                this.fieldStates.set(field.id || field.name, {
-                    valid: result.valid,
-                    value: value,
-                    result: result
-                });
-                
-                if (showFeedback) {
-                    this.updateFieldFeedback(field, result);
-                }
-                
-                return result;
-            }
-
-            // Get field validation type
-            getFieldType(field) {
-                if (field.type === 'email') return 'email';
-                if (field.type === 'password') return 'password';
-                if (field.name === 'firstName' || field.name === 'lastName') return 'name';
-                if (field.hasAttribute('required')) return 'required';
-                return 'text';
-            }
-
-            // Update visual feedback for field
-            updateFieldFeedback(field, result) {
-                const container = field.closest('.form-group');
-                if (!container) return;
-                
-                // Remove existing states
-                container.classList.remove('valid', 'invalid', 'weak', 'fair', 'good', 'strong');
-                
-                // Add appropriate state
-                if (result.valid) {
-                    container.classList.add('valid');
-                    if (result.strength) {
-                        container.classList.add(result.strength);
-                    }
-                } else if (field.value.length > 0) {
-                    container.classList.add('invalid');
-                }
-                
-                // Update error message
-                this.updateErrorMessage(container, result);
-                
-                // Update password strength indicator
-                if (field.type === 'password') {
-                    this.updatePasswordStrengthIndicator(container, result);
-                }
-                
-                // Update checkmark/error icons
-                this.updateFieldIcon(container, result);
-            }
-
-            // Update error message
-            updateErrorMessage(container, result) {
-                let errorElement = container.querySelector('.validation-message');
-                
-                if (!errorElement) {
-                    errorElement = document.createElement('div');
-                    errorElement.className = 'validation-message';
-                    container.appendChild(errorElement);
-                }
-                
-                errorElement.textContent = result.message || '';
-                errorElement.className = `validation-message ${result.valid ? 'success' : 'error'}`;
-            }
-
-            // Update field icon (checkmark/error)
-            updateFieldIcon(container, result) {
-                let iconElement = container.querySelector('.field-icon');
-                
-                if (!iconElement) {
-                    iconElement = document.createElement('i');
-                    iconElement.className = 'field-icon';
-                    const input = container.querySelector('input');
-                    if (input) {
-                        input.parentNode.insertBefore(iconElement, input.nextSibling);
-                    }
-                }
-                
-                if (result.valid) {
-                    iconElement.className = 'field-icon fas fa-check-circle valid-icon';
-                    iconElement.setAttribute('aria-label', 'Valid input');
-                } else if (container.querySelector('input').value.length > 0) {
-                    iconElement.className = 'field-icon fas fa-exclamation-circle invalid-icon';
-                    iconElement.setAttribute('aria-label', 'Invalid input');
-                } else {
-                    iconElement.className = 'field-icon';
-                }
-            }
-
-            // Update password strength indicator
-            updatePasswordStrengthIndicator(container, result) {
-                let strengthContainer = container.querySelector('.password-strength');
-                
-                if (!strengthContainer) {
-                    strengthContainer = document.createElement('div');
-                    strengthContainer.className = 'password-strength';
-                    strengthContainer.innerHTML = `
-                        <div class="strength-meter">
-                            <div class="strength-bar"></div>
-                        </div>
-                        <div class="strength-text"></div>
-                    `;
-                    container.appendChild(strengthContainer);
-                }
-                
-                const strengthBar = strengthContainer.querySelector('.strength-bar');
-                const strengthText = strengthContainer.querySelector('.strength-text');
-                
-                if (result.strength && container.querySelector('input').value.length > 0) {
-                    const strengthLevels = {
-                        weak: { width: '25%', color: '#ff4757' },
-                        fair: { width: '50%', color: '#ffa502' },
-                        good: { width: '75%', color: '#26de81' },
-                        strong: { width: '100%', color: '#2ed573' }
-                    };
-                    
-                    const level = strengthLevels[result.strength];
-                    strengthBar.style.width = level.width;
-                    strengthBar.style.backgroundColor = level.color;
-                    strengthText.textContent = `Password strength: ${result.strength}`;
-                    strengthText.className = `strength-text ${result.strength}`;
-                    
-                    strengthContainer.style.display = 'block';
-                } else {
-                    strengthContainer.style.display = 'none';
-                }
-            }
-
-            // Setup password visibility toggle
-            setupPasswordToggle(passwordField) {
-                const container = passwordField.closest('.form-group');
-                if (!container) return;
-                
-                let toggleButton = container.querySelector('.password-toggle');
-                
-                if (!toggleButton) {
-                    toggleButton = document.createElement('button');
-                    toggleButton.type = 'button';
-                    toggleButton.className = 'password-toggle';
-                    toggleButton.innerHTML = '<i class="fas fa-eye" aria-hidden="true"></i>';
-                    toggleButton.setAttribute('aria-label', 'Show password');
-                    toggleButton.setAttribute('tabindex', '0');
-                    
-                    // Position toggle button
-                    passwordField.parentNode.style.position = 'relative';
-                    passwordField.parentNode.appendChild(toggleButton);
-                    
-                    // Add click handler
-                    toggleButton.addEventListener('click', () => {
-                        this.togglePasswordVisibility(passwordField, toggleButton);
-                    });
-                    
-                    // Add keyboard handler
-                    toggleButton.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            this.togglePasswordVisibility(passwordField, toggleButton);
-                        }
-                    });
-                }
-            }
-
-            // Toggle password visibility
-            togglePasswordVisibility(passwordField, toggleButton) {
-                const isPassword = passwordField.type === 'password';
-                const icon = toggleButton.querySelector('i');
-                
-                if (isPassword) {
-                    passwordField.type = 'text';
-                    icon.className = 'fas fa-eye-slash';
-                    toggleButton.setAttribute('aria-label', 'Hide password');
-                } else {
-                    passwordField.type = 'password';
-                    icon.className = 'fas fa-eye';
-                    toggleButton.setAttribute('aria-label', 'Show password');
-                }
-                
-                // Maintain focus on password field
-                passwordField.focus();
-            }
-
-            // Bind event listeners for real-time validation
-            bindEventListeners() {
-                // Use event delegation for dynamic forms
-                document.addEventListener('input', (e) => {
-                    if (e.target.matches('input[type="email"], input[type="password"], input[name="firstName"], input[name="lastName"], input[required]')) {
-                        // Clear existing timer
-                        if (this.debounceTimers.has(e.target)) {
-                            clearTimeout(this.debounceTimers.get(e.target));
-                        }
-                        
-                        // Set new timer for debounced validation
-                        const timer = setTimeout(() => {
-                            this.validateField(e.target);
-                        }, 300); // 300ms debounce
-                        
-                        this.debounceTimers.set(e.target, timer);
-                    }
-                });
-                
-                // Immediate validation on blur
-                document.addEventListener('blur', (e) => {
-                    if (e.target.matches('input[type="email"], input[type="password"], input[name="firstName"], input[name="lastName"], input[required]')) {
-                        this.validateField(e.target);
-                    }
-                }, true);
-                
-                // Setup password toggles when password fields are focused
-                document.addEventListener('focus', (e) => {
-                    if (e.target.type === 'password') {
-                        this.setupPasswordToggle(e.target);
-                    }
-                }, true);
-            }
-
-            // Validate entire form
-            validateForm(form) {
-                const inputs = form.querySelectorAll('input[type="email"], input[type="password"], input[name="firstName"], input[name="lastName"], input[required]');
-                let isValid = true;
-                
-                inputs.forEach(input => {
-                    const result = this.validateField(input);
-                    if (!result.valid) {
-                        isValid = false;
-                    }
-                });
-                
-                return isValid;
-            }
-
-            // Add validation styles
-            addValidationStyles() {
-                const style = document.createElement('style');
-                style.textContent = `
-                    /* Validation States */
-                    .form-group {
-                        position: relative;
-                        margin-bottom: 1.5rem;
-                    }
-                    
-                    .form-group.valid input {
-                        border-color: #26de81;
-                        box-shadow: 0 0 0 2px rgba(38, 222, 129, 0.2);
-                    }
-                    
-                    .form-group.invalid input {
-                        border-color: #ff4757;
-                        box-shadow: 0 0 0 2px rgba(255, 71, 87, 0.2);
-                    }
-                    
-                    /* Field Icons */
-                    .field-icon {
-                        position: absolute;
-                        right: 12px;
-                        top: 50%;
-                        transform: translateY(-50%);
-                        font-size: 1rem;
-                        pointer-events: none;
-                        z-index: 2;
-                    }
-                    
-                    .valid-icon {
-                        color: #26de81;
-                    }
-                    
-                    .invalid-icon {
-                        color: #ff4757;
-                    }
-                    
-                    /* Validation Messages */
-                    .validation-message {
-                        font-size: 0.875rem;
-                        margin-top: 0.5rem;
-                        padding: 0.25rem 0;
-                        transition: all 0.3s ease;
-                    }
-                    
-                    .validation-message.success {
-                        color: #26de81;
-                    }
-                    
-                    .validation-message.error {
-                        color: #ff4757;
-                    }
-                    
-                    /* Password Strength Indicator */
-                    .password-strength {
-                        margin-top: 0.75rem;
-                        display: none;
-                    }
-                    
-                    .strength-meter {
-                        width: 100%;
-                        height: 4px;
-                        background-color: rgba(255, 255, 255, 0.1);
-                        border-radius: 2px;
-                        overflow: hidden;
-                        margin-bottom: 0.5rem;
-                    }
-                    
-                    .strength-bar {
-                        height: 100%;
-                        width: 0%;
-                        transition: all 0.3s ease;
-                        border-radius: 2px;
-                    }
-                    
-                    .strength-text {
-                        font-size: 0.875rem;
-                        font-weight: 500;
-                        text-transform: capitalize;
-                    }
-                    
-                    .strength-text.weak { color: #ff4757; }
-                    .strength-text.fair { color: #ffa502; }
-                    .strength-text.good { color: #26de81; }
-                    .strength-text.strong { color: #2ed573; }
-                    
-                    /* Password Toggle */
-                    .password-toggle {
-                        position: absolute;
-                        right: 40px;
-                        top: 50%;
-                        transform: translateY(-50%);
-                        background: none;
-                        border: none;
-                        color: rgba(255, 255, 255, 0.6);
-                        cursor: pointer;
-                        padding: 0.5rem;
-                        font-size: 1rem;
-                        z-index: 3;
-                        transition: color 0.3s ease;
-                    }
-                    
-                    .password-toggle:hover {
-                        color: rgba(255, 255, 255, 0.9);
-                    }
-                    
-                    .password-toggle:focus {
-                        outline: 2px solid #007bff;
-                        outline-offset: 2px;
-                        border-radius: 4px;
-                    }
-                    
-                    /* Adjust input padding for icons */
-                    .form-group.valid input,
-                    .form-group.invalid input {
-                        padding-right: 3rem;
-                    }
-                    
-                    input[type="password"] {
-                        padding-right: 5rem;
-                    }
-                    
-                    /* Animation for validation feedback */
-                    .validation-message,
-                    .field-icon {
-                        animation: fadeIn 0.3s ease;
-                    }
-                    
-                    @keyframes fadeIn {
-                        from { opacity: 0; transform: translateY(-10px); }
-                        to { opacity: 1; transform: translateY(0); }
-                    }
-                    
-                    /* Responsive adjustments */
-                    @media (max-width: 768px) {
-                        .field-icon {
-                            right: 8px;
-                            font-size: 0.9rem;
-                        }
-                        
-                        .password-toggle {
-                            right: 32px;
-                            font-size: 0.9rem;
-                        }
-                        
-                        input[type="password"] {
-                            padding-right: 4rem;
-                        }
-                    }
-                `;
-                
-                if (!document.querySelector('style[data-validation-styles]')) {
-                    style.setAttribute('data-validation-styles', 'true');
-                    document.head.appendChild(style);
-                }
-            }
-        }
-
-        // Initialize Validation Manager
-        const validationManager = new ValidationManager();
-
-        // reCAPTCHA Integration
-        let recaptchaToken = null;
-
-        // Initialize reCAPTCHA when page loads
-        window.addEventListener('load', function() {
-            if (typeof grecaptcha !== 'undefined') {
-                grecaptcha.ready(function() {
-                    console.log('reCAPTCHA loaded successfully');
-                });
-            }
-        });
-
-        // Get reCAPTCHA token
-        async function getRecaptchaToken(action = 'submit') {
-            try {
-                if (typeof grecaptcha === 'undefined') {
-                    throw new Error('reCAPTCHA not loaded');
-                }
-                
-                const token = await grecaptcha.execute('6LcEzq0rAAAAAKosYlDqLUxYp_8Fl09xC1M__PaN', {
-                    action: action
-                });
-                
-                recaptchaToken = token;
-                return token;
-            } catch (error) {
-                console.error('reCAPTCHA error:', error);
-                showNotification('Security verification failed. Please try again.', 'error');
-                return null;
-            }
-        }
-
-        // Enhanced form submission with reCAPTCHA and Security
-        async function submitSigninForm(event) {
+        // Form submission handlers
+        function submitSigninForm(event) {
             event.preventDefault();
-            
-            const form = event.target;
-            const email = form.querySelector('input[type="email"]').value;
-            const password = form.querySelector('input[type="password"]').value;
-            
-            // Validate session
-            if (!securityManager.validateSession()) {
-                showNotification('Session expired. Please refresh the page.', 'error');
-                return;
-            }
-            
-            // Validate form data
-            if (!email || !password) {
-                showNotification('Please fill in all required fields.', 'error');
-                return;
-            }
-            
-            // Validate email format
-            if (!securityManager.validateEmail(email)) {
-                showNotification('Please enter a valid email address.', 'error');
-                return;
-            }
-            
-            // Check rate limiting
-            const rateLimitCheck = securityManager.checkRateLimit(email);
-            if (!rateLimitCheck.allowed) {
-                showNotification(`Too many login attempts. Please try again in ${rateLimitCheck.timeRemaining} minutes.`, 'error');
-                return;
-            }
-            
-            // Record login attempt
-            securityManager.recordLoginAttempt(email);
-            
-            // Get reCAPTCHA token
-            const token = await getRecaptchaToken('signin');
-            if (!token) {
-                return; // Error already shown in getRecaptchaToken
-            }
-            
-            // Show loading state
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
-            submitBtn.disabled = true;
-            
-            try {
-                // Sanitize form data
-                const sanitizedData = securityManager.sanitizeFormData({
-                    email: email,
-                    password: password,
-                    recaptcha_token: token,
-                    csrf_token: securityManager.getCSRFToken(),
-                    session_id: securityManager.sessionId,
-                    fingerprint: securityManager.generateFingerprint()
-                });
-                
-                // Simulate API call (replace with actual endpoint)
-                const response = await fetch('/api/auth/signin', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-Token': securityManager.getCSRFToken(),
-                        'X-Session-ID': securityManager.sessionId
-                    },
-                    body: JSON.stringify(sanitizedData)
-                });
-                
-                if (response.ok) {
-                    const responseData = await response.json();
-                    
-                    // Update session with authentication data
-                    if (responseData.session_token) {
-                        sessionStorage.setItem('auth_token', responseData.session_token);
-                    }
-                    
-                    showNotification('Sign in successful! Redirecting...', 'success');
-                    setTimeout(() => {
-                        closeAuthModal();
-                        // Redirect to dashboard or reload page
-                        window.location.reload();
-                    }, 1500);
-                } else {
-                    const errorData = await response.json();
-                    showNotification(errorData.message || 'Sign in failed. Please try again.', 'error');
-                }
-            } catch (error) {
-                console.error('Sign in error:', error);
-                showNotification('Network error. Please check your connection and try again.', 'error');
-            } finally {
-                // Reset button state
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }
+            showNotification('Sign in functionality will be available soon!', 'info');
         }
 
-        // Enhanced signup form submission with reCAPTCHA and Security
-        async function submitSignupForm(event) {
+        function submitSignupForm(event) {
             event.preventDefault();
-            
-            const form = event.target;
-            const formData = new FormData(form);
-            const signupData = Object.fromEntries(formData.entries());
-            
-            // Add selected user type
-            signupData.userType = selectedUserType;
-            
-            // Validate session
-            if (!securityManager.validateSession()) {
-                showNotification('Session expired. Please refresh the page.', 'error');
-                return;
-            }
-            
-            // Validate required fields
-            const requiredFields = ['firstName', 'lastName', 'email', 'password'];
-            for (const field of requiredFields) {
-                if (!signupData[field]) {
-                    showNotification(`Please fill in the ${field.replace(/([A-Z])/g, ' $1').toLowerCase()} field.`, 'error');
-                    return;
-                }
-            }
-            
-            // Validate email format
-            if (!securityManager.validateEmail(signupData.email)) {
-                showNotification('Please enter a valid email address.', 'error');
-                return;
-            }
-            
-            // Validate password strength
-            const passwordValidation = securityManager.validatePassword(signupData.password);
-            if (!passwordValidation.valid) {
-                const requirements = [];
-                if (!passwordValidation.requirements.length) requirements.push('at least 8 characters');
-                if (!passwordValidation.requirements.uppercase) requirements.push('uppercase letter');
-                if (!passwordValidation.requirements.lowercase) requirements.push('lowercase letter');
-                if (!passwordValidation.requirements.numbers) requirements.push('number');
-                
-                showNotification(`Password must contain: ${requirements.join(', ')}.`, 'error');
-                return;
-            }
-            
-            // Check rate limiting
-            const rateLimitCheck = securityManager.checkRateLimit(signupData.email);
-            if (!rateLimitCheck.allowed) {
-                showNotification(`Too many signup attempts. Please try again in ${rateLimitCheck.timeRemaining} minutes.`, 'error');
-                return;
-            }
-            
-            // Record signup attempt
-            securityManager.recordLoginAttempt(signupData.email);
-            
-            // Get reCAPTCHA token
-            const token = await getRecaptchaToken('signup');
-            if (!token) {
-                return; // Error already shown in getRecaptchaToken
-            }
-            
-            // Sanitize and prepare data
-            const sanitizedData = securityManager.sanitizeFormData({
-                ...signupData,
-                recaptcha_token: token,
-                csrf_token: securityManager.getCSRFToken(),
-                session_id: securityManager.sessionId,
-                fingerprint: securityManager.generateFingerprint()
-            });
-            
-            // Show loading state
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
-            submitBtn.disabled = true;
-            
-            try {
-                // Simulate API call (replace with actual endpoint)
-                const response = await fetch('/api/auth/signup', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-Token': securityManager.getCSRFToken(),
-                        'X-Session-ID': securityManager.sessionId
-                    },
-                    body: JSON.stringify(sanitizedData)
-                });
-                
-                if (response.ok) {
-                    const responseData = await response.json();
-                    
-                    // Update session with registration data
-                    if (responseData.verification_token) {
-                        sessionStorage.setItem('verification_pending', 'true');
-                    }
-                    
-                    showNotification('Account created successfully! Please check your email for verification.', 'success');
-                    setTimeout(() => {
-                        closeAuthModal();
-                        // Optionally redirect to a welcome page
-                    }, 2000);
-                } else {
-                    const errorData = await response.json();
-                    showNotification(errorData.message || 'Account creation failed. Please try again.', 'error');
-                }
-            } catch (error) {
-                console.error('Signup error:', error);
-                showNotification('Network error. Please check your connection and try again.', 'error');
-            } finally {
-                // Reset button state
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }
+            showNotification('Account creation will be available soon!', 'info');
         }
 
-        // Enhanced Social Login Implementation
-        class SocialLoginManager {
-            constructor() {
-                this.providers = {
-                    google: {
-                        name: 'Google',
-                        clientId: null, // Set from environment or config
-                        scope: 'openid email profile',
-                        authUrl: 'https://accounts.google.com/oauth/authorize',
-                        configured: false
-                    },
-                    linkedin: {
-                        name: 'LinkedIn',
-                        clientId: null, // Set from environment or config
-                        scope: 'r_liteprofile r_emailaddress',
-                        authUrl: 'https://www.linkedin.com/oauth/v2/authorization',
-                        configured: false
-                    }
-                };
-                this.init();
-            }
-
-            // Initialize social login manager
-            init() {
-                this.checkProviderConfiguration();
-                this.setupOAuthReturnHandler();
-                this.addSocialButtonStyles();
-            }
-
-            // Check if providers are configured
-            checkProviderConfiguration() {
-                // In a real implementation, these would come from environment variables or API
-                // For demo purposes, we'll simulate configuration check
-                this.providers.google.configured = false; // Set to true when Google OAuth is configured
-                this.providers.linkedin.configured = false; // Set to true when LinkedIn OAuth is configured
-            }
-
-            // Generate secure state parameter for CSRF protection
-            generateStateParameter(provider, action = 'signin') {
-                const stateData = {
-                    provider: provider,
-                    action: action,
-                    csrf_token: securityManager.getCSRFToken(),
-                    session_id: securityManager.sessionId,
-                    timestamp: Date.now(),
-                    nonce: crypto.getRandomValues(new Uint32Array(1))[0].toString(36)
-                };
-                
-                const stateString = btoa(JSON.stringify(stateData));
-                
-                // Store state in sessionStorage for validation
-                try {
-                    sessionStorage.setItem(`oauth_state_${provider}`, stateString);
-                } catch (error) {
-                    console.warn('Could not store OAuth state');
-                }
-                
-                return stateString;
-            }
-
-            // Validate OAuth state parameter
-            validateStateParameter(state, provider) {
-                try {
-                    const storedState = sessionStorage.getItem(`oauth_state_${provider}`);
-                    if (!storedState || storedState !== state) {
-                        return false;
-                    }
-                    
-                    const stateData = JSON.parse(atob(state));
-                    
-                    // Check timestamp (state should not be older than 10 minutes)
-                    if (Date.now() - stateData.timestamp > 10 * 60 * 1000) {
-                        return false;
-                    }
-                    
-                    // Validate CSRF token and session
-                    if (stateData.csrf_token !== securityManager.getCSRFToken() ||
-                        stateData.session_id !== securityManager.sessionId) {
-                        return false;
-                    }
-                    
-                    return stateData;
-                } catch (error) {
-                    console.error('State validation error:', error);
-                    return false;
-                }
-            }
-
-            // Set button loading state
-            setButtonLoading(provider, action = 'signin', loading = true) {
-                const buttonId = action === 'signin' ? `signin${provider.charAt(0).toUpperCase() + provider.slice(1)}Btn` : `${provider}LoginBtn`;
-                const button = document.getElementById(buttonId);
-                
-                if (button) {
-                    const textSpan = button.querySelector('.btn-text');
-                    const spinner = button.querySelector('.btn-spinner');
-                    
-                    if (loading) {
-                        button.disabled = true;
-                        button.classList.add('loading');
-                        if (textSpan) textSpan.style.display = 'none';
-                        if (spinner) spinner.style.display = 'inline-block';
-                    } else {
-                        button.disabled = false;
-                        button.classList.remove('loading');
-                        if (textSpan) textSpan.style.display = 'inline';
-                        if (spinner) spinner.style.display = 'none';
-                    }
-                }
-            }
-
-            // Build OAuth URL
-            buildOAuthUrl(provider, action = 'signin') {
-                const config = this.providers[provider];
-                if (!config) {
-                    throw new Error(`Unknown provider: ${provider}`);
-                }
-
-                const state = this.generateStateParameter(provider, action);
-                const redirectUri = `${window.location.origin}/auth/callback/${provider}`;
-                
-                const params = new URLSearchParams({
-                    client_id: config.clientId || 'demo_client_id',
-                    redirect_uri: redirectUri,
-                    scope: config.scope,
-                    response_type: 'code',
-                    state: state,
-                    access_type: 'offline',
-                    prompt: action === 'signin' ? 'select_account' : 'consent'
-                });
-
-                return `${config.authUrl}?${params.toString()}`;
-            }
-
-            // Initiate social login
-            async initiateSocialLogin(provider, action = 'signin') {
-                try {
-                    // Validate session
-                    if (!securityManager.validateSession()) {
-                        showNotification('Session expired. Please refresh the page.', 'error');
-                        return;
-                    }
-
-                    // Check if provider is configured
-                    if (!this.providers[provider]?.configured) {
-                        this.showProviderNotConfiguredMessage(provider);
-                        return;
-                    }
-
-                    // Set loading state
-                    this.setButtonLoading(provider, action, true);
-
-                    // Get reCAPTCHA token for additional security
-                    const recaptchaToken = await getRecaptchaToken(`social_${action}`);
-                    if (!recaptchaToken) {
-                        this.setButtonLoading(provider, action, false);
-                        return;
-                    }
-
-                    // Store reCAPTCHA token for later validation
-                    sessionStorage.setItem(`oauth_recaptcha_${provider}`, recaptchaToken);
-
-                    // Build OAuth URL
-                    const oauthUrl = this.buildOAuthUrl(provider, action);
-
-                    // Open OAuth popup or redirect
-                    if (this.isMobile()) {
-                        // On mobile, use redirect
-                        window.location.href = oauthUrl;
-                    } else {
-                        // On desktop, use popup
-                        this.openOAuthPopup(oauthUrl, provider, action);
-                    }
-
-                } catch (error) {
-                    console.error('Social login error:', error);
-                    this.setButtonLoading(provider, action, false);
-                    showNotification(`Failed to initiate ${this.providers[provider]?.name || provider} login. Please try again.`, 'error');
-                }
-            }
-
-            // Open OAuth popup
-            openOAuthPopup(url, provider, action) {
-                const popup = window.open(
-                    url,
-                    `${provider}_oauth`,
-                    'width=500,height=600,scrollbars=yes,resizable=yes,status=yes,location=yes,toolbar=no,menubar=no'
-                );
-
-                if (!popup) {
-                    this.setButtonLoading(provider, action, false);
-                    showNotification('Popup blocked. Please allow popups and try again.', 'error');
-                    return;
-                }
-
-                // Monitor popup
-                const checkClosed = setInterval(() => {
-                    if (popup.closed) {
-                        clearInterval(checkClosed);
-                        this.setButtonLoading(provider, action, false);
-                        
-                        // Check if authentication was successful
-                        const authResult = sessionStorage.getItem(`oauth_result_${provider}`);
-                        if (authResult) {
-                            this.handleOAuthSuccess(JSON.parse(authResult), provider, action);
-                            sessionStorage.removeItem(`oauth_result_${provider}`);
-                        }
-                    }
-                }, 1000);
-
-                // Timeout after 5 minutes
-                setTimeout(() => {
-                    if (!popup.closed) {
-                        popup.close();
-                        clearInterval(checkClosed);
-                        this.setButtonLoading(provider, action, false);
-                        showNotification('Authentication timed out. Please try again.', 'error');
-                    }
-                }, 5 * 60 * 1000);
-            }
-
-            // Handle OAuth success
-            async handleOAuthSuccess(authData, provider, action) {
-                try {
-                    // Validate state parameter
-                    const stateData = this.validateStateParameter(authData.state, provider);
-                    if (!stateData) {
-                        throw new Error('Invalid OAuth state parameter');
-                    }
-
-                    // Get stored reCAPTCHA token
-                    const recaptchaToken = sessionStorage.getItem(`oauth_recaptcha_${provider}`);
-                    sessionStorage.removeItem(`oauth_recaptcha_${provider}`);
-
-                    // Prepare authentication data
-                    const authPayload = {
-                        provider: provider,
-                        action: action,
-                        code: authData.code,
-                        state: authData.state,
-                        recaptcha_token: recaptchaToken,
-                        csrf_token: securityManager.getCSRFToken(),
-                        session_id: securityManager.sessionId,
-                        fingerprint: securityManager.generateFingerprint()
-                    };
-
-                    // Send to backend for processing
-                    const response = await fetch('/api/auth/social', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-Token': securityManager.getCSRFToken(),
-                            'X-Session-ID': securityManager.sessionId
-                        },
-                        body: JSON.stringify(authPayload)
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        
-                        // Update session with authentication data
-                        if (result.session_token) {
-                            sessionStorage.setItem('auth_token', result.session_token);
-                        }
-
-                        showNotification(`${this.providers[provider].name} ${action} successful! Redirecting...`, 'success');
-                        
-                        setTimeout(() => {
-                            closeAuthModal();
-                            window.location.reload();
-                        }, 1500);
-                    } else {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || `${this.providers[provider].name} authentication failed`);
-                    }
-
-                } catch (error) {
-                    console.error('OAuth success handling error:', error);
-                    showNotification(error.message || 'Authentication failed. Please try again.', 'error');
-                } finally {
-                    this.setButtonLoading(provider, action, false);
-                }
-            }
-
-            // Show provider not configured message
-            showProviderNotConfiguredMessage(provider) {
-                const providerName = this.providers[provider]?.name || provider;
-                showNotification(
-                    `${providerName} login is currently being configured. Please use email login or try again later.`,
-                    'info'
-                );
-            }
-
-            // Check if device is mobile
-            isMobile() {
-                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            }
-
-            // Setup OAuth return handler
-            setupOAuthReturnHandler() {
-                // Handle OAuth callback if we're on the callback page
-                const urlParams = new URLSearchParams(window.location.search);
-                const code = urlParams.get('code');
-                const state = urlParams.get('state');
-                const error = urlParams.get('error');
-
-                if (code && state) {
-                    // Extract provider from state or URL
-                    try {
-                        const stateData = JSON.parse(atob(state));
-                        const provider = stateData.provider;
-                        
-                        if (window.opener) {
-                            // We're in a popup, send result to parent
-                            sessionStorage.setItem(`oauth_result_${provider}`, JSON.stringify({ code, state }));
-                            window.close();
-                        } else {
-                            // We're in a redirect, handle directly
-                            this.handleOAuthSuccess({ code, state }, provider, stateData.action);
-                        }
-                    } catch (error) {
-                        console.error('OAuth callback error:', error);
-                        showNotification('Authentication failed. Please try again.', 'error');
-                    }
-                } else if (error) {
-                    const errorDescription = urlParams.get('error_description') || 'Authentication was cancelled or failed';
-                    showNotification(errorDescription, 'error');
-                }
-            }
-
-            // Add social button styles
-            addSocialButtonStyles() {
-                const style = document.createElement('style');
-                style.textContent = `
-                    .social-btn {
-                        position: relative;
-                        transition: all 0.3s ease;
-                    }
-                    
-                    .social-btn.loading {
-                        opacity: 0.7;
-                        cursor: not-allowed;
-                    }
-                    
-                    .social-btn .btn-spinner {
-                        position: absolute;
-                        right: 1rem;
-                        top: 50%;
-                        transform: translateY(-50%);
-                        font-size: 0.9rem;
-                    }
-                    
-                    .social-btn:disabled {
-                        opacity: 0.6;
-                        cursor: not-allowed;
-                    }
-                    
-                    .social-btn:disabled:hover {
-                        transform: none;
-                        box-shadow: none;
-                    }
-                `;
-                
-                if (!document.querySelector('style[data-social-login-styles]')) {
-                    style.setAttribute('data-social-login-styles', 'true');
-                    document.head.appendChild(style);
-                }
-            }
+        function skipToSignup() {
+            showNotification('Quick access will be available soon!', 'info');
         }
 
-        // Initialize Social Login Manager
-        const socialLoginManager = new SocialLoginManager();
-
-        // Global function for social login (called by onclick handlers)
-        async function initiateSocialLogin(provider, action = 'signup') {
-            await socialLoginManager.initiateSocialLogin(provider, action);
+        // Social login handlers
+        function initiateSocialLogin(provider, action = 'signup') {
+            showNotification(`${provider} login will be available soon!`, 'info');
         }
 
-        // Show notification function
+        function showForgotPassword() {
+            showNotification('Password reset will be available soon!', 'info');
+        }
+
+        // Notification system
         function showNotification(message, type = 'info') {
             // Remove existing notifications
             const existingNotifications = document.querySelectorAll('.notification');
@@ -6572,7 +4394,22 @@
                 }
             }, 5000);
         }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('authModal');
+            if (event.target === modal) {
+                closeAuthModal();
+            }
+        });
+
+        // Real-time validation event listeners
+        document.addEventListener('input', function(event) {
+            if (event.target.form && event.target.form.id === 'signupStep1Form') {
+                validateStep1();
+            }
+        });
     </script>
 </body>
 </html>
-
+        
