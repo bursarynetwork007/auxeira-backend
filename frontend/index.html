@@ -37,6 +37,12 @@
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="frontend/images/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="frontend/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="frontend/images/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="frontend/images/apple-touch-icon.png">
+    
     <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1754,6 +1760,8 @@
         .footer-logo {
             height: 40px;
             width: auto;
+            object-fit: contain;
+            max-width: 120px;
         }
 
         .social-links {
@@ -3149,7 +3157,7 @@
     <header class="header" id="header">
         <nav class="nav container">
             <div class="nav-brand">
-                <img src="auxeira-logo.png" alt="Auxeira Logo" class="logo">
+                <img src="frontend/images/auxeira-logo.png" alt="Auxeira Logo" class="logo">
                 <span class="brand-text">Auxeira</span>
             </div>
             
@@ -3841,7 +3849,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <img src="auxeira-logo.png" alt="Auxeira Logo" class="footer-logo">
+                    <img src="frontend/images/auxeira-logo.png" alt="Auxeira Logo" class="footer-logo">
                     <h3>Auxeira</h3>
                     <p>The Bloomberg Terminal for Entrepreneurship</p>
                     <div class="social-links">
@@ -3901,7 +3909,7 @@
             <div class="auth-header">
                 <div class="logo-section">
                     <div class="logo">
-                        <img src="https://auxeira.com.s3.amazonaws.com/auxeira-logo.png" alt="Auxeira Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <img src="frontend/images/auxeira-logo.png" alt="Auxeira Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         <div style="display: none; width: 100%; height: 100%; background: var(--gradient-primary); border-radius: var(--border-radius-lg); align-items: center; justify-content: center; color: var(--bloomberg-dark); font-weight: bold; font-size: 1.2rem;">A</div>
                     </div>
                     <h1>Auxeira</h1>
