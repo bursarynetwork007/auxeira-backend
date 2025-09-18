@@ -25,14 +25,12 @@ jobs:
     - name: Install Serverless Framework v3
       run: npm install -g serverless@^3.0.0
 
-    - name: Deploy Lambda Layer (if exists)
+    - name: Deploy Solana Lambda Layer
       run: |
-        if [ -d "layers" ]; then
-          cd layers/solana-layer/nodejs
-          npm install --omit=dev
-          cd ../../../layers
-          serverless deploy -c serverless-layers.yml
-        fi
+        cd layers/solana-layer/nodejs
+        npm install --omit=dev
+        cd ../../../layers
+        serverless deploy -c serverless-layers.yml
 
     - name: Create ECR repository
       run: |
@@ -49,7 +47,12 @@ jobs:
         docker tag auxeira-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/auxeira-backend:latest
         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/auxeira-backend:latest
 
-    - name: Deploy to AWS
+    - name: Deploy backend with layer reference
       run: |
         cd backend
         serverless deploy
+
+    - name: Display deployment info
+      run: |
+        cd backend
+        serverless info
