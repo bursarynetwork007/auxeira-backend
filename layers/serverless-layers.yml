@@ -1,0 +1,16 @@
+service: auxeira-layers
+frameworkVersion: ^3.0.0
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+
+layers:
+  solana:
+    path: solana-layer
+    name: auxeira-solana-layer
+    description: "Solana Web3 dependencies for Auxeira"
+    compatibleRuntimes:
+      - nodejs18.x
+    retain: false

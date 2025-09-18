@@ -5,12 +5,14 @@ provider:
   name: aws
   runtime: provided
   region: us-east-1
-  memorySize: 2048  # Increased for Solana operations
+  memorySize: 1024
   timeout: 30
   environment:
     NODE_ENV: production
-    # Add your environment variables here as needed
-    # SOLANA_RPC_URL: ${env:SOLANA_RPC_URL, 'https://api.mainnet-beta.solana.com'}
+
+# Use the Solana layer
+layers:
+  - arn:aws:lambda:${aws:region}:${aws:accountId}:layer:auxeira-solana-layer:1
 
 functions:
   api:
@@ -20,38 +22,8 @@ functions:
       - http:
           path: /
           method: ANY
-          cors:
-            origin: '*'
-            headers:
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
-              - X-Amz-Security-Token
-              - X-Amz-User-Agent
-            allowCredentials: false
+          cors: true
       - http:
           path: /{proxy+}
           method: ANY
-          cors:
-            origin: '*'
-            headers:
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
-              - X-Amz-Security-Token
-              - X-Amz-User-Agent
-            allowCredentials: false
-
-# CloudFormation resources if needed
-resources:
-  Resources:
-    # Add DynamoDB tables or other resources here if needed
-    ApiLambdaPermission:
-      Type: AWS::Lambda::Permission
-      Properties:
-        Action: lambda:InvokeFunction
-        FunctionName:
-          Ref: ApiLambdaFunction
-        Principal: apigateway.amazonaws.com
+          cors: true

@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'backend/**'
+      - 'layers/**'
 
 jobs:
   deploy:
@@ -21,6 +22,18 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
+    - name: Install Serverless Framework v3
+      run: npm install -g serverless@^3.0.0
+
+    - name: Deploy Lambda Layer (if exists)
+      run: |
+        if [ -d "layers" ]; then
+          cd layers/solana-layer/nodejs
+          npm install --omit=dev
+          cd ../../../layers
+          serverless deploy -c serverless-layers.yml
+        fi
+
     - name: Create ECR repository
       run: |
         aws ecr describe-repositories --repository-names auxeira-backend --region ${{ secrets.AWS_REGION }} || \
@@ -35,9 +48,6 @@ jobs:
         docker build -t auxeira-backend .
         docker tag auxeira-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/auxeira-backend:latest
         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/auxeira-backend:latest
-
-    - name: Install Serverless Framework v3
-      run: npm install -g serverless@^3.0.0
 
     - name: Deploy to AWS
       run: |
