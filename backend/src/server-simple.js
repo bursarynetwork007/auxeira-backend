@@ -1,16 +1,26 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const serverless = require('serverless-http');
 require('dotenv').config();
 
 const app = express();
-const PORT = parseInt(process.env.PORT || '3001', 10);
 
 // Middleware
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Root route
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Auxeira Backend API',
+    status: 'running',
+    platform: 'Good Business Rewards Platform',
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Simple health check
 app.get('/health', (req, res) => {
@@ -31,11 +41,24 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Auxeira Backend running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`🔗 API Status: http://localhost:${PORT}/api/status`);
+// Test Solana integration
+app.get('/api/solana/test', (req, res) => {
+  try {
+    const { Connection } = require('@solana/web3.js');
+    res.json({
+      solana: 'available',
+      message: 'Solana Web3.js loaded successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      solana: 'error',
+      message: error.message
+    });
+  }
 });
 
-module.exports = app;
+// Export Lambda handler
+module.exports.handler = serverless(app);
+
+// Export app for testing
+module.exports.app = app;
