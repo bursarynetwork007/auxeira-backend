@@ -1,15 +1,33 @@
-// Fix reCAPTCHA loading
-window.initializeRecaptcha = function() {
-    if (typeof grecaptcha !== 'undefined') {
-        // Your reCAPTCHA initialization code here
-        console.log('reCAPTCHA loaded successfully');
-    } else {
-        console.log('reCAPTCHA not yet loaded, retrying...');
-        setTimeout(initializeRecaptcha, 1000);
-    }
-};
-
-// Wait for page load then initialize
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(initializeRecaptcha, 2000);
-});
+// Universal reCaptcha fix - prevents errors across all pages
+(function() {
+    // Override any existing reCaptcha calls to be safe
+    window.initRecaptcha = function() {
+        if (typeof grecaptcha === 'undefined') {
+            return false; // reCaptcha not loaded
+        }
+        
+        // Find any reCaptcha container on the page
+        const containers = document.querySelectorAll('[data-recaptcha], .g-recaptcha, #recaptcha');
+        
+        containers.forEach(function(container) {
+            if (container && !container.innerHTML.trim()) {
+                try {
+                    grecaptcha.render(container, {
+                        'sitekey': container.dataset.sitekey || 'your-site-key'
+                    });
+                } catch (error) {
+                    console.log('reCaptcha initialization skipped for this element');
+                }
+            }
+        });
+    };
+    
+    // Safe initialization after page load
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            if (typeof grecaptcha !== 'undefined') {
+                grecaptcha.ready(initRecaptcha);
+            }
+        }, 1000);
+    });
+})();
