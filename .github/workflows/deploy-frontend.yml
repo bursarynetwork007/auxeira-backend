@@ -22,7 +22,7 @@ jobs:
 
     - name: Deploy to S3
       run: |
-        aws s3 sync frontend/ s3://auxeira.com --delete --acl public-read
+        aws s3 sync frontend/ s3://auxeira.com --delete
 
     - name: Invalidate CloudFront cache
       run: |
