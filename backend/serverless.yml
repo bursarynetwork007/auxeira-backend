@@ -14,9 +14,6 @@ functions:
   api:
     image: 
       uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/auxeira-backend:latest
-    # Reference layer using Serverless framework syntax
-    layers:
-      - ${cf:auxeira-layers-dev.SolanaLambdaLayerQualifiedArn}
     events:
       - http:
           path: /
