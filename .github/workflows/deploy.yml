@@ -26,18 +26,24 @@ jobs:
       run: |
         cd backend
         npm ci
+        npm install --save-dev webpack webpack-cli
 
-    - name: Install Serverless Framework globally
+    - name: Install Serverless Framework
       run: npm install -g serverless
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Deploy to AWS
+    - name: Deploy Layer
       run: |
         cd backend
-        npx serverless deploy
+        npm run deploy:layer
+
+    - name: Deploy Application
+      run: |
+        cd backend
+        npm run deploy:app
