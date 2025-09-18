@@ -3,18 +3,17 @@ frameworkVersion: ^3.0.0
 
 provider:
   name: aws
-  runtime: nodejs18.x  # ZIP package needs runtime specified
+  runtime: provided
   region: us-east-1
-  memorySize: 1024
+  memorySize: 2048  # More memory for Solana
   timeout: 30
   environment:
     NODE_ENV: production
 
 functions:
   api:
-    handler: src/server-simple.handler  # ZIP package needs handler
-    layers:
-      - arn:aws:lambda:${aws:region}:${aws:accountId}:layer:auxeira-solana-layer:1
+    image: 
+      uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/auxeira-backend:latest
     events:
       - http:
           path: /
@@ -24,11 +23,3 @@ functions:
           path: /{proxy+}
           method: ANY
           cors: true
-
-# Exclude heavy dependencies (they're in the layer)
-package:
-  patterns:
-    - '!node_modules/@solana/**'
-    - '!tests/**'
-    - '!*.md'
-    - '!.git/**'
