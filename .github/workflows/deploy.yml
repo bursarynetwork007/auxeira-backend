@@ -5,8 +5,6 @@ on:
     branches: [ main ]
     paths:
       - 'backend/**'
-      - 'package.json'
-      - 'serverless.yml'
 
 jobs:
   deploy:
@@ -16,21 +14,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        cache: 'npm'
-
-    - name: Install dependencies
-      run: |
-        cd backend
-        npm ci
-        npm install --save-dev webpack webpack-cli
-
-    - name: Install Serverless Framework
-      run: npm install -g serverless
-
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
@@ -38,12 +21,25 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Deploy Layer
+    - name: Create ECR repository if it doesn't exist
       run: |
-        cd backend
-        npm run deploy:layer
+        aws ecr describe-repositories --repository-names auxeira-backend --region ${{ secrets.AWS_REGION }} || \
+        aws ecr create-repository --repository-name auxeira-backend --region ${{ secrets.AWS_REGION }}
 
-    - name: Deploy Application
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build and push Docker image
       run: |
         cd backend
-        npm run deploy:app
+        docker build -t auxeira-backend .
+        docker tag auxeira-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/auxeira-backend:latest
+        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/auxeira-backend:latest
+
+    - name: Install Serverless Framework
+      run: npm install -g serverless
+
+    - name: Deploy to AWS
+      run: |
+        cd backend  
+        serverless deploy

@@ -2,89 +2,31 @@ service: auxeira-backend
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: provided
   region: us-east-1
-  environment:
-    NODE_ENV: production
-    USERS_TABLE: ${self:service}-users-${sls:stage}
-    TRANSACTIONS_TABLE: ${self:service}-transactions-${sls:stage}
-    # Add other table names as needed
-
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource:
-        - Fn::GetAtt: [UsersTable, Arn]
-        - Fn::GetAtt: [TransactionsTable, Arn]
-        # Add other table ARNs as needed
+  memorySize: 1024
+  timeout: 30
 
 functions:
   api:
-    handler: lambda.handler
+    image: 
+      uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/auxeira-backend:latest
     events:
       - http:
           path: /
           method: ANY
-          cors: true
       - http:
           path: /{proxy+}
           method: ANY
-          cors: true
+
+plugins:
+  - serverless-deployment-bucket
 
 resources:
   Resources:
-    UsersTable:
-      Type: AWS::DynamoDB::Table
+    ECRRepository:
+      Type: AWS::ECR::Repository
       Properties:
-        TableName: ${self:provider.environment.USERS_TABLE}
-        AttributeDefinitions:
-          - AttributeName: userId
-            AttributeType: S
-          - AttributeName: email
-            AttributeType: S
-        KeySchema:
-          - AttributeName: userId
-            KeyType: HASH
-        GlobalSecondaryIndexes:
-          - IndexName: emailIndex
-            KeySchema:
-              - AttributeName: email
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-        BillingMode: PAY_PER_REQUEST
-
-    TransactionsTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:provider.environment.TRANSACTIONS_TABLE}
-        AttributeDefinitions:
-          - AttributeName: transactionId
-            AttributeType: S
-          - AttributeName: userId
-            AttributeType: S
-          - AttributeName: timestamp
-            AttributeType: N
-        KeySchema:
-          - AttributeName: transactionId
-            KeyType: HASH
-        GlobalSecondaryIndexes:
-          - IndexName: userIndex
-            KeySchema:
-              - AttributeName: userId
-                KeyType: HASH
-              - AttributeName: timestamp
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-        BillingMode: PAY_PER_REQUEST
-    # Add other tables as needed
-
-plugins:
-  - serverless-offline
+        RepositoryName: auxeira-backend
+        ImageScanningConfiguration:
+          ScanOnPush: true
