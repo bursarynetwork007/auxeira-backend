@@ -1710,3 +1710,46 @@ const generateReport = async (startupId, token) => {
 </body>
 </html>
 
+
+<!-- Backend Integration Panel -->
+<div class="integration-panel" style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px;">
+    <h3 style="margin: 0 0 15px 0;">Live Backend Integration</h3>
+    <div class="backend-status" style="margin-bottom: 15px;">Initializing connection...</div>
+    <button onclick="AuxeiraApp.testBackendConnection()" 
+            style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+        Test Live Connection
+    </button>
+    <div id="api-test-results" style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 4px; min-height: 60px; display: none;">
+    </div>
+</div>
+
+<script>
+AuxeiraApp.testBackendConnection = async function() {
+    const resultsDiv = document.getElementById('api-test-results');
+    resultsDiv.style.display = 'block';
+    resultsDiv.innerHTML = '<div style="color: #ffd700;">Testing connection...</div>';
+    
+    try {
+        const health = await this.api.getHealth();
+        const status = await this.api.getStatus();
+        const solana = await this.api.testSolana();
+        
+        resultsDiv.innerHTML = `
+            <div style="color: #90ee90;">
+                <strong>✅ All Systems Operational</strong><br>
+                Backend: ${health.status}<br>
+                Services: ${status.services}<br>
+                Blockchain: ${solana.solana}<br>
+                <small>Last tested: ${new Date().toLocaleString()}</small>
+            </div>
+        `;
+    } catch (error) {
+        resultsDiv.innerHTML = `
+            <div style="color: #ffcccb;">
+                <strong>❌ Connection Failed</strong><br>
+                ${error.message}
+            </div>
+        `;
+    }
+};
+</script>
