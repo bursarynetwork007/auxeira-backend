@@ -8,7 +8,15 @@ const app = express();
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+
+// CORS Configuration - THIS IS THE FIX
+app.use(cors({
+    origin: ['https://auxeira.com', 'https://www.auxeira.com'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Api-Key', 'X-Amz-Date', 'X-Amz-Security-Token', 'X-Requested-With']
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -59,6 +67,5 @@ app.get('/api/solana/test', (req, res) => {
 
 // Export Lambda handler
 module.exports.handler = serverless(app);
-
 // Export app for testing
 module.exports.app = app;
