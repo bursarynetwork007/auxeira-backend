@@ -21,7 +21,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Create ECR repository if it doesn't exist
+    - name: Create ECR repository
       run: |
         aws ecr describe-repositories --repository-names auxeira-backend --region ${{ secrets.AWS_REGION }} || \
         aws ecr create-repository --repository-name auxeira-backend --region ${{ secrets.AWS_REGION }}
@@ -36,10 +36,10 @@ jobs:
         docker tag auxeira-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/auxeira-backend:latest
         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/auxeira-backend:latest
 
-    - name: Install Serverless Framework
-      run: npm install -g serverless
+    - name: Install Serverless Framework v3
+      run: npm install -g serverless@^3.0.0
 
     - name: Deploy to AWS
       run: |
-        cd backend  
+        cd backend
         serverless deploy

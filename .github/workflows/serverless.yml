@@ -1,0 +1,21 @@
+service: auxeira-backend
+frameworkVersion: ^3.0.0
+
+provider:
+  name: aws
+  runtime: provided
+  region: us-east-1
+  memorySize: 1024
+  timeout: 30
+
+functions:
+  api:
+    image: 
+      uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/auxeira-backend:latest
+    events:
+      - http:
+          path: /
+          method: ANY
+      - http:
+          path: /{proxy+}
+          method: ANY
