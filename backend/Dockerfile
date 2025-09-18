@@ -1,9 +1,9 @@
-FROM public.ecr.aws/lambda/node:18
+FROM public.ecr.aws/lambda/nodejs:18
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies (AWS will handle the heavy lifting)
+# Install dependencies  
 RUN npm install --omit=dev --ignore-scripts
 
 # Copy application code
