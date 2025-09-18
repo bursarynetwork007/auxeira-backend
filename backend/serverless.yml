@@ -14,6 +14,9 @@ functions:
   api:
     image: 
       uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/auxeira-backend:latest
+    layers:
+      # Reference the layer dynamically
+      - arn:aws:lambda:${aws:region}:${aws:accountId}:layer:auxeira-solana-layer:1
     events:
       - http:
           path: /
