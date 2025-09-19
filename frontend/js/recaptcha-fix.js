@@ -12,7 +12,7 @@
         containers.forEach(function(container) {
             if (container && !container.innerHTML.trim()) {
                 try {
-                    grecaptcha.render(container, {
+                    // grecaptcha.render(container, {
                         'sitekey': container.dataset.sitekey || 'your-site-key'
                     });
                 } catch (error) {

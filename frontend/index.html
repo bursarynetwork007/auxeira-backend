@@ -59,7 +59,7 @@
     <link rel="dns-prefetch" href="//www.google.com">
     
     <!-- reCAPTCHA Script -->
-    <script src="https://www.google.com/recaptcha/api.js?render=6LcEzq0rAAAAAKosYlDqLUxYp_8Fl09xC1M__PaN"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     
     <style>
         /* Enhanced Design System with Production Optimizations */
@@ -3985,7 +3985,7 @@
                             </div>
 
                             <div class="recaptcha-container">
-                                <div id="signinRecaptcha"></div>
+                                <div class="g-recaptcha" data-sitekey="6LcEzq0rAAAAAKosYlDqLUxYp_8Fl09xC1M__PaN" data-theme="dark" data-callback="onSigninRecaptchaComplete"></div>
                             </div>
 
                             <button type="submit" class="btn-primary full-width" id="signinSubmitBtn">
@@ -4180,7 +4180,7 @@
                             </div>
 
                             <div class="recaptcha-container">
-                                <div id="signupRecaptcha"></div>
+                                <div class="g-recaptcha" data-sitekey="6LcEzq0rAAAAAKosYlDqLUxYp_8Fl09xC1M__PaN" data-theme="dark" data-callback="onSignupRecaptchaComplete"></div>
                             </div>
 
                             <button type="submit" class="btn-primary full-width" id="signupSubmitBtn">
@@ -4359,25 +4359,16 @@
 
             async initializeRecaptcha() {
                 try {
-                    if (typeof grecaptcha !== 'undefined') {
-                        await grecaptcha.ready();
-                        
-                        // Render signin recaptcha
-                        if (document.getElementById('signinRecaptcha')) {
-                            grecaptcha.render('signinRecaptcha', {
-                                'sitekey': '6LcEzq0rAAAAAKosYlDqLUxYp_8Fl09xC1M__PaN',
-                                'theme': 'dark',
-                                'size': 'normal'
-                            });
-                        }
+                    console.log("reCAPTCHA will load automatically with data attributes");
+                    this.recaptchaLoaded = true;
+                } catch (error) {
+                    console.warn("reCAPTCHA initialization skipped:", error);
+                }
+            }
                         
                         // Render signup recaptcha
                         if (document.getElementById('signupRecaptcha')) {
-                            grecaptcha.render('signupRecaptcha', {
-                                'sitekey': '6LcEzq0rAAAAAKosYlDqLUxYp_8Fl09xC1M__PaN',
-                                'theme': 'dark',
-                                'size': 'normal'
-                            });
+                            // Use data attributes instead of programmatic rendering
                         }
                         
                         this.recaptchaLoaded = true;
@@ -4391,7 +4382,7 @@
                 if (!this.recaptchaLoaded) return null;
                 
                 try {
-                    const token = await grecaptcha.execute('6LcEzq0rAAAAAKosYlDqLUxYp_8Fl09xC1M__PaN', {
+                    // const token = await // grecaptcha.execute('6LcEzq0rAAAAAKosYlDqLUxYp_8Fl09xC1M__PaN', {
                         action: action
                     });
                     return token;
@@ -5535,6 +5526,19 @@
             // Hide loading overlay if present
             uiManager.showLoading(false);
             
+        
+        // reCAPTCHA callback functions
+        function onSigninRecaptchaComplete(response) {
+            console.log("Signin reCAPTCHA completed:", response);
+            const submitBtn = document.getElementById("signinSubmitBtn");
+            if (submitBtn) submitBtn.disabled = false;
+        }
+        
+        function onSignupRecaptchaComplete(response) {
+            console.log("Signup reCAPTCHA completed:", response);
+            const submitBtn = document.getElementById("signupSubmitBtn");
+            if (submitBtn) submitBtn.disabled = false;
+        }
             console.info('Auxeira landing page initialized successfully');
         }
     </script>
