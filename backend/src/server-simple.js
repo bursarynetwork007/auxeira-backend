@@ -9,12 +9,12 @@ const app = express();
 // Middleware
 app.use(helmet());
 
-// CORS Configuration - THIS IS THE FIX
+// CORS Configuration - ADD x-csrf-token
 app.use(cors({
     origin: ['https://auxeira.com', 'https://www.auxeira.com'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Api-Key', 'X-Amz-Date', 'X-Amz-Security-Token', 'X-Requested-With']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Api-Key', 'X-Amz-Date', 'X-Amz-Security-Token', 'X-Requested-With', 'x-csrf-token']
 }));
 
 app.use(express.json());
