@@ -1,6 +1,6 @@
 // Extend existing AuxeiraApp with backend integration
 AuxeiraApp.api = {
-    BASE_URL: 'https://brhzyl9cj2.execute-api.us-east-1.amazonaws.com/dev',
+    BASE_URL: 'https://x39efpag2i.execute-api.us-east-1.amazonaws.com/dev',
     
     async request(endpoint, options = {}) {
         const url = this.BASE_URL + endpoint;
