@@ -63,15 +63,10 @@ const corsOptions = {
     "X-Requested-With",
     "x-csrf-token",
     "Accept",
-    "Origin"
-  ],
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization", 
-    "X-Requested-With",
-    "x-csrf-token",
-    "Accept",
-    "Origin"
+    "Origin",
+    "X-Api-Key",
+    "X-Amz-Date",
+    "X-Amz-Security-Token"
   ],
 };
 
