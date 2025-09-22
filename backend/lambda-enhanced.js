@@ -522,3 +522,6 @@ if (process.env.NODE_ENV === 'development') {
 
 // Export app for testing
 module.exports.app = app;
+
+// Export handler for Lambda
+module.exports.handler = serverless(app);

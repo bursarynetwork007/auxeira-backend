@@ -1,11 +1,36 @@
 service: auxeira-backend
 frameworkVersion: ^4.0.0
+
+package:
+  patterns:
+    - '!awscliv2.zip'
+    - '!.serverless/**'
+    - '!node_modules/aws-sdk/**'
+    - '!**/*.zip'
+    - '!**/*.backup'
+    - '!aws/**'
+    - '!.env*'
+    - '!README.md'
+    - '!Dockerfile'
+    - '!docker-compose.yml'
+    - '!package-original.json'
+    - '!src/types/**'
+    - '!src/websocket/**'
+    - '!src/ml-pipeline/**'
+    - 'lambda-enhanced.js'
+    - 'src/services/auth-dynamodb.service.js'
+    - 'package.json'
+    - 'node_modules/**'
+
 provider:
   name: aws
   runtime: nodejs18.x
   region: us-east-1
-  memorySize: 2048  # More memory for Solana
-  timeout: 30
+  stage: ${opt:stage, 'dev'}
+  memorySize: 2048
+  timeout: 29
+  deploymentBucket:
+    name: auxeira-backend-deployment-bucket-${self:provider.stage}
   environment:
     NODE_ENV: production
   iamRoleStatements:
@@ -21,6 +46,7 @@ provider:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-users-${self:provider.stage}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-sessions-${self:provider.stage}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-users-${self:provider.stage}/index/*"
+        
 functions:
   api:
     handler: lambda-enhanced.handler
@@ -39,9 +65,8 @@ functions:
       JWT_SECRET: ${env:JWT_SECRET, 'your-super-secret-jwt-key-change-in-production'}
       JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET, 'your-super-secret-refresh-key-change-in-production'}
 
-
 resources:
-  Resources:
+  Resources:        
     UsersTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -61,7 +86,6 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-            BillingMode: PAY_PER_REQUEST
         BillingMode: PAY_PER_REQUEST
         
     SessionsTable:
@@ -83,7 +107,6 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-            BillingMode: PAY_PER_REQUEST
         BillingMode: PAY_PER_REQUEST
         TimeToLiveSpecification:
           AttributeName: expiresAt
