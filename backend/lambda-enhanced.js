@@ -58,14 +58,21 @@ const corsOptions = {
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: [
-    'Content-Type', 
-    'Authorization', 
-    'X-Api-Key', 
-    'X-Amz-Date', 
-    'X-Amz-Security-Token', 
-    'X-Requested-With', 
-    'x-csrf-token'
-  ]
+    "Content-Type",
+    "Authorization",
+    "X-Requested-With",
+    "x-csrf-token",
+    "Accept",
+    "Origin"
+  ],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization", 
+    "X-Requested-With",
+    "x-csrf-token",
+    "Accept",
+    "Origin"
+  ],
 };
 
 app.use(cors(corsOptions));
