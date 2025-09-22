@@ -21,3 +21,4 @@ build/
 backend/.serverless/
 backend/test-payload.json
 backend/response.json
+backend/.serverless/
