@@ -89,7 +89,7 @@ const AuxeiraApp = {
                 mobileMenuBtn.classList.toggle('active');
             });
         }
-    }
+    },
 
     // Handle form submission
     handleFormSubmit(form) {

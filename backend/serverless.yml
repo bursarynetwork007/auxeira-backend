@@ -54,11 +54,11 @@ functions:
       - http:
           path: /
           method: ANY
-          cors: true
+          
       - http:
           path: /{proxy+}
           method: ANY
-          cors: true
+          
     environment:
       USERS_TABLE: ${self:service}-users-${self:provider.stage}
       SESSIONS_TABLE: ${self:service}-sessions-${self:provider.stage}

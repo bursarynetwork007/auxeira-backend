@@ -6,90 +6,69 @@
     "service": {
       "service": "auxeira-backend",
       "frameworkVersion": "^4.0.0",
+      "package": {
+        "patterns": [
+          "!awscliv2.zip",
+          "!.serverless/**",
+          "!node_modules/aws-sdk/**",
+          "!**/*.zip",
+          "!**/*.backup",
+          "!aws/**",
+          "!.env*",
+          "!README.md",
+          "!Dockerfile",
+          "!docker-compose.yml",
+          "!package-original.json",
+          "!src/types/**",
+          "!src/websocket/**",
+          "!src/ml-pipeline/**",
+          "lambda-enhanced.js",
+          "src/services/auth-dynamodb.service.js",
+          "package.json",
+          "node_modules/**"
+        ],
+        "artifactsS3KeyDirname": "serverless/auxeira-backend/dev/code-artifacts",
+        "deploymentBucket": "auxeira-backend-deployment-bucket-dev",
+        "artifact": "/workspaces/auxeira-backend/backend/.serverless/auxeira-backend.zip",
+        "artifactDirectoryName": "serverless/auxeira-backend/dev/1758557799354-2025-09-22T16:16:39.354Z"
+      },
       "provider": {
         "name": "aws",
-        "runtime": "provided",
+        "runtime": "nodejs18.x",
         "region": "us-east-1",
+        "stage": "dev",
         "memorySize": 2048,
-        "timeout": 30,
+        "timeout": 29,
+        "deploymentBucket": "auxeira-backend-deployment-bucket-dev",
         "environment": {
           "NODE_ENV": "production"
         },
-        "stage": "dev",
+        "iamRoleStatements": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "dynamodb:Query",
+              "dynamodb:Scan",
+              "dynamodb:GetItem",
+              "dynamodb:PutItem",
+              "dynamodb:UpdateItem",
+              "dynamodb:DeleteItem"
+            ],
+            "Resource": [
+              "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev",
+              "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-sessions-dev",
+              "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev/index/*"
+            ]
+          }
+        ],
         "versionFunctions": true,
+        "deploymentBucketObject": {
+          "name": "auxeira-backend-deployment-bucket-dev"
+        },
         "compiledCloudFormationTemplate": {
           "AWSTemplateFormatVersion": "2010-09-09",
           "Description": "The AWS CloudFormation template for this Serverless application",
           "Resources": {
-            "ServerlessDeploymentBucket": {
-              "Type": "AWS::S3::Bucket",
-              "Properties": {
-                "BucketEncryption": {
-                  "ServerSideEncryptionConfiguration": [
-                    {
-                      "ServerSideEncryptionByDefault": {
-                        "SSEAlgorithm": "AES256"
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "ServerlessDeploymentBucketPolicy": {
-              "Type": "AWS::S3::BucketPolicy",
-              "Properties": {
-                "Bucket": {
-                  "Ref": "ServerlessDeploymentBucket"
-                },
-                "PolicyDocument": {
-                  "Statement": [
-                    {
-                      "Action": "s3:*",
-                      "Effect": "Deny",
-                      "Principal": "*",
-                      "Resource": [
-                        {
-                          "Fn::Join": [
-                            "",
-                            [
-                              "arn:",
-                              {
-                                "Ref": "AWS::Partition"
-                              },
-                              ":s3:::",
-                              {
-                                "Ref": "ServerlessDeploymentBucket"
-                              },
-                              "/*"
-                            ]
-                          ]
-                        },
-                        {
-                          "Fn::Join": [
-                            "",
-                            [
-                              "arn:",
-                              {
-                                "Ref": "AWS::Partition"
-                              },
-                              ":s3:::",
-                              {
-                                "Ref": "ServerlessDeploymentBucket"
-                              }
-                            ]
-                          ]
-                        }
-                      ],
-                      "Condition": {
-                        "Bool": {
-                          "aws:SecureTransport": false
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            },
             "ApiLogGroup": {
               "Type": "AWS::Logs::LogGroup",
               "Properties": {
@@ -153,6 +132,22 @@
                               "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/auxeira-backend-dev*:*:*"
                             }
                           ]
+                        },
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "dynamodb:Query",
+                            "dynamodb:Scan",
+                            "dynamodb:GetItem",
+                            "dynamodb:PutItem",
+                            "dynamodb:UpdateItem",
+                            "dynamodb:DeleteItem"
+                          ],
+                          "Resource": [
+                            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev",
+                            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-sessions-dev",
+                            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev/index/*"
+                          ]
                         }
                       ]
                     }
@@ -178,15 +173,21 @@
               "Type": "AWS::Lambda::Function",
               "Properties": {
                 "Code": {
-                  "ImageUri": "615608124862.dkr.ecr.us-east-1.amazonaws.com/auxeira-backend@sha256:f0cf2e15ddfb3297a5cef4f9b45691c58eab51ffc2a3cbcafedd791a4362fdbc"
+                  "S3Bucket": "auxeira-backend-deployment-bucket-dev",
+                  "S3Key": "serverless/auxeira-backend/dev/1758557799354-2025-09-22T16:16:39.354Z/auxeira-backend.zip"
                 },
-                "PackageType": "Image",
+                "Handler": "lambda-enhanced.handler",
+                "Runtime": "nodejs18.x",
                 "FunctionName": "auxeira-backend-dev-api",
                 "MemorySize": 2048,
-                "Timeout": 30,
+                "Timeout": 29,
                 "Environment": {
                   "Variables": {
-                    "NODE_ENV": "production"
+                    "NODE_ENV": "production",
+                    "USERS_TABLE": "auxeira-backend-users-dev",
+                    "SESSIONS_TABLE": "auxeira-backend-sessions-dev",
+                    "JWT_SECRET": "<REDACTED>",
+                    "JWT_REFRESH_SECRET": "<REDACTED>"
                   }
                 },
                 "Role": {
@@ -200,14 +201,14 @@
                 "ApiLogGroup"
               ]
             },
-            "ApiLambdaVersion26JBepu8fk3cXIjPpLj5AEmDBnT2bhRibF9NWk": {
+            "ApiLambdaVersionk5X5GbihVsf51CckmVxOxotBDlGOD4471gZ9FdaBU": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "ApiLambdaFunction"
                 },
-                "CodeSha256": "f0cf2e15ddfb3297a5cef4f9b45691c58eab51ffc2a3cbcafedd791a4362fdbc"
+                "CodeSha256": "AyqK+20BSM5JM9qqgRcqycZxuwqUi1puNRB30Yyt468="
               }
             },
             "ApiGatewayRestApi": {
@@ -332,7 +333,7 @@
                 "ApiLambdaPermissionApiGateway"
               ]
             },
-            "ApiGatewayDeployment1758266327818": {
+            "ApiGatewayDeployment1758557786188": {
               "Type": "AWS::ApiGateway::Deployment",
               "Properties": {
                 "RestApiId": {
@@ -381,13 +382,89 @@
                   ]
                 }
               }
+            },
+            "UsersTable": {
+              "Type": "AWS::DynamoDB::Table",
+              "Properties": {
+                "TableName": "auxeira-backend-users-dev",
+                "AttributeDefinitions": [
+                  {
+                    "AttributeName": "email",
+                    "AttributeType": "S"
+                  },
+                  {
+                    "AttributeName": "id",
+                    "AttributeType": "S"
+                  }
+                ],
+                "KeySchema": [
+                  {
+                    "AttributeName": "email",
+                    "KeyType": "HASH"
+                  }
+                ],
+                "GlobalSecondaryIndexes": [
+                  {
+                    "IndexName": "UserIdIndex",
+                    "KeySchema": [
+                      {
+                        "AttributeName": "id",
+                        "KeyType": "HASH"
+                      }
+                    ],
+                    "Projection": {
+                      "ProjectionType": "ALL"
+                    }
+                  }
+                ],
+                "BillingMode": "PAY_PER_REQUEST"
+              }
+            },
+            "SessionsTable": {
+              "Type": "AWS::DynamoDB::Table",
+              "Properties": {
+                "TableName": "auxeira-backend-sessions-dev",
+                "AttributeDefinitions": [
+                  {
+                    "AttributeName": "sessionId",
+                    "AttributeType": "S"
+                  },
+                  {
+                    "AttributeName": "userId",
+                    "AttributeType": "S"
+                  }
+                ],
+                "KeySchema": [
+                  {
+                    "AttributeName": "sessionId",
+                    "KeyType": "HASH"
+                  }
+                ],
+                "GlobalSecondaryIndexes": [
+                  {
+                    "IndexName": "UserIdIndex",
+                    "KeySchema": [
+                      {
+                        "AttributeName": "userId",
+                        "KeyType": "HASH"
+                      }
+                    ],
+                    "Projection": {
+                      "ProjectionType": "ALL"
+                    }
+                  }
+                ],
+                "BillingMode": "PAY_PER_REQUEST",
+                "TimeToLiveSpecification": {
+                  "AttributeName": "expiresAt",
+                  "Enabled": true
+                }
+              }
             }
           },
           "Outputs": {
             "ServerlessDeploymentBucketName": {
-              "Value": {
-                "Ref": "ServerlessDeploymentBucket"
-              },
+              "Value": "auxeira-backend-deployment-bucket-dev",
               "Export": {
                 "Name": "sls-auxeira-backend-dev-ServerlessDeploymentBucketName"
               }
@@ -395,7 +472,7 @@
             "ApiLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "ApiLambdaVersion26JBepu8fk3cXIjPpLj5AEmDBnT2bhRibF9NWk"
+                "Ref": "ApiLambdaVersionk5X5GbihVsf51CckmVxOxotBDlGOD4471gZ9FdaBU"
               },
               "Export": {
                 "Name": "sls-auxeira-backend-dev-ApiLambdaFunctionQualifiedArn"
@@ -429,95 +506,11 @@
             }
           }
         },
-        "coreCloudFormationTemplate": {
-          "AWSTemplateFormatVersion": "2010-09-09",
-          "Description": "The AWS CloudFormation template for this Serverless application",
-          "Resources": {
-            "ServerlessDeploymentBucket": {
-              "Type": "AWS::S3::Bucket",
-              "Properties": {
-                "BucketEncryption": {
-                  "ServerSideEncryptionConfiguration": [
-                    {
-                      "ServerSideEncryptionByDefault": {
-                        "SSEAlgorithm": "AES256"
-                      }
-                    }
-                  ]
-                }
-              }
-            },
-            "ServerlessDeploymentBucketPolicy": {
-              "Type": "AWS::S3::BucketPolicy",
-              "Properties": {
-                "Bucket": {
-                  "Ref": "ServerlessDeploymentBucket"
-                },
-                "PolicyDocument": {
-                  "Statement": [
-                    {
-                      "Action": "s3:*",
-                      "Effect": "Deny",
-                      "Principal": "*",
-                      "Resource": [
-                        {
-                          "Fn::Join": [
-                            "",
-                            [
-                              "arn:",
-                              {
-                                "Ref": "AWS::Partition"
-                              },
-                              ":s3:::",
-                              {
-                                "Ref": "ServerlessDeploymentBucket"
-                              },
-                              "/*"
-                            ]
-                          ]
-                        },
-                        {
-                          "Fn::Join": [
-                            "",
-                            [
-                              "arn:",
-                              {
-                                "Ref": "AWS::Partition"
-                              },
-                              ":s3:::",
-                              {
-                                "Ref": "ServerlessDeploymentBucket"
-                              }
-                            ]
-                          ]
-                        }
-                      ],
-                      "Condition": {
-                        "Bool": {
-                          "aws:SecureTransport": false
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "Outputs": {
-            "ServerlessDeploymentBucketName": {
-              "Value": {
-                "Ref": "ServerlessDeploymentBucket"
-              }
-            }
-          }
-        },
         "vpc": {}
       },
       "functions": {
         "api": {
-          "image": {
-            "uri": "615608124862.dkr.ecr.us-east-1.amazonaws.com/auxeira-backend:latest"
-          },
+          "handler": "lambda-enhanced.handler",
           "events": [
             {
               "http": {
@@ -534,99 +527,142 @@
               }
             }
           ],
+          "environment": {
+            "USERS_TABLE": "auxeira-backend-users-dev",
+            "SESSIONS_TABLE": "auxeira-backend-sessions-dev",
+            "JWT_SECRET": "<REDACTED>",
+            "JWT_REFRESH_SECRET": "<REDACTED>"
+          },
           "name": "auxeira-backend-dev-api",
           "package": {},
           "memory": 2048,
-          "timeout": 30,
+          "timeout": 29,
+          "runtime": "nodejs18.x",
           "vpc": {},
-          "versionLogicalId": "ApiLambdaVersion26JBepu8fk3cXIjPpLj5AEmDBnT2bhRibF9NWk"
+          "versionLogicalId": "ApiLambdaVersionk5X5GbihVsf51CckmVxOxotBDlGOD4471gZ9FdaBU"
         }
+      },
+      "resources": {
+        "Resources": {
+          "UsersTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "auxeira-backend-users-dev",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "email",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "id",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "email",
+                  "KeyType": "HASH"
+                }
+              ],
+              "GlobalSecondaryIndexes": [
+                {
+                  "IndexName": "UserIdIndex",
+                  "KeySchema": [
+                    {
+                      "AttributeName": "id",
+                      "KeyType": "HASH"
+                    }
+                  ],
+                  "Projection": {
+                    "ProjectionType": "ALL"
+                  }
+                }
+              ],
+              "BillingMode": "PAY_PER_REQUEST"
+            }
+          },
+          "SessionsTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "auxeira-backend-sessions-dev",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "sessionId",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "userId",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "sessionId",
+                  "KeyType": "HASH"
+                }
+              ],
+              "GlobalSecondaryIndexes": [
+                {
+                  "IndexName": "UserIdIndex",
+                  "KeySchema": [
+                    {
+                      "AttributeName": "userId",
+                      "KeyType": "HASH"
+                    }
+                  ],
+                  "Projection": {
+                    "ProjectionType": "ALL"
+                  }
+                }
+              ],
+              "BillingMode": "PAY_PER_REQUEST",
+              "TimeToLiveSpecification": {
+                "AttributeName": "expiresAt",
+                "Enabled": true
+              }
+            }
+          }
+        },
+        "Outputs": {}
       }
     },
     "provider": {
       "name": "aws",
-      "runtime": "provided",
+      "runtime": "nodejs18.x",
       "region": "us-east-1",
+      "stage": "dev",
       "memorySize": 2048,
-      "timeout": 30,
+      "timeout": 29,
+      "deploymentBucket": "auxeira-backend-deployment-bucket-dev",
       "environment": {
         "NODE_ENV": "production"
       },
-      "stage": "dev",
+      "iamRoleStatements": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "dynamodb:Query",
+            "dynamodb:Scan",
+            "dynamodb:GetItem",
+            "dynamodb:PutItem",
+            "dynamodb:UpdateItem",
+            "dynamodb:DeleteItem"
+          ],
+          "Resource": [
+            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev",
+            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-sessions-dev",
+            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev/index/*"
+          ]
+        }
+      ],
       "versionFunctions": true,
+      "deploymentBucketObject": {
+        "name": "auxeira-backend-deployment-bucket-dev"
+      },
       "compiledCloudFormationTemplate": {
         "AWSTemplateFormatVersion": "2010-09-09",
         "Description": "The AWS CloudFormation template for this Serverless application",
         "Resources": {
-          "ServerlessDeploymentBucket": {
-            "Type": "AWS::S3::Bucket",
-            "Properties": {
-              "BucketEncryption": {
-                "ServerSideEncryptionConfiguration": [
-                  {
-                    "ServerSideEncryptionByDefault": {
-                      "SSEAlgorithm": "AES256"
-                    }
-                  }
-                ]
-              }
-            }
-          },
-          "ServerlessDeploymentBucketPolicy": {
-            "Type": "AWS::S3::BucketPolicy",
-            "Properties": {
-              "Bucket": {
-                "Ref": "ServerlessDeploymentBucket"
-              },
-              "PolicyDocument": {
-                "Statement": [
-                  {
-                    "Action": "s3:*",
-                    "Effect": "Deny",
-                    "Principal": "*",
-                    "Resource": [
-                      {
-                        "Fn::Join": [
-                          "",
-                          [
-                            "arn:",
-                            {
-                              "Ref": "AWS::Partition"
-                            },
-                            ":s3:::",
-                            {
-                              "Ref": "ServerlessDeploymentBucket"
-                            },
-                            "/*"
-                          ]
-                        ]
-                      },
-                      {
-                        "Fn::Join": [
-                          "",
-                          [
-                            "arn:",
-                            {
-                              "Ref": "AWS::Partition"
-                            },
-                            ":s3:::",
-                            {
-                              "Ref": "ServerlessDeploymentBucket"
-                            }
-                          ]
-                        ]
-                      }
-                    ],
-                    "Condition": {
-                      "Bool": {
-                        "aws:SecureTransport": false
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          },
           "ApiLogGroup": {
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
@@ -690,6 +726,22 @@
                             "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/auxeira-backend-dev*:*:*"
                           }
                         ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "dynamodb:Query",
+                          "dynamodb:Scan",
+                          "dynamodb:GetItem",
+                          "dynamodb:PutItem",
+                          "dynamodb:UpdateItem",
+                          "dynamodb:DeleteItem"
+                        ],
+                        "Resource": [
+                          "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev",
+                          "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-sessions-dev",
+                          "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev/index/*"
+                        ]
                       }
                     ]
                   }
@@ -715,15 +767,21 @@
             "Type": "AWS::Lambda::Function",
             "Properties": {
               "Code": {
-                "ImageUri": "615608124862.dkr.ecr.us-east-1.amazonaws.com/auxeira-backend@sha256:f0cf2e15ddfb3297a5cef4f9b45691c58eab51ffc2a3cbcafedd791a4362fdbc"
+                "S3Bucket": "auxeira-backend-deployment-bucket-dev",
+                "S3Key": "serverless/auxeira-backend/dev/1758557799354-2025-09-22T16:16:39.354Z/auxeira-backend.zip"
               },
-              "PackageType": "Image",
+              "Handler": "lambda-enhanced.handler",
+              "Runtime": "nodejs18.x",
               "FunctionName": "auxeira-backend-dev-api",
               "MemorySize": 2048,
-              "Timeout": 30,
+              "Timeout": 29,
               "Environment": {
                 "Variables": {
-                  "NODE_ENV": "production"
+                  "NODE_ENV": "production",
+                  "USERS_TABLE": "auxeira-backend-users-dev",
+                  "SESSIONS_TABLE": "auxeira-backend-sessions-dev",
+                  "JWT_SECRET": "<REDACTED>",
+                  "JWT_REFRESH_SECRET": "<REDACTED>"
                 }
               },
               "Role": {
@@ -737,14 +795,14 @@
               "ApiLogGroup"
             ]
           },
-          "ApiLambdaVersion26JBepu8fk3cXIjPpLj5AEmDBnT2bhRibF9NWk": {
+          "ApiLambdaVersionk5X5GbihVsf51CckmVxOxotBDlGOD4471gZ9FdaBU": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "f0cf2e15ddfb3297a5cef4f9b45691c58eab51ffc2a3cbcafedd791a4362fdbc"
+              "CodeSha256": "AyqK+20BSM5JM9qqgRcqycZxuwqUi1puNRB30Yyt468="
             }
           },
           "ApiGatewayRestApi": {
@@ -869,7 +927,7 @@
               "ApiLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1758266327818": {
+          "ApiGatewayDeployment1758557786188": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -918,13 +976,89 @@
                 ]
               }
             }
+          },
+          "UsersTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "auxeira-backend-users-dev",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "email",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "id",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "email",
+                  "KeyType": "HASH"
+                }
+              ],
+              "GlobalSecondaryIndexes": [
+                {
+                  "IndexName": "UserIdIndex",
+                  "KeySchema": [
+                    {
+                      "AttributeName": "id",
+                      "KeyType": "HASH"
+                    }
+                  ],
+                  "Projection": {
+                    "ProjectionType": "ALL"
+                  }
+                }
+              ],
+              "BillingMode": "PAY_PER_REQUEST"
+            }
+          },
+          "SessionsTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "auxeira-backend-sessions-dev",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "sessionId",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "userId",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "sessionId",
+                  "KeyType": "HASH"
+                }
+              ],
+              "GlobalSecondaryIndexes": [
+                {
+                  "IndexName": "UserIdIndex",
+                  "KeySchema": [
+                    {
+                      "AttributeName": "userId",
+                      "KeyType": "HASH"
+                    }
+                  ],
+                  "Projection": {
+                    "ProjectionType": "ALL"
+                  }
+                }
+              ],
+              "BillingMode": "PAY_PER_REQUEST",
+              "TimeToLiveSpecification": {
+                "AttributeName": "expiresAt",
+                "Enabled": true
+              }
+            }
           }
         },
         "Outputs": {
           "ServerlessDeploymentBucketName": {
-            "Value": {
-              "Ref": "ServerlessDeploymentBucket"
-            },
+            "Value": "auxeira-backend-deployment-bucket-dev",
             "Export": {
               "Name": "sls-auxeira-backend-dev-ServerlessDeploymentBucketName"
             }
@@ -932,7 +1066,7 @@
           "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiLambdaVersion26JBepu8fk3cXIjPpLj5AEmDBnT2bhRibF9NWk"
+              "Ref": "ApiLambdaVersionk5X5GbihVsf51CckmVxOxotBDlGOD4471gZ9FdaBU"
             },
             "Export": {
               "Name": "sls-auxeira-backend-dev-ApiLambdaFunctionQualifiedArn"
@@ -966,88 +1100,6 @@
           }
         }
       },
-      "coreCloudFormationTemplate": {
-        "AWSTemplateFormatVersion": "2010-09-09",
-        "Description": "The AWS CloudFormation template for this Serverless application",
-        "Resources": {
-          "ServerlessDeploymentBucket": {
-            "Type": "AWS::S3::Bucket",
-            "Properties": {
-              "BucketEncryption": {
-                "ServerSideEncryptionConfiguration": [
-                  {
-                    "ServerSideEncryptionByDefault": {
-                      "SSEAlgorithm": "AES256"
-                    }
-                  }
-                ]
-              }
-            }
-          },
-          "ServerlessDeploymentBucketPolicy": {
-            "Type": "AWS::S3::BucketPolicy",
-            "Properties": {
-              "Bucket": {
-                "Ref": "ServerlessDeploymentBucket"
-              },
-              "PolicyDocument": {
-                "Statement": [
-                  {
-                    "Action": "s3:*",
-                    "Effect": "Deny",
-                    "Principal": "*",
-                    "Resource": [
-                      {
-                        "Fn::Join": [
-                          "",
-                          [
-                            "arn:",
-                            {
-                              "Ref": "AWS::Partition"
-                            },
-                            ":s3:::",
-                            {
-                              "Ref": "ServerlessDeploymentBucket"
-                            },
-                            "/*"
-                          ]
-                        ]
-                      },
-                      {
-                        "Fn::Join": [
-                          "",
-                          [
-                            "arn:",
-                            {
-                              "Ref": "AWS::Partition"
-                            },
-                            ":s3:::",
-                            {
-                              "Ref": "ServerlessDeploymentBucket"
-                            }
-                          ]
-                        ]
-                      }
-                    ],
-                    "Condition": {
-                      "Bool": {
-                        "aws:SecureTransport": false
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "Outputs": {
-          "ServerlessDeploymentBucketName": {
-            "Value": {
-              "Ref": "ServerlessDeploymentBucket"
-            }
-          }
-        }
-      },
       "vpc": {}
     },
     "dashboard": {
@@ -1059,36 +1111,39 @@
       "serviceProvider": null,
       "instanceParameters": null
     },
-    "serviceRawFile": "service: auxeira-backend\nframeworkVersion: ^4.0.0\nprovider:\n  name: aws\n  runtime: provided\n  region: us-east-1\n  memorySize: 2048  # More memory for Solana\n  timeout: 30\n  environment:\n    NODE_ENV: production\nfunctions:\n  api:\n    image: \n      uri: ${aws:accountId}.dkr.ecr.${aws:region}.amazonaws.com/auxeira-backend:latest\n    events:\n      - http:\n          path: /\n          method: ANY\n          # Remove cors: true from here\n      - http:\n          path: /{proxy+}\n          method: ANY\n          # Remove cors: true from here\n",
+    "serviceRawFile": "service: auxeira-backend\nframeworkVersion: ^4.0.0\n\npackage:\n  patterns:\n    - '!awscliv2.zip'\n    - '!.serverless/**'\n    - '!node_modules/aws-sdk/**'\n    - '!**/*.zip'\n    - '!**/*.backup'\n    - '!aws/**'\n    - '!.env*'\n    - '!README.md'\n    - '!Dockerfile'\n    - '!docker-compose.yml'\n    - '!package-original.json'\n    - '!src/types/**'\n    - '!src/websocket/**'\n    - '!src/ml-pipeline/**'\n    - 'lambda-enhanced.js'\n    - 'src/services/auth-dynamodb.service.js'\n    - 'package.json'\n    - 'node_modules/**'\n\nprovider:\n  name: aws\n  runtime: nodejs18.x\n  region: us-east-1\n  stage: ${opt:stage, 'dev'}\n  memorySize: 2048\n  timeout: 29\n  deploymentBucket:\n    name: auxeira-backend-deployment-bucket-${self:provider.stage}\n  environment:\n    NODE_ENV: production\n  iamRoleStatements:\n    - Effect: Allow\n      Action:\n        - dynamodb:Query\n        - dynamodb:Scan\n        - dynamodb:GetItem\n        - dynamodb:PutItem\n        - dynamodb:UpdateItem\n        - dynamodb:DeleteItem\n      Resource:\n        - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-users-${self:provider.stage}\"\n        - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-sessions-${self:provider.stage}\"\n        - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-users-${self:provider.stage}/index/*\"\n        \nfunctions:\n  api:\n    handler: lambda-enhanced.handler\n    events:\n      - http:\n          path: /\n          method: ANY\n          \n      - http:\n          path: /{proxy+}\n          method: ANY\n          \n    environment:\n      USERS_TABLE: ${self:service}-users-${self:provider.stage}\n      SESSIONS_TABLE: ${self:service}-sessions-${self:provider.stage}\n      JWT_SECRET: ${env:JWT_SECRET, 'your-super-secret-jwt-key-change-in-production'}\n      JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET, 'your-super-secret-refresh-key-change-in-production'}\n\nresources:\n  Resources:        \n    UsersTable:\n      Type: AWS::DynamoDB::Table\n      Properties:\n        TableName: ${self:service}-users-${self:provider.stage}\n        AttributeDefinitions:\n          - AttributeName: email\n            AttributeType: S\n          - AttributeName: id\n            AttributeType: S\n        KeySchema:\n          - AttributeName: email\n            KeyType: HASH\n        GlobalSecondaryIndexes:\n          - IndexName: UserIdIndex\n            KeySchema:\n              - AttributeName: id\n                KeyType: HASH\n            Projection:\n              ProjectionType: ALL\n        BillingMode: PAY_PER_REQUEST\n        \n    SessionsTable:\n      Type: AWS::DynamoDB::Table\n      Properties:\n        TableName: ${self:service}-sessions-${self:provider.stage}\n        AttributeDefinitions:\n          - AttributeName: sessionId\n            AttributeType: S\n          - AttributeName: userId\n            AttributeType: S\n        KeySchema:\n          - AttributeName: sessionId\n            KeyType: HASH\n        GlobalSecondaryIndexes:\n          - IndexName: UserIdIndex\n            KeySchema:\n              - AttributeName: userId\n                KeyType: HASH\n            Projection:\n              ProjectionType: ALL\n        BillingMode: PAY_PER_REQUEST\n        TimeToLiveSpecification:\n          AttributeName: expiresAt\n          Enabled: true\n",
     "command": [
       "deploy"
     ],
-    "options": {},
+    "options": {
+      "stage": "dev"
+    },
     "orgId": "00a51e9b-62da-43be-8a05-85bc1ba7e140",
     "orgName": "lante",
-    "userId": null,
+    "userId": "7pMlkpmqlcShND1h6g",
+    "userName": "lante",
     "serviceProviderAwsAccountId": "615608124862",
     "serviceProviderAwsCfStackName": "auxeira-backend-dev",
-    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-1:615608124862:stack/auxeira-backend-dev/352df7c0-9468-11f0-ab5f-0e0390eb12ab",
-    "serviceProviderAwsCfStackCreated": "2025-09-18T08:19:33.906Z",
-    "serviceProviderAwsCfStackUpdated": "2025-09-19T06:07:56.634Z",
+    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-1:615608124862:stack/auxeira-backend-dev/9091bfb0-9789-11f0-aded-0e0e759f8867",
+    "serviceProviderAwsCfStackCreated": "2025-09-22T07:55:54.195Z",
+    "serviceProviderAwsCfStackUpdated": "2025-09-22T15:58:22.703Z",
     "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
     "serviceProviderAwsCfStackOutputs": [
       {
         "OutputKey": "ApiLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:us-east-1:615608124862:function:auxeira-backend-dev-api:11",
+        "OutputValue": "arn:aws:lambda:us-east-1:615608124862:function:auxeira-backend-dev-api:21",
         "Description": "Current Lambda function version",
         "ExportName": "sls-auxeira-backend-dev-ApiLambdaFunctionQualifiedArn"
       },
       {
         "OutputKey": "ServiceEndpoint",
-        "OutputValue": "https://brhzyl9cj2.execute-api.us-east-1.amazonaws.com/dev",
+        "OutputValue": "https://x39efpag2i.execute-api.us-east-1.amazonaws.com/dev",
         "Description": "URL of the service endpoint",
         "ExportName": "sls-auxeira-backend-dev-ServiceEndpoint"
       },
       {
         "OutputKey": "ServerlessDeploymentBucketName",
-        "OutputValue": "auxeira-backend-dev-serverlessdeploymentbucket-jksb1eqwv9kb",
+        "OutputValue": "auxeira-backend-deployment-bucket-dev",
         "ExportName": "sls-auxeira-backend-dev-ServerlessDeploymentBucketName"
       }
     ],
@@ -1096,75 +1151,6 @@
       "AWSTemplateFormatVersion": "2010-09-09",
       "Description": "The AWS CloudFormation template for this Serverless application",
       "Resources": {
-        "ServerlessDeploymentBucket": {
-          "Type": "AWS::S3::Bucket",
-          "Properties": {
-            "BucketEncryption": {
-              "ServerSideEncryptionConfiguration": [
-                {
-                  "ServerSideEncryptionByDefault": {
-                    "SSEAlgorithm": "AES256"
-                  }
-                }
-              ]
-            }
-          }
-        },
-        "ServerlessDeploymentBucketPolicy": {
-          "Type": "AWS::S3::BucketPolicy",
-          "Properties": {
-            "Bucket": {
-              "Ref": "ServerlessDeploymentBucket"
-            },
-            "PolicyDocument": {
-              "Statement": [
-                {
-                  "Action": "s3:*",
-                  "Effect": "Deny",
-                  "Principal": "*",
-                  "Resource": [
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:",
-                          {
-                            "Ref": "AWS::Partition"
-                          },
-                          ":s3:::",
-                          {
-                            "Ref": "ServerlessDeploymentBucket"
-                          },
-                          "/*"
-                        ]
-                      ]
-                    },
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:",
-                          {
-                            "Ref": "AWS::Partition"
-                          },
-                          ":s3:::",
-                          {
-                            "Ref": "ServerlessDeploymentBucket"
-                          }
-                        ]
-                      ]
-                    }
-                  ],
-                  "Condition": {
-                    "Bool": {
-                      "aws:SecureTransport": false
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        },
         "ApiLogGroup": {
           "Type": "AWS::Logs::LogGroup",
           "Properties": {
@@ -1228,6 +1214,22 @@
                           "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/auxeira-backend-dev*:*:*"
                         }
                       ]
+                    },
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "dynamodb:Query",
+                        "dynamodb:Scan",
+                        "dynamodb:GetItem",
+                        "dynamodb:PutItem",
+                        "dynamodb:UpdateItem",
+                        "dynamodb:DeleteItem"
+                      ],
+                      "Resource": [
+                        "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev",
+                        "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-sessions-dev",
+                        "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev/index/*"
+                      ]
                     }
                   ]
                 }
@@ -1253,15 +1255,21 @@
           "Type": "AWS::Lambda::Function",
           "Properties": {
             "Code": {
-              "ImageUri": "615608124862.dkr.ecr.us-east-1.amazonaws.com/auxeira-backend@sha256:f0cf2e15ddfb3297a5cef4f9b45691c58eab51ffc2a3cbcafedd791a4362fdbc"
+              "S3Bucket": "auxeira-backend-deployment-bucket-dev",
+              "S3Key": "serverless/auxeira-backend/dev/1758557799354-2025-09-22T16:16:39.354Z/auxeira-backend.zip"
             },
-            "PackageType": "Image",
+            "Handler": "lambda-enhanced.handler",
+            "Runtime": "nodejs18.x",
             "FunctionName": "auxeira-backend-dev-api",
             "MemorySize": 2048,
-            "Timeout": 30,
+            "Timeout": 29,
             "Environment": {
               "Variables": {
-                "NODE_ENV": "production"
+                "NODE_ENV": "production",
+                "USERS_TABLE": "auxeira-backend-users-dev",
+                "SESSIONS_TABLE": "auxeira-backend-sessions-dev",
+                "JWT_SECRET": "<REDACTED>",
+                "JWT_REFRESH_SECRET": "<REDACTED>"
               }
             },
             "Role": {
@@ -1275,14 +1283,14 @@
             "ApiLogGroup"
           ]
         },
-        "ApiLambdaVersion26JBepu8fk3cXIjPpLj5AEmDBnT2bhRibF9NWk": {
+        "ApiLambdaVersionk5X5GbihVsf51CckmVxOxotBDlGOD4471gZ9FdaBU": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "ApiLambdaFunction"
             },
-            "CodeSha256": "f0cf2e15ddfb3297a5cef4f9b45691c58eab51ffc2a3cbcafedd791a4362fdbc"
+            "CodeSha256": "AyqK+20BSM5JM9qqgRcqycZxuwqUi1puNRB30Yyt468="
           }
         },
         "ApiGatewayRestApi": {
@@ -1407,7 +1415,7 @@
             "ApiLambdaPermissionApiGateway"
           ]
         },
-        "ApiGatewayDeployment1758266327818": {
+        "ApiGatewayDeployment1758557786188": {
           "Type": "AWS::ApiGateway::Deployment",
           "Properties": {
             "RestApiId": {
@@ -1456,13 +1464,89 @@
               ]
             }
           }
+        },
+        "UsersTable": {
+          "Type": "AWS::DynamoDB::Table",
+          "Properties": {
+            "TableName": "auxeira-backend-users-dev",
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "email",
+                "AttributeType": "S"
+              },
+              {
+                "AttributeName": "id",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "email",
+                "KeyType": "HASH"
+              }
+            ],
+            "GlobalSecondaryIndexes": [
+              {
+                "IndexName": "UserIdIndex",
+                "KeySchema": [
+                  {
+                    "AttributeName": "id",
+                    "KeyType": "HASH"
+                  }
+                ],
+                "Projection": {
+                  "ProjectionType": "ALL"
+                }
+              }
+            ],
+            "BillingMode": "PAY_PER_REQUEST"
+          }
+        },
+        "SessionsTable": {
+          "Type": "AWS::DynamoDB::Table",
+          "Properties": {
+            "TableName": "auxeira-backend-sessions-dev",
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "sessionId",
+                "AttributeType": "S"
+              },
+              {
+                "AttributeName": "userId",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "sessionId",
+                "KeyType": "HASH"
+              }
+            ],
+            "GlobalSecondaryIndexes": [
+              {
+                "IndexName": "UserIdIndex",
+                "KeySchema": [
+                  {
+                    "AttributeName": "userId",
+                    "KeyType": "HASH"
+                  }
+                ],
+                "Projection": {
+                  "ProjectionType": "ALL"
+                }
+              }
+            ],
+            "BillingMode": "PAY_PER_REQUEST",
+            "TimeToLiveSpecification": {
+              "AttributeName": "expiresAt",
+              "Enabled": true
+            }
+          }
         }
       },
       "Outputs": {
         "ServerlessDeploymentBucketName": {
-          "Value": {
-            "Ref": "ServerlessDeploymentBucket"
-          },
+          "Value": "auxeira-backend-deployment-bucket-dev",
           "Export": {
             "Name": "sls-auxeira-backend-dev-ServerlessDeploymentBucketName"
           }
@@ -1470,7 +1554,7 @@
         "ApiLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "ApiLambdaVersion26JBepu8fk3cXIjPpLj5AEmDBnT2bhRibF9NWk"
+            "Ref": "ApiLambdaVersionk5X5GbihVsf51CckmVxOxotBDlGOD4471gZ9FdaBU"
           },
           "Export": {
             "Name": "sls-auxeira-backend-dev-ApiLambdaFunctionQualifiedArn"
@@ -1500,88 +1584,6 @@
           },
           "Export": {
             "Name": "sls-auxeira-backend-dev-ServiceEndpoint"
-          }
-        }
-      }
-    },
-    "coreCloudFormationTemplate": {
-      "AWSTemplateFormatVersion": "2010-09-09",
-      "Description": "The AWS CloudFormation template for this Serverless application",
-      "Resources": {
-        "ServerlessDeploymentBucket": {
-          "Type": "AWS::S3::Bucket",
-          "Properties": {
-            "BucketEncryption": {
-              "ServerSideEncryptionConfiguration": [
-                {
-                  "ServerSideEncryptionByDefault": {
-                    "SSEAlgorithm": "AES256"
-                  }
-                }
-              ]
-            }
-          }
-        },
-        "ServerlessDeploymentBucketPolicy": {
-          "Type": "AWS::S3::BucketPolicy",
-          "Properties": {
-            "Bucket": {
-              "Ref": "ServerlessDeploymentBucket"
-            },
-            "PolicyDocument": {
-              "Statement": [
-                {
-                  "Action": "s3:*",
-                  "Effect": "Deny",
-                  "Principal": "*",
-                  "Resource": [
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:",
-                          {
-                            "Ref": "AWS::Partition"
-                          },
-                          ":s3:::",
-                          {
-                            "Ref": "ServerlessDeploymentBucket"
-                          },
-                          "/*"
-                        ]
-                      ]
-                    },
-                    {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "arn:",
-                          {
-                            "Ref": "AWS::Partition"
-                          },
-                          ":s3:::",
-                          {
-                            "Ref": "ServerlessDeploymentBucket"
-                          }
-                        ]
-                      ]
-                    }
-                  ],
-                  "Condition": {
-                    "Bool": {
-                      "aws:SecureTransport": false
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      },
-      "Outputs": {
-        "ServerlessDeploymentBucketName": {
-          "Value": {
-            "Ref": "ServerlessDeploymentBucket"
           }
         }
       }
