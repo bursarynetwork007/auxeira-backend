@@ -90,6 +90,45 @@ const AuxeiraApp = {
             });
         }
     }
+
+    // Handle form submission
+    handleFormSubmit(form) {
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        
+        // Determine endpoint based on form type
+        let endpoint = "/api/auth/register";
+        if (form.querySelector("input[name=\"action\"]")?.value === "login") {
+            endpoint = "/api/auth/login";
+        }
+        
+        // Submit to backend API
+        fetch(API_CONFIG.BASE_URL + endpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                console.log("Authentication successful:", result);
+                // Store tokens and close modal
+                if (result.data?.access_token) {
+                    localStorage.setItem("access_token", result.data.access_token);
+                }
+                this.closeAuthModal();
+            } else {
+                console.error("Authentication failed:", result.message);
+                alert("Authentication failed: " + result.message);
+            }
+        })
+        .catch(error => {
+            console.error("Form submission error:", error);
+            alert("Network error. Please try again.");
+        });
+    },
 };
 
 // Authentication Modal Functions
