@@ -34,10 +34,10 @@ const AuxeiraApp = {
         });
         
         // Handle form submissions
-        document.addEventListener('submit', (e) => {
+        document.addEventListener('submit', function(e) {
             if (e.target.classList.contains('auth-form')) {
                 e.preventDefault();
-                this.handleFormSubmit(e.target);
+                AuxeiraApp.handleFormSubmit(e.target);
             }
         });
         
