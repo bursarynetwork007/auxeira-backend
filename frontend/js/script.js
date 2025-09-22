@@ -1205,7 +1205,7 @@ function handleLogin(event) {
 }
 
 // API Configuration
-const API_BASE_URL = 'https://brhzyl9cj2.execute-api.us-east-1.amazonaws.com/dev';
+const API_BASE_URL = API_CONFIG.BASE_URL;
 
 // CAPTCHA Management
 let currentCaptcha = null;
