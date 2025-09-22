@@ -12,8 +12,8 @@
         containers.forEach(function(container) {
             if (container && !container.innerHTML.trim()) {
                 try {
-                    // grecaptcha.render(container, {
-                        'sitekey': container.dataset.sitekey || 'your-site-key'
+                    grecaptcha.render(container, {
+                        'sitekey': '6LcEzq0rAAAAAKosYlDqLUxYp_8Fl09xC1M__PaN'
                     });
                 } catch (error) {
                     console.log('reCaptcha initialization skipped for this element');
