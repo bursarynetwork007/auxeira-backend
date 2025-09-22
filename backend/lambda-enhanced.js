@@ -8,7 +8,33 @@ const authService = require('./src/services/auth-dynamodb.service');
 
 const app = express();
 
+// Override API Gateway CORS with manual headers
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && (origin.includes("auxeira.com") || origin.includes("localhost"))) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+  res.header("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Requested-With,x-csrf-token,Accept,Origin");
+  res.header("Access-Control-Allow-Credentials", "true");
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+  next();
+});
+
 // Security middleware
+// Manual CORS headers to override API Gateway
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Requested-With,x-csrf-token,Accept,Origin");
+  res.header("Access-Control-Allow-Credentials", "true");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
