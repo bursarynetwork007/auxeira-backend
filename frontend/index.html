@@ -4351,7 +4351,7 @@
                 };
         
         // Global variables for user type tracking
-        window.currentUserType = currentUserType;
+        window.currentUserType = window.currentUserType || 'startup_founder';
 
 
         // SecurityManager Class for Enhanced Security Features
@@ -4463,6 +4463,12 @@
         // Initialize security and validation managers
         const validationManager = new ValidationManager();
         const securityManager = new SecurityManager();
+
+        // Global authentication variables (declared early to avoid temporal dead zone)
+        let currentStep = 1;
+        let selectedUserType = null;
+        let currentUserType = 'startup_founder';
+        let signupData = {};
 
         // Make securityManager globally accessible for reCAPTCHA callback
         window.securityManager = securityManager;
@@ -4658,13 +4664,9 @@
 
 
 
-        let currentUserType = 'startup_founder';
-        let signupData = {};
 
         // Enhanced Authentication Functions with Security
-        let currentStep = 1;
         // Authentication variables
-let selectedUserType = null;
 
         // Modal Management
         function openAuthModal(type = 'signin') {
