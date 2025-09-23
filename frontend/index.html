@@ -4829,6 +4829,9 @@
         function selectQuickUserType(type) {
             selectedUserType = type;
             
+            // Update global variable for backend submission
+            window.currentUserType = type;
+            
             document.querySelectorAll('.user-type-option').forEach(option => {
                 option.classList.remove('selected');
             });
@@ -4837,6 +4840,8 @@
             if (selectedOption) {
                 selectedOption.classList.add('selected');
             }
+            
+            console.log('User type selected:', type); // Debug log
             
             validateStep1();
             updateDynamicFields(type);
