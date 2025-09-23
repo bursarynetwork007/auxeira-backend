@@ -4351,9 +4351,6 @@
                 };
         
         // Global variables for user type tracking
-        let currentUserType = 'startup_founder';
-        let selectedUserType = null;
-        let signupData = {};
         window.currentUserType = currentUserType;
 
 
@@ -4654,18 +4651,22 @@
         const uiManager = new UIManager();
 
         // Global variables for authentication  
-        let selectedUserType = null;
-        let currentUserType = 'startup_founder'; 
-        let signupData = {};
 
 
 
         
 
+
+        // Authentication variables
+
+
+        // Authentication variables
+        let selectedUserType = null;
+        let currentUserType = 'startup_founder';
+        let signupData = {};
+
         // Enhanced Authentication Functions with Security
         let currentStep = 1;
-        let selectedUserType = null;
-        let signupData = {};
 
         // Modal Management
         function openAuthModal(type = 'signin') {
