@@ -5039,6 +5039,8 @@
             }
         }
 
+
+
         async function submitSignupForm(event) {
             event.preventDefault();
             const form = event.target;
@@ -5062,12 +5064,18 @@
                 // Get reCAPTCHA token
                 const recaptchaToken = await securityManager.verifyRecaptcha('signup');
                 
-                // Combine all form data
                 const finalData = {
                     ...signupData,
                     ...Object.fromEntries(new FormData(form)),
+                    user_type: selectedUserType || window.currentUserType || 'startup_founder', // Ensure user type is included
+                    account_type: selectedUserType || window.currentUserType || 'startup_founder', // Alternative field name
                     recaptchaToken
                 };
+                
+                console.log('Submitting signup data:', finalData); // Debug log
+
+
+                
 
                 // Simulate API call
                 await new Promise(resolve => setTimeout(resolve, 3000));
