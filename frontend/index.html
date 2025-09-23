@@ -4323,6 +4323,17 @@
             }
         }
 
+            // Global reCAPTCHA callback
+            window.initRecaptcha = function() {
+                console.log('reCAPTCHA API loaded');
+                if (window.securityManager) {
+                    window.securityManager.initializeRecaptcha();
+                }
+            };
+
+
+
+
         // SecurityManager Class for Enhanced Security Features
         class SecurityManager {
             constructor() {
