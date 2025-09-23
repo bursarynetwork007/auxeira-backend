@@ -4444,6 +4444,9 @@
         const validationManager = new ValidationManager();
         const securityManager = new SecurityManager();
 
+        // Make securityManager globally accessible for reCAPTCHA callback
+        window.securityManager = securityManager;
+
         // Enhanced UI Manager with Performance Optimizations
         class UIManager {
             constructor() {
