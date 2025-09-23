@@ -4360,9 +4360,7 @@
 
             async initializeRecaptcha() {
                 try {
-                    if (typeof grecaptcha !== 'undefined') {
-                        await grecaptcha.ready();
-                        
+                    if (typeof grecaptcha !== 'undefined' && grecaptcha.render) {
                         // Render signin recaptcha
                         if (document.getElementById('signinRecaptcha')) {
                             grecaptcha.render('signinRecaptcha', {
@@ -4382,12 +4380,15 @@
                         }
                         
                         this.recaptchaLoaded = true;
+                        console.log('reCAPTCHA initialized successfully');
+                    } else {
+                        console.warn('reCAPTCHA not ready yet - grecaptcha.render not available');
                     }
                 } catch (error) {
-                    console.warn('reCAPTCHA initialization failed:', error);
+                    console.error('reCAPTCHA initialization failed:', error);
                 }
             }
-
+            
             async verifyRecaptcha(action) {
                 if (!this.recaptchaLoaded) return null;
                 
