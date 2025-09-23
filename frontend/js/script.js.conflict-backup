@@ -3,7 +3,7 @@
 
 // Global state management
 const AuxeiraApp = {
-    
+    currentModal: null,
     currentStep: 1,
     maxSteps: 4,
     userType: null,
@@ -18,7 +18,20 @@ const AuxeiraApp = {
     
     // Bind event listeners
     bindEvents() {
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('authModal');
+            if (e.target === modal) {
+                this.closeAuthModal();
+            }
+        });
         
+        // Handle escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.currentModal) {
+                this.closeAuthModal();
+            }
+        });
         
         // Handle form submissions
         document.addEventListener('submit', function(e) {
@@ -105,7 +118,7 @@ const AuxeiraApp = {
                 if (result.data?.access_token) {
                     localStorage.setItem("access_token", result.data.access_token);
                 }
-                
+                this.closeAuthModal();
             } else {
                 console.error("Authentication failed:", result.message);
                 alert("Authentication failed: " + result.message);
@@ -117,6 +130,47 @@ const AuxeiraApp = {
         });
     },
 };
+
+// Authentication Modal Functions
+function openAuthModal(type = 'signup') {
+    const modal = document.getElementById('authModal');
+    const content = document.getElementById('authContent');
+    
+    AuxeiraApp.currentModal = type;
+    AuxeiraApp.currentStep = 1;
+    AuxeiraApp.userType = type === 'startup' || type === 'investor' ? type : null;
+    AuxeiraApp.formData = {};
+    
+    if (type === 'login') {
+        content.innerHTML = generateLoginForm();
+    } else if (type === 'startup') {
+        content.innerHTML = generateStartupSignupForm();
+    } else if (type === 'investor') {
+        content.innerHTML = generateInvestorSignupForm();
+    } else {
+        content.innerHTML = generateUserTypeSelection();
+    }
+    
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    
+    // Focus first input
+    setTimeout(() => {
+        const firstInput = content.querySelector('input, select, textarea');
+        if (firstInput) firstInput.focus();
+    }, 100);
+}
+
+function closeAuthModal() {
+    const modal = document.getElementById('authModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    
+    AuxeiraApp.currentModal = null;
+    AuxeiraApp.currentStep = 1;
+    AuxeiraApp.userType = null;
+    AuxeiraApp.formData = {};
+}
 
 function toggleMobileMenu() {
     const mobileMenu = document.getElementById('mobileMenu');
@@ -131,7 +185,7 @@ function generateUserTypeSelection() {
             <p>Choose your path to transform entrepreneurship</p>
         </div>
         <div class="user-type-selection">
-            <div class="user-type-card" >
+            <div class="user-type-card" onclick="openAuthModal('startup')">
                 <div class="user-type-icon">🚀</div>
                 <h3>I'm a Startup Founder</h3>
                 <p>Build real business value and unlock $50K-$500K+ in benefits</p>
@@ -141,7 +195,7 @@ function generateUserTypeSelection() {
                     <span>✓ Investor introductions</span>
                 </div>
             </div>
-            <div class="user-type-card" >
+            <div class="user-type-card" onclick="openAuthModal('investor')">
                 <div class="user-type-icon">📊</div>
                 <h3>I'm an Investor</h3>
                 <p>Enhance portfolio performance with 85.7% prediction accuracy</p>
@@ -153,7 +207,7 @@ function generateUserTypeSelection() {
             </div>
         </div>
         <div class="auth-footer">
-            <p>Already have an account? <a href="#" >Sign in</a></p>
+            <p>Already have an account? <a href="#" onclick="openAuthModal('login')">Sign in</a></p>
         </div>
     `;
 }
@@ -191,7 +245,7 @@ function generateLoginForm() {
             </button>
         </form>
         <div class="auth-footer">
-            <p>Don't have an account? <a href="#" >Sign up</a></p>
+            <p>Don't have an account? <a href="#" onclick="openAuthModal('signup')">Sign up</a></p>
         </div>
     `;
 }
@@ -1485,7 +1539,7 @@ async function handleLogin(event) {
 
 function redirectToDashboard() {
     // Close modal first
-    
+    closeAuthModal();
     
     // Get the authentication token from localStorage
     const token = localStorage.getItem('auxeira_token');
@@ -1593,4 +1647,485 @@ document.addEventListener('DOMContentLoaded', () => {
     AuxeiraApp.init();
     checkAuthStatus();
 });
+
+// Add CSS for modal and form styles
+const modalStyles = `
+<style>
+/* Modal Styles */
+.auth-header {
+    text-align: center;
+    padding: 2rem 2rem 1rem 2rem;
+    border-bottom: 1px solid var(--bloomberg-gray);
+}
+
+.auth-header h2 {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+    color: var(--bloomberg-text);
+}
+
+.auth-header p {
+    color: var(--bloomberg-text-secondary);
+    margin-bottom: 1rem;
+}
+
+/* CAPTCHA Styles */
+.captcha-group {
+    background: rgba(42, 42, 42, 0.3);
+    border: 1px solid var(--bloomberg-gray);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.captcha-challenge {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.captcha-question {
+    font-weight: 600;
+    color: var(--bloomberg-orange);
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    min-width: 120px;
+}
+
+.captcha-challenge input {
+    width: 80px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.btn-small {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+    min-width: auto;
+}
+
+.captcha-help {
+    color: var(--bloomberg-text-muted);
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+.captcha-loading {
+    color: var(--bloomberg-text-secondary);
+    font-style: italic;
+    padding: 0.5rem 0;
+}
+
+.progress-bar {
+    margin-top: 1.5rem;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1rem;
+}
+
+.step {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bloomberg-gray);
+    color: var(--bloomberg-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+.step.active {
+    background: var(--bloomberg-orange);
+    color: white;
+}
+
+.step.completed {
+    background: var(--bloomberg-success);
+    color: white;
+}
+
+.progress-line {
+    height: 2px;
+    background: var(--bloomberg-gray);
+    border-radius: 1px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--bloomberg-orange);
+    transition: width 0.3s ease;
+}
+
+.step-content {
+    padding: 2rem;
+}
+
+.step-content h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: var(--bloomberg-text);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--bloomberg-text);
+    font-size: 0.875rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--bloomberg-gray);
+    border-radius: var(--border-radius);
+    background: var(--bloomberg-dark);
+    color: var(--bloomberg-text);
+    font-family: var(--font-primary);
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--bloomberg-orange);
+    box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.1);
+}
+
+.radio-group,
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.radio-label,
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease;
+}
+
+.radio-label:hover,
+.checkbox-label:hover {
+    background: rgba(255, 107, 53, 0.1);
+}
+
+.radio-label input,
+.checkbox-label input {
+    width: auto;
+    margin: 0;
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.forgot-password {
+    color: var(--bloomberg-blue);
+    font-size: 0.875rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-full {
+    flex: 1;
+}
+
+.metric-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(42, 42, 42, 0.3);
+    border: 1px solid var(--bloomberg-gray);
+    border-radius: var(--border-radius-lg);
+}
+
+.metric-section h4 {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: var(--bloomberg-orange);
+    font-weight: 600;
+}
+
+.tier-recommendation,
+.plan-recommendation {
+    margin: 1rem 0;
+}
+
+.recommended-tier,
+.recommended-plan {
+    background: rgba(255, 107, 53, 0.1);
+    border: 1px solid rgba(255, 107, 53, 0.3);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    position: relative;
+}
+
+.tier-badge,
+.plan-badge {
+    position: absolute;
+    top: -8px;
+    left: 1rem;
+    background: var(--bloomberg-orange);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.tier-details,
+.plan-details {
+    margin-top: 0.5rem;
+}
+
+.tier-details h4,
+.plan-details h4 {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+    color: var(--bloomberg-text);
+}
+
+.tier-price,
+.plan-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--bloomberg-orange);
+    font-family: var(--font-mono);
+    margin-top: 0.5rem;
+}
+
+.plan-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.plan-features span {
+    font-size: 0.75rem;
+    color: var(--bloomberg-text-secondary);
+}
+
+.password-requirements {
+    margin-top: 0.25rem;
+}
+
+.password-requirements small {
+    color: var(--bloomberg-text-muted);
+    font-size: 0.75rem;
+}
+
+.agreement {
+    align-items: flex-start;
+    line-height: 1.4;
+}
+
+.agreement span {
+    font-size: 0.875rem;
+}
+
+.auth-footer {
+    text-align: center;
+    padding: 1rem 2rem 2rem 2rem;
+    border-top: 1px solid var(--bloomberg-gray);
+}
+
+.auth-footer p {
+    margin: 0;
+    color: var(--bloomberg-text-secondary);
+    font-size: 0.875rem;
+}
+
+.auth-footer a {
+    color: var(--bloomberg-blue);
+    font-weight: 500;
+}
+
+.user-type-selection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    padding: 2rem;
+}
+
+.user-type-card {
+    background: rgba(26, 26, 26, 0.8);
+    border: 1px solid var(--bloomberg-gray);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.user-type-card:hover {
+    border-color: var(--bloomberg-orange);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.user-type-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.user-type-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    color: var(--bloomberg-text);
+}
+
+.user-type-card p {
+    color: var(--bloomberg-text-secondary);
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+}
+
+.user-type-benefits {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.user-type-benefits span {
+    font-size: 0.75rem;
+    color: var(--bloomberg-accent);
+}
+
+.registration-success {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.success-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--bloomberg-success);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0 auto 1.5rem auto;
+}
+
+.registration-success h2 {
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
+    color: var(--bloomberg-text);
+}
+
+.registration-success p {
+    color: var(--bloomberg-text-secondary);
+    margin-bottom: 2rem;
+}
+
+.success-details {
+    background: rgba(42, 42, 42, 0.3);
+    border: 1px solid var(--bloomberg-gray);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.success-details h3 {
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+    color: var(--bloomberg-text);
+}
+
+.next-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.step-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: left;
+}
+
+.step-number {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--bloomberg-orange);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+/* Responsive Design for Modal */
+@media (max-width: 768px) {
+    .modal-content {
+        margin: 2% auto;
+        width: 95%;
+        max-height: 95vh;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .user-type-selection {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .progress-steps {
+        gap: 1rem;
+    }
+}
+</style>
+`;
+
+// Inject modal styles
+document.head.insertAdjacentHTML('beforeend', modalStyles);
 
