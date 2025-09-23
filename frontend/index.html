@@ -4332,6 +4332,29 @@
             };
 
 
+        // Global reCAPTCHA callback function
+                window.initRecaptcha = function() {
+                    console.log('reCAPTCHA API loaded and ready');
+                    setTimeout(() => {
+                        if (window.securityManager) {
+                            console.log('Initializing reCAPTCHA through callback');
+                            window.securityManager.initializeRecaptcha();
+                        } else {
+                            console.warn('SecurityManager not available yet, retrying...');
+                            setTimeout(() => {
+                                if (window.securityManager) {
+                                    window.securityManager.initializeRecaptcha();
+                                }
+                            }, 1000);
+                        }
+                    }, 500);
+                };
+        
+        // Global variables for user type tracking
+        let currentUserType = 'startup_founder';
+        let selectedUserType = null;
+        let signupData = {};
+        window.currentUserType = currentUserType;
 
 
         // SecurityManager Class for Enhanced Security Features
