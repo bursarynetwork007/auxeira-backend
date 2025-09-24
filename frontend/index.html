@@ -59,7 +59,7 @@
     <link rel="dns-prefetch" href="//www.google.com">
     
     <!-- reCAPTCHA Script -->
-    <script src="https://www.google.com/recaptcha/api.js?onload=initRecaptcha&render=explicit" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
     
     <style>
         /* Enhanced Design System with Production Optimizations */
@@ -4324,31 +4324,25 @@
         }
 
             // Global reCAPTCHA callback
-            window.initRecaptcha = function() {
-                console.log('reCAPTCHA API loaded');
-                if (window.securityManager) {
+        window.onRecaptchaLoad = function() {
+            console.log("reCAPTCHA API loaded successfully");
+            if (window.securityManager) {
+                setTimeout(() => {
                     window.securityManager.initializeRecaptcha();
-                }
-            };
+                }, 100);
+            }
+        };
 
 
         // Global reCAPTCHA callback function
-                window.initRecaptcha = function() {
-                    console.log('reCAPTCHA API loaded and ready');
-                    setTimeout(() => {
-                        if (window.securityManager) {
-                            console.log('Initializing reCAPTCHA through callback');
-                            window.securityManager.initializeRecaptcha();
-                        } else {
-                            console.warn('SecurityManager not available yet, retrying...');
-                            setTimeout(() => {
-                                if (window.securityManager) {
-                                    window.securityManager.initializeRecaptcha();
-                                }
-                            }, 1000);
-                        }
-                    }, 500);
-                };
+        window.onRecaptchaLoad = function() {
+            console.log("reCAPTCHA API loaded successfully");
+            if (window.securityManager) {
+                setTimeout(() => {
+                    window.securityManager.initializeRecaptcha();
+                }, 100);
+            }
+        };
         
         // Global variables for user type tracking
         window.currentUserType = window.currentUserType || 'startup_founder';
