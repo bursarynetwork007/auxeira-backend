@@ -4334,15 +4334,6 @@
         };
 
 
-        // Global reCAPTCHA callback function
-        window.onRecaptchaLoad = function() {
-            console.log("reCAPTCHA API loaded successfully");
-            if (window.securityManager) {
-                setTimeout(() => {
-                    window.securityManager.initializeRecaptcha();
-                }, 100);
-            }
-        };
         
         // Global variables for user type tracking
         window.currentUserType = window.currentUserType || 'startup_founder';
