@@ -5101,7 +5101,22 @@
                 // Simulate API call
                 await new Promise(resolve => setTimeout(resolve, 3000));
                 
-                showNotification('Account creation will be available soon!', 'success');
+                const response = await fetch('https://x39efpag2i.execute-api.us-east-1.amazonaws.com/dev/api/auth/register', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({email: finalData.email, password: finalData.password})
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showNotification('Account created!', 'success');
+                    window.location.href = '/demo.html';
+                } else {
+                    showNotification(data.message || 'Failed', 'error');
+                }
+
+
+
+                
                 
                 // In production, redirect to onboarding
                 setTimeout(() => {
