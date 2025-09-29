@@ -5101,7 +5101,7 @@
                 // Simulate API call
                 await new Promise(resolve => setTimeout(resolve, 3000));
                 
-                const response = await fetch('https://x39efpag2i.execute-api.us-east-1.amazonaws.com/dev/api/auth/register', {
+                const response = await fetch('https://6qfa3ssb10.execute-api.us-east-1.amazonaws.com/prod/api/auth/register', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({email: finalData.email, password: finalData.password})
@@ -5644,8 +5644,6 @@
 <script src="js/api-config.js"></script>
 <script src="js/script.js"></script>
 <script src="js/api-integration.js"></script>
-<script src="js/recaptcha-fix.js"></script>
-<script src="js/sw-registration.js"></script>
-<script src="js/simple-backend.js"></script>
+<!-- <!-- <script src="js/sw-registration.js"></script> --> -->
 </body>
 </html>

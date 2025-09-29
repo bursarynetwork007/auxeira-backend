@@ -47,8 +47,6 @@ provider:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-sessions-${self:provider.stage}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-users-${self:provider.stage}/index/*"
         
-
-          
 functions:
   api:
     handler: lambda-enhanced.handler
@@ -56,29 +54,11 @@ functions:
       - http:
           path: /
           method: ANY
-          cors:
-            origin: '*'
-            headers:
-              - Content-Type
-              - Authorization
-              - X-Requested-With
-              - Accept
-            allowCredentials: false
+          
       - http:
           path: /{proxy+}
           method: ANY
-          cors:
-            origin: '*'
-            headers:
-              - Content-Type
-              - Authorization
-              - X-Requested-With
-              - x-csrf-token
-              - Accept
-            allowCredentials: false
-
-
-
+          
     environment:
       USERS_TABLE: ${self:service}-users-${self:provider.stage}
       SESSIONS_TABLE: ${self:service}-sessions-${self:provider.stage}

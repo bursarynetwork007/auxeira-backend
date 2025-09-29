@@ -53,22 +53,28 @@ const corsOptions = {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
 
-
-
-    const allowedOrigins = [
+const allowedOrigins = [
       'https://auxeira.com',
       'https://www.auxeira.com',
-      'http://localhost:3000',
+      'http://localhost:3000
       'http://localhost:3001',
-      'http://auxeira-com-frontend-prod.s3-website-us-east-1.amazonaws.com',
+      'http://localhost:8080',
+      'https://localhost:8080',
       // Add CloudFront and S3 patterns
       /^https:\/\/.*\.cloudfront\.net$/,
       /^https:\/\/.*\.s3\.amazonaws\.com$/,
       /^https:\/\/.*\.s3-website.*\.amazonaws\.com$/,
-      /^https:\/\/.*\.app\.github\.dev$/,
-
+      /^https:\/\/.*\.app\.github\.dev$/
+    ];    const allowedOrigins = [
+      'https://auxeira.com',
+      'https://www.auxeira.com',
+      'http://localhost:3000',
+      'http://localhost:3001',
+      // Add CloudFront and S3 patterns
+      /^https:\/\/.*\.cloudfront\.net$/,
+      /^https:\/\/.*\.s3\.amazonaws\.com$/,
+      /^https:\/\/.*\.s3-website.*\.amazonaws\.com$/
     ];
-
 
 
     // Check if origin matches any allowed pattern

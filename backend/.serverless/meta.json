@@ -27,19 +27,19 @@
           "package.json",
           "node_modules/**"
         ],
-        "artifactsS3KeyDirname": "serverless/auxeira-backend/dev/code-artifacts",
-        "deploymentBucket": "auxeira-backend-deployment-bucket-dev",
+        "artifactsS3KeyDirname": "serverless/auxeira-backend/prod/code-artifacts",
+        "deploymentBucket": "auxeira-backend-deployment-bucket-prod",
         "artifact": "/workspaces/auxeira-backend/backend/.serverless/auxeira-backend.zip",
-        "artifactDirectoryName": "serverless/auxeira-backend/dev/1758557799354-2025-09-22T16:16:39.354Z"
+        "artifactDirectoryName": "serverless/auxeira-backend/prod/1759166938310-2025-09-29T17:28:58.310Z"
       },
       "provider": {
         "name": "aws",
         "runtime": "nodejs18.x",
         "region": "us-east-1",
-        "stage": "dev",
+        "stage": "prod",
         "memorySize": 2048,
         "timeout": 29,
-        "deploymentBucket": "auxeira-backend-deployment-bucket-dev",
+        "deploymentBucket": "auxeira-backend-deployment-bucket-prod",
         "environment": {
           "NODE_ENV": "production"
         },
@@ -55,15 +55,15 @@
               "dynamodb:DeleteItem"
             ],
             "Resource": [
-              "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev",
-              "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-sessions-dev",
-              "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev/index/*"
+              "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-prod",
+              "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-sessions-prod",
+              "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-prod/index/*"
             ]
           }
         ],
         "versionFunctions": true,
         "deploymentBucketObject": {
-          "name": "auxeira-backend-deployment-bucket-dev"
+          "name": "auxeira-backend-deployment-bucket-prod"
         },
         "compiledCloudFormationTemplate": {
           "AWSTemplateFormatVersion": "2010-09-09",
@@ -72,7 +72,7 @@
             "ApiLogGroup": {
               "Type": "AWS::Logs::LogGroup",
               "Properties": {
-                "LogGroupName": "/aws/lambda/auxeira-backend-dev-api"
+                "LogGroupName": "/aws/lambda/auxeira-backend-prod-api"
               }
             },
             "IamRoleLambdaExecution": {
@@ -101,7 +101,7 @@
                         "-",
                         [
                           "auxeira-backend",
-                          "dev",
+                          "prod",
                           "lambda"
                         ]
                       ]
@@ -118,7 +118,7 @@
                           ],
                           "Resource": [
                             {
-                              "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/auxeira-backend-dev*:*"
+                              "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/auxeira-backend-prod*:*"
                             }
                           ]
                         },
@@ -129,7 +129,7 @@
                           ],
                           "Resource": [
                             {
-                              "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/auxeira-backend-dev*:*:*"
+                              "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/auxeira-backend-prod*:*:*"
                             }
                           ]
                         },
@@ -144,9 +144,9 @@
                             "dynamodb:DeleteItem"
                           ],
                           "Resource": [
-                            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev",
-                            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-sessions-dev",
-                            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev/index/*"
+                            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-prod",
+                            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-sessions-prod",
+                            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-prod/index/*"
                           ]
                         }
                       ]
@@ -159,7 +159,7 @@
                     "-",
                     [
                       "auxeira-backend",
-                      "dev",
+                      "prod",
                       {
                         "Ref": "AWS::Region"
                       },
@@ -173,19 +173,19 @@
               "Type": "AWS::Lambda::Function",
               "Properties": {
                 "Code": {
-                  "S3Bucket": "auxeira-backend-deployment-bucket-dev",
-                  "S3Key": "serverless/auxeira-backend/dev/1758557799354-2025-09-22T16:16:39.354Z/auxeira-backend.zip"
+                  "S3Bucket": "auxeira-backend-deployment-bucket-prod",
+                  "S3Key": "serverless/auxeira-backend/prod/1759166938310-2025-09-29T17:28:58.310Z/auxeira-backend.zip"
                 },
                 "Handler": "lambda-enhanced.handler",
                 "Runtime": "nodejs18.x",
-                "FunctionName": "auxeira-backend-dev-api",
+                "FunctionName": "auxeira-backend-prod-api",
                 "MemorySize": 2048,
                 "Timeout": 29,
                 "Environment": {
                   "Variables": {
                     "NODE_ENV": "production",
-                    "USERS_TABLE": "auxeira-backend-users-dev",
-                    "SESSIONS_TABLE": "auxeira-backend-sessions-dev",
+                    "USERS_TABLE": "auxeira-backend-users-prod",
+                    "SESSIONS_TABLE": "auxeira-backend-sessions-prod",
                     "JWT_SECRET": "<REDACTED>",
                     "JWT_REFRESH_SECRET": "<REDACTED>"
                   }
@@ -201,20 +201,20 @@
                 "ApiLogGroup"
               ]
             },
-            "ApiLambdaVersionk5X5GbihVsf51CckmVxOxotBDlGOD4471gZ9FdaBU": {
+            "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "ApiLambdaFunction"
                 },
-                "CodeSha256": "AyqK+20BSM5JM9qqgRcqycZxuwqUi1puNRB30Yyt468="
+                "CodeSha256": "FwT7h66gZSupKzYHyWve7Y9No2yJ13mh4Q3AvqYDifM="
               }
             },
             "ApiGatewayRestApi": {
               "Type": "AWS::ApiGateway::RestApi",
               "Properties": {
-                "Name": "dev-auxeira-backend",
+                "Name": "prod-auxeira-backend",
                 "EndpointConfiguration": {
                   "Types": [
                     "EDGE"
@@ -233,6 +233,99 @@
                   ]
                 },
                 "PathPart": "{proxy+}",
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                }
+              }
+            },
+            "ApiGatewayMethodOptions": {
+              "Type": "AWS::ApiGateway::Method",
+              "Properties": {
+                "AuthorizationType": "NONE",
+                "HttpMethod": "OPTIONS",
+                "MethodResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": true,
+                      "method.response.header.Access-Control-Allow-Headers": true,
+                      "method.response.header.Access-Control-Allow-Methods": true
+                    },
+                    "ResponseModels": {}
+                  }
+                ],
+                "RequestParameters": {},
+                "Integration": {
+                  "Type": "MOCK",
+                  "RequestTemplates": {
+                    "application/json": "{statusCode:200}"
+                  },
+                  "ContentHandling": "CONVERT_TO_TEXT",
+                  "IntegrationResponses": [
+                    {
+                      "StatusCode": "200",
+                      "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'",
+                        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Requested-With,Accept'",
+                        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'"
+                      },
+                      "ResponseTemplates": {
+                        "application/json": ""
+                      }
+                    }
+                  ]
+                },
+                "ResourceId": {
+                  "Fn::GetAtt": [
+                    "ApiGatewayRestApi",
+                    "RootResourceId"
+                  ]
+                },
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                }
+              }
+            },
+            "ApiGatewayMethodProxyVarOptions": {
+              "Type": "AWS::ApiGateway::Method",
+              "Properties": {
+                "AuthorizationType": "NONE",
+                "HttpMethod": "OPTIONS",
+                "MethodResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": true,
+                      "method.response.header.Access-Control-Allow-Headers": true,
+                      "method.response.header.Access-Control-Allow-Methods": true
+                    },
+                    "ResponseModels": {}
+                  }
+                ],
+                "RequestParameters": {},
+                "Integration": {
+                  "Type": "MOCK",
+                  "RequestTemplates": {
+                    "application/json": "{statusCode:200}"
+                  },
+                  "ContentHandling": "CONVERT_TO_TEXT",
+                  "IntegrationResponses": [
+                    {
+                      "StatusCode": "200",
+                      "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'",
+                        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Requested-With,x-csrf-token,Accept'",
+                        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'"
+                      },
+                      "ResponseTemplates": {
+                        "application/json": ""
+                      }
+                    }
+                  ]
+                },
+                "ResourceId": {
+                  "Ref": "ApiGatewayResourceProxyVar"
+                },
                 "RestApiId": {
                   "Ref": "ApiGatewayRestApi"
                 }
@@ -333,15 +426,17 @@
                 "ApiLambdaPermissionApiGateway"
               ]
             },
-            "ApiGatewayDeployment1758557786188": {
+            "ApiGatewayDeployment1759166923205": {
               "Type": "AWS::ApiGateway::Deployment",
               "Properties": {
                 "RestApiId": {
                   "Ref": "ApiGatewayRestApi"
                 },
-                "StageName": "dev"
+                "StageName": "prod"
               },
               "DependsOn": [
+                "ApiGatewayMethodOptions",
+                "ApiGatewayMethodProxyVarOptions",
                 "ApiGatewayMethodAny",
                 "ApiGatewayMethodProxyVarAny"
               ]
@@ -386,7 +481,7 @@
             "UsersTable": {
               "Type": "AWS::DynamoDB::Table",
               "Properties": {
-                "TableName": "auxeira-backend-users-dev",
+                "TableName": "auxeira-backend-users-prod",
                 "AttributeDefinitions": [
                   {
                     "AttributeName": "email",
@@ -423,7 +518,7 @@
             "SessionsTable": {
               "Type": "AWS::DynamoDB::Table",
               "Properties": {
-                "TableName": "auxeira-backend-sessions-dev",
+                "TableName": "auxeira-backend-sessions-prod",
                 "AttributeDefinitions": [
                   {
                     "AttributeName": "sessionId",
@@ -464,18 +559,18 @@
           },
           "Outputs": {
             "ServerlessDeploymentBucketName": {
-              "Value": "auxeira-backend-deployment-bucket-dev",
+              "Value": "auxeira-backend-deployment-bucket-prod",
               "Export": {
-                "Name": "sls-auxeira-backend-dev-ServerlessDeploymentBucketName"
+                "Name": "sls-auxeira-backend-prod-ServerlessDeploymentBucketName"
               }
             },
             "ApiLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "ApiLambdaVersionk5X5GbihVsf51CckmVxOxotBDlGOD4471gZ9FdaBU"
+                "Ref": "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY"
               },
               "Export": {
-                "Name": "sls-auxeira-backend-dev-ApiLambdaFunctionQualifiedArn"
+                "Name": "sls-auxeira-backend-prod-ApiLambdaFunctionQualifiedArn"
               }
             },
             "ServiceEndpoint": {
@@ -496,12 +591,12 @@
                     {
                       "Ref": "AWS::URLSuffix"
                     },
-                    "/dev"
+                    "/prod"
                   ]
                 ]
               },
               "Export": {
-                "Name": "sls-auxeira-backend-dev-ServiceEndpoint"
+                "Name": "sls-auxeira-backend-prod-ServiceEndpoint"
               }
             }
           }
@@ -516,6 +611,20 @@
               "http": {
                 "path": "",
                 "method": "any",
+                "cors": {
+                  "origin": "*",
+                  "methods": [
+                    "OPTIONS",
+                    "ANY"
+                  ],
+                  "headers": [
+                    "Content-Type",
+                    "Authorization",
+                    "X-Requested-With",
+                    "Accept"
+                  ],
+                  "allowCredentials": "<REDACTED>"
+                },
                 "integration": "AWS_PROXY"
               }
             },
@@ -523,23 +632,38 @@
               "http": {
                 "path": "{proxy+}",
                 "method": "any",
+                "cors": {
+                  "origin": "*",
+                  "methods": [
+                    "OPTIONS",
+                    "ANY"
+                  ],
+                  "headers": [
+                    "Content-Type",
+                    "Authorization",
+                    "X-Requested-With",
+                    "x-csrf-token",
+                    "Accept"
+                  ],
+                  "allowCredentials": "<REDACTED>"
+                },
                 "integration": "AWS_PROXY"
               }
             }
           ],
           "environment": {
-            "USERS_TABLE": "auxeira-backend-users-dev",
-            "SESSIONS_TABLE": "auxeira-backend-sessions-dev",
+            "USERS_TABLE": "auxeira-backend-users-prod",
+            "SESSIONS_TABLE": "auxeira-backend-sessions-prod",
             "JWT_SECRET": "<REDACTED>",
             "JWT_REFRESH_SECRET": "<REDACTED>"
           },
-          "name": "auxeira-backend-dev-api",
+          "name": "auxeira-backend-prod-api",
           "package": {},
           "memory": 2048,
           "timeout": 29,
           "runtime": "nodejs18.x",
           "vpc": {},
-          "versionLogicalId": "ApiLambdaVersionk5X5GbihVsf51CckmVxOxotBDlGOD4471gZ9FdaBU"
+          "versionLogicalId": "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY"
         }
       },
       "resources": {
@@ -547,7 +671,7 @@
           "UsersTable": {
             "Type": "AWS::DynamoDB::Table",
             "Properties": {
-              "TableName": "auxeira-backend-users-dev",
+              "TableName": "auxeira-backend-users-prod",
               "AttributeDefinitions": [
                 {
                   "AttributeName": "email",
@@ -584,7 +708,7 @@
           "SessionsTable": {
             "Type": "AWS::DynamoDB::Table",
             "Properties": {
-              "TableName": "auxeira-backend-sessions-dev",
+              "TableName": "auxeira-backend-sessions-prod",
               "AttributeDefinitions": [
                 {
                   "AttributeName": "sessionId",
@@ -630,10 +754,10 @@
       "name": "aws",
       "runtime": "nodejs18.x",
       "region": "us-east-1",
-      "stage": "dev",
+      "stage": "prod",
       "memorySize": 2048,
       "timeout": 29,
-      "deploymentBucket": "auxeira-backend-deployment-bucket-dev",
+      "deploymentBucket": "auxeira-backend-deployment-bucket-prod",
       "environment": {
         "NODE_ENV": "production"
       },
@@ -649,15 +773,15 @@
             "dynamodb:DeleteItem"
           ],
           "Resource": [
-            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev",
-            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-sessions-dev",
-            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev/index/*"
+            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-prod",
+            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-sessions-prod",
+            "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-prod/index/*"
           ]
         }
       ],
       "versionFunctions": true,
       "deploymentBucketObject": {
-        "name": "auxeira-backend-deployment-bucket-dev"
+        "name": "auxeira-backend-deployment-bucket-prod"
       },
       "compiledCloudFormationTemplate": {
         "AWSTemplateFormatVersion": "2010-09-09",
@@ -666,7 +790,7 @@
           "ApiLogGroup": {
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
-              "LogGroupName": "/aws/lambda/auxeira-backend-dev-api"
+              "LogGroupName": "/aws/lambda/auxeira-backend-prod-api"
             }
           },
           "IamRoleLambdaExecution": {
@@ -695,7 +819,7 @@
                       "-",
                       [
                         "auxeira-backend",
-                        "dev",
+                        "prod",
                         "lambda"
                       ]
                     ]
@@ -712,7 +836,7 @@
                         ],
                         "Resource": [
                           {
-                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/auxeira-backend-dev*:*"
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/auxeira-backend-prod*:*"
                           }
                         ]
                       },
@@ -723,7 +847,7 @@
                         ],
                         "Resource": [
                           {
-                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/auxeira-backend-dev*:*:*"
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/auxeira-backend-prod*:*:*"
                           }
                         ]
                       },
@@ -738,9 +862,9 @@
                           "dynamodb:DeleteItem"
                         ],
                         "Resource": [
-                          "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev",
-                          "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-sessions-dev",
-                          "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev/index/*"
+                          "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-prod",
+                          "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-sessions-prod",
+                          "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-prod/index/*"
                         ]
                       }
                     ]
@@ -753,7 +877,7 @@
                   "-",
                   [
                     "auxeira-backend",
-                    "dev",
+                    "prod",
                     {
                       "Ref": "AWS::Region"
                     },
@@ -767,19 +891,19 @@
             "Type": "AWS::Lambda::Function",
             "Properties": {
               "Code": {
-                "S3Bucket": "auxeira-backend-deployment-bucket-dev",
-                "S3Key": "serverless/auxeira-backend/dev/1758557799354-2025-09-22T16:16:39.354Z/auxeira-backend.zip"
+                "S3Bucket": "auxeira-backend-deployment-bucket-prod",
+                "S3Key": "serverless/auxeira-backend/prod/1759166938310-2025-09-29T17:28:58.310Z/auxeira-backend.zip"
               },
               "Handler": "lambda-enhanced.handler",
               "Runtime": "nodejs18.x",
-              "FunctionName": "auxeira-backend-dev-api",
+              "FunctionName": "auxeira-backend-prod-api",
               "MemorySize": 2048,
               "Timeout": 29,
               "Environment": {
                 "Variables": {
                   "NODE_ENV": "production",
-                  "USERS_TABLE": "auxeira-backend-users-dev",
-                  "SESSIONS_TABLE": "auxeira-backend-sessions-dev",
+                  "USERS_TABLE": "auxeira-backend-users-prod",
+                  "SESSIONS_TABLE": "auxeira-backend-sessions-prod",
                   "JWT_SECRET": "<REDACTED>",
                   "JWT_REFRESH_SECRET": "<REDACTED>"
                 }
@@ -795,20 +919,20 @@
               "ApiLogGroup"
             ]
           },
-          "ApiLambdaVersionk5X5GbihVsf51CckmVxOxotBDlGOD4471gZ9FdaBU": {
+          "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "AyqK+20BSM5JM9qqgRcqycZxuwqUi1puNRB30Yyt468="
+              "CodeSha256": "FwT7h66gZSupKzYHyWve7Y9No2yJ13mh4Q3AvqYDifM="
             }
           },
           "ApiGatewayRestApi": {
             "Type": "AWS::ApiGateway::RestApi",
             "Properties": {
-              "Name": "dev-auxeira-backend",
+              "Name": "prod-auxeira-backend",
               "EndpointConfiguration": {
                 "Types": [
                   "EDGE"
@@ -827,6 +951,99 @@
                 ]
               },
               "PathPart": "{proxy+}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Requested-With,Accept'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodProxyVarOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Requested-With,x-csrf-token,Accept'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceProxyVar"
+              },
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
               }
@@ -927,15 +1144,17 @@
               "ApiLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1758557786188": {
+          "ApiGatewayDeployment1759166923205": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
               },
-              "StageName": "dev"
+              "StageName": "prod"
             },
             "DependsOn": [
+              "ApiGatewayMethodOptions",
+              "ApiGatewayMethodProxyVarOptions",
               "ApiGatewayMethodAny",
               "ApiGatewayMethodProxyVarAny"
             ]
@@ -980,7 +1199,7 @@
           "UsersTable": {
             "Type": "AWS::DynamoDB::Table",
             "Properties": {
-              "TableName": "auxeira-backend-users-dev",
+              "TableName": "auxeira-backend-users-prod",
               "AttributeDefinitions": [
                 {
                   "AttributeName": "email",
@@ -1017,7 +1236,7 @@
           "SessionsTable": {
             "Type": "AWS::DynamoDB::Table",
             "Properties": {
-              "TableName": "auxeira-backend-sessions-dev",
+              "TableName": "auxeira-backend-sessions-prod",
               "AttributeDefinitions": [
                 {
                   "AttributeName": "sessionId",
@@ -1058,18 +1277,18 @@
         },
         "Outputs": {
           "ServerlessDeploymentBucketName": {
-            "Value": "auxeira-backend-deployment-bucket-dev",
+            "Value": "auxeira-backend-deployment-bucket-prod",
             "Export": {
-              "Name": "sls-auxeira-backend-dev-ServerlessDeploymentBucketName"
+              "Name": "sls-auxeira-backend-prod-ServerlessDeploymentBucketName"
             }
           },
           "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiLambdaVersionk5X5GbihVsf51CckmVxOxotBDlGOD4471gZ9FdaBU"
+              "Ref": "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY"
             },
             "Export": {
-              "Name": "sls-auxeira-backend-dev-ApiLambdaFunctionQualifiedArn"
+              "Name": "sls-auxeira-backend-prod-ApiLambdaFunctionQualifiedArn"
             }
           },
           "ServiceEndpoint": {
@@ -1090,12 +1309,12 @@
                   {
                     "Ref": "AWS::URLSuffix"
                   },
-                  "/dev"
+                  "/prod"
                 ]
               ]
             },
             "Export": {
-              "Name": "sls-auxeira-backend-dev-ServiceEndpoint"
+              "Name": "sls-auxeira-backend-prod-ServiceEndpoint"
             }
           }
         }
@@ -1111,40 +1330,40 @@
       "serviceProvider": null,
       "instanceParameters": null
     },
-    "serviceRawFile": "service: auxeira-backend\nframeworkVersion: ^4.0.0\n\npackage:\n  patterns:\n    - '!awscliv2.zip'\n    - '!.serverless/**'\n    - '!node_modules/aws-sdk/**'\n    - '!**/*.zip'\n    - '!**/*.backup'\n    - '!aws/**'\n    - '!.env*'\n    - '!README.md'\n    - '!Dockerfile'\n    - '!docker-compose.yml'\n    - '!package-original.json'\n    - '!src/types/**'\n    - '!src/websocket/**'\n    - '!src/ml-pipeline/**'\n    - 'lambda-enhanced.js'\n    - 'src/services/auth-dynamodb.service.js'\n    - 'package.json'\n    - 'node_modules/**'\n\nprovider:\n  name: aws\n  runtime: nodejs18.x\n  region: us-east-1\n  stage: ${opt:stage, 'dev'}\n  memorySize: 2048\n  timeout: 29\n  deploymentBucket:\n    name: auxeira-backend-deployment-bucket-${self:provider.stage}\n  environment:\n    NODE_ENV: production\n  iamRoleStatements:\n    - Effect: Allow\n      Action:\n        - dynamodb:Query\n        - dynamodb:Scan\n        - dynamodb:GetItem\n        - dynamodb:PutItem\n        - dynamodb:UpdateItem\n        - dynamodb:DeleteItem\n      Resource:\n        - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-users-${self:provider.stage}\"\n        - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-sessions-${self:provider.stage}\"\n        - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-users-${self:provider.stage}/index/*\"\n        \nfunctions:\n  api:\n    handler: lambda-enhanced.handler\n    events:\n      - http:\n          path: /\n          method: ANY\n          \n      - http:\n          path: /{proxy+}\n          method: ANY\n          \n    environment:\n      USERS_TABLE: ${self:service}-users-${self:provider.stage}\n      SESSIONS_TABLE: ${self:service}-sessions-${self:provider.stage}\n      JWT_SECRET: ${env:JWT_SECRET, 'your-super-secret-jwt-key-change-in-production'}\n      JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET, 'your-super-secret-refresh-key-change-in-production'}\n\nresources:\n  Resources:        \n    UsersTable:\n      Type: AWS::DynamoDB::Table\n      Properties:\n        TableName: ${self:service}-users-${self:provider.stage}\n        AttributeDefinitions:\n          - AttributeName: email\n            AttributeType: S\n          - AttributeName: id\n            AttributeType: S\n        KeySchema:\n          - AttributeName: email\n            KeyType: HASH\n        GlobalSecondaryIndexes:\n          - IndexName: UserIdIndex\n            KeySchema:\n              - AttributeName: id\n                KeyType: HASH\n            Projection:\n              ProjectionType: ALL\n        BillingMode: PAY_PER_REQUEST\n        \n    SessionsTable:\n      Type: AWS::DynamoDB::Table\n      Properties:\n        TableName: ${self:service}-sessions-${self:provider.stage}\n        AttributeDefinitions:\n          - AttributeName: sessionId\n            AttributeType: S\n          - AttributeName: userId\n            AttributeType: S\n        KeySchema:\n          - AttributeName: sessionId\n            KeyType: HASH\n        GlobalSecondaryIndexes:\n          - IndexName: UserIdIndex\n            KeySchema:\n              - AttributeName: userId\n                KeyType: HASH\n            Projection:\n              ProjectionType: ALL\n        BillingMode: PAY_PER_REQUEST\n        TimeToLiveSpecification:\n          AttributeName: expiresAt\n          Enabled: true\n",
+    "serviceRawFile": "service: auxeira-backend\nframeworkVersion: ^4.0.0\n\npackage:\n  patterns:\n    - '!awscliv2.zip'\n    - '!.serverless/**'\n    - '!node_modules/aws-sdk/**'\n    - '!**/*.zip'\n    - '!**/*.backup'\n    - '!aws/**'\n    - '!.env*'\n    - '!README.md'\n    - '!Dockerfile'\n    - '!docker-compose.yml'\n    - '!package-original.json'\n    - '!src/types/**'\n    - '!src/websocket/**'\n    - '!src/ml-pipeline/**'\n    - 'lambda-enhanced.js'\n    - 'src/services/auth-dynamodb.service.js'\n    - 'package.json'\n    - 'node_modules/**'\n\nprovider:\n  name: aws\n  runtime: nodejs18.x\n  region: us-east-1\n  stage: ${opt:stage, 'dev'}\n  memorySize: 2048\n  timeout: 29\n  deploymentBucket:\n    name: auxeira-backend-deployment-bucket-${self:provider.stage}\n  environment:\n    NODE_ENV: production\n  iamRoleStatements:\n    - Effect: Allow\n      Action:\n        - dynamodb:Query\n        - dynamodb:Scan\n        - dynamodb:GetItem\n        - dynamodb:PutItem\n        - dynamodb:UpdateItem\n        - dynamodb:DeleteItem\n      Resource:\n        - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-users-${self:provider.stage}\"\n        - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-sessions-${self:provider.stage}\"\n        - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-users-${self:provider.stage}/index/*\"\n        \n\n          \nfunctions:\n  api:\n    handler: lambda-enhanced.handler\n    events:\n      - http:\n          path: /\n          method: ANY\n          cors:\n            origin: '*'\n            headers:\n              - Content-Type\n              - Authorization\n              - X-Requested-With\n              - Accept\n            allowCredentials: false\n      - http:\n          path: /{proxy+}\n          method: ANY\n          cors:\n            origin: '*'\n            headers:\n              - Content-Type\n              - Authorization\n              - X-Requested-With\n              - x-csrf-token\n              - Accept\n            allowCredentials: false\n\n\n\n    environment:\n      USERS_TABLE: ${self:service}-users-${self:provider.stage}\n      SESSIONS_TABLE: ${self:service}-sessions-${self:provider.stage}\n      JWT_SECRET: ${env:JWT_SECRET, 'your-super-secret-jwt-key-change-in-production'}\n      JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET, 'your-super-secret-refresh-key-change-in-production'}\n\nresources:\n  Resources:        \n    UsersTable:\n      Type: AWS::DynamoDB::Table\n      Properties:\n        TableName: ${self:service}-users-${self:provider.stage}\n        AttributeDefinitions:\n          - AttributeName: email\n            AttributeType: S\n          - AttributeName: id\n            AttributeType: S\n        KeySchema:\n          - AttributeName: email\n            KeyType: HASH\n        GlobalSecondaryIndexes:\n          - IndexName: UserIdIndex\n            KeySchema:\n              - AttributeName: id\n                KeyType: HASH\n            Projection:\n              ProjectionType: ALL\n        BillingMode: PAY_PER_REQUEST\n        \n    SessionsTable:\n      Type: AWS::DynamoDB::Table\n      Properties:\n        TableName: ${self:service}-sessions-${self:provider.stage}\n        AttributeDefinitions:\n          - AttributeName: sessionId\n            AttributeType: S\n          - AttributeName: userId\n            AttributeType: S\n        KeySchema:\n          - AttributeName: sessionId\n            KeyType: HASH\n        GlobalSecondaryIndexes:\n          - IndexName: UserIdIndex\n            KeySchema:\n              - AttributeName: userId\n                KeyType: HASH\n            Projection:\n              ProjectionType: ALL\n        BillingMode: PAY_PER_REQUEST\n        TimeToLiveSpecification:\n          AttributeName: expiresAt\n          Enabled: true\n",
     "command": [
       "deploy"
     ],
     "options": {
-      "stage": "dev"
+      "stage": "prod"
     },
     "orgId": "00a51e9b-62da-43be-8a05-85bc1ba7e140",
     "orgName": "lante",
     "userId": "7pMlkpmqlcShND1h6g",
     "userName": "lante",
     "serviceProviderAwsAccountId": "615608124862",
-    "serviceProviderAwsCfStackName": "auxeira-backend-dev",
-    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-1:615608124862:stack/auxeira-backend-dev/9091bfb0-9789-11f0-aded-0e0e759f8867",
-    "serviceProviderAwsCfStackCreated": "2025-09-22T07:55:54.195Z",
-    "serviceProviderAwsCfStackUpdated": "2025-09-22T15:58:22.703Z",
+    "serviceProviderAwsCfStackName": "auxeira-backend-prod",
+    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-1:615608124862:stack/auxeira-backend-prod/c3c7dd70-9d2d-11f0-b120-12eed062793d",
+    "serviceProviderAwsCfStackCreated": "2025-09-29T12:13:53.358Z",
+    "serviceProviderAwsCfStackUpdated": "2025-09-29T17:15:52.285Z",
     "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
     "serviceProviderAwsCfStackOutputs": [
       {
         "OutputKey": "ApiLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:us-east-1:615608124862:function:auxeira-backend-dev-api:21",
+        "OutputValue": "arn:aws:lambda:us-east-1:615608124862:function:auxeira-backend-prod-api:6",
         "Description": "Current Lambda function version",
-        "ExportName": "sls-auxeira-backend-dev-ApiLambdaFunctionQualifiedArn"
+        "ExportName": "sls-auxeira-backend-prod-ApiLambdaFunctionQualifiedArn"
       },
       {
         "OutputKey": "ServiceEndpoint",
-        "OutputValue": "https://x39efpag2i.execute-api.us-east-1.amazonaws.com/dev",
+        "OutputValue": "https://6qfa3ssb10.execute-api.us-east-1.amazonaws.com/prod",
         "Description": "URL of the service endpoint",
-        "ExportName": "sls-auxeira-backend-dev-ServiceEndpoint"
+        "ExportName": "sls-auxeira-backend-prod-ServiceEndpoint"
       },
       {
         "OutputKey": "ServerlessDeploymentBucketName",
-        "OutputValue": "auxeira-backend-deployment-bucket-dev",
-        "ExportName": "sls-auxeira-backend-dev-ServerlessDeploymentBucketName"
+        "OutputValue": "auxeira-backend-deployment-bucket-prod",
+        "ExportName": "sls-auxeira-backend-prod-ServerlessDeploymentBucketName"
       }
     ],
     "compiledCloudFormationTemplate": {
@@ -1154,7 +1373,7 @@
         "ApiLogGroup": {
           "Type": "AWS::Logs::LogGroup",
           "Properties": {
-            "LogGroupName": "/aws/lambda/auxeira-backend-dev-api"
+            "LogGroupName": "/aws/lambda/auxeira-backend-prod-api"
           }
         },
         "IamRoleLambdaExecution": {
@@ -1183,7 +1402,7 @@
                     "-",
                     [
                       "auxeira-backend",
-                      "dev",
+                      "prod",
                       "lambda"
                     ]
                   ]
@@ -1200,7 +1419,7 @@
                       ],
                       "Resource": [
                         {
-                          "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/auxeira-backend-dev*:*"
+                          "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/auxeira-backend-prod*:*"
                         }
                       ]
                     },
@@ -1211,7 +1430,7 @@
                       ],
                       "Resource": [
                         {
-                          "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/auxeira-backend-dev*:*:*"
+                          "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/auxeira-backend-prod*:*:*"
                         }
                       ]
                     },
@@ -1226,9 +1445,9 @@
                         "dynamodb:DeleteItem"
                       ],
                       "Resource": [
-                        "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev",
-                        "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-sessions-dev",
-                        "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-dev/index/*"
+                        "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-prod",
+                        "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-sessions-prod",
+                        "arn:aws:dynamodb:us-east-1:*:table/auxeira-backend-users-prod/index/*"
                       ]
                     }
                   ]
@@ -1241,7 +1460,7 @@
                 "-",
                 [
                   "auxeira-backend",
-                  "dev",
+                  "prod",
                   {
                     "Ref": "AWS::Region"
                   },
@@ -1255,19 +1474,19 @@
           "Type": "AWS::Lambda::Function",
           "Properties": {
             "Code": {
-              "S3Bucket": "auxeira-backend-deployment-bucket-dev",
-              "S3Key": "serverless/auxeira-backend/dev/1758557799354-2025-09-22T16:16:39.354Z/auxeira-backend.zip"
+              "S3Bucket": "auxeira-backend-deployment-bucket-prod",
+              "S3Key": "serverless/auxeira-backend/prod/1759166938310-2025-09-29T17:28:58.310Z/auxeira-backend.zip"
             },
             "Handler": "lambda-enhanced.handler",
             "Runtime": "nodejs18.x",
-            "FunctionName": "auxeira-backend-dev-api",
+            "FunctionName": "auxeira-backend-prod-api",
             "MemorySize": 2048,
             "Timeout": 29,
             "Environment": {
               "Variables": {
                 "NODE_ENV": "production",
-                "USERS_TABLE": "auxeira-backend-users-dev",
-                "SESSIONS_TABLE": "auxeira-backend-sessions-dev",
+                "USERS_TABLE": "auxeira-backend-users-prod",
+                "SESSIONS_TABLE": "auxeira-backend-sessions-prod",
                 "JWT_SECRET": "<REDACTED>",
                 "JWT_REFRESH_SECRET": "<REDACTED>"
               }
@@ -1283,20 +1502,20 @@
             "ApiLogGroup"
           ]
         },
-        "ApiLambdaVersionk5X5GbihVsf51CckmVxOxotBDlGOD4471gZ9FdaBU": {
+        "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "ApiLambdaFunction"
             },
-            "CodeSha256": "AyqK+20BSM5JM9qqgRcqycZxuwqUi1puNRB30Yyt468="
+            "CodeSha256": "FwT7h66gZSupKzYHyWve7Y9No2yJ13mh4Q3AvqYDifM="
           }
         },
         "ApiGatewayRestApi": {
           "Type": "AWS::ApiGateway::RestApi",
           "Properties": {
-            "Name": "dev-auxeira-backend",
+            "Name": "prod-auxeira-backend",
             "EndpointConfiguration": {
               "Types": [
                 "EDGE"
@@ -1315,6 +1534,99 @@
               ]
             },
             "PathPart": "{proxy+}",
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            }
+          }
+        },
+        "ApiGatewayMethodOptions": {
+          "Type": "AWS::ApiGateway::Method",
+          "Properties": {
+            "AuthorizationType": "NONE",
+            "HttpMethod": "OPTIONS",
+            "MethodResponses": [
+              {
+                "StatusCode": "200",
+                "ResponseParameters": {
+                  "method.response.header.Access-Control-Allow-Origin": true,
+                  "method.response.header.Access-Control-Allow-Headers": true,
+                  "method.response.header.Access-Control-Allow-Methods": true
+                },
+                "ResponseModels": {}
+              }
+            ],
+            "RequestParameters": {},
+            "Integration": {
+              "Type": "MOCK",
+              "RequestTemplates": {
+                "application/json": "{statusCode:200}"
+              },
+              "ContentHandling": "CONVERT_TO_TEXT",
+              "IntegrationResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": "'*'",
+                    "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Requested-With,Accept'",
+                    "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'"
+                  },
+                  "ResponseTemplates": {
+                    "application/json": ""
+                  }
+                }
+              ]
+            },
+            "ResourceId": {
+              "Fn::GetAtt": [
+                "ApiGatewayRestApi",
+                "RootResourceId"
+              ]
+            },
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            }
+          }
+        },
+        "ApiGatewayMethodProxyVarOptions": {
+          "Type": "AWS::ApiGateway::Method",
+          "Properties": {
+            "AuthorizationType": "NONE",
+            "HttpMethod": "OPTIONS",
+            "MethodResponses": [
+              {
+                "StatusCode": "200",
+                "ResponseParameters": {
+                  "method.response.header.Access-Control-Allow-Origin": true,
+                  "method.response.header.Access-Control-Allow-Headers": true,
+                  "method.response.header.Access-Control-Allow-Methods": true
+                },
+                "ResponseModels": {}
+              }
+            ],
+            "RequestParameters": {},
+            "Integration": {
+              "Type": "MOCK",
+              "RequestTemplates": {
+                "application/json": "{statusCode:200}"
+              },
+              "ContentHandling": "CONVERT_TO_TEXT",
+              "IntegrationResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": "'*'",
+                    "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Requested-With,x-csrf-token,Accept'",
+                    "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'"
+                  },
+                  "ResponseTemplates": {
+                    "application/json": ""
+                  }
+                }
+              ]
+            },
+            "ResourceId": {
+              "Ref": "ApiGatewayResourceProxyVar"
+            },
             "RestApiId": {
               "Ref": "ApiGatewayRestApi"
             }
@@ -1415,15 +1727,17 @@
             "ApiLambdaPermissionApiGateway"
           ]
         },
-        "ApiGatewayDeployment1758557786188": {
+        "ApiGatewayDeployment1759166923205": {
           "Type": "AWS::ApiGateway::Deployment",
           "Properties": {
             "RestApiId": {
               "Ref": "ApiGatewayRestApi"
             },
-            "StageName": "dev"
+            "StageName": "prod"
           },
           "DependsOn": [
+            "ApiGatewayMethodOptions",
+            "ApiGatewayMethodProxyVarOptions",
             "ApiGatewayMethodAny",
             "ApiGatewayMethodProxyVarAny"
           ]
@@ -1468,7 +1782,7 @@
         "UsersTable": {
           "Type": "AWS::DynamoDB::Table",
           "Properties": {
-            "TableName": "auxeira-backend-users-dev",
+            "TableName": "auxeira-backend-users-prod",
             "AttributeDefinitions": [
               {
                 "AttributeName": "email",
@@ -1505,7 +1819,7 @@
         "SessionsTable": {
           "Type": "AWS::DynamoDB::Table",
           "Properties": {
-            "TableName": "auxeira-backend-sessions-dev",
+            "TableName": "auxeira-backend-sessions-prod",
             "AttributeDefinitions": [
               {
                 "AttributeName": "sessionId",
@@ -1546,18 +1860,18 @@
       },
       "Outputs": {
         "ServerlessDeploymentBucketName": {
-          "Value": "auxeira-backend-deployment-bucket-dev",
+          "Value": "auxeira-backend-deployment-bucket-prod",
           "Export": {
-            "Name": "sls-auxeira-backend-dev-ServerlessDeploymentBucketName"
+            "Name": "sls-auxeira-backend-prod-ServerlessDeploymentBucketName"
           }
         },
         "ApiLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "ApiLambdaVersionk5X5GbihVsf51CckmVxOxotBDlGOD4471gZ9FdaBU"
+            "Ref": "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY"
           },
           "Export": {
-            "Name": "sls-auxeira-backend-dev-ApiLambdaFunctionQualifiedArn"
+            "Name": "sls-auxeira-backend-prod-ApiLambdaFunctionQualifiedArn"
           }
         },
         "ServiceEndpoint": {
@@ -1578,12 +1892,12 @@
                 {
                   "Ref": "AWS::URLSuffix"
                 },
-                "/dev"
+                "/prod"
               ]
             ]
           },
           "Export": {
-            "Name": "sls-auxeira-backend-dev-ServiceEndpoint"
+            "Name": "sls-auxeira-backend-prod-ServiceEndpoint"
           }
         }
       }
