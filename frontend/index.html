@@ -4946,47 +4946,141 @@
             container.innerHTML = fieldsHTML;
         }
 
+                // ========================================
+        // STEP 1 VALIDATION & NAVIGATION FUNCTIONS
+        // ========================================
+        
         function validateStep1() {
-            const form = document.getElementById('signupStep1Form');
-            const formData = new FormData(form);
-            let isValid = true;
-
-            // Check required fields
-            const requiredFields = ['firstName', 'lastName', 'email', 'password'];
-            requiredFields.forEach(fieldName => {
-                const value = formData.get(fieldName);
-                const field = form.querySelector(`[name="${fieldName}"]`);
-                if (!value || value.trim() === '') {
-                    isValid = false;
-                } else if (field) {
-                    validationManager.validateField(fieldName === 'firstName' || fieldName === 'lastName' ? 'name' : fieldName, value, field);
-                }
-            });
-
-            // Check user type selection
-            if (!selectedUserType) {
-                isValid = false;
-            }
-
-            // Check terms acceptance
-            if (!formData.get('termsAccepted')) {
-                isValid = false;
-            }
-
-            // Update submit button state
-            const submitBtn = document.getElementById('step1NextBtn');
-            submitBtn.disabled = !isValid;
+            // Get all required fields directly from DOM
+            const firstName = document.getElementById('firstName')?.value.trim();
+            const lastName = document.getElementById('lastName')?.value.trim();
+            const email = document.getElementById('email')?.value.trim();
+            const password = document.getElementById('password')?.value;
+            const termsAccepted = document.getElementById('termsAccepted')?.checked;
             
+            // CRITICAL: Check user type selection (checks both variables)
+            const userTypeSelected = selectedUserType || window.currentUserType;
+            
+            // Validate each field
+            let isValid = true;
+            
+            if (!firstName || firstName.length < 2) isValid = false;
+            if (!lastName || lastName.length < 2) isValid = false;
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) isValid = false;
+            if (!password || password.length < 8) isValid = false;
+            if (!termsAccepted) isValid = false;
+            if (!userTypeSelected) isValid = false;
+            
+            // Update button state IMMEDIATELY
+            const submitBtn = document.getElementById('step1NextBtn');
+            if (submitBtn) {
+                submitBtn.disabled = !isValid;
+            }
+            
+            // Store data if valid
             if (isValid) {
                 signupData = {
-                    ...Object.fromEntries(formData),
-                    userType: selectedUserType
+                    firstName,
+                    lastName,
+                    email,
+                    password,
+                    userType: userTypeSelected
                 };
             }
-
+            
             return isValid;
         }
-
+        
+        // Real-time validation listeners
+        function initStep1Validation() {
+            const step1Inputs = ['firstName', 'lastName', 'email', 'password', 'termsAccepted'];
+            
+            step1Inputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                if (input) {
+                    input.addEventListener('input', validateStep1);
+                    input.addEventListener('change', validateStep1);
+                }
+            });
+        }
+        
+        // Updated user type selection
+        function selectQuickUserType(type) {
+            selectedUserType = type;
+            window.currentUserType = type;
+            
+            // Update UI
+            document.querySelectorAll('.user-type-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            const selectedOption = document.querySelector(`[data-type="${type}"]`);
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+            }
+            
+            // Hide error message if shown
+            const errorMsg = document.getElementById('userTypeError');
+            if (errorMsg) {
+                errorMsg.classList.remove('show');
+            }
+            
+            // Trigger validation to enable button
+            validateStep1();
+            
+            // Update dynamic fields for Step 2
+            updateDynamicFields(type);
+        }
+        
+        // Navigate to Step 2
+        function nextStep() {
+            if (!validateStep1()) {
+                showNotification('Please complete all required fields', 'error');
+                return;
+            }
+            
+            // Hide Step 1
+            document.getElementById('signupStep1').classList.remove('active');
+            
+            // Show Step 2
+            document.getElementById('signupStep2').classList.add('active');
+            
+            // Update progress indicators
+            const progressDots = document.querySelectorAll('.signup-progress .progress-dot');
+            if (progressDots.length >= 2) {
+                progressDots[0].classList.add('completed');
+                progressDots[0].classList.remove('active');
+                progressDots[1].classList.add('active');
+            }
+            
+            // Focus first input in Step 2
+            setTimeout(() => {
+                const firstInput = document.querySelector('#signupStep2 input, #signupStep2 select');
+                if (firstInput) firstInput.focus();
+            }, 100);
+        }
+        
+        // Go back to Step 1
+        function previousStep() {
+            // Hide Step 2
+            document.getElementById('signupStep2').classList.remove('active');
+            
+            // Show Step 1
+            document.getElementById('signupStep1').classList.add('active');
+            
+            // Update progress indicators
+            const progressDots = document.querySelectorAll('.signup-progress .progress-dot');
+            if (progressDots.length >= 2) {
+                progressDots[0].classList.add('active');
+                progressDots[0].classList.remove('completed');
+                progressDots[1].classList.remove('active');
+            }
+        }
+        
+        // Initialize validation when modal opens
+        document.addEventListener('DOMContentLoaded', function() {
+            initStep1Validation();
+        });
         function nextStep() {
             if (validateStep1()) {
                 currentStep = 2;
