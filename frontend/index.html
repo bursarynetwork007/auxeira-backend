@@ -4939,7 +4939,16 @@
             const termsAccepted = document.getElementById('termsAccepted')?.checked;
             
             // CRITICAL: Check user type selection (checks both variables)
-            const userTypeSelected = selectedUserType || window.currentUserType;
+            const userTypeSelected = selectedUserType || window.selectedUserType || window.currentUserType;
+            
+            // Debug logging
+            console.log('=== VALIDATE STEP 1 DEBUG ===');
+            console.log('firstName:', `"${firstName}"`, 'length:', firstName?.length, 'valid:', firstName && firstName.length >= 2);
+            console.log('lastName:', `"${lastName}"`, 'length:', lastName?.length, 'valid:', lastName && lastName.length >= 2);
+            console.log('email:', `"${email}"`, 'valid:', email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+            console.log('password:', password ? '[HIDDEN]' : 'empty', 'length:', password?.length, 'valid:', password && password.length >= 8);
+            console.log('termsAccepted:', termsAccepted);
+            console.log('userTypeSelected:', userTypeSelected);
             
             // Validate each field
             let isValid = true;
@@ -4950,6 +4959,8 @@
             if (!password || password.length < 8) isValid = false;
             if (!termsAccepted) isValid = false;
             if (!userTypeSelected) isValid = false;
+            
+            console.log('Overall validation result:', isValid);
             
             // Update button state IMMEDIATELY
             const submitBtn = document.getElementById('step1NextBtn');
@@ -5005,7 +5016,9 @@
         
         // Updated user type selection
         function selectQuickUserType(type) {
+            // Set both global variables to ensure compatibility
             selectedUserType = type;
+            window.selectedUserType = type;
             window.currentUserType = type;
             
             // Update UI
@@ -5033,16 +5046,30 @@
         
         // Navigate to Step 2
         function nextStep() {
+            console.log('nextStep() called - validating form...');
+            
             if (!validateStep1()) {
+                console.log('Validation failed - showing error');
                 showNotification('Please complete all required fields', 'error');
                 return;
             }
             
+            console.log('Validation passed - transitioning to Step 2');
+            
             // Hide Step 1
-            document.getElementById('signupStep1').classList.remove('active');
+            const step1 = document.getElementById('signupStep1');
+            const step2 = document.getElementById('signupStep2');
+            
+            if (step1) {
+                step1.classList.remove('active');
+                console.log('Step 1 hidden');
+            }
             
             // Show Step 2
-            document.getElementById('signupStep2').classList.add('active');
+            if (step2) {
+                step2.classList.add('active');
+                console.log('Step 2 shown');
+            }
             
             // Update progress indicators
             const progressDots = document.querySelectorAll('.signup-progress .progress-dot');
