@@ -4847,27 +4847,7 @@
             }
         }
 
-        function selectQuickUserType(type) {
-            selectedUserType = type;
-            
-            // Update global variable for backend submission
-            window.currentUserType = type;
-            
-            document.querySelectorAll('.user-type-option').forEach(option => {
-                option.classList.remove('selected');
-            });
-            
-            const selectedOption = document.querySelector(`[data-type="${type}"]`);
-            if (selectedOption) {
-                selectedOption.classList.add('selected');
-            }
-            
-            console.log('User type selected:', type); // Debug log
-            
-            validateStep1();
-            updateDynamicFields(type);
-        }
-
+        
         function updateDynamicFields(userType) {
             const container = document.getElementById('dynamicQuickFields');
             if (!container) return;
