@@ -4990,7 +4990,26 @@
             
             return isValid;
         }
-        
+
+        // Real-time validation for Step 1
+        document.addEventListener('DOMContentLoaded', function() {
+            const step1Inputs = ['firstName', 'lastName', 'email', 'password', 'termsAccepted'];
+            
+            step1Inputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                if (input) {
+                    input.addEventListener('input', validateStep1);
+                    input.addEventListener('change', validateStep1);
+                }
+            });
+            
+            // Also validate when user type is selected
+            document.querySelectorAll('.user-type-option').forEach(option => {
+                option.addEventListener('click', validateStep1);
+            });
+        });
+
+                        
         // Real-time validation listeners
         function initStep1Validation() {
             const step1Inputs = ['firstName', 'lastName', 'email', 'password', 'termsAccepted'];
