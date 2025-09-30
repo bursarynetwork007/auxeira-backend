@@ -4133,7 +4133,7 @@
                                 <span>Your data is encrypted and secure. No credit card required.</span>
                             </div>
 
-                            <button type="button" class="btn-primary full-width" onclick="nextStep()" id="step1NextBtn" disabled>
+                            <button type="button" class="btn-primary full-width" onclick="signupNextStep()" id="step1NextBtn" disabled>
                                 <span id="step1BtnText">Continue to Setup</span>
                                 <i class="fas fa-arrow-right"></i>
                             </button>
@@ -5045,7 +5045,7 @@
         }
         
         // Navigate to Step 2
-        function nextStep() {
+        function signupNextStep() {
             console.log('nextStep() called - validating form...');
             
             if (!validateStep1()) {
@@ -5087,7 +5087,7 @@
         }
         
         // Go back to Step 1
-        function previousStep() {
+        function signupPreviousStep() {
             // Hide Step 2
             document.getElementById('signupStep2').classList.remove('active');
             
@@ -5274,21 +5274,7 @@
                 }
             }
 
-        function previousStep() {
-            // Hide Step 2
-            document.getElementById('signupStep2').classList.remove('active');
-            
-            // Show Step 1
-            document.getElementById('signupStep1').classList.add('active');
-            
-            // Update progress indicators
-            const progressDots = document.querySelectorAll('.signup-progress .progress-dot');
-            if (progressDots.length >= 2) {
-                progressDots[0].classList.add('active');
-                progressDots[0].classList.remove('completed');
-                progressDots[1].classList.remove('active');
-            }
-        }
+        // Duplicate function removed - using signupPreviousStep() instead
 
 
         
