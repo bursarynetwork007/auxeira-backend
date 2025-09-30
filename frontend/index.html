@@ -5080,13 +5080,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             initStep1Validation();
         });
-        function nextStep() {
-            if (validateStep1()) {
-                currentStep = 2;
-                showStep(2);
-            }
-        }
-
+        
         function showStep(step) {
             document.querySelectorAll('.form-step').forEach(stepEl => {
                 stepEl.classList.remove('active');
