@@ -5247,7 +5247,24 @@
                 }
             }
 
+        function previousStep() {
+            // Hide Step 2
+            document.getElementById('signupStep2').classList.remove('active');
+            
+            // Show Step 1
+            document.getElementById('signupStep1').classList.add('active');
+            
+            // Update progress indicators
+            const progressDots = document.querySelectorAll('.signup-progress .progress-dot');
+            if (progressDots.length >= 2) {
+                progressDots[0].classList.add('active');
+                progressDots[0].classList.remove('completed');
+                progressDots[1].classList.remove('active');
+            }
+        }
 
+
+        
         
         function skipToSignup() {
             showNotification('Quick access will be available soon!', 'info');
