@@ -4033,7 +4033,7 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="firstName">First Name <span class="required">*</span></label>
-                                    <input type="text" id="firstName" name="firstName" required autocomplete="given-name">
+                                    <input type="text" id="firstName" name="firstName" required autocomplete="given-name" oninput="validateStep1()">
                                     <div class="error-message" id="firstNameError">
                                         <i class="fas fa-exclamation-circle"></i>
                                         <span>First name is required</span>
@@ -4041,7 +4041,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="lastName">Last Name <span class="required">*</span></label>
-                                    <input type="text" id="lastName" name="lastName" required autocomplete="family-name">
+                                    <input type="text" id="lastName" name="lastName" required autocomplete="family-name" oninput="validateStep1()">
                                     <div class="error-message" id="lastNameError">
                                         <i class="fas fa-exclamation-circle"></i>
                                         <span>Last name is required</span>
@@ -4051,7 +4051,7 @@
 
                             <div class="form-group">
                                 <label for="email">Email Address <span class="required">*</span></label>
-                                <input type="email" id="email" name="email" required autocomplete="email">
+                                <input type="email" id="email" name="email" required autocomplete="email" oninput="validateStep1()">
                                 <div class="error-message" id="emailError">
                                     <i class="fas fa-exclamation-circle"></i>
                                     <span>Please enter a valid email address</span>
@@ -4067,7 +4067,7 @@
                                 <div class="password-wrapper">
                                     <input type="password" id="password" name="password" required 
                                            aria-describedby="passwordError passwordStrengthText" 
-                                           autocomplete="new-password" oninput="validatePasswordStrength(this)">
+                                           autocomplete="new-password" oninput="validatePasswordStrength(this); validateStep1()">
                                     <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password')" 
                                             aria-label="Toggle password visibility" tabindex="-1">
                                         <i class="fas fa-eye"></i>
@@ -4123,7 +4123,7 @@
 
                             <div class="form-group">
                                 <label class="checkbox-label">
-                                    <input type="checkbox" id="termsAccepted" name="termsAccepted" required>
+                                    <input type="checkbox" id="termsAccepted" name="termsAccepted" required onchange="validateStep1()">
                                     I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a> <span class="required">*</span>
                                 </label>
                             </div>
@@ -5729,6 +5729,11 @@
             
             // Hide loading overlay if present
             uiManager.showLoading(false);
+            
+            // Initialize form validation state
+            if (typeof validateStep1 === 'function') {
+                validateStep1();
+            }
             
             console.info('Auxeira landing page initialized successfully');
         }
