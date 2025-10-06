@@ -15,10 +15,13 @@ export { default as AngelInvestorDashboard } from './AngelInvestorDashboard.jsx'
 export { default as CorporateShareValuePartnerDashboard } from './CorporateShareValuePartnerDashboard.jsx'
 export { default as FerrariESGInvestorDashboard } from './FerrariESGInvestorDashboard.jsx'
 
-// Specialized Components
+// Specialized Components with Subscription Features
 export { default as StartupDashboardWithBilling } from './StartupDashboardWithBilling.jsx'
 export { default as GatedStartupDashboard } from './GatedStartupDashboard.jsx'
 export { default as LPReportGenerator } from './LPReportGenerator.jsx'
+
+// Subscription System Components
+export { default as SubscriptionGating } from '../subscription/SubscriptionGating.jsx'
 
 // UI Components
 export * from './ui/button.jsx'
@@ -65,40 +68,60 @@ export const DASHBOARD_CONFIG = {
     name: 'Startup Founder Dashboard',
     component: 'CompleteStartupFounderDashboard',
     features: ['AI Mentor', 'Valuation Engine', 'Token Rewards', 'Subscription Gating'],
-    pricing: { free: true, standard: 149, premium: 499 }
+    pricing: { free: true, standard: 149, premium: 499 },
+    subscriptionGating: true,
+    trialDays: 30
   },
   [DASHBOARD_TYPES.VENTURE_CAPITAL]: {
     name: 'Venture Capital Dashboard', 
     component: 'FerrariVCDashboard',
     features: ['LP Reports', 'Deal Flow', 'Portfolio Analytics', 'Premium Reports'],
-    pricing: { free: false, standard: 299, premium: 699 }
+    pricing: { free: false, standard: 299, premium: 699 },
+    subscriptionGating: true,
+    trialDays: 30
   },
   [DASHBOARD_TYPES.ANGEL_INVESTOR]: {
     name: 'Angel Investor Dashboard',
     component: 'FerrariAngelInvestorDashboard', 
     features: ['Personal Portfolio', 'Ghost Network', 'Syndicate Deals', 'Tax Reports'],
-    pricing: { free: true, standard: 199, premium: 399 }
+    pricing: { free: true, standard: 199, premium: 399 },
+    subscriptionGating: true,
+    trialDays: 30
   },
   [DASHBOARD_TYPES.ESG_EDUCATION]: {
     name: 'ESG Education Investor Dashboard',
     component: 'FerrariESGEducationDashboard',
     features: ['Learning Analytics', 'Teacher Impact', 'UNESCO Compliance', 'Education Reports'],
-    pricing: { free: true, standard: 299, premium: 699 }
+    pricing: { free: true, standard: 299, premium: 699 },
+    subscriptionGating: true,
+    trialDays: 30
   },
   [DASHBOARD_TYPES.GOVERNMENT_AGENCY]: {
     name: 'Government Agency Dashboard',
     component: 'FerrariGovernmentAgencyDashboard',
     features: ['Economic Analytics', 'Job Creation', 'Policy Reports', 'Compliance Tracking'],
-    pricing: { free: true, standard: 2499, premium: 4999 }
+    pricing: { free: true, standard: 2499, premium: 4999 },
+    subscriptionGating: true,
+    trialDays: 30
   }
 }
 
 // Subscription Tiers
 export const SUBSCRIPTION_TIERS = {
   FREE: 'free',
+  TRIAL: 'trial',
   STANDARD: 'standard', 
   PREMIUM: 'premium',
   ENTERPRISE: 'enterprise'
+}
+
+// Subscription Status
+export const SUBSCRIPTION_STATUS = {
+  ACTIVE: 'active',
+  TRIAL: 'trial',
+  GRACE: 'grace',
+  FROZEN: 'frozen',
+  CANCELLED: 'cancelled'
 }
 
 // Feature Flags
@@ -109,5 +132,37 @@ export const FEATURE_FLAGS = {
   QUANTUM_SECURITY: 'quantum_security',
   REAL_TIME_ANALYTICS: 'real_time_analytics',
   PREMIUM_REPORTS: 'premium_reports',
-  API_ACCESS: 'api_access'
+  API_ACCESS: 'api_access',
+  EXPORT_CAPABILITIES: 'export_capabilities',
+  CRYPTO_VESTING: 'crypto_vesting',
+  PARTNER_INTRODUCTIONS: 'partner_introductions',
+  PREMIUM_ANALYTICS: 'premium_analytics'
+}
+
+// Subscription Gating Configuration
+export const SUBSCRIPTION_GATING_CONFIG = {
+  trialDays: 30,
+  gracePeriodDays: 7,
+  autoFreezeOnFailure: true,
+  allowInlineRetry: true,
+  noRefundsMidMonth: true,
+  
+  // Features locked behind paywall
+  premiumFeatures: [
+    FEATURE_FLAGS.EXPORT_CAPABILITIES,
+    FEATURE_FLAGS.CRYPTO_VESTING,
+    FEATURE_FLAGS.PARTNER_INTRODUCTIONS,
+    FEATURE_FLAGS.PREMIUM_ANALYTICS,
+    FEATURE_FLAGS.API_ACCESS,
+    FEATURE_FLAGS.VOICE_INTERFACE,
+    FEATURE_FLAGS.BLOCKCHAIN_VERIFICATION
+  ],
+  
+  // Features available in free tier
+  freeFeatures: [
+    'basic_dashboard',
+    'sse_score_tracking',
+    'ai_mentor_basic',
+    'company_valuation_basic'
+  ]
 }
