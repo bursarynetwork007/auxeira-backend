@@ -103,6 +103,14 @@ export const DASHBOARD_CONFIG = {
     pricing: { free: true, standard: 2499, premium: 4999 },
     subscriptionGating: true,
     trialDays: 30
+  },
+  [DASHBOARD_TYPES.CORPORATE_PARTNER]: {
+    name: 'Corporate Share Value Partner Dashboard',
+    component: 'CorporateShareValuePartnerDashboard',
+    features: ['Ecosystem Pulse', 'Blind Auction Engine', 'Silent Shareholder Mode', 'Executive Voice Interface'],
+    pricing: { free: false, standard: 1299, premium: 2499 },
+    subscriptionGating: true,
+    trialDays: 30
   }
 }
 
