@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="format-detection" content="telephone=no">
     <meta name="mobile-web-app-capable" content="yes">
@@ -144,6 +144,10 @@
             top: 0;
             z-index: 1000;
             transition: var(--transition-smooth);
+            width: 100%;
+            min-height: 60px;
+            /* Safe area support for notched devices */
+            padding-top: env(safe-area-inset-top);
         }
 
         .header.scrolled {
@@ -157,6 +161,11 @@
             align-items: center;
             padding: 1rem 0;
             position: relative;
+            width: 100%;
+            min-height: 60px;
+            /* Ensure nav is always visible */
+            visibility: visible;
+            opacity: 1;
         }
 
         .nav-brand {
@@ -296,8 +305,15 @@
             background: transparent;
             border: none;
             cursor: pointer;
-            padding: 0;
+            padding: 8px;
             z-index: 1001;
+            /* Better touch target */
+            min-width: 44px;
+            min-height: 44px;
+            border-radius: 4px;
+            /* Ensure visibility */
+            position: relative;
+            flex-shrink: 0;
         }
 
         .mobile-menu-btn span {
@@ -2643,7 +2659,7 @@
 
         /* Enhanced Responsive Design - Mobile First Approach */
         
-        /* Small Mobile Devices (320px and up) */
+            /* Mobile Devices (up to 480px) */
         @media screen and (max-width: 480px) {
             :root {
                 --spacing-xs: 0.125rem;
@@ -2657,23 +2673,86 @@
 
             .container {
                 padding: 0 15px;
+                /* Safe area support */
+                padding-left: max(15px, env(safe-area-inset-left));
+                padding-right: max(15px, env(safe-area-inset-right));
             }
 
-            /* Header Mobile */
+            /* Enhanced Header Mobile */
+            .header {
+                /* Ensure header is always visible */
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border-bottom: 1px solid var(--glass-border);
+                width: 100%;
+                min-height: 60px;
+                /* Safe area support for notched devices */
+                padding-top: env(safe-area-inset-top);
+            }
+
             .nav {
                 padding: 0.75rem 0;
+                min-height: 60px;
+                /* Ensure nav elements are visible */
+                display: flex !important;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+            }
+
+            .nav-brand {
+                /* Ensure brand is always visible */
+                display: flex !important;
+                align-items: center;
+                gap: 0.75rem;
+                z-index: 1001;
+                flex-shrink: 0;
+            }
+
+            .logo {
+                height: 36px;
+                width: auto;
+                /* Ensure logo is visible */
+                display: block !important;
             }
 
             .nav-menu, .nav-buttons {
-                display: none;
+                display: none !important;
             }
 
             .mobile-menu-btn {
-                display: flex;
+                display: flex !important;
+                /* Ensure button is always visible */
+                position: relative;
+                z-index: 1001;
+                background: rgba(0, 123, 255, 0.1);
+                border-radius: 6px;
+                padding: 8px;
+                min-width: 44px;
+                min-height: 44px;
+                flex-shrink: 0;
+            }
+
+            .mobile-menu-btn span {
+                background-color: var(--bloomberg-text);
+                height: 2px;
+                width: 20px;
+                display: block;
+                transition: var(--transition-smooth);
             }
 
             .brand-text {
                 font-size: 1.25rem;
+                /* Ensure text is visible */
+                display: block !important;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
             }
 
             /* Hero Mobile */
@@ -2917,18 +2996,60 @@
             }
         }
 
-        /* Large Mobile Devices (481px to 768px) */
+              /* Tablet Devices (481px to 768px) */
         @media screen and (min-width: 481px) and (max-width: 768px) {
             .container {
                 padding: 0 20px;
+                /* Safe area support */
+                padding-left: max(20px, env(safe-area-inset-left));
+                padding-right: max(20px, env(safe-area-inset-right));
+            }
+
+            .header {
+                /* Ensure header is visible on tablets */
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                min-height: 60px;
+                padding-top: env(safe-area-inset-top);
+            }
+
+            .nav {
+                min-height: 60px;
+                display: flex !important;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .nav-brand {
+                display: flex !important;
+                align-items: center;
+                gap: 0.75rem;
+                z-index: 1001;
+            }
+
+            .logo {
+                height: 38px;
+                display: block !important;
             }
 
             .nav-menu, .nav-buttons {
-                display: none;
+                display: none !important;
             }
 
             .mobile-menu-btn {
-                display: flex;
+                display: flex !important;
+                background: rgba(0, 123, 255, 0.1);
+                border-radius: 6px;
+                padding: 8px;
+                min-width: 44px;
+                min-height: 44px;
+                z-index: 1001;
+            }
+
+            .brand-text {
+                font-size: 1.4rem;
+                display: block !important;
             }
 
             .hero {
