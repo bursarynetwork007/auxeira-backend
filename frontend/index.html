@@ -351,33 +351,65 @@
             border-radius: var(--border-radius-lg);
             margin: 0.5rem;
             box-shadow: var(--shadow-xl);
+            /* Ensure menu is visible when active */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            min-height: auto;
+            max-height: 0;
+            overflow: hidden;
         }
 
         .mobile-menu.active {
-            display: flex;
+            display: flex !important;
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            max-height: 500px;
+            min-height: auto;
         }
 
         .mobile-menu a {
             color: var(--bloomberg-text);
             text-decoration: none;
-            padding: 0.75rem 0;
+            padding: 1rem 0;
             border-bottom: 1px solid var(--glass-border);
             transition: var(--transition-smooth);
+            font-size: 1.1rem;
+            font-weight: 500;
+            display: block;
+            /* Ensure links are visible */
+            opacity: 1;
+            visibility: visible;
         }
 
         .mobile-menu a:last-of-type {
-            border-bottom: none;
+            border-bottom: 1px solid var(--glass-border);
         }
 
         .mobile-menu a:hover {
             color: var(--bloomberg-blue);
-            transform: translateX(10px);
+            background: rgba(0, 123, 255, 0.1);
+            transform: translateX(5px);
+            padding-left: 0.5rem;
+        }
+
+        .mobile-menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--glass-border);
         }
 
         .mobile-menu .btn {
-            margin-top: 1rem;
             text-align: center;
             width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            font-weight: 600;
         }
 
         /* Enhanced Hero Section with Better Mobile Responsiveness */
@@ -2737,6 +2769,44 @@
                 flex-shrink: 0;
             }
 
+            /* Ensure mobile menu is properly styled on mobile */
+            .mobile-menu {
+                position: absolute !important;
+                top: 100% !important;
+                left: 0 !important;
+                right: 0 !important;
+                background: var(--glass-bg) !important;
+                backdrop-filter: blur(20px) !important;
+                -webkit-backdrop-filter: blur(20px) !important;
+                border: 1px solid var(--glass-border) !important;
+                border-radius: var(--border-radius-lg) !important;
+                margin: 0.5rem !important;
+                padding: 1rem !important;
+                z-index: 999 !important;
+                box-shadow: var(--shadow-xl) !important;
+            }
+
+            .mobile-menu.active {
+                display: flex !important;
+                flex-direction: column !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                transform: translateY(0) !important;
+                max-height: 500px !important;
+            }
+
+            .mobile-menu a {
+                display: block !important;
+                color: var(--bloomberg-text) !important;
+                text-decoration: none !important;
+                padding: 1rem 0 !important;
+                border-bottom: 1px solid var(--glass-border) !important;
+                font-size: 1.1rem !important;
+                font-weight: 500 !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+
             .mobile-menu-btn span {
                 background-color: var(--bloomberg-text);
                 height: 2px;
@@ -3305,12 +3375,14 @@
 
         <!-- Mobile Menu -->
         <div class="mobile-menu" id="mobileMenu">
-            <a href="#platform">Platform</a>
-            <a href="#investors">For Investors</a>
-            <a href="#partners">Partners</a>
-            <a href="#pricing">Pricing</a>
-            <button class="btn btn-outline" onclick="openAuthModal('login')">Login</button>
-            <button class="btn btn-primary" onclick="openAuthModal('signup')">Get Started</button>
+            <a href="#platform" onclick="closeMobileMenu()">Platform</a>
+            <a href="#investors" onclick="closeMobileMenu()">For Investors</a>
+            <a href="#partners" onclick="closeMobileMenu()">Partners</a>
+            <a href="#pricing" onclick="closeMobileMenu()">Pricing</a>
+            <div class="mobile-menu-buttons">
+                <button class="btn btn-outline" onclick="openAuthModal('login'); closeMobileMenu();">Login</button>
+                <button class="btn btn-primary" onclick="openAuthModal('signup'); closeMobileMenu();">Get Started</button>
+            </div>
         </div>
     </header>
 
@@ -3777,7 +3849,7 @@
                 <p>Be the first to join our exclusive pilot program, unlocking 5-10x ROI with actuarial intelligence and real-time dashboards for reward issuers.</p>
                 
                 <div class="buttons">
-                    <a href="partners.html" class="btn btn-primary">
+                    <a href="auxeira.com/partners.html" class="btn btn-primary">
                         <i class="fas fa-handshake"></i>
                         Explore Partnership
                         <i class="fas fa-chevron-right" style="margin-left: 0.5rem;"></i>
@@ -5466,6 +5538,17 @@
             if (mobileMenu.classList.contains('active')) {
                 const firstLink = mobileMenu.querySelector('a');
                 if (firstLink) firstLink.focus();
+            }
+        }
+
+        // Close Mobile Menu Function
+        function closeMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                mobileMenu.classList.remove('active');
+                menuBtn.classList.remove('active');
             }
         }
 
