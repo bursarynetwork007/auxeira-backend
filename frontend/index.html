@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="format-detection" content="telephone=no">
     <meta name="mobile-web-app-capable" content="yes">
@@ -144,10 +144,6 @@
             top: 0;
             z-index: 1000;
             transition: var(--transition-smooth);
-            width: 100%;
-            min-height: 60px;
-            /* Safe area support for notched devices */
-            padding-top: env(safe-area-inset-top);
         }
 
         .header.scrolled {
@@ -161,11 +157,6 @@
             align-items: center;
             padding: 1rem 0;
             position: relative;
-            width: 100%;
-            min-height: 60px;
-            /* Ensure nav is always visible */
-            visibility: visible;
-            opacity: 1;
         }
 
         .nav-brand {
@@ -305,15 +296,8 @@
             background: transparent;
             border: none;
             cursor: pointer;
-            padding: 8px;
+            padding: 0;
             z-index: 1001;
-            /* Better touch target */
-            min-width: 44px;
-            min-height: 44px;
-            border-radius: 4px;
-            /* Ensure visibility */
-            position: relative;
-            flex-shrink: 0;
         }
 
         .mobile-menu-btn span {
@@ -351,65 +335,33 @@
             border-radius: var(--border-radius-lg);
             margin: 0.5rem;
             box-shadow: var(--shadow-xl);
-            /* Ensure menu is visible when active */
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-            min-height: auto;
-            max-height: 0;
-            overflow: hidden;
         }
 
         .mobile-menu.active {
-            display: flex !important;
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-            max-height: 500px;
-            min-height: auto;
+            display: flex;
         }
 
         .mobile-menu a {
             color: var(--bloomberg-text);
             text-decoration: none;
-            padding: 1rem 0;
+            padding: 0.75rem 0;
             border-bottom: 1px solid var(--glass-border);
             transition: var(--transition-smooth);
-            font-size: 1.1rem;
-            font-weight: 500;
-            display: block;
-            /* Ensure links are visible */
-            opacity: 1;
-            visibility: visible;
         }
 
         .mobile-menu a:last-of-type {
-            border-bottom: 1px solid var(--glass-border);
+            border-bottom: none;
         }
 
         .mobile-menu a:hover {
             color: var(--bloomberg-blue);
-            background: rgba(0, 123, 255, 0.1);
-            transform: translateX(5px);
-            padding-left: 0.5rem;
-        }
-
-        .mobile-menu-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--glass-border);
+            transform: translateX(10px);
         }
 
         .mobile-menu .btn {
+            margin-top: 1rem;
             text-align: center;
             width: 100%;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
-            font-weight: 600;
         }
 
         /* Enhanced Hero Section with Better Mobile Responsiveness */
@@ -2691,7 +2643,7 @@
 
         /* Enhanced Responsive Design - Mobile First Approach */
         
-            /* Mobile Devices (up to 480px) */
+        /* Small Mobile Devices (320px and up) */
         @media screen and (max-width: 480px) {
             :root {
                 --spacing-xs: 0.125rem;
@@ -2705,124 +2657,23 @@
 
             .container {
                 padding: 0 15px;
-                /* Safe area support */
-                padding-left: max(15px, env(safe-area-inset-left));
-                padding-right: max(15px, env(safe-area-inset-right));
             }
 
-            /* Enhanced Header Mobile */
-            .header {
-                /* Ensure header is always visible */
-                position: sticky;
-                top: 0;
-                z-index: 1000;
-                background: var(--glass-bg);
-                backdrop-filter: blur(20px);
-                -webkit-backdrop-filter: blur(20px);
-                border-bottom: 1px solid var(--glass-border);
-                width: 100%;
-                min-height: 60px;
-                /* Safe area support for notched devices */
-                padding-top: env(safe-area-inset-top);
-            }
-
+            /* Header Mobile */
             .nav {
                 padding: 0.75rem 0;
-                min-height: 60px;
-                /* Ensure nav elements are visible */
-                display: flex !important;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-            }
-
-            .nav-brand {
-                /* Ensure brand is always visible */
-                display: flex !important;
-                align-items: center;
-                gap: 0.75rem;
-                z-index: 1001;
-                flex-shrink: 0;
-            }
-
-            .logo {
-                height: 36px;
-                width: auto;
-                /* Ensure logo is visible */
-                display: block !important;
             }
 
             .nav-menu, .nav-buttons {
-                display: none !important;
+                display: none;
             }
 
             .mobile-menu-btn {
-                display: flex !important;
-                /* Ensure button is always visible */
-                position: relative;
-                z-index: 1001;
-                background: rgba(0, 123, 255, 0.1);
-                border-radius: 6px;
-                padding: 8px;
-                min-width: 44px;
-                min-height: 44px;
-                flex-shrink: 0;
-            }
-
-            /* Ensure mobile menu is properly styled on mobile */
-            .mobile-menu {
-                position: absolute !important;
-                top: 100% !important;
-                left: 0 !important;
-                right: 0 !important;
-                background: var(--glass-bg) !important;
-                backdrop-filter: blur(20px) !important;
-                -webkit-backdrop-filter: blur(20px) !important;
-                border: 1px solid var(--glass-border) !important;
-                border-radius: var(--border-radius-lg) !important;
-                margin: 0.5rem !important;
-                padding: 1rem !important;
-                z-index: 999 !important;
-                box-shadow: var(--shadow-xl) !important;
-            }
-
-            .mobile-menu.active {
-                display: flex !important;
-                flex-direction: column !important;
-                opacity: 1 !important;
-                visibility: visible !important;
-                transform: translateY(0) !important;
-                max-height: 500px !important;
-            }
-
-            .mobile-menu a {
-                display: block !important;
-                color: var(--bloomberg-text) !important;
-                text-decoration: none !important;
-                padding: 1rem 0 !important;
-                border-bottom: 1px solid var(--glass-border) !important;
-                font-size: 1.1rem !important;
-                font-weight: 500 !important;
-                opacity: 1 !important;
-                visibility: visible !important;
-            }
-
-            .mobile-menu-btn span {
-                background-color: var(--bloomberg-text);
-                height: 2px;
-                width: 20px;
-                display: block;
-                transition: var(--transition-smooth);
+                display: flex;
             }
 
             .brand-text {
                 font-size: 1.25rem;
-                /* Ensure text is visible */
-                display: block !important;
-                background: var(--gradient-primary);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
             }
 
             /* Hero Mobile */
@@ -3066,60 +2917,18 @@
             }
         }
 
-              /* Tablet Devices (481px to 768px) */
+        /* Large Mobile Devices (481px to 768px) */
         @media screen and (min-width: 481px) and (max-width: 768px) {
             .container {
                 padding: 0 20px;
-                /* Safe area support */
-                padding-left: max(20px, env(safe-area-inset-left));
-                padding-right: max(20px, env(safe-area-inset-right));
-            }
-
-            .header {
-                /* Ensure header is visible on tablets */
-                position: sticky;
-                top: 0;
-                z-index: 1000;
-                min-height: 60px;
-                padding-top: env(safe-area-inset-top);
-            }
-
-            .nav {
-                min-height: 60px;
-                display: flex !important;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .nav-brand {
-                display: flex !important;
-                align-items: center;
-                gap: 0.75rem;
-                z-index: 1001;
-            }
-
-            .logo {
-                height: 38px;
-                display: block !important;
             }
 
             .nav-menu, .nav-buttons {
-                display: none !important;
+                display: none;
             }
 
             .mobile-menu-btn {
-                display: flex !important;
-                background: rgba(0, 123, 255, 0.1);
-                border-radius: 6px;
-                padding: 8px;
-                min-width: 44px;
-                min-height: 44px;
-                z-index: 1001;
-            }
-
-            .brand-text {
-                font-size: 1.4rem;
-                display: block !important;
+                display: flex;
             }
 
             .hero {
@@ -3375,14 +3184,12 @@
 
         <!-- Mobile Menu -->
         <div class="mobile-menu" id="mobileMenu">
-            <a href="#platform" onclick="closeMobileMenu()">Platform</a>
-            <a href="#investors" onclick="closeMobileMenu()">For Investors</a>
-            <a href="#partners" onclick="closeMobileMenu()">Partners</a>
-            <a href="#pricing" onclick="closeMobileMenu()">Pricing</a>
-            <div class="mobile-menu-buttons">
-                <button class="btn btn-outline" onclick="openAuthModal('login'); closeMobileMenu();">Login</button>
-                <button class="btn btn-primary" onclick="openAuthModal('signup'); closeMobileMenu();">Get Started</button>
-            </div>
+            <a href="#platform">Platform</a>
+            <a href="#investors">For Investors</a>
+            <a href="#partners">Partners</a>
+            <a href="#pricing">Pricing</a>
+            <button class="btn btn-outline" onclick="openAuthModal('login')">Login</button>
+            <button class="btn btn-primary" onclick="openAuthModal('signup')">Get Started</button>
         </div>
     </header>
 
@@ -5316,128 +5123,124 @@
             event.preventDefault();
             const form = event.target;
             const submitBtn = document.getElementById('signinSubmitBtn');
-// Fix for the login function - replace lines 5126-5175
-async function submitSigninForm(event) {
-    event.preventDefault();
-    const form = event.target;
-    const submitBtn = document.getElementById('signinSubmitBtn');
-    const loader = document.getElementById('signinLoader');
-    const btnText = document.getElementById('signinBtnText');
+            const loader = document.getElementById('signinLoader');
+            const btnText = document.getElementById('signinBtnText');
 
-    // Rate limiting
-    const identifier = 'signin_' + form.email.value;
-    if (!validationManager.checkRateLimit(identifier, 3, 900000)) {
-        showNotification('Too many login attempts. Please wait before trying again.', 'warning');
-        return;
-    }
+            // Rate limiting
+            const identifier = 'signin_' + form.email.value;
+            if (!validationManager.checkRateLimit(identifier, 3, 900000)) {
+                showNotification('Too many login attempts. Please wait before trying again.', 'warning');
+                return;
+            }
 
-    // Validate CSRF token
-    if (!securityManager.validateCSRF(form.csrf_token.value)) {
-        showNotification('Security validation failed. Please refresh the page.', 'error');
-        return;
-    }
+            // Validate CSRF token
+            if (!securityManager.validateCSRF(form.csrf_token.value)) {
+                showNotification('Security validation failed. Please refresh the page.', 'error');
+                return;
+            }
 
-    // Validate form
-    if (!validationManager.validateForm(form)) {
-        showNotification('Please fix the errors in the form.', 'error');
-        return;
-    }
+            // Validate form
+            if (!validationManager.validateForm(form)) {
+                showNotification('Please fix the errors in the form.', 'error');
+                return;
+            }
 
-    // Show loading state
-    submitBtn.disabled = true;
-    loader.classList.add('show');
-    btnText.style.opacity = '0';
+            // Show loading state
+            submitBtn.disabled = true;
+            loader.classList.add('show');
+            btnText.style.opacity = '0';
 
-    try {
-        // Get reCAPTCHA token
-        let recaptchaToken = null;
-        if (typeof grecaptcha !== 'undefined') {
             try {
-                recaptchaToken = grecaptcha.getResponse();
-            } catch (e) {
-                console.warn('reCAPTCHA not ready:', e);
+                // Get reCAPTCHA token
+                let recaptchaToken = null;
+                if (typeof grecaptcha !== 'undefined') {
+                    try {
+                        recaptchaToken = grecaptcha.getResponse();
+                    } catch (e) {
+                        console.warn('reCAPTCHA not ready:', e);
+                    }
+                }
+
+                const loginData = {
+                    email: form.email.value,
+                    password: form.password.value
+                };
+
+                if (recaptchaToken) {
+                    loginData.recaptchaToken = recaptchaToken;
+                }
+
+                console.log('Logging in user:', loginData.email);
+
+                const response = await fetch('https://6qfa3ssb10.execute-api.us-east-1.amazonaws.com/prod/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || data.error || 'Login failed');
+                }
+
+                // Store auth tokens
+                if (data.data?.access_token) {
+                    localStorage.setItem('auxeira_auth_token', data.data.access_token);
+                }
+                if (data.data?.refresh_token) {
+                    localStorage.setItem('auxeira_refresh_token', data.data.refresh_token);
+                }
+
+                // Store user data
+                const userData = {
+                    id: data.data?.user?.id || data.userId,
+                    email: data.data?.user?.email || loginData.email,
+                    firstName: data.data?.user?.firstName || '',
+                    lastName: data.data?.user?.lastName || '',
+                    userType: data.data?.user?.userType || 'venture_capital'
+                };
+                
+                localStorage.setItem('auxeira_user', JSON.stringify(userData));
+
+                showNotification('Login successful! Redirecting...', 'success');
+
+                const modal = document.getElementById('authModal');
+                if (modal) {
+                    setTimeout(() => modal.classList.remove('show'), 1000);
+                }
+
+                // Redirect to appropriate dashboard
+                setTimeout(() => {
+                    const dashboardMap = {
+                        'startup_founder': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/startup_founder.html',
+                        'corporate_partner': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/corporate_partner.html',
+                        'venture_capital': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/venture_capital.html',
+                        'angel_investor': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/angel_investor.html',
+                        'government': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/government.html',
+                        'esg_funder': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/esg_funder.html',
+                        'impact_investor': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/impact_investor.html'
+                    };
+                    window.location.href = dashboardMap[userData.userType] || 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/venture_capital.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification(error.message || 'Login failed. Please try again.', 'error');
+                
+                if (typeof grecaptcha !== 'undefined' && grecaptcha.reset) {
+                    grecaptcha.reset();
+                }
+            } finally {
+                submitBtn.disabled = false;
+                loader.classList.remove('show');
+                btnText.style.opacity = '1';
             }
         }
 
-        const loginData = {
-            email: form.email.value,
-            password: form.password.value
-        };
-
-        if (recaptchaToken) {
-            loginData.recaptchaToken = recaptchaToken;
-        }
-
-        console.log('Logging in user:', loginData.email);
-
-        const response = await fetch('https://6qfa3ssb10.execute-api.us-east-1.amazonaws.com/prod/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(loginData)
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || data.error || 'Login failed');
-        }
-
-        // Store auth tokens
-        if (data.data?.access_token) {
-            localStorage.setItem('auxeira_auth_token', data.data.access_token);
-        }
-        if (data.data?.refresh_token) {
-            localStorage.setItem('auxeira_refresh_token', data.data.refresh_token);
-        }
-
-        // Store user data
-        const userData = {
-            id: data.data?.user?.id || data.userId,
-            email: data.data?.user?.email || loginData.email,
-            firstName: data.data?.user?.firstName || '',
-            lastName: data.data?.user?.lastName || '',
-            userType: data.data?.user?.userType || 'venture_capital'
-        };
-        
-        localStorage.setItem('auxeira_user', JSON.stringify(userData));
-
-        showNotification('Login successful! Redirecting...', 'success');
-
-        const modal = document.getElementById('authModal');
-        if (modal) {
-            setTimeout(() => modal.classList.remove('show'), 1000);
-        }
-
-        // Redirect to appropriate dashboard
-        setTimeout(() => {
-            const dashboardMap = {
-                'startup_founder': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/startup_founder.html',
-                'corporate_partner': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/corporate_partner.html',
-                'venture_capital': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/venture_capital.html',
-                'angel_investor': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/angel_investor.html',
-                'government': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/government.html',
-                'esg_funder': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/esg_funder.html',
-                'impact_investor': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/impact_investor.html'
-            };
-            window.location.href = dashboardMap[userData.userType] || 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/venture_capital.html';
-        }, 1500);
-        
-    } catch (error) {
-        console.error('Login error:', error);
-        showNotification(error.message || 'Login failed. Please try again.', 'error');
-        
-        if (typeof grecaptcha !== 'undefined' && grecaptcha.reset) {
-            grecaptcha.reset();
-        }
-    } finally {
-        submitBtn.disabled = false;
-        loader.classList.remove('show');
-        btnText.style.opacity = '1';
-    }
-}
 
         async function submitSignupForm(event) {
                 event.preventDefault();
@@ -5610,17 +5413,6 @@ async function submitSigninForm(event) {
             if (mobileMenu.classList.contains('active')) {
                 const firstLink = mobileMenu.querySelector('a');
                 if (firstLink) firstLink.focus();
-            }
-        }
-
-        // Close Mobile Menu Function
-        function closeMobileMenu() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            const menuBtn = document.querySelector('.mobile-menu-btn');
-            
-            if (mobileMenu && mobileMenu.classList.contains('active')) {
-                mobileMenu.classList.remove('active');
-                menuBtn.classList.remove('active');
             }
         }
 
