@@ -4393,8 +4393,8 @@
 
             async initializeRecaptcha() {
                 try {
-                    if (document.getElementById('recaptcha-container').innerHTML) return; // Already rendered
-                    if (document.getElementById('recaptcha-container').innerHTML) return; // Already rendered
+                    const container = document.getElementById('recaptcha-container'); if (!container || container.innerHTML) return; // Already rendered or missing
+                    const container = document.getElementById('recaptcha-container'); if (!container || container.innerHTML) return; // Already rendered or missing
                     if (typeof grecaptcha !== 'undefined' && grecaptcha.render) {
                         // Render signin recaptcha
                         if (document.getElementById('signinRecaptcha')) {
