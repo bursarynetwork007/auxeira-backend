@@ -338,7 +338,21 @@
         }
 
         .mobile-menu.active {
-            display: flex;
+            display: flex !important;
+            background: rgba(13, 17, 23, 0.95) !important;
+            backdrop-filter: blur(20px);
+        }
+        .mobile-menu * {
+            color: #ffffff !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+        }
+        
+        .mobile-menu .btn {
+            display: block !important;
+            margin: 0.5rem 0 !important;
+            padding: 0.75rem !important;
         }
 
         .mobile-menu a {
