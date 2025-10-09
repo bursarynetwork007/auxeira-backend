@@ -4394,6 +4394,13 @@
 
             async initializeRecaptcha() {
                 try {
+                    // Wait for grecaptcha to be fully ready
+                    if (typeof grecaptcha === 'undefined' || !grecaptcha.render) {
+                        console.log('reCAPTCHA not ready yet, retrying in 500ms...');
+                        setTimeout(() => this.initializeRecaptcha(), 500);
+                        return;
+                    }
+                    
                     if (typeof grecaptcha !== 'undefined' && grecaptcha.render) {
                         // Render signin recaptcha
                         if (document.getElementById('signinRecaptcha')) {
