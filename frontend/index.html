@@ -4394,7 +4394,6 @@
             async initializeRecaptcha() {
                 try {
                     const container = document.getElementById('recaptcha-container'); if (!container || container.innerHTML) return; // Already rendered or missing
-                    const container = document.getElementById('recaptcha-container'); if (!container || container.innerHTML) return; // Already rendered or missing
                     if (typeof grecaptcha !== 'undefined' && grecaptcha.render) {
                         // Render signin recaptcha
                         if (document.getElementById('signinRecaptcha')) {
