@@ -342,6 +342,7 @@
             background: rgba(13, 17, 23, 0.95) !important;
             backdrop-filter: blur(20px);
         }
+        
         .mobile-menu * {
             color: #ffffff !important;
             opacity: 1 !important;
@@ -4393,7 +4394,6 @@
 
             async initializeRecaptcha() {
                 try {
-                    const container = document.getElementById('recaptcha-container'); if (!container || container.innerHTML) return; // Already rendered or missing
                     if (typeof grecaptcha !== 'undefined' && grecaptcha.render) {
                         // Render signin recaptcha
                         if (document.getElementById('signinRecaptcha')) {
@@ -5144,32 +5144,27 @@
             const loader = document.getElementById('signinLoader');
             const btnText = document.getElementById('signinBtnText');
 
-            // Rate limiting
             const identifier = 'signin_' + form.email.value;
             if (!validationManager.checkRateLimit(identifier, 3, 900000)) {
                 showNotification('Too many login attempts. Please wait before trying again.', 'warning');
                 return;
             }
 
-            // Validate CSRF token
             if (!securityManager.validateCSRF(form.csrf_token.value)) {
                 showNotification('Security validation failed. Please refresh the page.', 'error');
                 return;
             }
 
-            // Validate form
             if (!validationManager.validateForm(form)) {
                 showNotification('Please fix the errors in the form.', 'error');
                 return;
             }
 
-            // Show loading state
             submitBtn.disabled = true;
             loader.classList.add('show');
             btnText.style.opacity = '0';
 
             try {
-                // Get reCAPTCHA token
                 let recaptchaToken = null;
                 if (typeof grecaptcha !== 'undefined') {
                     try {
@@ -5188,8 +5183,6 @@
                     loginData.recaptchaToken = recaptchaToken;
                 }
 
-                console.log('Logging in user:', loginData.email);
-
                 const response = await fetch('https://6qfa3ssb10.execute-api.us-east-1.amazonaws.com/prod/api/auth/login', {
                     method: 'POST',
                     headers: {
@@ -5205,7 +5198,6 @@
                     throw new Error(data.message || data.error || 'Login failed');
                 }
 
-                // Store auth tokens
                 if (data.data?.access_token) {
                     localStorage.setItem('auxeira_auth_token', data.data.access_token);
                 }
@@ -5213,7 +5205,6 @@
                     localStorage.setItem('auxeira_refresh_token', data.data.refresh_token);
                 }
 
-                // Store user data
                 const userData = {
                     id: data.data?.user?.id || data.userId,
                     email: data.data?.user?.email || loginData.email,
@@ -5231,7 +5222,6 @@
                     setTimeout(() => modal.classList.remove('show'), 1000);
                 }
 
-                // Redirect to appropriate dashboard
                 setTimeout(() => {
                     const dashboardMap = {
                         'startup_founder': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/startup_founder.html',
@@ -5239,8 +5229,7 @@
                         'venture_capital': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/venture_capital.html',
                         'angel_investor': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/angel_investor.html',
                         'government': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/government.html',
-                        'esg_funder': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/esg_funder.html',
-                        'impact_investor': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/impact_investor.html'
+                        'esg_funder': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/esg_funder.html'
                     };
                     window.location.href = dashboardMap[userData.userType] || 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/venture_capital.html';
                 }, 1500);
@@ -5341,7 +5330,7 @@
                             'angel_investor': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/angel_investor.html',
                             'government': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/government.html',
                             'esg_funder': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/esg_funder.html',
-                            'impact_investor': 'http://auxeira-dashboards-jsx-1759943238.s3-website-us-east-1.amazonaws.com/impact_investor.html'
+                            'impact_investor': '/dashboard/impact_investor.html'
                         };
                         window.location.href = dashboardMap[finalData.userType] || '/demo.html';
                     }, 1500);
@@ -5427,7 +5416,6 @@
             mobileMenu.classList.toggle('active');
             menuBtn.classList.toggle('active');
             
-            // Manage focus for accessibility
             if (mobileMenu.classList.contains('active')) {
                 const firstLink = mobileMenu.querySelector('a');
                 if (firstLink) firstLink.focus();
@@ -5441,7 +5429,6 @@
             
             if (!mobileMenu || !menuBtn) return;
             
-            // If menu is open and click is outside menu and button
             if (mobileMenu.classList.contains('active') && 
                 !mobileMenu.contains(event.target) && 
                 !menuBtn.contains(event.target)) {
@@ -5450,14 +5437,21 @@
             }
         });
         
-        // Close mobile menu when clicking any link
+        // Initialize mobile menu
         document.addEventListener('DOMContentLoaded', function() {
+            // Bind hamburger button click
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            if (menuBtn) {
+                menuBtn.addEventListener('click', toggleMobileMenu);
+            }
+            
+            // Close menu when clicking links
             const mobileMenu = document.getElementById('mobileMenu');
             if (mobileMenu) {
                 mobileMenu.querySelectorAll('a').forEach(link => {
                     link.addEventListener('click', function() {
                         mobileMenu.classList.remove('active');
-                        document.querySelector('.mobile-menu-btn').classList.remove('active');
+                        menuBtn.classList.remove('active');
                     });
                 });
             }
