@@ -1,0 +1,12 @@
+Find line with: .mobile-menu a {
+
+Replace with:
+        .mobile-menu a {
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: var(--transition-smooth);
+            font-size: 1rem;
+            font-weight: 500;
+        }

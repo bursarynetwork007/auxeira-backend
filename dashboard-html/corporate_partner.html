@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate Partner Dashboard - Auxeira</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <style>
+        body { margin: 0; background: #0f172a; min-height: 100vh; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module">
+        import { createElement } from 'https://esm.sh/react@18';
+        import { createRoot } from 'https://esm.sh/react-dom@18/client';
+        
+        const Dashboard = () => {
+            const metrics = { "partnerships": 12, "value": "$5.2M", "growth": "+67%" };
+            const metricEntries = Object.entries(metrics);
+            
+            return createElement('div', { className: 'min-h-screen bg-slate-900 text-white p-8' },
+                createElement('div', { className: 'max-w-7xl mx-auto' },
+                    createElement('h1', { className: 'text-4xl font-bold mb-8', style: { color: '#3b82f6' } }, '🚀 Corporate Partner Dashboard'),
+                    createElement('div', { className: 'bg-slate-800 rounded-lg p-6 mb-6' },
+                        createElement('h2', { className: 'text-2xl font-semibold mb-4' }, 'Welcome to Auxeira'),
+                        createElement('p', { className: 'text-gray-300' }, 'Your personalized dashboard is ready')
+                    ),
+                    createElement('div', { className: 'grid grid-cols-1 md:grid-cols-3 gap-6' },
+                        ...metricEntries.map(([key, value]) => 
+                            createElement('div', { className: 'bg-slate-800 rounded-lg p-6', key },
+                                createElement('h3', { className: 'text-lg font-semibold mb-2 capitalize' }, key),
+                                createElement('p', { className: 'text-3xl font-bold text-blue-400' }, value),
+                                createElement('p', { className: 'text-sm text-gray-400 mt-2' }, 'Live data')
+                            )
+                        )
+                    ),
+                    createElement('div', { className: 'mt-8 bg-blue-900/20 border border-blue-500/30 rounded-lg p-6' },
+                        createElement('p', { className: 'text-blue-200' }, '💡 Full interactive dashboard with charts and analytics is being deployed.')
+                    )
+                )
+            );
+        };
+        
+        const root = createRoot(document.getElementById('root'));
+        root.render(createElement(Dashboard));
+    </script>
+</body>
+</html>

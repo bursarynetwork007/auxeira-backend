@@ -1,0 +1,40 @@
+
+> auxeira-dashboards@1.0.0 build
+> vite build
+
+vite v5.4.20 building for production...
+transforming...
+✓ 10 modules transformed.
+x Build failed in 367ms
+error during build:
+[vite:esbuild] Transform failed with 2 errors:
+/workspaces/auxeira-backend/auxeira-dashboard-build/src/dashboards/FerrariVCDashboard.jsx:29:2: ERROR: The symbol "Radar" has already been declared
+/workspaces/auxeira-backend/auxeira-dashboard-build/src/dashboards/FerrariVCDashboard.jsx:712:55: ERROR: Expected identifier but found "1"
+file: /workspaces/auxeira-backend/auxeira-dashboard-build/src/dashboards/FerrariVCDashboard.jsx:29:2
+
+The symbol "Radar" has already been declared
+27 |    LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+28 |    AreaChart as RechartsAreaChart, Area, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, 
+29 |    Radar, BarChart, Bar, PieChart as RechartsPieChart, Cell, ScatterChart, Scatter as RechartsScatter,
+   |    ^
+30 |    ComposedChart, ReferenceLine, Treemap
+31 |  } from 'recharts'
+
+Expected identifier but found "1"
+710|                <option value="all">All Companies</option>
+711|                <option value="high_performers">High Performers (IRR >30%)</option>
+712|                <option value="at_risk">At Risk (Runway <18mo)</option>
+   |                                                         ^
+713|                <option value="strong_signals">Strong Buy Signals</option>
+714|                <option value="unicorn_potential">Unicorn Potential (>$10M)</option>
+
+    at failureErrorWithLog (/workspaces/auxeira-backend/auxeira-dashboard-build/node_modules/esbuild/lib/main.js:1472:15)
+    at /workspaces/auxeira-backend/auxeira-dashboard-build/node_modules/esbuild/lib/main.js:755:50
+    at responseCallbacks.<computed> (/workspaces/auxeira-backend/auxeira-dashboard-build/node_modules/esbuild/lib/main.js:622:9)
+    at handleIncomingPacket (/workspaces/auxeira-backend/auxeira-dashboard-build/node_modules/esbuild/lib/main.js:677:12)
+    at Socket.readFromStdout (/workspaces/auxeira-backend/auxeira-dashboard-build/node_modules/esbuild/lib/main.js:600:7)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)

@@ -1,0 +1,9 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = true
+[remote "origin"]
+	url = https://github.com/bursarynetwork007/auxeira-backend.git
+	tagOpt = --no-tags
+	fetch = +refs/*:refs/*
+	mirror = true

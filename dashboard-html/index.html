@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: white;
+        }
+        .loading { text-align: center; }
+        .loading-icon { font-size: 64px; margin-bottom: 20px; animation: pulse 2s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+    <div class="loading">
+        <div class="loading-icon">🚀</div>
+        <h1>Auxeira Dashboard</h1>
+        <p>Redirecting...</p>
+    </div>
+    <script>
+        const userType = localStorage.getItem('userType') || new URLSearchParams(window.location.search).get('userType') || 'venture_capital';
+        const dashboardMap = {
+            'startup_founder': '/startup_founder.html',
+            'venture_capital': '/venture_capital.html',
+            'angel_investor': '/angel_investor.html',
+            'corporate_partner': '/corporate_partner.html',
+            'government': '/government.html',
+            'esg_funder': '/esg_investor.html'
+        };
+        setTimeout(() => { window.location.href = dashboardMap[userType] || '/venture_capital.html'; }, 1000);
+    </script>
+</body>
+</html>
