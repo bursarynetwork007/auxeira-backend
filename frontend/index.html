@@ -4393,6 +4393,12 @@
             }
 
             async initializeRecaptcha() {
+                // Prevent duplicate initialization
+                if (this.recaptchaInitialized) {
+                    console.log('reCAPTCHA already initialized, skipping...');
+                    return;
+                }
+                
                 try {
                     // Wait for grecaptcha to be fully ready
                     if (typeof grecaptcha === 'undefined' || !grecaptcha.render) {
@@ -4400,6 +4406,9 @@
                         setTimeout(() => this.initializeRecaptcha(), 500);
                         return;
                     }
+                    
+                    // Mark as initialized before rendering
+                    this.recaptchaInitialized = true;
                     
                     if (typeof grecaptcha !== 'undefined' && grecaptcha.render) {
                         // Render signin recaptcha
