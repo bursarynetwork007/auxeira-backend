@@ -7,46 +7,365 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        body { margin: 0; background: #0f172a; min-height: 100vh; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        body { margin: 0; background: #030712; min-height: 100vh; color: white; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     </style>
 </head>
 <body>
-    <div id="root"></div>
-    <script type="module">
-        import { createElement } from 'https://esm.sh/react@18';
-        import { createRoot } from 'https://esm.sh/react-dom@18/client';
-        
-        const Dashboard = () => {
-            const metrics = { "partnerships": 12, "value": "$5.2M", "growth": "+67%" };
-            const metricEntries = Object.entries(metrics);
+    <div id="root">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+            <div style="text-align: center;">
+                <div style="width: 50px; height: 50px; border: 4px solid rgba(139,92,246,0.3); border-top-color: #8b5cf6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                <div>Loading Corporate Partner Dashboard...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        setTimeout(() => {
+            const { createElement: h, useState, useEffect } = React;
+            const { createRoot } = ReactDOM;
             
-            return createElement('div', { className: 'min-h-screen bg-slate-900 text-white p-8' },
-                createElement('div', { className: 'max-w-7xl mx-auto' },
-                    createElement('h1', { className: 'text-4xl font-bold mb-8', style: { color: '#3b82f6' } }, '🚀 Corporate Partner Dashboard'),
-                    createElement('div', { className: 'bg-slate-800 rounded-lg p-6 mb-6' },
-                        createElement('h2', { className: 'text-2xl font-semibold mb-4' }, 'Welcome to Auxeira'),
-                        createElement('p', { className: 'text-gray-300' }, 'Your personalized dashboard is ready')
-                    ),
-                    createElement('div', { className: 'grid grid-cols-1 md:grid-cols-3 gap-6' },
-                        ...metricEntries.map(([key, value]) => 
-                            createElement('div', { className: 'bg-slate-800 rounded-lg p-6', key },
-                                createElement('h3', { className: 'text-lg font-semibold mb-2 capitalize' }, key),
-                                createElement('p', { className: 'text-3xl font-bold text-blue-400' }, value),
-                                createElement('p', { className: 'text-sm text-gray-400 mt-2' }, 'Live data')
+            // Partner profile
+            const partnerProfile = {
+                name: 'Marcus Chen',
+                company: 'AWS Cloud Services',
+                title: 'VP Strategic Partnerships',
+                tier: 'executive',
+                shadowValue: 98000,
+                influence: 72,
+                rank: 7,
+                score: 28,
+                streak: 15,
+                monthlyFee: 1896
+            };
+            
+            // Ecosystem pulse data
+            const ecosystemPulse = {
+                totalSignals: 39,
+                signals: [
+                    { category: 'cloud', count: 14, odds: 87, urgency: 'high', avgDeal: 2400 },
+                    { category: 'payment', count: 8, odds: 92, urgency: 'medium', avgDeal: 1800 },
+                    { category: 'analytics', count: 12, odds: 78, urgency: 'high', avgDeal: 1200 },
+                    { category: 'ai', count: 5, odds: 95, urgency: 'critical', avgDeal: 5000 }
+                ]
+            };
+            
+            // Blind auctions
+            const blindAuctions = [
+                { id: 1, category: 'cloud', score: 82, time: '2h 15m', value: 3500, sse: 78 },
+                { id: 2, category: 'payment', score: 91, time: '1h 30m', value: 2200, sse: 85 },
+                { id: 3, category: 'ai', score: 96, time: '4h 45m', value: 8500, sse: 92 }
+            ];
+            
+            // Shadow value history
+            const shadowHistory = [
+                { time: '9:00', value: 95000 },
+                { time: '10:00', value: 96500 },
+                { time: '11:00', value: 97200 },
+                { time: '12:00', value: 98000 }
+            ];
+            
+            // Leaderboard
+            const leaderboard = [
+                { name: 'Alpha Architect', score: 42, tier: 'platinum' },
+                { name: 'Stripe Ventures', score: 38, tier: 'platinum' },
+                { name: 'Tech Angels', score: 31, tier: 'gold' },
+                { name: 'Anonymous', score: 30, tier: 'gold' },
+                { name: 'Anonymous', score: 29, tier: 'gold' }
+            ];
+            
+            const Dashboard = () => {
+                const [activeTab, setActiveTab] = useState('pulse');
+                const [shadowValue, setShadowValue] = useState(partnerProfile.shadowValue);
+                const [chartInitialized, setChartInitialized] = useState({});
+                const [approvedBids, setApprovedBids] = useState(new Set());
+                
+                useEffect(() => {
+                    // Initialize charts based on active tab
+                    if (activeTab === 'shadow' && !chartInitialized.shadow) {
+                        setTimeout(() => {
+                            const ctx = document.getElementById('shadowChart');
+                            if (ctx && typeof Chart !== 'undefined') {
+                                new Chart(ctx, {
+                                    type: 'line',
+                                    data: {
+                                        labels: shadowHistory.map(d => d.time),
+                                        datasets: [{
+                                            label: 'Shadow Value',
+                                            data: shadowHistory.map(d => d.value),
+                                            borderColor: '#f59e0b',
+                                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                            borderWidth: 3,
+                                            tension: 0.4,
+                                            fill: true
+                                        }]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: { legend: { labels: { color: '#9ca3af' } } },
+                                        scales: {
+                                            y: { ticks: { color: '#9ca3af' }, grid: { color: '#374151' } },
+                                            x: { ticks: { color: '#9ca3af' }, grid: { color: '#374151' } }
+                                        }
+                                    }
+                                });
+                                setChartInitialized(prev => ({ ...prev, shadow: true }));
+                            }
+                        }, 100);
+                    }
+                }, [activeTab]);
+                
+                // Simulate real-time shadow value updates
+                useEffect(() => {
+                    const interval = setInterval(() => {
+                        setShadowValue(prev => {
+                            const change = Math.random() > 0.6 ? Math.floor(Math.random() * 500) + 100 : 0;
+                            return prev + change;
+                        });
+                    }, 10000);
+                    return () => clearInterval(interval);
+                }, []);
+                
+                const tabs = [
+                    { id: 'pulse', label: 'Ecosystem Pulse', icon: '📡' },
+                    { id: 'auctions', label: 'Blind Auctions', icon: '🔒' },
+                    { id: 'shadow', label: 'Shadow Value', icon: '💰' },
+                    { id: 'mirror', label: 'Founder Mirror', icon: '🤝' },
+                    { id: 'leaderboard', label: 'Leaderboard', icon: '👑' }
+                ];
+                
+                const getUrgencyColor = (urgency) => {
+                    if (urgency === 'critical') return 'border-red-400 bg-red-900/20';
+                    if (urgency === 'high') return 'border-orange-400 bg-orange-900/20';
+                    return 'border-yellow-400 bg-yellow-900/20';
+                };
+                
+                return h('div', { className: 'min-h-screen bg-gray-950' },
+                    // Status Banner
+                    h('div', { className: 'bg-gradient-to-r from-blue-500 to-purple-500 text-white p-4 sticky top-0 z-50' },
+                        h('div', { className: 'max-w-7xl mx-auto flex items-center justify-between' },
+                            h('div', { className: 'flex items-center gap-3' },
+                                h('div', { className: 'w-2 h-2 bg-green-400 rounded-full animate-pulse' }),
+                                h('div', null,
+                                    h('strong', null, 'SILENT ENGINE ACTIVE: '),
+                                    `Shadow value: $${shadowValue.toLocaleString()} • Influence: ${partnerProfile.influence}% • Rank: #${partnerProfile.rank}`
+                                )
+                            ),
+                            h('div', { className: 'flex items-center gap-2' },
+                                h('div', { className: 'bg-green-400/20 px-3 py-1 rounded text-sm' }, 'Live'),
+                                h('div', { className: 'bg-yellow-500 text-black px-3 py-1 rounded text-sm font-bold' }, partnerProfile.tier.toUpperCase())
                             )
                         )
                     ),
-                    createElement('div', { className: 'mt-8 bg-blue-900/20 border border-blue-500/30 rounded-lg p-6' },
-                        createElement('p', { className: 'text-blue-200' }, '💡 Full interactive dashboard with charts and analytics is being deployed.')
+                    
+                    // Navigation
+                    h('div', { className: 'bg-gray-900 border-b border-gray-700 sticky top-16 z-40' },
+                        h('div', { className: 'max-w-7xl mx-auto px-4' },
+                            h('div', { className: 'flex items-center justify-between py-4' },
+                                h('div', { className: 'text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent', style: { backgroundClip: 'text', WebkitBackgroundClip: 'text' } }, 'AUXEIRA'),
+                                h('div', { className: 'flex gap-1' },
+                                    ...tabs.map(tab =>
+                                        h('button', {
+                                            key: tab.id,
+                                            onClick: () => setActiveTab(tab.id),
+                                            className: `flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+                                                activeTab === tab.id ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800'
+                                            }`
+                                        }, tab.icon, ' ', tab.label)
+                                    )
+                                ),
+                                h('div', { className: 'flex items-center gap-3' },
+                                    h('div', { className: 'bg-yellow-500 text-black px-3 py-1 rounded text-sm font-bold' }, `$${shadowValue.toLocaleString()}`),
+                                    h('div', { className: 'bg-purple-500 text-white px-3 py-1 rounded text-sm font-medium' }, `Rank #${partnerProfile.rank}`)
+                                )
+                            )
+                        )
+                    ),
+                    
+                    // Main Content
+                    h('div', { className: 'max-w-7xl mx-auto p-6' },
+                        // Welcome Header
+                        h('div', { className: 'mb-8' },
+                            h('h1', { className: 'text-3xl font-bold mb-2' }, `Welcome back, ${partnerProfile.name}`),
+                            h('p', { className: 'text-gray-400' },
+                                `${partnerProfile.company} • ${partnerProfile.title} • Silent Engine Active • $${partnerProfile.monthlyFee.toLocaleString()}/month`
+                            )
+                        ),
+                        
+                        // Ecosystem Pulse Tab
+                        activeTab === 'pulse' && h('div', { className: 'space-y-6' },
+                            h('div', { className: 'bg-gray-900/50 border border-purple-400/30 rounded-lg p-6' },
+                                h('h2', { className: 'text-2xl font-bold text-purple-400 mb-6 flex items-center gap-2' },
+                                    '📡 Ecosystem Pulse',
+                                    h('span', { className: 'text-sm bg-purple-500/20 px-3 py-1 rounded animate-pulse' }, `${ecosystemPulse.totalSignals} Signals`)
+                                ),
+                                h('div', { className: 'grid grid-cols-1 md:grid-cols-2 gap-4' },
+                                    ...ecosystemPulse.signals.map(signal =>
+                                        h('div', {
+                                            key: signal.category,
+                                            className: `p-4 rounded-lg border-2 ${getUrgencyColor(signal.urgency)}`
+                                        },
+                                            h('div', { className: 'flex items-center justify-between mb-3' },
+                                                h('h4', { className: 'font-semibold capitalize text-lg' }, signal.category),
+                                                h('div', { className: 'bg-blue-500/20 px-3 py-1 rounded text-sm font-bold' }, `${signal.count} signals`)
+                                            ),
+                                            h('div', { className: 'space-y-2' },
+                                                h('div', { className: 'flex justify-between text-sm' },
+                                                    h('span', { className: 'text-gray-400' }, 'Conversion Rate:'),
+                                                    h('span', { className: 'font-bold text-green-400' }, `${signal.odds}%`)
+                                                ),
+                                                h('div', { className: 'relative h-2 bg-gray-700 rounded-full overflow-hidden' },
+                                                    h('div', {
+                                                        className: 'absolute h-full bg-green-500 transition-all',
+                                                        style: { width: `${signal.odds}%` }
+                                                    })
+                                                ),
+                                                h('div', { className: 'text-xs text-gray-400' }, `Avg Deal: $${signal.avgDeal}`)
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        
+                        // Blind Auctions Tab
+                        activeTab === 'auctions' && h('div', { className: 'space-y-6' },
+                            h('div', { className: 'bg-gray-900/50 border border-blue-400/30 rounded-lg p-6' },
+                                h('h2', { className: 'text-2xl font-bold text-blue-400 mb-6 flex items-center gap-2' },
+                                    '🔒 Blind Auction Engine',
+                                    h('span', { className: 'text-sm bg-blue-500/20 px-3 py-1 rounded' }, `${blindAuctions.length} Active`)
+                                ),
+                                h('div', { className: 'space-y-4' },
+                                    ...blindAuctions.map(auction => {
+                                        const isApproved = approvedBids.has(auction.id);
+                                        return h('div', {
+                                            key: auction.id,
+                                            className: `p-4 rounded-lg border-2 ${isApproved ? 'border-green-400 bg-green-900/20' : 'border-gray-600 bg-gray-800/30'}`
+                                        },
+                                            h('div', { className: 'flex items-center justify-between mb-3' },
+                                                h('div', { className: 'flex items-center gap-3' },
+                                                    h('div', { className: 'w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-2xl' }, '🎯'),
+                                                    h('div', null,
+                                                        h('h4', { className: 'font-semibold capitalize text-lg' }, auction.category),
+                                                        h('p', { className: 'text-sm text-gray-400' }, 'Encrypted startup identity')
+                                                    )
+                                                ),
+                                                h('div', { className: 'text-right' },
+                                                    h('div', { className: 'text-2xl font-bold text-blue-400' }, auction.score),
+                                                    h('div', { className: 'text-xs text-gray-400' }, 'Match Score')
+                                                )
+                                            ),
+                                            h('div', { className: 'grid grid-cols-2 gap-4 mb-3' },
+                                                h('div', { className: 'text-sm' },
+                                                    h('span', { className: 'text-gray-400' }, 'Value: '),
+                                                    h('span', { className: 'font-bold text-green-400' }, `$${auction.value.toLocaleString()}`)
+                                                ),
+                                                h('div', { className: 'text-sm' },
+                                                    h('span', { className: 'text-gray-400' }, 'SSE: '),
+                                                    h('span', { className: 'font-bold text-purple-400' }, `${auction.sse}/100`)
+                                                )
+                                            ),
+                                            h('div', { className: 'flex items-center justify-between' },
+                                                h('div', { className: 'text-sm text-gray-400' }, `⏱️ ${auction.time} remaining`),
+                                                isApproved ? 
+                                                    h('div', { className: 'bg-green-500/20 text-green-400 px-3 py-1 rounded text-sm' }, '✓ Approved') :
+                                                    h('button', {
+                                                        onClick: () => setApprovedBids(prev => new Set([...prev, auction.id])),
+                                                        className: 'bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-medium transition'
+                                                    }, '✓ Approve Bid')
+                                            )
+                                        );
+                                    })
+                                )
+                            )
+                        ),
+                        
+                        // Shadow Value Tab
+                        activeTab === 'shadow' && h('div', { className: 'space-y-6' },
+                            h('div', { className: 'bg-gradient-to-br from-gray-900 to-black border border-yellow-400/30 rounded-lg p-6' },
+                                h('h2', { className: 'text-2xl font-bold text-yellow-400 mb-6' }, '💰 Silent Shareholder Mode'),
+                                h('div', { className: 'text-center mb-6' },
+                                    h('div', { className: 'text-5xl font-bold text-yellow-400 mb-2 font-mono' }, `$${shadowValue.toLocaleString()}`),
+                                    h('div', { className: 'text-gray-400 text-sm' }, 'Unrealized paper gains'),
+                                    h('div', { className: 'text-green-400 text-lg font-semibold mt-1' }, `${(shadowValue / (partnerProfile.monthlyFee * 6)).toFixed(1)}× ROI Multiple`)
+                                ),
+                                h('div', { style: { height: '200px' } },
+                                    h('canvas', { id: 'shadowChart' })
+                                ),
+                                h('div', { className: 'grid grid-cols-2 md:grid-cols-4 gap-4 mt-6' },
+                                    [
+                                        { label: 'Conversion', value: '87%', color: 'blue' },
+                                        { label: 'Saves', value: '8', color: 'green' },
+                                        { label: 'Streak', value: partnerProfile.streak, color: 'orange' },
+                                        { label: 'ROI', value: '5.2×', color: 'purple' }
+                                    ].map((metric, i) =>
+                                        h('div', { key: i, className: `text-center p-3 bg-${metric.color}-900/20 rounded-lg border border-${metric.color}-400/20` },
+                                            h('div', { className: `text-xl font-bold text-${metric.color}-400` }, metric.value),
+                                            h('div', { className: 'text-xs text-gray-400' }, metric.label)
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        
+                        // Founder Mirror Tab
+                        activeTab === 'mirror' && h('div', { className: 'bg-gray-900/50 border border-green-400/30 rounded-lg p-6' },
+                            h('h2', { className: 'text-2xl font-bold text-green-400 mb-6' }, '🤝 Founder Mirror Feed'),
+                            h('p', { className: 'text-gray-400 text-center py-8' }, 'Real-time founder requests and needs will appear here')
+                        ),
+                        
+                        // Leaderboard Tab
+                        activeTab === 'leaderboard' && h('div', { className: 'bg-gray-900/50 border border-orange-400/30 rounded-lg p-6' },
+                            h('h2', { className: 'text-2xl font-bold text-orange-400 mb-6' }, '👑 Ghost Leaderboard'),
+                            h('div', { className: 'space-y-3' },
+                                ...leaderboard.map((partner, i) =>
+                                    h('div', { key: i, className: 'flex items-center justify-between p-3 bg-gray-800 rounded-lg' },
+                                        h('div', { className: 'flex items-center gap-3' },
+                                            h('div', { 
+                                                className: `w-8 h-8 rounded-full flex items-center justify-center ${i < 3 ? 'bg-yellow-500 text-black' : 'bg-gray-600 text-white'} font-bold`
+                                            }, i + 1),
+                                            h('div', null,
+                                                h('div', { className: 'font-semibold' }, partner.name),
+                                                h('div', { className: 'text-xs text-gray-400 uppercase' }, partner.tier)
+                                            )
+                                        ),
+                                        h('div', { className: 'text-right' },
+                                            h('div', { className: 'font-bold text-orange-400' }, partner.score),
+                                            h('div', { className: 'text-xs text-gray-400' }, 'points')
+                                        )
+                                    )
+                                ),
+                                h('div', { className: 'border-t border-gray-600 pt-3' },
+                                    h('div', { className: 'flex items-center justify-between p-3 bg-orange-900/20 rounded-lg' },
+                                        h('div', { className: 'flex items-center gap-3' },
+                                            h('div', { className: 'w-8 h-8 rounded-full bg-orange-500 text-black flex items-center justify-center font-bold' }, partnerProfile.rank),
+                                            h('div', null,
+                                                h('div', { className: 'font-semibold text-orange-400' }, 'You'),
+                                                h('div', { className: 'text-xs text-gray-400 uppercase' }, partnerProfile.tier)
+                                            )
+                                        ),
+                                        h('div', { className: 'text-right' },
+                                            h('div', { className: 'font-bold text-orange-400' }, partnerProfile.score),
+                                            h('div', { className: 'text-xs text-gray-400' }, 'points')
+                                        )
+                                    )
+                                )
+                            )
+                        )
                     )
-                )
-            );
-        };
-        
-        const root = createRoot(document.getElementById('root'));
-        root.render(createElement(Dashboard));
+                );
+            };
+            
+            const root = createRoot(document.getElementById('root'));
+            root.render(h(Dashboard));
+            console.log('✅ Corporate Partner Dashboard loaded!');
+        }, 1000);
     </script>
 </body>
 </html>

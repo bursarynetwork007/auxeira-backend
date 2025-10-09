@@ -1,0 +1,52 @@
+{
+  "timestamp": "2025-10-09T17:35:36.325Z",
+  "message": "Dashboard files have been moved. Please update references accordingly.",
+  "locations": [
+    {
+      "type": "startup",
+      "oldPath": "/workspaces/auxeira-backend/dashboard/startup.html",
+      "newPath": "/workspaces/auxeira-backend/dashboard/startup.html"
+    },
+    {
+      "type": "vc",
+      "oldPath": "/workspaces/auxeira-backend/dashboard/vc.html",
+      "newPath": "/workspaces/auxeira-backend/dashboard/vc.html"
+    },
+    {
+      "type": "angel_investor",
+      "oldPath": "/workspaces/auxeira-backend/dashboard/angel_investor.html",
+      "newPath": "/workspaces/auxeira-backend/dashboard/angel_investor.html"
+    },
+    {
+      "type": "corporate_partner",
+      "oldPath": "/workspaces/auxeira-backend/dashboard/corporate_partner.html",
+      "newPath": "/workspaces/auxeira-backend/dashboard/corporate_partner.html"
+    },
+    {
+      "type": "government",
+      "oldPath": "/workspaces/auxeira-backend/dashboard/government.html",
+      "newPath": "/workspaces/auxeira-backend/dashboard/government.html"
+    },
+    {
+      "type": "esg_education",
+      "oldPath": "/workspaces/auxeira-backend/dashboard/esg_education.html",
+      "newPath": "/workspaces/auxeira-backend/dashboard/esg_education.html"
+    },
+    {
+      "type": "esg_index",
+      "oldPath": "/workspaces/auxeira-backend/dashboard/esg_index.html",
+      "newPath": "/workspaces/auxeira-backend/dashboard/esg_index.html"
+    }
+  ],
+  "actions": [
+    "Use API endpoints to dynamically locate files",
+    "Run migration script to update database",
+    "Update any hardcoded file paths"
+  ],
+  "apiEndpoints": {
+    "listLocations": "GET /api/dashboard/locations",
+    "getLocation": "GET /api/dashboard/locations/:type",
+    "updateLocation": "POST /api/dashboard/locations/:type",
+    "scanLocation": "POST /api/dashboard/locations/:type/scan"
+  }
+}

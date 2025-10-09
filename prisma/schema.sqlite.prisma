@@ -1,0 +1,82 @@
+// SQLite schema for development
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model DashboardLocation {
+  id                String   @id @default(cuid())
+  dashboardType     String   @unique
+  originalPath      String
+  currentPath       String
+  s3Bucket          String?
+  cloudFrontUrl     String?
+  isActive          Boolean  @default(true)
+  lastAccessed      DateTime @default(now())
+  movedAt           DateTime @default(now())
+  notes             String?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([dashboardType])
+  @@index([isActive])
+}
+
+model MarketIntelligence {
+  id                String   @id @default(cuid())
+  sector            String   @unique
+  growth            Float
+  funding           Float
+  dealCount         Int
+  avgValuation      Float
+  momentum          String
+  hotKeywords       String   // Store as comma-separated string
+  emergingTrends    String   // Store as comma-separated string  
+  riskFactors       String   // Store as comma-separated string
+  lastUpdate        DateTime @default(now())
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([sector])
+  @@index([growth])
+}
+
+model DataUpdateSchedule {
+  id                String   @id @default(cuid())
+  entityType        String
+  entityId          String
+  metric            String
+  updateFrequency   String
+  lastUpdate        DateTime @default(now())
+  nextUpdate        DateTime
+  isActive          Boolean  @default(true)
+  retryCount        Int      @default(0)
+  lastError         String?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([entityType, entityId, metric])
+  @@index([nextUpdate, isActive])
+}
+
+model DataAuditLog {
+  id                String   @id @default(cuid())
+  entityType        String
+  entityId          String
+  field             String
+  oldValue          String?
+  newValue          String?
+  changeReason      String?
+  changedBy         String?
+  timestamp         DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([timestamp])
+}

@@ -1,0 +1,28 @@
+
+Add these scripts to your package.json:
+
+{
+  "scripts": {
+    "seed:dashboard": "ts-node scripts/seed-dashboard-data.ts",
+    "update:dashboard": "ts-node scripts/update-dashboard-data.ts",
+    "update:dashboard:hourly": "ts-node scripts/update-dashboard-data.ts --frequency=hourly",
+    "update:dashboard:daily": "ts-node scripts/update-dashboard-data.ts --frequency=daily",
+    "update:dashboard:weekly": "ts-node scripts/update-dashboard-data.ts --frequency=weekly",
+    "update:dashboard:monthly": "ts-node scripts/update-dashboard-data.ts --frequency=monthly",
+    "backup:audit-logs": "ts-node scripts/backup-audit-logs.ts"
+  }
+}
+
+Add these scripts to your package.json:
+
+{
+  "scripts": {
+    "seed:dashboard": "ts-node scripts/seed-dashboard-data.ts",
+    "update:dashboard": "ts-node scripts/update-dashboard-data.ts",
+    "update:dashboard:hourly": "ts-node scripts/update-dashboard-data.ts --frequency=hourly",
+    "update:dashboard:daily": "ts-node scripts/update-dashboard-data.ts --frequency=daily",
+    "update:dashboard:weekly": "ts-node scripts/update-dashboard-data.ts --frequency=weekly",
+    "update:dashboard:monthly": "ts-node scripts/update-dashboard-data.ts --frequency=monthly",
+    "backup:audit-logs": "ts-node scripts/backup-audit-logs.ts"
+  }
+}

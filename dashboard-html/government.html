@@ -3,50 +3,324 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Government Dashboard - Auxeira</title>
+    <title>Government Agency Dashboard - Auxeira</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        body { margin: 0; background: #0f172a; min-height: 100vh; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        body { margin: 0; background: #030712; min-height: 100vh; color: white; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     </style>
 </head>
 <body>
-    <div id="root"></div>
-    <script type="module">
-        import { createElement } from 'https://esm.sh/react@18';
-        import { createRoot } from 'https://esm.sh/react-dom@18/client';
-        
-        const Dashboard = () => {
-            const metrics = { "programs": 23, "funding": "$15M", "jobs": "1,200" };
-            const metricEntries = Object.entries(metrics);
+    <div id="root">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+            <div style="text-align: center;">
+                <div style="width: 50px; height: 50px; border: 4px solid rgba(59,130,246,0.3); border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                <div>Loading Government Dashboard...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        setTimeout(() => {
+            const { createElement: h, useState } = React;
+            const { createRoot } = ReactDOM;
             
-            return createElement('div', { className: 'min-h-screen bg-slate-900 text-white p-8' },
-                createElement('div', { className: 'max-w-7xl mx-auto' },
-                    createElement('h1', { className: 'text-4xl font-bold mb-8', style: { color: '#3b82f6' } }, '🚀 Government Dashboard'),
-                    createElement('div', { className: 'bg-slate-800 rounded-lg p-6 mb-6' },
-                        createElement('h2', { className: 'text-2xl font-semibold mb-4' }, 'Welcome to Auxeira'),
-                        createElement('p', { className: 'text-gray-300' }, 'Your personalized dashboard is ready')
+            // Government profile
+            const govProfile = {
+                name: 'Dr. Adaora Okafor',
+                title: 'Director of Innovation & Economic Development',
+                agency: 'Federal Ministry of Industry, Trade & Investment',
+                economicROI: 2.4,
+                jobsCreated: 45680,
+                taxROI: 0.36,
+                compliance: 94,
+                activePrograms: 28,
+                startupsSupported: 1247,
+                budgetAllocated: 2500000000,
+                economicImpact: 4800000000
+            };
+            
+            // Programs
+            const programs = [
+                { name: 'Nigeria Startup Support', sector: 'Multi-Sector', roi: 2.4, compliance: 96, jobs: 12500, startups: 285, budget: 500000000, impact: 1200000000, status: 'Exceeding' },
+                { name: 'AgriTech Hub', sector: 'Agriculture', roi: 3.4, compliance: 92, jobs: 8500, startups: 125, budget: 200000000, impact: 680000000, status: 'Strong' },
+                { name: 'FinTech Sandbox', sector: 'Finance', roi: 3.0, compliance: 98, jobs: 6200, startups: 85, budget: 150000000, impact: 450000000, status: 'Leader' },
+                { name: 'Women Entrepreneurs', sector: 'Gender Equity', roi: 2.8, compliance: 89, jobs: 5500, startups: 180, budget: 100000000, impact: 280000000, status: 'Champion' }
+            ];
+            
+            // Policy opportunities
+            const policyOpps = [
+                { name: 'Digital Nigeria 2030', sector: 'Digital Infrastructure', budget: 1000000000, gov: 300000000, impact: 2500000000, jobs: 25000, match: 96, stage: 'Development' },
+                { name: 'Green Economy Fund', sector: 'Sustainability', budget: 750000000, gov: 200000000, impact: 1800000000, jobs: 18000, match: 92, stage: 'Consultation' },
+                { name: 'Healthcare Innovation', sector: 'Health Tech', budget: 400000000, gov: 150000000, impact: 950000000, jobs: 12000, match: 89, stage: 'Pilot' }
+            ];
+            
+            const Dashboard = () => {
+                const [activeTab, setActiveTab] = useState('overview');
+                
+                const tabs = [
+                    { id: 'overview', label: 'Economic Overview', icon: '📊' },
+                    { id: 'programs', label: 'Government Programs', icon: '🏛️' },
+                    { id: 'opportunities', label: 'Policy Opportunities', icon: '🔍' },
+                    { id: 'reports', label: 'Reports', icon: '📄' }
+                ];
+                
+                const getStatusColor = (status) => {
+                    if (status === 'Exceeding') return 'border-green-400 bg-green-900/20';
+                    if (status === 'Strong') return 'border-blue-400 bg-blue-900/20';
+                    if (status === 'Leader') return 'border-purple-400 bg-purple-900/20';
+                    return 'border-yellow-400 bg-yellow-900/20';
+                };
+                
+                return h('div', { className: 'min-h-screen bg-gray-950' },
+                    // Banner
+                    h('div', { className: 'bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 sticky top-0 z-50' },
+                        h('div', { className: 'max-w-7xl mx-auto flex items-center justify-between' },
+                            h('div', { className: 'flex items-center gap-3' },
+                                h('span', { className: 'text-2xl' }, '🏛️'),
+                                h('div', null,
+                                    h('strong', null, 'GOVERNMENT INTELLIGENCE: '),
+                                    `Economic ROI: ${govProfile.economicROI}× • Jobs: ${(govProfile.jobsCreated / 1000).toFixed(0)}K • Tax ROI: ${(govProfile.taxROI * 100).toFixed(0)}¢/$1`
+                                )
+                            ),
+                            h('div', { className: 'bg-green-400/20 px-3 py-1 rounded text-sm animate-pulse' }, 'Live Economic Analytics')
+                        )
                     ),
-                    createElement('div', { className: 'grid grid-cols-1 md:grid-cols-3 gap-6' },
-                        ...metricEntries.map(([key, value]) => 
-                            createElement('div', { className: 'bg-slate-800 rounded-lg p-6', key },
-                                createElement('h3', { className: 'text-lg font-semibold mb-2 capitalize' }, key),
-                                createElement('p', { className: 'text-3xl font-bold text-blue-400' }, value),
-                                createElement('p', { className: 'text-sm text-gray-400 mt-2' }, 'Live data')
+                    
+                    // Navigation
+                    h('div', { className: 'bg-gray-900 border-b border-gray-700 sticky top-16 z-40' },
+                        h('div', { className: 'max-w-7xl mx-auto px-4' },
+                            h('div', { className: 'flex items-center justify-between py-4' },
+                                h('div', { className: 'text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent', style: { backgroundClip: 'text', WebkitBackgroundClip: 'text' } }, 'AUXEIRA GOVERNMENT'),
+                                h('div', { className: 'flex gap-1' },
+                                    ...tabs.map(tab =>
+                                        h('button', {
+                                            key: tab.id,
+                                            onClick: () => setActiveTab(tab.id),
+                                            className: `flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+                                                activeTab === tab.id ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800'
+                                            }`
+                                        }, tab.icon, ' ', tab.label)
+                                    )
+                                ),
+                                h('div', { className: 'flex items-center gap-3' },
+                                    h('div', { className: 'bg-blue-500 text-white px-3 py-1 rounded text-sm font-medium' }, `ROI: ${govProfile.economicROI}×`),
+                                    h('div', { className: 'bg-green-500 text-white px-3 py-1 rounded text-sm font-medium' }, `Jobs: ${(govProfile.jobsCreated / 1000).toFixed(0)}K`),
+                                    h('div', { className: 'bg-purple-500 text-white px-3 py-1 rounded text-sm font-medium' }, `${govProfile.compliance}% Compliance`)
+                                )
                             )
                         )
                     ),
-                    createElement('div', { className: 'mt-8 bg-blue-900/20 border border-blue-500/30 rounded-lg p-6' },
-                        createElement('p', { className: 'text-blue-200' }, '💡 Full interactive dashboard with charts and analytics is being deployed.')
+                    
+                    // Main Content
+                    h('div', { className: 'max-w-7xl mx-auto p-6' },
+                        // Header
+                        h('div', { className: 'mb-8' },
+                            h('h1', { className: 'text-3xl font-bold mb-2' }, `Welcome back, ${govProfile.name}`),
+                            h('p', { className: 'text-gray-400' },
+                                `${govProfile.title} • ${govProfile.agency} • $${(govProfile.budgetAllocated / 1000000000).toFixed(1)}B Budget • ${govProfile.activePrograms} Programs • ${govProfile.jobsCreated.toLocaleString()} Jobs Created`
+                            )
+                        ),
+                        
+                        // Overview Tab
+                        activeTab === 'overview' && h('div', { className: 'space-y-6' },
+                            // Profile Completion
+                            h('div', { className: 'bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-6' },
+                                h('div', { className: 'flex items-center justify-between mb-4' },
+                                    h('h3', { className: 'font-bold text-lg' }, 'Complete Your Government Policy Profile'),
+                                    h('div', { className: 'bg-white/20 px-3 py-1 rounded font-bold' }, '78%')
+                                ),
+                                h('div', { className: 'relative h-3 bg-white/20 rounded-full mb-4 overflow-hidden' },
+                                    h('div', { className: 'absolute h-full bg-white rounded-full', style: { width: '78%' } })
+                                ),
+                                h('p', { className: 'text-sm mb-4' }, 'Unlock personalized policy recommendations and economic impact forecasting'),
+                                h('button', { className: 'w-full bg-white text-blue-600 py-2 rounded font-medium hover:bg-gray-100' }, '➕ Complete Profile')
+                            ),
+                            
+                            // Premium Teaser
+                            h('div', { className: 'bg-gradient-to-br from-blue-600 to-purple-600 text-white rounded-lg p-8 text-center' },
+                                h('div', { className: 'text-5xl mb-4' }, '🏛️'),
+                                h('h3', { className: 'text-2xl font-bold mb-4' }, 'Your programs created 45,680 jobs... but are you maximizing economic impact?'),
+                                h('p', { className: 'text-lg mb-6 opacity-90' }, 'Unlock Premium for $2,499/month for advanced economic modeling and policy analytics'),
+                                h('button', { className: 'bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-medium hover:bg-gray-100' }, '💳 Unlock Premium')
+                            ),
+                            
+                            // Impact Metrics
+                            h('div', { className: 'grid grid-cols-2 md:grid-cols-3 gap-4' },
+                                [
+                                    { label: 'Economic ROI', value: `${govProfile.economicROI}×`, icon: '📈', color: 'blue' },
+                                    { label: 'Jobs Created', value: `${(govProfile.jobsCreated / 1000).toFixed(0)}K`, icon: '👥', color: 'green' },
+                                    { label: 'Tax ROI', value: `${(govProfile.taxROI * 100).toFixed(0)}¢/$1`, icon: '💰', color: 'purple' },
+                                    { label: 'Compliance', value: `${govProfile.compliance}%`, icon: '✓', color: 'indigo' },
+                                    { label: 'Startups', value: govProfile.startupsSupported.toLocaleString(), icon: '🚀', color: 'pink' },
+                                    { label: 'Programs', value: govProfile.activePrograms, icon: '��', color: 'orange' }
+                                ].map((metric, i) =>
+                                    h('div', { key: i, className: `bg-gray-900/50 border border-${metric.color}-400/30 rounded-lg p-4` },
+                                        h('div', { className: 'text-2xl mb-2' }, metric.icon),
+                                        h('div', { className: `text-2xl font-bold text-${metric.color}-400 mb-1` }, metric.value),
+                                        h('div', { className: 'text-sm text-gray-400' }, metric.label)
+                                    )
+                                )
+                            ),
+                            
+                            // Policy Priorities
+                            h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
+                                h('h3', { className: 'text-xl font-bold text-white mb-4' }, '🎯 Policy Priority Areas'),
+                                h('div', { className: 'grid grid-cols-2 md:grid-cols-4 gap-4' },
+                                    [
+                                        { name: 'Job Creation', icon: '👥', priority: 'High' },
+                                        { name: 'Export Growth', icon: '🌍', priority: 'High' },
+                                        { name: 'Tech Transfer', icon: '🔬', priority: 'Medium' },
+                                        { name: 'SME Development', icon: '🏢', priority: 'High' },
+                                        { name: 'Innovation Hubs', icon: '💡', priority: 'Medium' },
+                                        { name: 'Regulatory Reform', icon: '⚖️', priority: 'High' },
+                                        { name: 'Digital Transform', icon: '💻', priority: 'High' },
+                                        { name: 'Sustainability', icon: '🌱', priority: 'Medium' }
+                                    ].map((area, i) =>
+                                        h('div', { key: i, className: 'p-4 border-2 border-blue-400 bg-blue-900/20 rounded-lg text-center' },
+                                            h('div', { className: 'text-2xl mb-2' }, area.icon),
+                                            h('div', { className: 'text-xs font-semibold mb-1' }, area.name),
+                                            h('div', { className: `text-xs px-2 py-1 rounded ${area.priority === 'High' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}` }, area.priority)
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        
+                        // Programs Tab
+                        activeTab === 'programs' && h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
+                            h('h2', { className: 'text-2xl font-bold text-white mb-6' }, `🏛️ Government Programs (${programs.length})`),
+                            h('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-6' },
+                                ...programs.map(program =>
+                                    h('div', { key: program.name, className: `${getStatusColor(program.status)} border-2 rounded-lg p-6` },
+                                        h('div', { className: 'flex items-center justify-between mb-4' },
+                                            h('div', null,
+                                                h('h4', { className: 'font-semibold text-white text-lg' }, program.name),
+                                                h('p', { className: 'text-sm text-gray-400' }, program.sector)
+                                            ),
+                                            h('div', { className: 'text-xs px-2 py-1 rounded bg-gray-700' }, program.status)
+                                        ),
+                                        h('div', { className: 'grid grid-cols-4 gap-2 mb-4' },
+                                            h('div', null,
+                                                h('div', { className: 'text-lg font-bold text-green-400' }, `${program.roi.toFixed(1)}×`),
+                                                h('div', { className: 'text-xs text-gray-400' }, 'ROI')
+                                            ),
+                                            h('div', null,
+                                                h('div', { className: 'text-lg font-bold text-blue-400' }, `${program.compliance}%`),
+                                                h('div', { className: 'text-xs text-gray-400' }, 'Compliance')
+                                            ),
+                                            h('div', null,
+                                                h('div', { className: 'text-lg font-bold text-purple-400' }, `${(program.jobs / 1000).toFixed(1)}K`),
+                                                h('div', { className: 'text-xs text-gray-400' }, 'Jobs')
+                                            ),
+                                            h('div', null,
+                                                h('div', { className: 'text-lg font-bold text-yellow-400' }, program.startups),
+                                                h('div', { className: 'text-xs text-gray-400' }, 'Startups')
+                                            )
+                                        ),
+                                        h('div', { className: 'grid grid-cols-2 gap-2 text-xs' },
+                                            h('div', { className: 'flex justify-between' },
+                                                h('span', { className: 'text-gray-400' }, 'Budget:'),
+                                                h('span', { className: 'text-green-400 font-semibold' }, `$${(program.budget / 1000000).toFixed(0)}M`)
+                                            ),
+                                            h('div', { className: 'flex justify-between' },
+                                                h('span', { className: 'text-gray-400' }, 'Impact:'),
+                                                h('span', { className: 'text-blue-400 font-semibold' }, `$${(program.impact / 1000000).toFixed(0)}M`)
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        
+                        // Opportunities Tab
+                        activeTab === 'opportunities' && h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
+                            h('h2', { className: 'text-2xl font-bold text-white mb-6 flex items-center gap-2' },
+                                '🔍 Policy Opportunities',
+                                h('span', { className: 'text-sm bg-purple-500/20 px-3 py-1 rounded' }, 'High Impact')
+                            ),
+                            h('div', { className: 'space-y-6' },
+                                ...policyOpps.map(opp =>
+                                    h('div', { key: opp.name, className: 'bg-gray-800/50 border border-gray-600 rounded-lg p-6' },
+                                        h('div', { className: 'flex items-start justify-between mb-4' },
+                                            h('div', null,
+                                                h('h4', { className: 'font-semibold text-white text-lg' }, opp.name),
+                                                h('p', { className: 'text-gray-400' }, `${opp.sector} • ${opp.stage}`)
+                                            ),
+                                            h('div', { className: `${opp.match >= 90 ? 'text-green-400 bg-green-900/20' : 'text-blue-400 bg-blue-900/20'} font-bold text-lg px-3 py-1 rounded` }, `${opp.match}% Match`)
+                                        ),
+                                        h('div', { className: 'grid grid-cols-4 gap-4 mb-4' },
+                                            h('div', null,
+                                                h('div', { className: 'text-sm text-gray-400' }, 'Total Budget'),
+                                                h('div', { className: 'font-semibold text-white' }, `$${(opp.budget / 1000000).toFixed(0)}M`)
+                                            ),
+                                            h('div', null,
+                                                h('div', { className: 'text-sm text-gray-400' }, 'Gov Share'),
+                                                h('div', { className: 'font-semibold text-green-400' }, `$${(opp.gov / 1000000).toFixed(0)}M`)
+                                            ),
+                                            h('div', null,
+                                                h('div', { className: 'text-sm text-gray-400' }, 'Impact'),
+                                                h('div', { className: 'font-semibold text-blue-400' }, `$${(opp.impact / 1000000).toFixed(1)}B`)
+                                            ),
+                                            h('div', null,
+                                                h('div', { className: 'text-sm text-gray-400' }, 'Jobs Target'),
+                                                h('div', { className: 'font-semibold text-purple-400' }, opp.jobs.toLocaleString())
+                                            )
+                                        ),
+                                        h('div', { className: 'flex gap-2' },
+                                            h('button', { className: 'flex-1 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded font-medium transition' }, '📄 Policy Brief'),
+                                            h('button', { className: 'flex-1 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-medium transition' }, '🤝 Engage Stakeholders')
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        
+                        // Reports Tab
+                        activeTab === 'reports' && h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
+                            h('div', { className: 'text-center mb-6' },
+                                h('div', { className: 'text-6xl mb-4' }, '📄'),
+                                h('h3', { className: 'text-2xl font-bold text-white mb-2' }, 'Generate Government Impact Reports'),
+                                h('p', { className: 'text-gray-400' }, 'Create comprehensive economic impact reports for parliament and stakeholders')
+                            ),
+                            h('div', { className: 'grid grid-cols-2 gap-4 mb-6' },
+                                h('div', { className: 'p-4 bg-blue-900/20 border border-blue-400/30 rounded-lg' },
+                                    h('h4', { className: 'font-semibold text-white mb-2' }, 'Standard Report'),
+                                    h('div', { className: 'text-2xl font-bold text-blue-400 mb-2' }, '$999'),
+                                    h('ul', { className: 'text-sm text-gray-300 space-y-1' },
+                                        h('li', null, '• Executive Summary'),
+                                        h('li', null, '• Job Creation Analysis'),
+                                        h('li', null, '• Economic Metrics')
+                                    )
+                                ),
+                                h('div', { className: 'p-4 bg-purple-900/20 border border-purple-400/30 rounded-lg' },
+                                    h('h4', { className: 'font-semibold text-white mb-2' }, 'Premium Report'),
+                                    h('div', { className: 'text-2xl font-bold text-purple-400 mb-2' }, '$1,999'),
+                                    h('ul', { className: 'text-sm text-gray-300 space-y-1' },
+                                        h('li', null, '• Complete Policy Analysis'),
+                                        h('li', null, '• Tax Revenue Impact'),
+                                        h('li', null, '• Compliance Audit')
+                                    )
+                                )
+                            ),
+                            h('div', { className: 'space-y-3' },
+                                h('button', { className: 'w-full bg-gradient-to-r from-blue-600 to-purple-600 py-3 rounded-lg font-medium hover:opacity-90' }, '⬇️ Generate Standard Report - $999'),
+                                h('button', { className: 'w-full bg-gradient-to-r from-purple-600 to-blue-600 py-3 rounded-lg font-medium hover:opacity-90' }, '👑 Generate Premium Report - $1,999')
+                            )
+                        )
                     )
-                )
-            );
-        };
-        
-        const root = createRoot(document.getElementById('root'));
-        root.render(createElement(Dashboard));
+                );
+            };
+            
+            const root = createRoot(document.getElementById('root'));
+            root.render(h(Dashboard));
+            console.log('✅ Government Dashboard loaded!');
+        }, 1000);
     </script>
 </body>
 </html>

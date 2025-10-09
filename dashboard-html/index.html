@@ -3,40 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auxeira Dashboard</title>
+    <title>Auxeira - Dashboard Showcase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            color: white;
-        }
-        .loading { text-align: center; }
-        .loading-icon { font-size: 64px; margin-bottom: 20px; animation: pulse 2s ease-in-out infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        body { margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        .float { animation: float 3s ease-in-out infinite; }
     </style>
 </head>
 <body>
-    <div class="loading">
-        <div class="loading-icon">🚀</div>
-        <h1>Auxeira Dashboard</h1>
-        <p>Redirecting...</p>
+    <div class="min-h-screen py-12 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h1 class="text-5xl font-bold text-white mb-4 float">AUXEIRA</h1>
+                <p class="text-xl text-purple-100">AI-Powered Investment Intelligence Platform</p>
+                <p class="text-purple-200 mt-2">Select your dashboard to explore</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="startup.html" class="block bg-white rounded-xl p-6 shadow-2xl hover:shadow-3xl transition-all hover:scale-105">
+                    <div class="text-4xl mb-3">🚀</div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Startup Founder</h3>
+                    <p class="text-gray-600 mb-4">SSE score tracking, investor matching, and fundraising insights</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">SSE Score</span>
+                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Investor Match</span>
+                        <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">Growth Analytics</span>
+                    </div>
+                </a>
+                
+                <a href="corporate_partner.html" class="block bg-white rounded-xl p-6 shadow-2xl hover:shadow-3xl transition-all hover:scale-105">
+                    <div class="text-4xl mb-3">🏢</div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Corporate Partner</h3>
+                    <p class="text-gray-600 mb-4">Shadow value tracking, blind auctions, and ecosystem pulse</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Shadow Value</span>
+                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Blind Auctions</span>
+                        <span class="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">Gamification</span>
+                    </div>
+                </a>
+                
+                <a href="angel_investor.html" class="block bg-white rounded-xl p-6 shadow-2xl hover:shadow-3xl transition-all hover:scale-105">
+                    <div class="text-4xl mb-3">👼</div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Angel Investor</h3>
+                    <p class="text-gray-600 mb-4">Alpha score, portfolio tracking, and deal flow matching</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">Alpha Score</span>
+                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Portfolio</span>
+                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Deal Flow</span>
+                    </div>
+                </a>
+                
+                <a href="government.html" class="block bg-white rounded-xl p-6 shadow-2xl hover:shadow-3xl transition-all hover:scale-105">
+                    <div class="text-4xl mb-3">🏛️</div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Government Agency</h3>
+                    <p class="text-gray-600 mb-4">Economic impact, job creation, and policy effectiveness</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Economic ROI</span>
+                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Jobs Created</span>
+                        <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded">Tax Revenue</span>
+                    </div>
+                </a>
+                
+                <a href="esg_education.html" class="block bg-white rounded-xl p-6 shadow-2xl hover:shadow-3xl transition-all hover:scale-105">
+                    <div class="text-4xl mb-3">🎓</div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">ESG Education</h3>
+                    <p class="text-gray-600 mb-4">Learning outcomes, student impact, and teacher training</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Education ROI</span>
+                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Students Reached</span>
+                        <span class="text-xs bg-pink-100 text-pink-800 px-2 py-1 rounded">Gender Parity</span>
+                    </div>
+                </a>
+                
+                <a href="vc.html" class="block bg-white rounded-xl p-6 shadow-2xl hover:shadow-3xl transition-all hover:scale-105">
+                    <div class="text-4xl mb-3">💼</div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Venture Capital</h3>
+                    <p class="text-gray-600 mb-4">Alpha intelligence, IRR predictions, and LP reports</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">Alpha Score</span>
+                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">IRR Engine</span>
+                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Market Intel</span>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="mt-12 text-center">
+                <div class="bg-white/10 backdrop-blur-lg rounded-xl p-8 max-w-2xl mx-auto">
+                    <h2 class="text-2xl font-bold text-white mb-4">About Auxeira</h2>
+                    <p class="text-purple-100 mb-4">
+                        Auxeira is an AI-powered investment intelligence platform that connects startups with the right investors
+                        through data-driven matching, real-time analytics, and predictive insights.
+                    </p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-white">
+                        <div>
+                            <div class="text-3xl font-bold">6</div>
+                            <div class="text-sm text-purple-200">Dashboards</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold">AI</div>
+                            <div class="text-sm text-purple-200">Powered</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold">Live</div>
+                            <div class="text-sm text-purple-200">Analytics</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold">24/7</div>
+                            <div class="text-sm text-purple-200">Access</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <script>
-        const userType = localStorage.getItem('userType') || new URLSearchParams(window.location.search).get('userType') || 'venture_capital';
-        const dashboardMap = {
-            'startup_founder': '/startup_founder.html',
-            'venture_capital': '/venture_capital.html',
-            'angel_investor': '/angel_investor.html',
-            'corporate_partner': '/corporate_partner.html',
-            'government': '/government.html',
-            'esg_funder': '/esg_investor.html'
-        };
-        setTimeout(() => { window.location.href = dashboardMap[userType] || '/venture_capital.html'; }, 1000);
-    </script>
 </body>
 </html>

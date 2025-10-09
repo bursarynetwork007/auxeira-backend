@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venture Capital Dashboard - Auxeira</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body { margin: 0; background: #030712; min-height: 100vh; color: white; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+            <div style="text-align: center;">
+                <div style="width: 50px; height: 50px; border: 4px solid rgba(59,130,246,0.3); border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                <div>Loading VC Dashboard...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        setTimeout(() => {
+            const { createElement: h, useState, useEffect } = React;
+            const { createRoot } = ReactDOM;
+            
+            // VC profile
+            const vcProfile = {
+                name: 'Sarah Chen',
+                fund: 'Alpha Ventures Fund III',
+                title: 'Managing Partner',
+                irr: 28.4,
+                moic: 2.8,
+                dpi: 0.9,
+                alphaScore: 76,
+                portfolioValue: 450000000,
+                activeInvestments: 28,
+                fundSize: 250000000
+            };
+            
+            // Portfolio companies
+            const companies = [
+                { name: 'CloudSec', sector: 'Cybersecurity', irr: 45.2, moic: 3.0, sse: 92, value: 24000000, risk: 'low', signal: 'strong_buy', mrr: 1200000, runway: 18 },
+                { name: 'HealthTech', sector: 'Healthcare', irr: 32.1, moic: 2.4, sse: 78, value: 12000000, risk: 'medium', signal: 'hold', mrr: 850000, runway: 14 },
+                { name: 'FinanceApp', sector: 'Fintech', irr: 78.5, moic: 4.0, sse: 88, value: 8000000, risk: 'high', signal: 'strong_buy', mrr: 320000, runway: 22 },
+                { name: 'TechCo', sector: 'SaaS', irr: 28.9, moic: 3.0, sse: 85, value: 36000000, risk: 'low', signal: 'buy', mrr: 2800000, runway: 24 },
+                { name: 'DataCorp', sector: 'AI/ML', irr: 65.2, moic: 4.0, sse: 94, value: 16000000, risk: 'medium', signal: 'strong_buy', mrr: 650000, runway: 16 }
+            ];
+            
+            // Market intelligence
+            const sectors = [
+                { name: 'AI/ML', growth: 45.2, funding: 12500000000, momentum: 'accelerating' },
+                { name: 'Fintech', growth: 23.8, funding: 8900000000, momentum: 'stable' },
+                { name: 'Healthcare', growth: 18.5, funding: 7200000000, momentum: 'recovering' },
+                { name: 'Cybersecurity', growth: 32.1, funding: 5800000000, momentum: 'accelerating' }
+            ];
+            
+            const Dashboard = () => {
+                const [activeTab, setActiveTab] = useState('overview');
+                const [alphaScore, setAlphaScore] = useState(vcProfile.alphaScore);
+                const [showReportModal, setShowReportModal] = useState(false);
+                const [timeHorizon, setTimeHorizon] = useState(5);
+                
+                const tabs = [
+                    { id: 'overview', label: 'Alpha Overview', icon: '🧠' },
+                    { id: 'companies', label: 'Portfolio', icon: '🏢' },
+                    { id: 'market', label: 'Market Intel', icon: '📡' },
+                    { id: 'predictions', label: 'IRR Engine', icon: '🧮' },
+                    { id: 'reports', label: 'LP Reports', icon: '📄' }
+                ];
+                
+                // Simulate alpha score updates
+                useEffect(() => {
+                    const interval = setInterval(() => {
+                        setAlphaScore(prev => Math.max(0, Math.min(100, prev + (Math.random() - 0.5) * 2)));
+                    }, 30000);
+                    return () => clearInterval(interval);
+                }, []);
+                
+                const getScoreColor = (score) => {
+                    if (score >= 80) return '#10B981';
+                    if (score >= 60) return '#3B82F6';
+                    if (score >= 40) return '#F59E0B';
+                    return '#EF4444';
+                };
+                
+                const getRiskColor = (risk) => {
+                    if (risk === 'low') return 'border-green-400 bg-green-900/20';
+                    if (risk === 'medium') return 'border-yellow-400 bg-yellow-900/20';
+                    return 'border-red-400 bg-red-900/20';
+                };
+                
+                const getSignalColor = (signal) => {
+                    if (signal === 'strong_buy') return '#10B981';
+                    if (signal === 'buy') return '#3B82F6';
+                    if (signal === 'hold') return '#F59E0B';
+                    return '#EF4444';
+                };
+                
+                return h('div', { className: 'min-h-screen bg-gray-950' },
+                    // Banner
+                    h('div', { className: 'bg-gradient-to-r from-blue-500 to-purple-500 text-white p-4 sticky top-0 z-50' },
+                        h('div', { className: 'max-w-7xl mx-auto flex items-center justify-between' },
+                            h('div', { className: 'flex items-center gap-3' },
+                                h('span', { className: 'text-2xl animate-pulse' }, '🧠'),
+                                h('div', null,
+                                    h('strong', null, 'ALPHA INTELLIGENCE: '),
+                                    `Portfolio Alpha: ${Math.round(alphaScore)} • 2 critical alerts`
+                                )
+                            ),
+                            h('div', { className: 'bg-green-400/20 px-3 py-1 rounded text-sm animate-pulse' }, 'Live AI Analysis')
+                        )
+                    ),
+                    
+                    // Navigation
+                    h('div', { className: 'bg-gray-900 border-b border-gray-700 sticky top-16 z-40' },
+                        h('div', { className: 'max-w-7xl mx-auto px-4' },
+                            h('div', { className: 'flex items-center justify-between py-4' },
+                                h('div', { className: 'text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent', style: { backgroundClip: 'text', WebkitBackgroundClip: 'text' } }, 'AUXEIRA VC'),
+                                h('div', { className: 'flex gap-1' },
+                                    ...tabs.map(tab =>
+                                        h('button', {
+                                            key: tab.id,
+                                            onClick: () => setActiveTab(tab.id),
+                                            className: `flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+                                                activeTab === tab.id ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800'
+                                            }`
+                                        }, tab.icon, ' ', tab.label)
+                                    )
+                                ),
+                                h('div', { className: 'flex items-center gap-3' },
+                                    h('div', { className: 'bg-green-500 text-white px-3 py-1 rounded text-sm font-medium' }, `IRR: ${vcProfile.irr}%`),
+                                    h('div', { className: 'bg-blue-500 text-white px-3 py-1 rounded text-sm font-medium' }, `${vcProfile.moic}× MOIC`),
+                                    h('div', { className: 'bg-purple-500 text-white px-3 py-1 rounded text-sm font-medium' }, `Alpha: ${Math.round(alphaScore)}`)
+                                )
+                            )
+                        )
+                    ),
+                    
+                    // Main Content
+                    h('div', { className: 'max-w-7xl mx-auto p-6' },
+                        // Header
+                        h('div', { className: 'mb-8' },
+                            h('h1', { className: 'text-3xl font-bold mb-2' }, `Welcome back, ${vcProfile.name}`),
+                            h('p', { className: 'text-gray-400' },
+                                `${vcProfile.fund} • ${vcProfile.title} • $${(vcProfile.fundSize / 1000000).toFixed(0)}M Fund • ${vcProfile.activeInvestments} Active Investments`
+                            )
+                        ),
+                        
+                        // Overview Tab
+                        activeTab === 'overview' && h('div', { className: 'space-y-6' },
+                            // Alpha Score
+                            h('div', { className: 'bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-blue-400/30 rounded-lg p-6' },
+                                h('div', { className: 'flex items-center justify-between mb-6' },
+                                    h('h3', { className: 'text-xl font-bold text-blue-400' }, '🧠 Portfolio Alpha Intelligence'),
+                                    h('div', { className: 'bg-purple-500/20 px-3 py-1 rounded text-sm animate-pulse' }, 'Live AI')
+                                ),
+                                h('div', { className: 'text-center' },
+                                    h('div', { className: 'relative w-48 h-48 mx-auto mb-6' },
+                                        h('svg', { className: 'w-full h-full transform -rotate-90', viewBox: '0 0 100 100' },
+                                            h('circle', { cx: 50, cy: 50, r: 40, stroke: '#374151', strokeWidth: 8, fill: 'none' }),
+                                            h('circle', {
+                                                cx: 50, cy: 50, r: 40,
+                                                stroke: getScoreColor(alphaScore),
+                                                strokeWidth: 8,
+                                                fill: 'none',
+                                                strokeLinecap: 'round',
+                                                strokeDasharray: `${alphaScore * 2.51} 251`,
+                                                style: { transition: 'all 1s' }
+                                            })
+                                        ),
+                                        h('div', { className: 'absolute inset-0 flex flex-col items-center justify-center' },
+                                            h('div', { className: 'text-4xl font-bold', style: { color: getScoreColor(alphaScore) } }, Math.round(alphaScore)),
+                                            h('div', { className: 'text-sm text-gray-400' }, alphaScore >= 80 ? 'Exceptional' : alphaScore >= 60 ? 'Strong' : 'Moderate')
+                                        )
+                                    ),
+                                    h('div', { className: 'bg-gray-800/50 rounded-lg p-4' },
+                                        h('h4', { className: 'font-semibold text-white mb-2' }, 'AI Alpha Insights'),
+                                        h('p', { className: 'text-gray-300 text-sm' },
+                                            'Your portfolio is performing 9% above market expectations. DataCorp and FinanceApp are driving exceptional returns.'
+                                        )
+                                    )
+                                )
+                            ),
+                            
+                            // Metrics
+                            h('div', { className: 'grid grid-cols-2 md:grid-cols-4 gap-4' },
+                                [
+                                    { label: 'IRR', value: `${vcProfile.irr}%`, target: '25%', color: 'green' },
+                                    { label: 'MOIC', value: `${vcProfile.moic}×`, target: '3.5×', color: 'blue' },
+                                    { label: 'DPI', value: `${vcProfile.dpi}×`, target: '1.2×', color: 'yellow' },
+                                    { label: 'Portfolio', value: `$${(vcProfile.portfolioValue / 1000000).toFixed(0)}M`, target: 'Top 25%', color: 'purple' }
+                                ].map((metric, i) =>
+                                    h('div', { key: i, className: `bg-gray-900/50 border border-${metric.color}-400/30 rounded-lg p-4` },
+                                        h('div', { className: `text-2xl font-bold text-${metric.color}-400 mb-1` }, metric.value),
+                                        h('div', { className: 'text-sm text-gray-400 mb-1' }, metric.label),
+                                        h('div', { className: 'text-xs text-gray-500' }, `Target: ${metric.target}`)
+                                    )
+                                )
+                            )
+                        ),
+                        
+                        // Companies Tab
+                        activeTab === 'companies' && h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
+                            h('h2', { className: 'text-2xl font-bold text-white mb-6' }, `🏢 Portfolio Companies (${companies.length})`),
+                            h('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4' },
+                                ...companies.map(company =>
+                                    h('div', { key: company.name, className: `${getRiskColor(company.risk)} border-2 rounded-lg p-4` },
+                                        h('div', { className: 'flex items-center justify-between mb-3' },
+                                            h('div', null,
+                                                h('h4', { className: 'font-semibold text-white' }, company.name),
+                                                h('p', { className: 'text-sm text-gray-400' }, company.sector)
+                                            ),
+                                            h('div', { className: 'text-xs px-2 py-1 rounded bg-gray-700' }, company.risk)
+                                        ),
+                                        h('div', { className: 'grid grid-cols-3 gap-2 mb-3' },
+                                            h('div', null,
+                                                h('div', { className: 'text-lg font-bold text-green-400' }, `${company.irr.toFixed(1)}%`),
+                                                h('div', { className: 'text-xs text-gray-400' }, 'IRR')
+                                            ),
+                                            h('div', null,
+                                                h('div', { className: 'text-lg font-bold text-blue-400' }, `${company.moic.toFixed(1)}×`),
+                                                h('div', { className: 'text-xs text-gray-400' }, 'MOIC')
+                                            ),
+                                            h('div', null,
+                                                h('div', { className: 'text-lg font-bold text-purple-400' }, company.sse),
+                                                h('div', { className: 'text-xs text-gray-400' }, 'SSE')
+                                            )
+                                        ),
+                                        h('div', { className: 'flex items-center justify-between text-xs' },
+                                            h('span', { className: 'text-gray-400' }, `MRR: $${(company.mrr / 1000).toFixed(0)}K`),
+                                            h('span', { className: 'text-gray-400' }, `${company.runway}mo runway`)
+                                        ),
+                                        h('div', { className: 'mt-3 px-3 py-1 rounded text-center font-medium', style: { backgroundColor: getSignalColor(company.signal), color: 'white' } },
+                                            company.signal.replace('_', ' ').toUpperCase()
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        
+                        // Market Tab
+                        activeTab === 'market' && h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
+                            h('h2', { className: 'text-2xl font-bold text-white mb-6 flex items-center gap-2' },
+                                '📡 Market Intelligence',
+                                h('span', { className: 'text-sm bg-purple-500/20 px-3 py-1 rounded' }, 'AI-Powered')
+                            ),
+                            h('div', { className: 'grid grid-cols-2 md:grid-cols-4 gap-4 mb-6' },
+                                h('div', { className: 'text-center p-3 bg-blue-900/20 rounded-lg border border-blue-400/30' },
+                                    h('div', { className: 'text-2xl mb-1' }, '📈'),
+                                    h('div', { className: 'text-sm text-gray-400' }, 'Sentiment'),
+                                    h('div', { className: 'text-xs text-blue-400 font-semibold' }, 'BULLISH')
+                                ),
+                                h('div', { className: 'text-center p-3 bg-green-900/20 rounded-lg border border-green-400/30' },
+                                    h('div', { className: 'text-2xl font-bold text-green-400' }, '78'),
+                                    h('div', { className: 'text-sm text-gray-400' }, 'Liquidity'),
+                                    h('div', { className: 'text-xs text-green-400 font-semibold' }, 'HIGH')
+                                ),
+                                h('div', { className: 'text-center p-3 bg-yellow-900/20 rounded-lg border border-yellow-400/30' },
+                                    h('div', { className: 'text-2xl font-bold text-yellow-400' }, '23.5'),
+                                    h('div', { className: 'text-sm text-gray-400' }, 'Volatility'),
+                                    h('div', { className: 'text-xs text-yellow-400 font-semibold' }, 'MODERATE')
+                                ),
+                                h('div', { className: 'text-center p-3 bg-purple-900/20 rounded-lg border border-purple-400/30' },
+                                    h('div', { className: 'text-2xl font-bold text-purple-400' }, '$15.2B'),
+                                    h('div', { className: 'text-sm text-gray-400' }, 'Q4 Forecast'),
+                                    h('div', { className: 'text-xs text-purple-400 font-semibold' }, 'PROJECTED')
+                                )
+                            ),
+                            h('div', { className: 'grid grid-cols-1 md:grid-cols-2 gap-4' },
+                                ...sectors.map(sector =>
+                                    h('div', { key: sector.name, className: 'p-4 bg-gray-800/30 border border-gray-600 rounded-lg' },
+                                        h('div', { className: 'flex items-center justify-between mb-2' },
+                                            h('h5', { className: 'font-semibold text-white' }, sector.name),
+                                            h('div', { className: `text-xs px-2 py-1 rounded ${sector.growth > 30 ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400'}` }, `${sector.growth.toFixed(1)}%`)
+                                        ),
+                                        h('div', { className: 'space-y-2 text-sm' },
+                                            h('div', { className: 'flex justify-between' },
+                                                h('span', { className: 'text-gray-400' }, 'Funding:'),
+                                                h('span', { className: 'text-white' }, `$${(sector.funding / 1000000000).toFixed(1)}B`)
+                                            ),
+                                            h('div', { className: 'flex justify-between' },
+                                                h('span', { className: 'text-gray-400' }, 'Momentum:'),
+                                                h('span', { className: 'text-white capitalize' }, sector.momentum)
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        
+                        // Predictions Tab
+                        activeTab === 'predictions' && h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
+                            h('h2', { className: 'text-2xl font-bold text-white mb-6 flex items-center gap-2' },
+                                '🧮 IRR Prediction Engine',
+                                h('span', { className: 'text-sm bg-purple-500/20 px-3 py-1 rounded' }, 'Monte Carlo')
+                            ),
+                            h('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-6' },
+                                h('div', null,
+                                    h('h4', { className: 'font-semibold text-white mb-4' }, 'Prediction Parameters'),
+                                    h('div', { className: 'space-y-4' },
+                                        h('div', null,
+                                            h('label', { className: 'block text-sm text-gray-400 mb-2' }, `Time Horizon: ${timeHorizon} years`),
+                                            h('input', {
+                                                type: 'range',
+                                                min: 1,
+                                                max: 10,
+                                                value: timeHorizon,
+                                                onChange: (e) => setTimeHorizon(parseInt(e.target.value)),
+                                                className: 'w-full h-2 bg-gray-700 rounded-lg'
+                                            })
+                                        ),
+                                        h('div', { className: 'p-4 bg-blue-900/20 border border-blue-400/30 rounded-lg' },
+                                            h('div', { className: 'text-sm text-blue-400 font-semibold mb-1' }, 'Current IRR'),
+                                            h('div', { className: 'text-3xl font-bold text-white' }, `${vcProfile.irr}%`),
+                                            h('div', { className: 'text-xs text-gray-400 mt-1' }, `+${(vcProfile.irr - 25).toFixed(1)}% vs target`)
+                                        )
+                                    )
+                                ),
+                                h('div', null,
+                                    h('h4', { className: 'font-semibold text-white mb-4' }, 'Scenario Analysis'),
+                                    h('div', { className: 'space-y-4' },
+                                        [
+                                            { name: 'Bear Case', irr: 25.8, prob: 20, color: '#EF4444' },
+                                            { name: 'Base Case', irr: 31.2, prob: 50, color: '#3B82F6' },
+                                            { name: 'Bull Case', irr: 38.7, prob: 30, color: '#10B981' }
+                                        ].map((scenario, i) =>
+                                            h('div', { key: i, className: 'p-4 rounded-lg border', style: { borderColor: scenario.color + '50', backgroundColor: scenario.color + '20' } },
+                                                h('div', { className: 'flex items-center justify-between mb-3' },
+                                                    h('h5', { className: 'font-semibold text-white' }, scenario.name),
+                                                    h('div', { className: 'text-xs px-2 py-1 rounded', style: { color: scenario.color, borderColor: scenario.color, border: '1px solid' } }, `${scenario.prob}%`)
+                                                ),
+                                                h('div', { className: 'grid grid-cols-2 gap-4' },
+                                                    h('div', null,
+                                                        h('div', { className: 'text-sm text-gray-400' }, 'Projected IRR'),
+                                                        h('div', { className: 'text-2xl font-bold text-white' }, `${scenario.irr.toFixed(1)}%`)
+                                                    ),
+                                                    h('div', null,
+                                                        h('div', { className: 'text-sm text-gray-400' }, 'Portfolio Value'),
+                                                        h('div', { className: 'text-lg font-bold', style: { color: scenario.color } }, `$${Math.round(vcProfile.portfolioValue * scenario.irr / 100 * timeHorizon / 1000000)}M`)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        
+                        // Reports Tab
+                        activeTab === 'reports' && h('div', { className: 'space-y-6' },
+                            h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
+                                h('h2', { className: 'text-2xl font-bold text-white mb-6' }, '📄 LP Report Generator'),
+                                h('div', { className: 'grid grid-cols-3 gap-4 mb-6' },
+                                    h('div', { className: 'text-center p-4 bg-blue-900/20 rounded-lg border border-blue-400/30' },
+                                        h('div', { className: 'text-2xl font-bold text-blue-400' }, '4'),
+                                        h('div', { className: 'text-sm text-gray-400' }, 'Sections Selected')
+                                    ),
+                                    h('div', { className: 'text-center p-4 bg-purple-900/20 rounded-lg border border-purple-400/30' },
+                                        h('div', { className: 'text-2xl font-bold text-purple-400' }, '8/8'),
+                                        h('div', { className: 'text-sm text-gray-400' }, 'Premium Features')
+                                    ),
+                                    h('div', { className: 'text-center p-4 bg-green-900/20 rounded-lg border border-green-400/30' },
+                                        h('div', { className: 'text-2xl font-bold text-green-400' }, 'Q4 2024'),
+                                        h('div', { className: 'text-sm text-gray-400' }, 'Period')
+                                    )
+                                ),
+                                h('div', { className: 'bg-white text-gray-900 rounded-lg p-6' },
+                                    h('h3', { className: 'text-xl font-bold mb-4' }, 'Alpha Ventures Fund III'),
+                                    h('p', { className: 'text-gray-600 mb-4' }, 'Limited Partner Report • Q4 2024'),
+                                    h('div', { className: 'space-y-4' },
+                                        h('div', null,
+                                            h('h4', { className: 'font-semibold mb-2' }, 'Executive Summary'),
+                                            h('div', { className: 'grid grid-cols-3 gap-4' },
+                                                h('div', { className: 'bg-green-50 p-3 rounded' },
+                                                    h('div', { className: 'text-2xl font-bold text-green-600' }, `${vcProfile.irr}%`),
+                                                    h('div', { className: 'text-sm text-gray-600' }, 'Net IRR')
+                                                ),
+                                                h('div', { className: 'bg-blue-50 p-3 rounded' },
+                                                    h('div', { className: 'text-2xl font-bold text-blue-600' }, `${vcProfile.moic}×`),
+                                                    h('div', { className: 'text-sm text-gray-600' }, 'MOIC')
+                                                ),
+                                                h('div', { className: 'bg-purple-50 p-3 rounded' },
+                                                    h('div', { className: 'text-2xl font-bold text-purple-600' }, `$${(vcProfile.portfolioValue / 1000000).toFixed(0)}M`),
+                                                    h('div', { className: 'text-sm text-gray-600' }, 'Portfolio')
+                                                )
+                                            )
+                                        )
+                                    )
+                                ),
+                                h('button', {
+                                    onClick: () => setShowReportModal(true),
+                                    className: 'w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-6 py-3 rounded-lg font-medium transition'
+                                }, '⬇️ Generate Premium Report - $49')
+                            )
+                        )
+                    ),
+                    
+                    // Report Modal
+                    showReportModal && h('div', { className: 'fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4' }, h('div', { className: 'bg-gray-900 border border-gray-700 rounded-lg max-w-md w-full p-6' },
+                            h('div', { className: 'text-center mb-6' },
+                                h('div', { className: 'w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl' }, '👑'),
+                                h('h3', { className: 'text-xl font-bold text-white mb-2' }, 'Unlock Premium LP Report'),
+                                h('p', { className: 'text-gray-400' }, 'Get complete analytics, company updates, and predictive insights')
+                            ),
+                            h('div', { className: 'bg-gray-800/50 rounded-lg p-4 mb-6' },
+                                h('h4', { className: 'font-semibold text-white mb-3' }, 'Premium Features:'),
+                                h('ul', { className: 'space-y-2 text-sm text-gray-300' },
+                                    ...[
+                                        'Individual company updates',
+                                        'AI-powered predictions',
+                                        'Benchmark comparisons',
+                                        'Counterfactual analysis',
+                                        'Market intelligence',
+                                        'Professional PDF export'
+                                    ].map((feature, i) =>
+                                        h('li', { key: i, className: 'flex items-center gap-2' },
+                                            h('span', { className: 'text-green-400' }, '✓'),
+                                            feature
+                                        )
+                                    )
+                                )
+                            ),
+                            h('div', { className: 'bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4 mb-6' },
+                                h('div', { className: 'flex items-center justify-between' },
+                                    h('div', null,
+                                        h('div', { className: 'text-white font-bold text-lg' }, 'Premium Report'),
+                                        h('div', { className: 'text-blue-100 text-sm' }, 'One-time purchase')
+                                    ),
+                                    h('div', { className: 'text-right' },
+                                        h('div', { className: 'text-white font-bold text-2xl' }, '$49'),
+                                        h('div', { className: 'text-blue-100 text-sm' }, 'USD')
+                                    )
+                                )
+                            ),
+                            h('div', { className: 'flex gap-3' },
+                                h('button', {
+                                    onClick: () => setShowReportModal(false),
+                                    className: 'flex-1 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded font-medium transition'
+                                }, 'Cancel'),
+                                h('button', {
+                                    onClick: () => {
+                                        alert('Payment processed! Report generating...');
+                                        setShowReportModal(false);
+                                    },
+                                    className: 'flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-4 py-2 rounded font-medium transition'
+                                }, '💳 Pay with Paystack')
+                            ),
+                            h('div', { className: 'mt-4 text-center' },
+                                h('p', { className: 'text-xs text-gray-500' }, 'Secure payment • 256-bit SSL encryption')
+                            )
+                        )
+                    )
+                );
+            };
+            
+            const root = createRoot(document.getElementById('root'));
+            root.render(h(Dashboard));
+            console.log('✅ VC Dashboard loaded!');
+        }, 1000);
+    </script>
+</body>
+</html>

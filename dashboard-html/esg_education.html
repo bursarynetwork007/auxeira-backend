@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESG Education Investor Dashboard - Auxeira</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body { margin: 0; background: #030712; min-height: 100vh; color: white; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+            <div style="text-align: center;">
+                <div style="width: 50px; height: 50px; border: 4px solid rgba(59,130,246,0.3); border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                <div>Loading ESG Education Dashboard...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        setTimeout(() => {
+            const { createElement: h, useState } = React;
+            const { createRoot } = ReactDOM;
+            
+            // ESG Education profile
+            const esgProfile = {
+                name: 'Dr. Amara Okafor',
+                title: 'ESG Education Fund Manager',
+                educationROI: 5.8,
+                studentsReached: 285000,
+                teachersTrained: 12500,
+                literacyImprovement: 42,
+                impactScore: 91,
+                genderParity: 0.94,
+                activeInvestments: 16,
+                portfolioValue: 18200000
+            };
+            
+            // Portfolio companies
+            const companies = [
+                { name: 'LearnBridge Africa', sector: 'Digital Learning', roi: 3.09, impact: 94, students: 85000, teachers: 2800, status: 'Leader' },
+                { name: 'STEM Sisters', sector: 'STEM & Gender', roi: 2.8, impact: 96, students: 45000, teachers: 1200, status: 'Champion' },
+                { name: 'Rural Teacher Connect', sector: 'Teacher Training', roi: 2.63, impact: 88, students: 65000, teachers: 3500, status: 'Strong' },
+                { name: 'VocationalPath', sector: 'Vocational Skills', roi: 1.78, impact: 85, students: 28000, teachers: 850, status: 'Monitor' }
+            ];
+            
+            // Education deals
+            const deals = [
+                { name: 'AI Tutor Global', sector: 'AI Learning', education: 96, match: 94, ask: 5000000, check: 1200000, students: '150K+', warm: true },
+                { name: 'Climate Education Labs', sector: 'Climate Ed', education: 89, match: 91, ask: 2500000, check: 600000, students: '75K', warm: false },
+                { name: 'Inclusive Learning Tech', sector: 'Special Needs', education: 92, match: 88, ask: 1800000, check: 400000, students: '12K', warm: true }
+            ];
+            
+            const Dashboard = () => {
+                const [activeTab, setActiveTab] = useState('overview');
+                
+                const tabs = [
+                    { id: 'overview', label: 'Learning Overview', icon: '📊' },
+                    { id: 'portfolio', label: 'Education Portfolio', icon: '💼' },
+                    { id: 'dealflow', label: 'Learning Deals', icon: '🔍' },
+                    { id: 'reports', label: 'Reports', icon: '📄' }
+                ];
+                
+                const getStatusColor = (status) => {
+                    if (status === 'Leader') return 'border-green-400 bg-green-900/20';
+                    if (status === 'Champion') return 'border-blue-400 bg-blue-900/20';
+                    if (status === 'Strong') return 'border-purple-400 bg-purple-900/20';
+                    return 'border-yellow-400 bg-yellow-900/20';
+                };
+                
+                return h('div', { className: 'min-h-screen bg-gray-950' },
+                    // Banner
+                    h('div', { className: 'bg-gradient-to-r from-blue-500 to-purple-500 text-white p-4 sticky top-0 z-50' },
+                        h('div', { className: 'max-w-7xl mx-auto flex items-center justify-between' },
+                            h('div', { className: 'flex items-center gap-3' },
+                                h('span', { className: 'text-2xl animate-pulse' }, '🎓'),
+                                h('div', null,
+                                    h('strong', null, 'EDUCATION INTELLIGENCE: '),
+                                    `Education ROI: ${esgProfile.educationROI}× • Students: ${(esgProfile.studentsReached / 1000).toFixed(0)}K • Teachers: ${(esgProfile.teachersTrained / 1000).toFixed(1)}K`
+                                )
+                            ),
+                            h('div', { className: 'bg-green-400/20 px-3 py-1 rounded text-sm animate-pulse' }, 'Live Learning Analytics')
+                        )
+                    ),
+                    
+                    // Navigation
+                    h('div', { className: 'bg-gray-900 border-b border-gray-700 sticky top-16 z-40' },
+                        h('div', { className: 'max-w-7xl mx-auto px-4' },
+                            h('div', { className: 'flex items-center justify-between py-4' },
+                                h('div', { className: 'text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent', style: { backgroundClip: 'text', WebkitBackgroundClip: 'text' } }, 'AUXEIRA EDUCATION'),
+                                h('div', { className: 'flex gap-1' },
+                                    ...tabs.map(tab =>
+                                        h('button', {
+                                            key: tab.id,
+                                            onClick: () => setActiveTab(tab.id),
+                                            className: `flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+                                                activeTab === tab.id ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800'
+                                            }`
+                                        }, tab.icon, ' ', tab.label)
+                                    )
+                                ),
+                                h('div', { className: 'flex items-center gap-3' },
+                                    h('div', { className: 'bg-blue-500 text-white px-3 py-1 rounded text-sm font-medium' }, `ROI: ${esgProfile.educationROI}×`),
+                                    h('div', { className: 'bg-green-500 text-white px-3 py-1 rounded text-sm font-medium' }, `${(esgProfile.studentsReached / 1000).toFixed(0)}K Students`),
+                                    h('div', { className: 'bg-purple-500 text-white px-3 py-1 rounded text-sm font-medium' }, `Impact: ${esgProfile.impactScore}`)
+                                )
+                            )
+                        )
+                    ),
+                    
+                    // Main Content
+                    h('div', { className: 'max-w-7xl mx-auto p-6' },
+                        // Header
+                        h('div', { className: 'mb-8' },
+                            h('h1', { className: 'text-3xl font-bold mb-2' }, `Welcome back, ${esgProfile.name}`),
+                            h('p', { className: 'text-gray-400' },
+                                `${esgProfile.title} • ${esgProfile.studentsReached.toLocaleString()} students reached • ${esgProfile.teachersTrained.toLocaleString()} teachers trained • ${esgProfile.literacyImprovement}% literacy improvement`
+                            )
+                        ),
+                        
+                        // Overview Tab
+                        activeTab === 'overview' && h('div', { className: 'space-y-6' },
+                            // Profile Completion
+                            h('div', { className: 'bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg p-6' },
+                                h('div', { className: 'flex items-center justify-between mb-4' },
+                                    h('h3', { className: 'font-bold text-lg' }, 'Complete Your Education Impact Profile'),
+                                    h('div', { className: 'bg-white/20 px-3 py-1 rounded font-bold' }, '65%')
+                                ),
+                                h('div', { className: 'relative h-3 bg-white/20 rounded-full mb-4 overflow-hidden' },
+                                    h('div', { className: 'absolute h-full bg-white rounded-full', style: { width: '65%' } })
+                                ),
+                                h('p', { className: 'text-sm mb-4' }, 'Unlock personalized learning deal flow and comprehensive education impact reporting'),
+                                h('button', { className: 'w-full bg-white text-blue-600 py-2 rounded font-medium hover:bg-gray-100' }, '➕ Complete Profile')
+                            ),
+                            
+                            // Premium Teaser
+                            h('div', { className: 'bg-gradient-to-br from-blue-500 to-purple-500 text-white rounded-lg p-8 text-center' },
+                                h('div', { className: 'text-5xl mb-4' }, '🎓'),
+                                h('h3', { className: 'text-2xl font-bold mb-4' }, 'Your portfolio reached 285K students... but are you maximizing learning outcomes?'),
+                                h('p', { className: 'text-lg mb-6 opacity-90' }, 'Unlock Premium for $299/month for advanced learning analytics'),
+                                h('button', { className: 'bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-medium hover:bg-gray-100' }, '💳 Unlock Premium')
+                            ),
+                            
+                            // Impact Metrics
+                            h('div', { className: 'grid grid-cols-2 md:grid-cols-3 gap-4' },
+                                [
+                                    { label: 'Education ROI', value: `${esgProfile.educationROI}×`, icon: '🎓', color: 'blue' },
+                                    { label: 'Students', value: `${(esgProfile.studentsReached / 1000).toFixed(0)}K`, icon: '👥', color: 'green' },
+                                    { label: 'Teachers', value: `${(esgProfile.teachersTrained / 1000).toFixed(1)}K`, icon: '👩‍🏫', color: 'purple' },
+                                    { label: 'Literacy', value: `${esgProfile.literacyImprovement}%`, icon: '📚', color: 'indigo' },
+                                    { label: 'Gender Parity', value: esgProfile.genderParity.toFixed(2), icon: '⚖️', color: 'pink' },
+                                    { label: 'Impact Score', value: esgProfile.impactScore, icon: '⭐', color: 'orange' }
+                                ].map((metric, i) =>
+                                    h('div', { key: i, className: `bg-gray-900/50 border border-${metric.color}-400/30 rounded-lg p-4` },
+                                        h('div', { className: 'text-2xl mb-2' }, metric.icon),
+                                        h('div', { className: `text-2xl font-bold text-${metric.color}-400 mb-1` }, metric.value),
+                                        h('div', { className: 'text-sm text-gray-400' }, metric.label)
+                                    )
+                                )
+                            ),
+                            
+                            // Focus Areas
+                            h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
+                                h('h3', { className: 'text-xl font-bold text-white mb-4' }, '🎯 Education Focus Areas'),
+                                h('div', { className: 'grid grid-cols-2 md:grid-cols-5 gap-4' },
+                                    [
+                                        { name: 'Early Childhood', icon: '👶' },
+                                        { name: 'Digital Literacy', icon: '💻' },
+                                        { name: 'Teacher Training', icon: '👩‍🏫' },
+                                        { name: 'STEM Education', icon: '🔬' },
+                                        { name: 'Vocational Skills', icon: '🛠️' }
+                                    ].map((area, i) =>
+                                        h('div', { key: i, className: 'p-4 border-2 border-blue-400 bg-blue-900/20 rounded-lg text-center' },
+                                            h('div', { className: 'text-2xl mb-2' }, area.icon),
+                                            h('div', { className: 'text-xs font-semibold' }, area.name),
+                                            h('div', { className: 'text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded mt-2' }, 'Active')
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        
+                        // Portfolio Tab
+                        activeTab === 'portfolio' && h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
+                            h('h2', { className: 'text-2xl font-bold text-white mb-6' }, `💼 Education Portfolio (${companies.length})`),
+                            h('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-6' },
+                                ...companies.map(company =>
+                                    h('div', { key: company.name, className: `${getStatusColor(company.status)} border-2 rounded-lg p-6` },
+                                        h('div', { className: 'flex items-center justify-between mb-4' },
+                                            h('div', null,
+                                                h('h4', { className: 'font-semibold text-white text-lg' }, company.name),
+                                                h('p', { className: 'text-sm text-gray-400' }, company.sector)
+                                            ),
+                                            h('div', { className: 'text-xs px-2 py-1 rounded bg-gray-700' }, company.status)
+                                        ),
+                                        h('div', { className: 'grid grid-cols-4 gap-2 mb-4' },
+                                            h('div', null,
+                                                h('div', { className: 'text-lg font-bold text-green-400' }, `${company.roi.toFixed(1)}×`),
+                                                h('div', { className: 'text-xs text-gray-400' }, 'ROI')
+                                            ),
+                                            h('div', null,
+                                                h('div', { className: 'text-lg font-bold text-blue-400' }, company.impact),
+                                                h('div', { className: 'text-xs text-gray-400' }, 'Impact')
+                                            ),
+                                            h('div', null,
+                                                h('div', { className: 'text-lg font-bold text-purple-400' }, `${(company.students / 1000).toFixed(0)}K`),
+                                                h('div', { className: 'text-xs text-gray-400' }, 'Students')
+                                            ),
+                                            h('div', null,
+                                                h('div', { className: 'text-lg font-bold text-yellow-400' }, `${(company.teachers / 1000).toFixed(1)}K`),
+                                                h('div', { className: 'text-xs text-gray-400' }, 'Teachers')
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        
+                        // Deal Flow Tab
+                        activeTab === 'dealflow' && h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
+                            h('h2', { className: 'text-2xl font-bold text-white mb-6 flex items-center gap-2' },
+                                '🔍 Learning Deal Flow',
+                                h('span', { className: 'text-sm bg-purple-500/20 px-3 py-1 rounded' }, 'Education-Matched')
+                            ),
+                            h('div', { className: 'space-y-6' },
+                                ...deals.map(deal =>
+                                    h('div', { key: deal.name, className: 'bg-gray-800/50 border border-gray-600 rounded-lg p-6' },
+                                        h('div', { className: 'flex items-start justify-between mb-4' },
+                                            h('div', null,
+                                                h('h4', { className: 'font-semibold text-white text-lg' }, deal.name),
+                                                h('p', { className: 'text-gray-400' }, deal.sector)
+                                            ),
+                                            h('div', { className: 'flex items-center gap-2' },
+                                                h('div', { className: `${deal.education >= 90 ? 'text-green-400 bg-green-900/20' : 'text-blue-400 bg-blue-900/20'} font-bold text-lg px-3 py-1 rounded` }, `${deal.education}% Education`),
+                                                deal.warm && h('div', { className: 'bg-green-500/20 text-green-400 px-2 py-1 rounded text-sm' }, '🔥 Warm')
+                                            )
+                                        ),
+                                        h('div', { className: 'grid grid-cols-4 gap-4 mb-4' },
+                                            h('div', null,
+                                                h('div', { className: 'text-sm text-gray-400' }, 'Ask Amount'),
+                                                h('div', { className: 'font-semibold text-white' }, `$${(deal.ask / 1000000).toFixed(1)}M`)
+                                            ),
+                                            h('div', null,
+                                                h('div', { className: 'text-sm text-gray-400' }, 'Your Check'),
+                                                h('div', { className: 'font-semibold text-green-400' }, `$${(deal.check / 1000000).toFixed(1)}M`)
+                                            ),
+                                            h('div', null,
+                                                h('div', { className: 'text-sm text-gray-400' }, 'Students'),
+                                                h('div', { className: 'font-semibold text-purple-400' }, deal.students)
+                                            ),
+                                            h('div', null,
+                                                h('div', { className: 'text-sm text-gray-400' }, 'Impact Match'),
+                                                h('div', { className: 'font-semibold text-blue-400' }, `${deal.match}%`)
+                                            )
+                                        ),
+                                        h('div', { className: 'flex gap-2' },
+                                            h('button', { className: 'flex-1 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded font-medium transition' }, '📄 Education Report'),
+                                            h('button', { className: 'flex-1 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-medium transition' }, '❤️ Express Interest')
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        
+                        // Reports Tab
+                        activeTab === 'reports' && h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
+                            h('div', { className: 'text-center mb-6' },
+                                h('div', { className: 'text-6xl mb-4' }, '📄'),
+                                h('h3', { className: 'text-2xl font-bold text-white mb-2' }, 'Generate Education Impact Reports'),
+                                h('p', { className: 'text-gray-400' }, 'Create comprehensive learning impact reports for stakeholders')
+                            ),
+                            h('div', { className: 'grid grid-cols-2 gap-4 mb-6' },
+                                h('div', { className: 'p-4 bg-blue-900/20 border border-blue-400/30 rounded-lg' },
+                                    h('h4', { className: 'font-semibold text-white mb-2' }, 'Standard Report'),
+                                    h('div', { className: 'text-2xl font-bold text-blue-400 mb-2' }, '$149'),
+                                    h('ul', { className: 'text-sm text-gray-300 space-y-1' },
+                                        h('li', null, '• Executive Summary'),
+                                        h('li', null, '• Learning Outcomes'),
+                                        h('li', null, '• Basic Impact Metrics')
+                                    )
+                                ),
+                                h('div', { className: 'p-4 bg-purple-900/20 border border-purple-400/30 rounded-lg' },
+                                    h('h4', { className: 'font-semibold text-white mb-2' }, 'Premium Report'),
+                                    h('div', { className: 'text-2xl font-bold text-purple-400 mb-2' }, '$299'),
+                                    h('ul', { className: 'text-sm text-gray-300 space-y-1' },
+                                        h('li', null, '• Complete Analysis'),
+                                        h('li', null, '• Teacher Impact'),
+                                        h('li', null, '• Gender Equity'),
+                                        h('li', null, '• Digital Divide')
+                                    )
+                                )
+                            ),
+                            h('div', { className: 'space-y-3' },
+                                h('button', { className: 'w-full bg-gradient-to-r from-blue-600 to-purple-600 py-3 rounded-lg font-medium hover:opacity-90' }, '⬇️ Generate Standard Report - $149'),
+                                h('button', { className: 'w-full bg-gradient-to-r from-purple-600 to-blue-600 py-3 rounded-lg font-medium hover:opacity-90' }, '👑 Generate Premium Report - $299')
+                            )
+                        )
+                    )
+                );
+            };
+            
+            const root = createRoot(document.getElementById('root'));
+            root.render(h(Dashboard));
+            console.log('✅ ESG Education Dashboard loaded!');
+        }, 1000);
+    </script>
+</body>
+</html>
