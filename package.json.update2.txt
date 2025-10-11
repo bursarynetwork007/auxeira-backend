@@ -1,0 +1,9 @@
+
+Add to package.json:
+
+{
+  "scripts": {
+    "generate:sim-data": "ts-node scripts/generate-simulation-data.ts",
+    "api:sim-data": "node dist/api/sim-data.js"
+  }
+}

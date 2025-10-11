@@ -25,7 +25,7 @@ async function generateSimulationData() {
       stage: stages[Math.floor(Math.random() * stages.length)],
       foundedDate: new Date(timestamp.getTime() - Math.random() * 730 * 24 * 60 * 60 * 1000),
       sseScore: Math.round(baseSSE + seasonalBoost),
-      sseScoreHistory: [],
+      sseScoreHistory: '[]',
       mrr: Math.floor(10000 + Math.random() * 200000),
       arr: 0,
       growthRate: 5 + Math.random() * 45,
@@ -45,7 +45,6 @@ async function generateSimulationData() {
     const batch = startups.slice(i, i + batchSize);
     await prisma.startupProfile.createMany({
       data: batch,
-      skipDuplicates: true,
     });
     console.log(`  ✅ Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(startups.length / batchSize)}`);
   }

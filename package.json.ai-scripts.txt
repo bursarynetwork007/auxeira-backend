@@ -1,0 +1,13 @@
+
+Add to package.json scripts:
+
+{
+  "scripts": {
+    "ai:generate-report": "ts-node src/services/ai-report-generator.ts",
+    "ai:daily-refresh": "ts-node scripts/daily-ai-report-refresh.ts",
+    "ai:test-prompts": "ts-node src/ai/test-prompts.ts"
+  }
+}
+
+Add to crontab:
+0 6 * * * cd /workspaces/auxeira-backend && npm run ai:daily-refresh

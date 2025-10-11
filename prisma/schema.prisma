@@ -1,13 +1,13 @@
-// SQLite schema for development
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = "file:../dev.db"
 }
 
+// Dashboard Infrastructure
 model DashboardLocation {
   id                String   @id @default(cuid())
   dashboardType     String   @unique
@@ -18,65 +18,150 @@ model DashboardLocation {
   isActive          Boolean  @default(true)
   lastAccessed      DateTime @default(now())
   movedAt           DateTime @default(now())
-  notes             String?
-
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-
   @@index([dashboardType])
-  @@index([isActive])
 }
 
+// Startup Profiles for Simulation
+model StartupProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  companyName       String
+  industry          String
+  stage             String
+  foundedDate       DateTime
+  sseScore          Int      @default(0)
+  sseScoreHistory   String   @default("[]")
+  lastSSEUpdate     DateTime @default(now())
+  mrr               Float    @default(0)
+  arr               Float    @default(0)
+  growthRate        Float    @default(0)
+  burnRate          Float    @default(0)
+  runway            Int      @default(0)
+  employees         Int      @default(0)
+  customers         Int      @default(0)
+  lastMetricsUpdate DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  @@index([userId])
+  @@index([lastMetricsUpdate])
+}
+
+// ESG Investor Profiles
+model ESGInvestorProfile {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  investorName          String?
+  fundName              String?
+  investorType          String?
+  tier                  String   @default("free")
+  focusAreas            String   @default("[]")
+  geographicFocus       String   @default("[]")
+  ticketSize            String?
+  stagePreference       String   @default("[]")
+  primarySDG            String   @default("[]")
+  impactMetrics         String   @default("[]")
+  theoryOfChange        String?
+  reportingFrequency    String   @default("daily")
+  preferredInsights     String   @default("[]")
+  narrativeStyle        String   @default("data_driven")
+  aiPersonaType         String?
+  readingLevel          String   @default("expert")
+  preferredLength       String   @default("concise")
+  profileCompleteness   Int      @default(0)
+  lastNudge             DateTime?
+  nudgeCount            Int      @default(0)
+  freeReportsUsed       Int      @default(0)
+  paidReportsGenerated  Int      @default(0)
+  lastReportDate        DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  aiReports             AIGeneratedReport[]
+  
+  @@index([userId])
+  @@index([tier])
+}
+
+// AI Generated Reports
+model AIGeneratedReport {
+  id                    String   @id @default(cuid())
+  reportId              String   @unique
+  investorId            String
+  investor              ESGInvestorProfile @relation(fields: [investorId], references: [id], onDelete: Cascade)
+  reportType            String
+  title                 String
+  subtitle              String?
+  generatedAt           DateTime @default(now())
+  executiveSummary      String
+  keyInsights           String
+  narrativeBody         String
+  dataVisualizations    String
+  recommendations       String
+  promptUsed            String
+  modelVersion          String   @default("nanogpt-5")
+  tokensUsed            Int?
+  generationTime        Int?
+  isTeaser              Boolean  @default(false)
+  teaserContent         String?
+  requiresPayment       Boolean  @default(false)
+  unlockPrice           Float?
+  viewCount             Int      @default(0)
+  shareCount            Int      @default(0)
+  feedbackRating        Int?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@index([investorId])
+  @@index([reportType])
+}
+
+// ESG Portfolio Companies
+model ESGPortfolioCompany {
+  id                String   @id @default(cuid())
+  investorId        String
+  companyName       String
+  sector            String
+  stage             String
+  investment        Float
+  currentValue      Float
+  roi               Float
+  impactScore       Int
+  studentsReached   Int      @default(0)
+  teachersTrained   Int      @default(0)
+  schoolsSupported  Int      @default(0)
+  sdgAlignment      String   @default("[]")
+  literacyGain      Float?
+  numeracyGain      Float?
+  digitalLiteracy   Float?
+  genderParity      Float?
+  status            String
+  lastUpdate        DateTime @default(now())
+  nextMilestone     String?
+  riskLevel         String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([investorId])
+  @@index([impactScore])
+}
+
+// Market Intelligence
 model MarketIntelligence {
-  id                String   @id @default(cuid())
-  sector            String   @unique
-  growth            Float
-  funding           Float
-  dealCount         Int
-  avgValuation      Float
-  momentum          String
-  hotKeywords       String   // Store as comma-separated string
-  emergingTrends    String   // Store as comma-separated string  
-  riskFactors       String   // Store as comma-separated string
-  lastUpdate        DateTime @default(now())
-
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
+  id            String   @id @default(cuid())
+  sector        String   @unique
+  growth        Float
+  funding       Float
+  dealCount     Int
+  avgValuation  Float
+  momentum      String
+  hotKeywords   String   @default("[]")
+  emergingTrends String  @default("[]")
+  riskFactors   String   @default("[]")
+  lastUpdate    DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
   @@index([sector])
-  @@index([growth])
-}
-
-model DataUpdateSchedule {
-  id                String   @id @default(cuid())
-  entityType        String
-  entityId          String
-  metric            String
-  updateFrequency   String
-  lastUpdate        DateTime @default(now())
-  nextUpdate        DateTime
-  isActive          Boolean  @default(true)
-  retryCount        Int      @default(0)
-  lastError         String?
-
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  @@unique([entityType, entityId, metric])
-  @@index([nextUpdate, isActive])
-}
-
-model DataAuditLog {
-  id                String   @id @default(cuid())
-  entityType        String
-  entityId          String
-  field             String
-  oldValue          String?
-  newValue          String?
-  changeReason      String?
-  changedBy         String?
-  timestamp         DateTime @default(now())
-
-  @@index([entityType, entityId])
-  @@index([timestamp])
 }

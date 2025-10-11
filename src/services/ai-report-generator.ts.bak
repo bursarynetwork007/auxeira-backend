@@ -12,6 +12,7 @@ interface GenerateReportOptions {
 export class AIReportGenerator {
   async generateReport(options: GenerateReportOptions) {
     const { investorId, reportType, createTeaser = false } = options;
+
     console.log(`🤖 Generating ${reportType} report for investor ${investorId}`);
 
     const profile = await prisma.eSGInvestorProfile.findUnique({
@@ -39,7 +40,9 @@ export class AIReportGenerator {
     const generationTime = Date.now() - startTime;
 
     const parsedReport = this.parseAIResponse(aiResponse, reportType);
-    const teaserContent = createTeaser ? generateTeaser(parsedReport.narrativeBody, 100) : null;
+    const teaserContent = createTeaser
+      ? generateTeaser(parsedReport.narrativeBody, 100)
+      : null;
 
     const report = await prisma.aIGeneratedReport.create({
       data: {
@@ -49,10 +52,10 @@ export class AIReportGenerator {
         title: parsedReport.title,
         subtitle: parsedReport.subtitle,
         executiveSummary: parsedReport.executiveSummary,
-        keyInsights: JSON.stringify(parsedReport.keyInsights),
+        keyInsights: parsedReport.keyInsights,
         narrativeBody: parsedReport.narrativeBody,
-        dataVisualizations: JSON.stringify(parsedReport.dataVisualizations),
-        recommendations: JSON.stringify(parsedReport.recommendations),
+        dataVisualizations: parsedReport.dataVisualizations,
+        recommendations: parsedReport.recommendations,
         promptUsed: prompt,
         modelVersion: 'nanogpt-5',
         tokensUsed: aiResponse.tokensUsed,
@@ -63,6 +66,18 @@ export class AIReportGenerator {
         unlockPrice: this.getReportPrice(reportType),
       },
     });
+
+    if (createTeaser) {
+      await prisma.eSGInvestorProfile.update({
+        where: { id: investorId },
+        data: { freeReportsUsed: { increment: 1 }, lastReportDate: new Date() },
+      });
+    } else {
+      await prisma.eSGInvestorProfile.update({
+        where: { id: investorId },
+        data: { paidReportsGenerated: { increment: 1 }, lastReportDate: new Date() },
+      });
+    }
 
     console.log(`✅ Report generated: ${report.reportId}`);
     return report;
@@ -75,12 +90,12 @@ export class AIReportGenerator {
       console.warn('⚠️ NANOGPT5_API_KEY not set, using mock response');
       await new Promise(resolve => setTimeout(resolve, 2000));
       return {
-        content: `AI-Generated Report:\n\n${prompt.substring(0, 500)}...`,
+        content: `[AI-Generated Report]\n\n${prompt.substring(0, 500)}...`,
         tokensUsed: 1500,
       };
     }
 
-    console.log('📡 Calling OpenAI API (NanoGPT-5 key)...');
+    console.log('📡 Calling NanoGPT-5 API...');
     
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -105,13 +120,73 @@ export class AIReportGenerator {
     } catch (error) {
       console.error('API error:', error);
       return {
-        content: `Mock Report Content:\n\n${prompt.substring(0, 500)}`,
+        content: `[Mock Report] ${prompt.substring(0, 500)}`,
         tokensUsed: 1500,
       };
     }
   }
 
+    return { investorProfile: profile, portfolioData, marketData, impactData };
+  }
+
+  private parseAIResponse(aiResponse: any, reportType: string) {
+    return {
+      title: `${reportType.replace(/_/g, ' ').toUpperCase()} Report`,
+      subtitle: 'AI-Powered Analysis',
+      executiveSummary: aiResponse.content.substring(0, 500),
+      keyInsights: [
+        { insight: 'Portfolio performing above benchmarks', data: '+15% vs. sector avg' },
+        { insight: 'Strong impact metrics', data: '285K students reached' },
+        { insight: 'Market opportunity identified', data: 'EdTech funding up 23%' },
+      ],
+      narrativeBody: aiResponse.content,
+      dataVisualizations: [{ type: 'line', data: [], title: 'Portfolio Performance' }],
+      recommendations: [
+        { priority: 'high', action: 'Review top-performing companies for follow-on' },
+        { priority: 'medium', action: 'Diversify geographic exposure' },
+      ],
+    };
+  }
+
+  private async createNudge(investorId: string, completeness: number) {
+    const nudgeMessages = [
+      { type: 'complete_profile', message: 'Complete your profile to unlock personalized insights', priority: 5 },
+      { type: 'add_focus_areas', message: 'Define your education focus areas for better matching', priority: 4 },
+      { type: 'define_impact_thesis', message: 'Share your theory of change to get tailored reports', priority: 3 },
+    ];
+
+    const nudge = nudgeMessages[Math.floor(Math.random() * nudgeMessages.length)];
+
+    await prisma.profileNudge.create({
+      data: { investorId, nudgeType: nudge.type, message: nudge.message, priority: nudge.priority },
+    });
+
+    await prisma.eSGInvestorProfile.update({
+      where: { id: investorId },
+      data: { profileCompleteness: completeness, lastNudge: new Date(), nudgeCount: { increment: 1 } },
+    });
+  }
+
+  private requiresPayment(reportType: string, tier: string): boolean {
+    const freeReports = ['daily_digest', 'risk_alert', 'impact_story'];
+    return tier === 'free' && !freeReports.includes(reportType);
+  }
+
+  private getReportPrice(reportType: string): number {
+    const pricing = {
+      portfolio_deep_dive: 49,
+      market_intelligence: 79,
+      custom_analysis: 149,
+      benchmark_report: 99,
+    };
+    return pricing[reportType] || 0;
+  }
+}
+
+export const aiReportGenerator = new AIReportGenerator();
+
   private async gatherContext(profile: any) {
+    // Parse JSON string fields to arrays
     const parseJson = (field: any): any[] => {
       if (!field) return [];
       if (Array.isArray(field)) return field;
@@ -143,43 +218,3 @@ export class AIReportGenerator {
 
     return { investorProfile: profile, portfolioData, marketData, impactData };
   }
-
-  private parseAIResponse(aiResponse: any, reportType: string) {
-    return {
-      title: `${reportType.replace(/_/g, ' ').toUpperCase()} Report`,
-      subtitle: 'AI-Powered Analysis',
-      executiveSummary: aiResponse.content.substring(0, 500),
-      keyInsights: [
-        { insight: 'Portfolio performing above benchmarks', data: '+15% vs. sector avg' },
-        { insight: 'Strong impact metrics', data: '210K students reached' },
-        { insight: 'Market opportunity identified', data: 'EdTech funding up 45%' },
-      ],
-      narrativeBody: aiResponse.content,
-      dataVisualizations: [{ type: 'line', data: [], title: 'Portfolio Performance' }],
-      recommendations: [
-        { priority: 'high', action: 'Review top-performing companies for follow-on' },
-        { priority: 'medium', action: 'Diversify geographic exposure' },
-      ],
-    };
-  }
-
-  private async createNudge(investorId: string, completeness: number) {
-    // Nudge creation logic here
-  }
-
-  private requiresPayment(reportType: string, tier: string): boolean {
-    const freeReports = ['daily_digest', 'risk_alert', 'impact_story'];
-    return tier === 'free' && !freeReports.includes(reportType);
-  }
-
-  private getReportPrice(reportType: string): number {
-    const pricing = {
-      portfolio_deep_dive: 49,
-      market_intelligence: 79,
-      custom_analysis: 149,
-    };
-    return pricing[reportType] || 0;
-  }
-}
-
-export const aiReportGenerator = new AIReportGenerator();
