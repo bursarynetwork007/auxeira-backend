@@ -4,374 +4,1464 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Angel Investor Dashboard - Auxeira</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Paystack -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    
     <style>
-        body { margin: 0; background: #030712; min-height: 100vh; color: white; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --accent-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --glass-bg: rgba(30, 41, 59, 0.8);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Glass Morphism Effects */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-nav {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Critical Action Banner */
+        .critical-banner {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.5); }
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            border-bottom: 2px solid var(--border-color);
+            background: transparent;
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--text-secondary);
+            border: none;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            background: transparent;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        /* Metric Cards */
+        .metric-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Alpha Score Circle */
+        .alpha-score-circle {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .alpha-score-circle svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .alpha-score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        /* Portfolio Grid */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .portfolio-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .portfolio-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-strong { background: rgba(16, 185, 129, 0.2); color: var(--success-color); }
+        .status-healthy { background: rgba(59, 130, 246, 0.2); color: var(--accent-color); }
+        .status-monitor { background: rgba(245, 158, 11, 0.2); color: var(--warning-color); }
+        .status-risk { background: rgba(239, 68, 68, 0.2); color: var(--danger-color); }
+
+        /* Deal Flow Cards */
+        .deal-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .deal-card:hover {
+            transform: translateX(5px);
+            border-color: var(--primary-color);
+        }
+
+        .match-score {
+            background: linear-gradient(135deg, var(--success-color), var(--accent-color));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        /* Premium Features */
+        .premium-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            z-index: 10;
+        }
+
+        .premium-unlock {
+            text-align: center;
+            color: white;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background: transparent;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metric-value {
+                font-size: 2rem;
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Chart Containers */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 1rem 0;
+        }
+
+        .chart-small {
+            height: 200px;
+        }
+
+        /* Profile Completion */
+        .profile-completion {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* Network Visualization */
+        .network-node {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+
+        /* Loading States */
+        .loading-shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Focus States */
+        .btn:focus,
+        .nav-link:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body>
-    <div id="root">
-        <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
-            <div style="text-align: center;">
-                <div style="width: 50px; height: 50px; border: 4px solid rgba(168,85,247,0.3); border-top-color: #a855f7; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-                <div>Loading Angel Investor Dashboard...</div>
+    <!-- Critical Action Banner -->
+    <div class="critical-banner p-3" id="criticalBanner">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-bolt me-2 text-warning"></i>
+                        <strong>ANGEL INTELLIGENCE:</strong>
+                        <span class="ms-2">
+                            Alpha Score: <span id="alphaScoreHeader">72</span> • 
+                            <span id="alertCount">2</span> portfolio alerts
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <span class="badge bg-success me-2">
+                        <i class="fas fa-circle me-1"></i>Live AI Analysis
+                    </span>
+                    <button class="btn btn-light btn-sm me-2" onclick="showInsights()">
+                        <i class="fas fa-eye me-1"></i>View Insights
+                    </button>
+                    <button class="btn btn-outline-light btn-sm" onclick="closeBanner()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-    
+
+    <!-- Navigation -->
+    <nav class="glass-nav py-2">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <h4 class="mb-0 text-primary fw-bold">
+                        <i class="fas fa-chart-line me-2"></i>Angel Dashboard
+                    </h4>
+                    <span class="badge bg-primary ms-2">Michael Chen</span>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-secondary small">Last updated: <span id="lastUpdated">2 min ago</span></span>
+                    <button class="btn btn-outline-primary btn-sm" onclick="upgradeModal()">
+                        <i class="fas fa-crown me-1"></i>Upgrade to Premium
+                    </button>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-question-circle me-2"></i>Help</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                    <i class="fas fa-tachometer-alt me-2"></i>Overview
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="portfolio-tab" data-bs-toggle="tab" data-bs-target="#portfolio" type="button" role="tab">
+                    <i class="fas fa-briefcase me-2"></i>Portfolio
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="dealflow-tab" data-bs-toggle="tab" data-bs-target="#dealflow" type="button" role="tab">
+                    <i class="fas fa-handshake me-2"></i>Deal Flow
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="radar-tab" data-bs-toggle="tab" data-bs-target="#radar" type="button" role="tab">
+                    <i class="fas fa-satellite-dish me-2"></i>Angel Radar
+                    <span class="badge bg-warning ms-1">Premium</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="network-tab" data-bs-toggle="tab" data-bs-target="#network" type="button" role="tab">
+                    <i class="fas fa-network-wired me-2"></i>Ghost Network
+                    <span class="badge bg-warning ms-1">Premium</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab">
+                    <i class="fas fa-file-alt me-2"></i>Reports
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="dashboardTabContent">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <div class="row g-4">
+                    <!-- Profile Completion -->
+                    <div class="col-md-4">
+                        <div class="profile-completion fade-in-up">
+                            <h5 class="mb-3">
+                                <i class="fas fa-user-check me-2"></i>Complete Your Profile for Better Deals
+                            </h5>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span>Progress</span>
+                                <span class="fw-bold">35%</span>
+                            </div>
+                            <div class="progress-bar mb-3">
+                                <div class="progress-fill" style="width: 35%"></div>
+                            </div>
+                            <p class="small mb-3 opacity-75">
+                                Unlock personalized dealflow by completing your profile. We use this data to find your "line of best fit" investments.
+                            </p>
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    <span class="small">Basic Info</span>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="far fa-circle me-2"></i>
+                                    <span class="small">Investment Thesis</span>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="far fa-circle me-2"></i>
+                                    <span class="small">Check Size & Preferences</span>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="far fa-circle me-2"></i>
+                                    <span class="small">Industry Expertise</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-light w-100" onclick="completeProfile()">
+                                <i class="fas fa-plus me-2"></i>Complete Profile Now
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Alpha Score & Nudge Score -->
+                    <div class="col-md-4">
+                        <div class="glass-card p-4 h-100 fade-in-up">
+                            <h5 class="mb-4">
+                                <i class="fas fa-brain me-2 text-primary"></i>Alpha Score
+                                <span class="badge bg-primary ms-2">AI-Powered</span>
+                            </h5>
+                            <div class="text-center">
+                                <div class="alpha-score-circle mb-3">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="40" stroke="#374151" stroke-width="8" fill="none"/>
+                                        <circle cx="50" cy="50" r="40" stroke="#6366f1" stroke-width="8" fill="none"
+                                                stroke-linecap="round" stroke-dasharray="180 251" id="alphaCircle"/>
+                                    </svg>
+                                    <div class="alpha-score-text">
+                                        <div class="h2 text-primary fw-bold" id="alphaScore">72</div>
+                                        <div class="small text-secondary">out of 100</div>
+                                    </div>
+                                </div>
+                                <div class="small text-secondary mb-2">Strong Performance</div>
+                                <div class="small text-success">+8 vs last month</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Key Metrics -->
+                    <div class="col-md-4">
+                        <div class="glass-card p-4 h-100 fade-in-up">
+                            <h5 class="mb-4">
+                                <i class="fas fa-chart-bar me-2 text-success"></i>Key Metrics
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <div class="h4 text-success mb-1">7.5x</div>
+                                        <div class="small text-secondary">Total ROI</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <div class="h4 text-info mb-1">45.2%</div>
+                                        <div class="small text-secondary">Avg IRR</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <div class="h4 text-warning mb-1">75%</div>
+                                        <div class="small text-secondary">Success Rate</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <div class="h4 text-primary mb-1">156</div>
+                                        <div class="small text-secondary">Network Score</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Portfolio Value Chart -->
+                    <div class="col-md-8">
+                        <div class="glass-card p-4 fade-in-up">
+                            <h5 class="mb-4">
+                                <i class="fas fa-chart-line me-2 text-primary"></i>Portfolio Performance
+                            </h5>
+                            <div class="chart-container">
+                                <canvas id="portfolioChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="col-md-4">
+                        <div class="glass-card p-4 fade-in-up">
+                            <h5 class="mb-4">
+                                <i class="fas fa-clock me-2 text-warning"></i>Recent Activity
+                            </h5>
+                            <div class="activity-feed">
+                                <div class="d-flex align-items-start mb-3">
+                                    <div class="bg-success rounded-circle p-2 me-3">
+                                        <i class="fas fa-arrow-up text-white small"></i>
+                                    </div>
+                                    <div>
+                                        <div class="small fw-bold">SaaSco Series A</div>
+                                        <div class="small text-secondary">Valuation increased 15%</div>
+                                        <div class="small text-muted">2 hours ago</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-start mb-3">
+                                    <div class="bg-info rounded-circle p-2 me-3">
+                                        <i class="fas fa-handshake text-white small"></i>
+                                    </div>
+                                    <div>
+                                        <div class="small fw-bold">New Deal Match</div>
+                                        <div class="small text-secondary">CloudSecure - 94% match</div>
+                                        <div class="small text-muted">5 hours ago</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-start mb-3">
+                                    <div class="bg-warning rounded-circle p-2 me-3">
+                                        <i class="fas fa-exclamation-triangle text-white small"></i>
+                                    </div>
+                                    <div>
+                                        <div class="small fw-bold">Portfolio Alert</div>
+                                        <div class="small text-secondary">HealthTech runway critical</div>
+                                        <div class="small text-muted">1 day ago</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Tab -->
+            <div class="tab-pane fade" id="portfolio" role="tabpanel">
+                <div class="row g-4">
+                    <!-- Portfolio Summary -->
+                    <div class="col-12">
+                        <div class="glass-card p-4 fade-in-up">
+                            <div class="row align-items-center mb-4">
+                                <div class="col-md-6">
+                                    <h4 class="mb-0">
+                                        <i class="fas fa-briefcase me-2 text-primary"></i>Portfolio Overview
+                                    </h4>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-outline-primary btn-sm active" onclick="filterPortfolio('all')">All</button>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="filterPortfolio('strong')">Strong</button>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="filterPortfolio('monitor')">Monitor</button>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="filterPortfolio('risk')">At Risk</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3">
+                                    <div class="metric-card text-center">
+                                        <div class="metric-value">$1.8M</div>
+                                        <div class="small text-secondary">Total Portfolio Value</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="metric-card text-center">
+                                        <div class="metric-value">8</div>
+                                        <div class="small text-secondary">Active Investments</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="metric-card text-center">
+                                        <div class="metric-value">$240K</div>
+                                        <div class="small text-secondary">Total Invested</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="metric-card text-center">
+                                        <div class="metric-value">7.5x</div>
+                                        <div class="small text-secondary">Portfolio Multiple</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Portfolio Companies Grid -->
+                    <div class="col-12">
+                        <div class="portfolio-grid" id="portfolioGrid">
+                            <!-- Portfolio cards will be dynamically generated -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deal Flow Tab -->
+            <div class="tab-pane fade" id="dealflow" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="glass-card p-4 fade-in-up">
+                            <div class="row align-items-center mb-4">
+                                <div class="col-md-6">
+                                    <h4 class="mb-0">
+                                        <i class="fas fa-handshake me-2 text-primary"></i>AI-Matched Deal Flow
+                                    </h4>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <div class="d-flex gap-2">
+                                        <select class="form-select form-select-sm" style="width: auto;">
+                                            <option>All Sectors</option>
+                                            <option>SaaS</option>
+                                            <option>Fintech</option>
+                                            <option>AI/ML</option>
+                                            <option>Healthcare</option>
+                                        </select>
+                                        <select class="form-select form-select-sm" style="width: auto;">
+                                            <option>All Stages</option>
+                                            <option>Pre-seed</option>
+                                            <option>Seed</option>
+                                            <option>Series A</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="dealFlowContainer">
+                                <!-- Deal flow cards will be dynamically generated -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Angel Radar Tab (Premium) -->
+            <div class="tab-pane fade" id="radar" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="glass-card p-4 fade-in-up position-relative">
+                            <h4 class="mb-4">
+                                <i class="fas fa-satellite-dish me-2 text-primary"></i>Angel Radar
+                                <span class="badge bg-warning ms-2">Premium Feature</span>
+                            </h4>
+                            
+                            <!-- Premium Overlay -->
+                            <div class="premium-overlay" id="radarOverlay">
+                                <div class="premium-unlock">
+                                    <i class="fas fa-crown fa-3x text-warning mb-3"></i>
+                                    <h5>Upgrade to Premium</h5>
+                                    <p>Access real-time market signals and portfolio intelligence</p>
+                                    <button class="btn btn-warning btn-lg" onclick="upgradeModal()">
+                                        <i class="fas fa-unlock me-2"></i>Unlock Angel Radar - $39/month
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <div class="glass-card p-4 text-center">
+                                        <i class="fas fa-dollar-sign fa-2x text-success mb-3"></i>
+                                        <h5>Cash Signals</h5>
+                                        <div class="h3 text-success">78</div>
+                                        <div class="small text-secondary">Portfolio Health Score</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="glass-card p-4 text-center">
+                                        <i class="fas fa-heart fa-2x text-info mb-3"></i>
+                                        <h5>Sentiment Signals</h5>
+                                        <div class="h3 text-info">65</div>
+                                        <div class="small text-secondary">Founder Confidence</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="glass-card p-4 text-center">
+                                        <i class="fas fa-rocket fa-2x text-warning mb-3"></i>
+                                        <h5>Exit Signals</h5>
+                                        <div class="h3 text-warning">82</div>
+                                        <div class="small text-secondary">Exit Probability</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ghost Network Tab (Premium) -->
+            <div class="tab-pane fade" id="network" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="glass-card p-4 fade-in-up position-relative">
+                            <h4 class="mb-4">
+                                <i class="fas fa-network-wired me-2 text-primary"></i>Ghost Network
+                                <span class="badge bg-warning ms-2">Premium Feature</span>
+                            </h4>
+                            
+                            <!-- Premium Overlay -->
+                            <div class="premium-overlay" id="networkOverlay">
+                                <div class="premium-unlock">
+                                    <i class="fas fa-users fa-3x text-warning mb-3"></i>
+                                    <h5>Unlock Your Network Intelligence</h5>
+                                    <p>Discover hidden connections and warm introduction paths</p>
+                                    <button class="btn btn-warning btn-lg" onclick="upgradeModal()">
+                                        <i class="fas fa-unlock me-2"></i>Access Ghost Network - $39/month
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="glass-card p-4">
+                                        <h5 class="mb-3">Network Overview</h5>
+                                        <div class="row g-3">
+                                            <div class="col-6 text-center">
+                                                <div class="h3 text-primary">156</div>
+                                                <div class="small text-secondary">Total Connections</div>
+                                            </div>
+                                            <div class="col-6 text-center">
+                                                <div class="h3 text-success">94%</div>
+                                                <div class="small text-secondary">Quality Score</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="glass-card p-4">
+                                        <h5 class="mb-3">Top Connectors</h5>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="network-node me-3">SJ</div>
+                                            <div>
+                                                <div class="fw-bold">Sarah Johnson</div>
+                                                <div class="small text-secondary">Partner at Sequoia</div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="network-node me-3">DK</div>
+                                            <div>
+                                                <div class="fw-bold">David Kim</div>
+                                                <div class="small text-secondary">Angel Investor</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div class="tab-pane fade" id="reports" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="glass-card p-4 fade-in-up">
+                            <h4 class="mb-4">
+                                <i class="fas fa-file-alt me-2 text-primary"></i>Investment Reports
+                            </h4>
+                            
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="glass-card p-4">
+                                        <h5 class="mb-3">
+                                            <i class="fas fa-chart-pie me-2 text-success"></i>Portfolio Summary Report
+                                        </h5>
+                                        <p class="text-secondary mb-3">
+                                            Comprehensive overview of your investment portfolio performance, including ROI analysis and risk assessment.
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-success">Free</span>
+                                            <button class="btn btn-primary btn-sm" onclick="generateReport('portfolio')">
+                                                <i class="fas fa-download me-1"></i>Generate
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="glass-card p-4">
+                                        <h5 class="mb-3">
+                                            <i class="fas fa-calculator me-2 text-warning"></i>Tax Documentation
+                                        </h5>
+                                        <p class="text-secondary mb-3">
+                                            Professional tax documentation for your angel investments, including capital gains and loss calculations.
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-warning">$29</span>
+                                            <button class="btn btn-warning btn-sm" onclick="purchaseReport('tax')">
+                                                <i class="fas fa-shopping-cart me-1"></i>Purchase
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="glass-card p-4">
+                                        <h5 class="mb-3">
+                                            <i class="fas fa-users me-2 text-info"></i>LP Communication Package
+                                        </h5>
+                                        <p class="text-secondary mb-3">
+                                            Professional investor update package with performance metrics and portfolio highlights for LP communications.
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-info">$29</span>
+                                            <button class="btn btn-info btn-sm" onclick="purchaseReport('lp')">
+                                                <i class="fas fa-shopping-cart me-1"></i>Purchase
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="glass-card p-4">
+                                        <h5 class="mb-3">
+                                            <i class="fas fa-chart-line me-2 text-primary"></i>Performance Benchmark Analysis
+                                        </h5>
+                                        <p class="text-secondary mb-3">
+                                            Detailed analysis comparing your portfolio performance against industry benchmarks and peer angels.
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-primary">$49</span>
+                                            <button class="btn btn-primary btn-sm" onclick="purchaseReport('benchmark')">
+                                                <i class="fas fa-shopping-cart me-1"></i>Purchase
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upgrade Modal -->
+    <div class="modal fade" id="upgradeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark border-primary">
+                <div class="modal-header border-primary">
+                    <h5 class="modal-title text-primary">
+                        <i class="fas fa-crown me-2"></i>Upgrade to Premium
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="glass-card p-4 h-100">
+                                <h5 class="text-center mb-3">Free Tier</h5>
+                                <div class="text-center mb-3">
+                                    <div class="h2">$0</div>
+                                    <div class="text-secondary">per month</div>
+                                </div>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Basic portfolio tracking</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Limited deal flow</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Alpha score</li>
+                                    <li class="mb-2"><i class="fas fa-times text-danger me-2"></i>Angel Radar</li>
+                                    <li class="mb-2"><i class="fas fa-times text-danger me-2"></i>Ghost Network</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="glass-card p-4 h-100 border-primary">
+                                <h5 class="text-center mb-3 text-primary">Premium Tier</h5>
+                                <div class="text-center mb-3">
+                                    <div class="h2 text-primary">$39</div>
+                                    <div class="text-secondary">per month</div>
+                                </div>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Advanced portfolio analytics</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Unlimited deal flow</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Angel Radar signals</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Ghost Network access</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Priority support</li>
+                                </ul>
+                                <button class="btn btn-primary w-100 mt-3" onclick="processPremiumUpgrade()">
+                                    <i class="fas fa-crown me-2"></i>Upgrade Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        setTimeout(() => {
-            const { createElement: h, useState, useEffect } = React;
-            const { createRoot } = ReactDOM;
-            
-            // Angel profile
-            const angelProfile = {
+        // Angel Investor Dashboard Data
+        const angelData = {
+            profile: {
                 name: 'Michael Chen',
-                title: 'Angel Investor & Former VP Engineering',
+                tier: 'free',
                 alphaScore: 72,
-                portfolioValue: 1800000,
-                totalInvested: 240000,
-                activeInvestments: 8,
+                nudgeScore: 70,
                 totalROI: 7.5,
                 avgIRR: 45.2,
-                nudgeScore: 70,
-                profileCompletion: 35
+                successRate: 75,
+                networkScore: 156,
+                portfolioValue: 1800000,
+                totalInvested: 240000,
+                activeInvestments: 8
+            },
+            portfolio: [
+                {
+                    id: 1,
+                    name: 'SaaSco',
+                    sector: 'Enterprise SaaS',
+                    stage: 'Series A',
+                    investment: 25000,
+                    currentValue: 180000,
+                    roi: 7.2,
+                    sseScore: 89,
+                    status: 'Strong Performer',
+                    riskLevel: 'low',
+                    quarterlyGrowth: 28.5,
+                    runway: 22,
+                    mrr: 280000
+                },
+                {
+                    id: 2,
+                    name: 'TechCo',
+                    sector: 'Developer Tools',
+                    stage: 'Seed',
+                    investment: 30000,
+                    currentValue: 210000,
+                    roi: 7.0,
+                    sseScore: 78,
+                    status: 'Healthy',
+                    riskLevel: 'low',
+                    quarterlyGrowth: 22.1,
+                    runway: 18,
+                    mrr: 150000
+                },
+                {
+                    id: 3,
+                    name: 'DataFlow',
+                    sector: 'AI/ML',
+                    stage: 'Pre-seed',
+                    investment: 20000,
+                    currentValue: 95000,
+                    roi: 4.75,
+                    sseScore: 65,
+                    status: 'Monitor',
+                    riskLevel: 'medium',
+                    quarterlyGrowth: 15.8,
+                    runway: 14,
+                    mrr: 45000
+                },
+                {
+                    id: 4,
+                    name: 'HealthTech',
+                    sector: 'Healthcare',
+                    stage: 'Seed',
+                    investment: 35000,
+                    currentValue: 85000,
+                    roi: 2.43,
+                    sseScore: 42,
+                    status: 'At Risk',
+                    riskLevel: 'high',
+                    quarterlyGrowth: -5.2,
+                    runway: 8,
+                    mrr: 25000
+                },
+                {
+                    id: 5,
+                    name: 'FinanceApp',
+                    sector: 'Fintech',
+                    stage: 'Seed',
+                    investment: 40000,
+                    currentValue: 220000,
+                    roi: 5.5,
+                    sseScore: 58,
+                    status: 'Monitor',
+                    riskLevel: 'medium',
+                    quarterlyGrowth: 18.3,
+                    runway: 16,
+                    mrr: 85000
+                }
+            ],
+            dealFlow: [
+                {
+                    id: 1,
+                    companyName: 'CloudSecure',
+                    sector: 'Cybersecurity',
+                    stage: 'Seed',
+                    askAmount: 2000000,
+                    checkSize: 25000,
+                    matchScore: 94,
+                    sseScore: 87,
+                    location: 'San Francisco, CA',
+                    description: 'AI-powered cloud security platform for enterprise',
+                    founders: ['Sarah Kim (Ex-Google)', 'David Chen (Ex-AWS)'],
+                    traction: '$150K ARR, 25 enterprise customers',
+                    timeline: '2 weeks left',
+                    warmIntro: true
+                },
+                {
+                    id: 2,
+                    companyName: 'DevTools Pro',
+                    sector: 'Developer Tools',
+                    stage: 'Pre-seed',
+                    askAmount: 1500000,
+                    checkSize: 20000,
+                    matchScore: 89,
+                    sseScore: 82,
+                    location: 'Austin, TX',
+                    description: 'No-code API testing and monitoring platform',
+                    founders: ['Alex Rodriguez (Ex-Stripe)', 'Maria Santos (Ex-Twilio)'],
+                    traction: '$50K ARR, 500+ developers using platform',
+                    timeline: '1 week left',
+                    warmIntro: false
+                },
+                {
+                    id: 3,
+                    companyName: 'FinTech Innovate',
+                    sector: 'Fintech',
+                    stage: 'Seed',
+                    askAmount: 3000000,
+                    checkSize: 35000,
+                    matchScore: 76,
+                    sseScore: 74,
+                    location: 'New York, NY',
+                    description: 'Digital banking platform for small businesses',
+                    founders: ['Jennifer Wu (Ex-Goldman Sachs)', 'Robert Kim (Ex-Square)'],
+                    traction: '$300K ARR, 1,200 business customers',
+                    timeline: '3 weeks left',
+                    warmIntro: true
+                }
+            ]
+        };
+
+        // Initialize Dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+            renderPortfolioChart();
+            renderPortfolioGrid();
+            renderDealFlow();
+            updateLastUpdated();
+        });
+
+        function initializeDashboard() {
+            // Update header values
+            document.getElementById('alphaScoreHeader').textContent = angelData.profile.alphaScore;
+            document.getElementById('alphaScore').textContent = angelData.profile.alphaScore;
+            
+            // Update alpha score circle
+            const alphaCircle = document.getElementById('alphaCircle');
+            const circumference = 2 * Math.PI * 40;
+            const dashArray = (angelData.profile.alphaScore / 100) * circumference;
+            alphaCircle.style.strokeDasharray = `${dashArray} ${circumference}`;
+        }
+
+        function renderPortfolioChart() {
+            const ctx = document.getElementById('portfolioChart').getContext('2d');
+            
+            // Generate sample data for portfolio performance over time
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const portfolioValues = [240000, 280000, 320000, 450000, 520000, 680000, 750000, 920000, 1200000, 1450000, 1650000, 1800000];
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Portfolio Value',
+                        data: portfolioValues,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#cbd5e1'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#cbd5e1',
+                                callback: function(value) {
+                                    return '$' + (value / 1000000).toFixed(1) + 'M';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderPortfolioGrid() {
+            const portfolioGrid = document.getElementById('portfolioGrid');
+            portfolioGrid.innerHTML = '';
+
+            angelData.portfolio.forEach(company => {
+                const statusClass = getStatusClass(company.status);
+                const riskColor = getRiskColor(company.riskLevel);
+                
+                const card = document.createElement('div');
+                card.className = 'portfolio-card';
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="mb-1">${company.name}</h5>
+                            <div class="small text-secondary">${company.sector} • ${company.stage}</div>
+                        </div>
+                        <span class="status-badge ${statusClass}">${company.status}</span>
+                    </div>
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <div class="small text-secondary">Investment</div>
+                            <div class="fw-bold">$${company.investment.toLocaleString()}</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="small text-secondary">Current Value</div>
+                            <div class="fw-bold">$${company.currentValue.toLocaleString()}</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="small text-secondary">ROI</div>
+                            <div class="fw-bold text-success">${company.roi}x</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="small text-secondary">SSE Score</div>
+                            <div class="fw-bold">${company.sseScore}/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-4">
+                            <div class="small text-secondary">Growth</div>
+                            <div class="fw-bold ${company.quarterlyGrowth > 0 ? 'text-success' : 'text-danger'}">
+                                ${company.quarterlyGrowth > 0 ? '+' : ''}${company.quarterlyGrowth}%
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="small text-secondary">Runway</div>
+                            <div class="fw-bold" style="color: ${riskColor}">${company.runway}mo</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="small text-secondary">MRR</div>
+                            <div class="fw-bold">$${(company.mrr / 1000).toFixed(0)}K</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm flex-fill">
+                            <i class="fas fa-chart-line me-1"></i>Details
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-envelope me-1"></i>Contact
+                        </button>
+                    </div>
+                `;
+                
+                portfolioGrid.appendChild(card);
+            });
+        }
+
+        function renderDealFlow() {
+            const dealFlowContainer = document.getElementById('dealFlowContainer');
+            dealFlowContainer.innerHTML = '';
+
+            angelData.dealFlow.forEach(deal => {
+                const card = document.createElement('div');
+                card.className = 'deal-card';
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="mb-1">${deal.companyName}</h5>
+                            <div class="small text-secondary">${deal.sector} • ${deal.stage}</div>
+                        </div>
+                        <div class="match-score">${deal.matchScore}% Match</div>
+                    </div>
+                    
+                    <p class="text-secondary mb-3">${deal.description}</p>
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <div class="small text-secondary">Raising</div>
+                            <div class="fw-bold">$${(deal.askAmount / 1000000).toFixed(1)}M</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="small text-secondary">Check Size</div>
+                            <div class="fw-bold">$${deal.checkSize.toLocaleString()}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="small text-secondary">SSE Score</div>
+                            <div class="fw-bold">${deal.sseScore}/100</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="small text-secondary">Timeline</div>
+                            <div class="fw-bold text-warning">${deal.timeline}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="small text-secondary mb-1">Founders</div>
+                        <div class="small">${deal.founders.join(', ')}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="small text-secondary mb-1">Traction</div>
+                        <div class="small">${deal.traction}</div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            ${deal.warmIntro ? 
+                                '<i class="fas fa-handshake text-success me-2"></i><span class="small text-success">Warm Intro Available</span>' :
+                                '<i class="fas fa-envelope text-secondary me-2"></i><span class="small text-secondary">Cold Outreach</span>'
+                            }
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </button>
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-handshake me-1"></i>Express Interest
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                dealFlowContainer.appendChild(card);
+            });
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'Strong Performer': return 'status-strong';
+                case 'Healthy': return 'status-healthy';
+                case 'Monitor': return 'status-monitor';
+                case 'At Risk': return 'status-risk';
+                default: return 'status-monitor';
+            }
+        }
+
+        function getRiskColor(riskLevel) {
+            switch(riskLevel) {
+                case 'low': return '#10b981';
+                case 'medium': return '#f59e0b';
+                case 'high': return '#ef4444';
+                default: return '#6b7280';
+            }
+        }
+
+        function filterPortfolio(filter) {
+            // Update active button
+            document.querySelectorAll('.btn-group .btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter portfolio (implementation would filter the data)
+            renderPortfolioGrid();
+        }
+
+        function updateLastUpdated() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('lastUpdated').textContent = `${timeString}`;
+        }
+
+        function closeBanner() {
+            document.getElementById('criticalBanner').style.display = 'none';
+        }
+
+        function showInsights() {
+            alert('Portfolio insights would be displayed here');
+        }
+
+        function completeProfile() {
+            alert('Profile completion modal would open here');
+        }
+
+        function upgradeModal() {
+            const modal = new bootstrap.Modal(document.getElementById('upgradeModal'));
+            modal.show();
+        }
+
+        function processPremiumUpgrade() {
+            // Paystack integration
+            const handler = PaystackPop.setup({
+                key: 'pk_test_your_paystack_public_key', // Replace with your public key
+                email: 'michael.chen@angelinvestor.com',
+                amount: 3900, // Amount in kobo (39 USD * 100)
+                currency: 'USD',
+                ref: 'angel_premium_' + Math.floor((Math.random() * 1000000000) + 1),
+                callback: function(response) {
+                    // Payment successful
+                    alert('Payment successful! Welcome to Premium. Reference: ' + response.reference);
+                    // Remove premium overlays
+                    document.getElementById('radarOverlay').style.display = 'none';
+                    document.getElementById('networkOverlay').style.display = 'none';
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('upgradeModal')).hide();
+                },
+                onClose: function() {
+                    alert('Payment cancelled');
+                }
+            });
+            handler.openIframe();
+        }
+
+        function generateReport(type) {
+            alert(`Generating ${type} report...`);
+        }
+
+        function purchaseReport(type) {
+            const prices = {
+                'tax': 2900, // $29 in kobo
+                'lp': 2900,
+                'benchmark': 4900
             };
             
-            // Portfolio companies
-            const portfolioCompanies = [
-                { name: 'SaaSco', sector: 'SaaS', roi: 7.2, sse: 89, value: 180000, status: 'Strong', runway: 22 },
-                { name: 'TechCo', sector: 'Dev Tools', roi: 7.0, sse: 78, value: 210000, status: 'Healthy', runway: 18 },
-                { name: 'DataFlow', sector: 'AI/ML', roi: 4.75, sse: 65, value: 95000, status: 'Monitor', runway: 14 },
-                { name: 'HealthTech', sector: 'Healthcare', roi: 2.43, sse: 42, value: 85000, status: 'At Risk', runway: 8 },
-                { name: 'FinanceApp', sector: 'Fintech', roi: 5.5, sse: 58, value: 220000, status: 'Monitor', runway: 16 }
-            ];
-            
-            // Deal flow
-            const dealFlow = [
-                { name: 'CloudSecure', sector: 'Cybersecurity', match: 94, sse: 87, ask: 2000000, check: 25000, warm: true },
-                { name: 'DevTools Pro', sector: 'Dev Tools', match: 89, sse: 82, ask: 1500000, check: 20000, warm: false },
-                { name: 'FinTech Innovate', sector: 'Fintech', match: 76, sse: 74, ask: 3000000, check: 35000, warm: true }
-            ];
-            
-            const Dashboard = () => {
-                const [activeTab, setActiveTab] = useState('overview');
-                const [alphaScore, setAlphaScore] = useState(angelProfile.alphaScore);
-                const [holdTime, setHoldTime] = useState(24);
-                const [showPremium, setShowPremium] = useState(false);
-                
-                const tabs = [
-                    { id: 'overview', label: 'Overview', icon: '📊' },
-                    { id: 'dealflow', label: 'Deal Flow', icon: '🔍' },
-                    { id: 'portfolio', label: 'Portfolio', icon: '💼' },
-                    { id: 'angelradar', label: 'Angel Radar', icon: '📡', premium: true },
-                    { id: 'reports', label: 'Reports', icon: '📄' }
-                ];
-                
-                const getStatusColor = (status) => {
-                    if (status === 'Strong') return 'border-green-400 bg-green-900/20';
-                    if (status === 'Healthy') return 'border-blue-400 bg-blue-900/20';
-                    if (status === 'Monitor') return 'border-yellow-400 bg-yellow-900/20';
-                    return 'border-red-400 bg-red-900/20';
-                };
-                
-                const getMatchColor = (match) => {
-                    if (match >= 90) return 'text-green-400 bg-green-900/20';
-                    if (match >= 75) return 'text-blue-400 bg-blue-900/20';
-                    return 'text-yellow-400 bg-yellow-900/20';
-                };
-                
-                return h('div', { className: 'min-h-screen bg-gray-950' },
-                    // Alert Banner
-                    h('div', { className: 'bg-gradient-to-r from-purple-500 to-blue-500 text-white p-4 sticky top-0 z-50' },
-                        h('div', { className: 'max-w-7xl mx-auto flex items-center justify-between' },
-                            h('div', { className: 'flex items-center gap-3' },
-                                h('span', { className: 'text-2xl animate-pulse' }, '⚡'),
-                                h('div', null,
-                                    h('strong', null, 'ANGEL INTELLIGENCE: '),
-                                    `Alpha Score: ${alphaScore} • 2 portfolio alerts`
-                                )
-                            ),
-                            h('div', { className: 'flex items-center gap-2' },
-                                h('div', { className: 'bg-green-400/20 px-3 py-1 rounded text-sm animate-pulse' }, 'Live AI'),
-                                h('button', { className: 'bg-white text-purple-600 px-4 py-2 rounded font-medium hover:bg-gray-100' }, '👁️ View Insights')
-                            )
-                        )
-                    ),
-                    
-                    // Navigation
-                    h('div', { className: 'bg-gray-900 border-b border-gray-700 sticky top-16 z-40' },
-                        h('div', { className: 'max-w-7xl mx-auto px-4' },
-                            h('div', { className: 'flex items-center justify-between py-4' },
-                                h('div', { className: 'text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 text-transparent', style: { backgroundClip: 'text', WebkitBackgroundClip: 'text' } }, 'AUXEIRA ANGEL'),
-                                h('div', { className: 'flex gap-1' },
-                                    ...tabs.map(tab =>
-                                        h('button', {
-                                            key: tab.id,
-                                            onClick: () => setActiveTab(tab.id),
-                                            className: `flex items-center gap-2 px-4 py-2 rounded-lg transition ${
-                                                activeTab === tab.id ? 'bg-purple-600 text-white' : 'text-gray-400 hover:bg-gray-800'
-                                            }`
-                                        }, 
-                                            tab.icon, ' ', tab.label,
-                                            tab.premium ? h('span', { className: 'text-yellow-400 text-xs ml-1' }, '🔒') : null
-                                        )
-                                    )
-                                ),
-                                h('div', { className: 'flex items-center gap-3' },
-                                    h('div', { className: 'bg-purple-500 text-white px-3 py-1 rounded text-sm font-medium' }, `Alpha: ${alphaScore}`),
-                                    h('div', { className: 'bg-blue-500 text-white px-3 py-1 rounded text-sm font-medium' }, `${angelProfile.totalROI}× ROI`),
-                                    h('div', { className: 'bg-green-500 text-white px-3 py-1 rounded text-sm font-medium' }, `$${(angelProfile.portfolioValue / 1000).toFixed(0)}K`)
-                                )
-                            )
-                        )
-                    ),
-                    
-                    // Main Content
-                    h('div', { className: 'max-w-7xl mx-auto p-6' },
-                        // Header
-                        h('div', { className: 'mb-8' },
-                            h('h1', { className: 'text-3xl font-bold mb-2' }, `Welcome back, ${angelProfile.name}`),
-                            h('p', { className: 'text-gray-400' },
-                                `${angelProfile.title} • $${(angelProfile.totalInvested / 1000).toFixed(0)}K Invested • ${angelProfile.activeInvestments} Active Companies • Alpha: ${alphaScore}`
-                            )
-                        ),
-                        
-                        // Overview Tab
-                        activeTab === 'overview' && h('div', { className: 'space-y-6' },
-                            // Profile Completion
-                            h('div', { className: 'bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg p-6' },
-                                h('div', { className: 'flex items-center justify-between mb-4' },
-                                    h('h3', { className: 'font-bold text-lg' }, 'Complete Your Profile for Better Deals'),
-                                    h('div', { className: 'bg-white/20 px-3 py-1 rounded font-bold' }, `${angelProfile.profileCompletion}%`)
-                                ),
-                                h('div', { className: 'relative h-3 bg-white/20 rounded-full mb-4 overflow-hidden' },
-                                    h('div', { className: 'absolute h-full bg-white rounded-full transition-all', style: { width: `${angelProfile.profileCompletion}%` } })
-                                ),
-                                h('p', { className: 'text-sm mb-4 opacity-90' }, 'Unlock personalized dealflow by completing your profile'),
-                                h('button', { className: 'w-full bg-white text-purple-600 py-2 rounded font-medium hover:bg-gray-100' }, '➕ Complete Profile Now')
-                            ),
-                            
-                            // Premium Paywall
-                            h('div', { className: 'bg-gradient-to-br from-purple-500 to-blue-500 text-white rounded-lg p-8 text-center' },
-                                h('div', { className: 'text-5xl mb-4' }, '👑'),
-                                h('h3', { className: 'text-2xl font-bold mb-4' }, 'Your 2022 pick beats medians 33%... but fintech\'s slipping'),
-                                h('p', { className: 'text-lg mb-6 opacity-90' }, 'Unlock Premium features for $39/month to see detailed risk analysis'),
-                                h('button', { className: 'bg-white text-purple-600 px-8 py-3 rounded-lg text-lg font-medium hover:bg-gray-100' }, '💳 Unlock Premium - $39/month')
-                            ),
-                            
-                            // Alpha & Nudge Scores
-                            h('div', { className: 'grid grid-cols-1 md:grid-cols-2 gap-6' },
-                                // Alpha Score
-                                h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
-                                    h('h3', { className: 'text-xl font-bold text-white mb-4 flex items-center gap-2' },
-                                        '🧠 Alpha Score',
-                                        h('span', { className: 'text-xs bg-purple-500/20 px-2 py-1 rounded' }, 'AI-Powered')
-                                    ),
-                                    h('div', { className: 'text-center' },
-                                        h('div', { className: 'text-6xl font-bold mb-2', style: { color: alphaScore >= 70 ? '#10b981' : '#3b82f6' } }, alphaScore),
-                                        h('div', { className: 'text-sm text-gray-400 mb-2' }, 'out of 100'),
-                                        h('div', { className: 'text-sm text-green-400' }, '+8 vs last month')
-                                    )
-                                ),
-                                
-                                // Nudge Score
-                                h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
-                                    h('h3', { className: 'text-xl font-bold text-white mb-4' }, '📡 Nudge Score'),
-                                    h('div', { className: 'text-center' },
-                                        h('div', { className: 'text-6xl font-bold text-blue-400 mb-2' }, `${angelProfile.nudgeScore}%`),
-                                        h('div', { className: 'text-sm text-gray-400 mb-4' }, `sticky, ${100 - angelProfile.nudgeScore}% fluff`),
-                                        h('div', { className: 'relative h-3 bg-gray-700 rounded-full overflow-hidden' },
-                                            h('div', { className: 'absolute h-full bg-gradient-to-r from-blue-500 to-purple-500', style: { width: `${angelProfile.nudgeScore}%` } })
-                                        )
-                                    )
-                                )
-                            ),
-                            
-                            // Portfolio Metrics
-                            h('div', { className: 'grid grid-cols-2 md:grid-cols-4 gap-4' },
-                                [
-                                    { label: 'Portfolio Value', value: `$${(angelProfile.portfolioValue / 1000).toFixed(0)}K`, change: '+$180K', color: 'green' },
-                                    { label: 'Total ROI', value: `${angelProfile.totalROI}×`, change: '+0.8×', color: 'blue' },
-                                    { label: 'Companies', value: angelProfile.activeInvestments, change: '5 Healthy', color: 'purple' },
-                                    { label: 'Avg IRR', value: `${angelProfile.avgIRR}%`, change: 'Top 20%', color: 'yellow' }
-                                ].map((metric, i) =>
-                                    h('div', { key: i, className: `bg-gray-900/50 border border-${metric.color}-400/30 rounded-lg p-4` },
-                                        h('div', { className: 'text-xs text-gray-400 mb-2' }, metric.label),
-                                        h('div', { className: `text-2xl font-bold text-${metric.color}-400 mb-1` }, metric.value),
-                                        h('div', { className: 'text-xs text-gray-400' }, metric.change)
-                                    )
-                                )
-                            ),
-                            
-                            // Flip Simulator
-                            h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
-                                h('h3', { className: 'text-xl font-bold text-white mb-4' }, '🧮 Flip Simulator'),
-                                h('p', { className: 'text-gray-400 text-sm mb-4' }, 'Drag hold time to see projected returns'),
-                                h('div', { className: 'text-center mb-4' },
-                                    h('div', { className: 'text-3xl font-bold text-blue-400 mb-2' }, `${holdTime} months`),
-                                    h('div', { className: 'text-sm text-gray-400' }, 'Hold Time')
-                                ),
-                                h('input', {
-                                    type: 'range',
-                                    min: 6,
-                                    max: 60,
-                                    value: holdTime,
-                                    onChange: (e) => setHoldTime(parseInt(e.target.value)),
-                                    className: 'w-full h-2 bg-gray-700 rounded-lg mb-6'
-                                }),
-                                h('div', { className: 'text-center p-4 bg-green-900/20 border border-green-400/30 rounded-lg' },
-                                    h('div', { className: 'text-3xl font-bold text-green-400 mb-2' }, `$${Math.round(45 * Math.pow(1.05, holdTime / 6))}K`),
-                                    h('div', { className: 'text-sm text-gray-400' }, 'Projected Return')
-                                )
-                            )
-                        ),
-                        
-                        // Deal Flow Tab
-                        activeTab === 'dealflow' && h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
-                            h('h2', { className: 'text-2xl font-bold text-white mb-6 flex items-center gap-2' },
-                                '🔍 Personalized Deal Flow',
-                                h('span', { className: 'text-sm bg-purple-500/20 px-3 py-1 rounded' }, 'AI-Matched')
-                            ),
-                            h('div', { className: 'space-y-4' },
-                                ...dealFlow.map(deal =>
-                                    h('div', { key: deal.name, className: 'bg-gray-800/50 border border-gray-600 rounded-lg p-6' },
-                                        h('div', { className: 'flex items-start justify-between mb-4' },
-                                            h('div', null,
-                                                h('h4', { className: 'font-semibold text-white text-lg' }, deal.name),
-                                                h('p', { className: 'text-gray-400' }, `${deal.sector} • Seed Stage`)
-                                            ),
-                                            h('div', { className: 'flex items-center gap-2' },
-                                                h('div', { className: `${getMatchColor(deal.match)} font-bold text-lg px-3 py-1 rounded` }, `${deal.match}% Match`),
-                                                deal.warm && h('div', { className: 'bg-green-500/20 text-green-400 px-2 py-1 rounded text-sm' }, '🔥 Warm Intro')
-                                            )
-                                        ),
-                                        h('div', { className: 'grid grid-cols-3 gap-4 mb-4' },
-                                            h('div', null,
-                                                h('div', { className: 'text-sm text-gray-400' }, 'Ask Amount'),
-                                                h('div', { className: 'font-semibold text-white' }, `$${(deal.ask / 1000000).toFixed(1)}M`)
-                                            ),
-                                            h('div', null,
-                                                h('div', { className: 'text-sm text-gray-400' }, 'Your Check'),
-                                                h('div', { className: 'font-semibold text-green-400' }, `$${(deal.check / 1000).toFixed(0)}K`)
-                                            ),
-                                            h('div', null,
-                                                h('div', { className: 'text-sm text-gray-400' }, 'SSE Score'),
-                                                h('div', { className: 'font-semibold text-purple-400' }, deal.sse)
-                                            )
-                                        ),
-                                        h('div', { className: 'flex gap-2' },
-                                            h('button', { className: 'flex-1 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded font-medium transition' }, '👁️ View Details'),
-                                            h('button', { className: 'flex-1 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-medium transition' }, '❤️ Express Interest')
-                                        )
-                                    )
-                                )
-                            )
-                        ),
-                        
-                        // Portfolio Tab
-                        activeTab === 'portfolio' && h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
-                            h('h2', { className: 'text-2xl font-bold text-white mb-6' }, `💼 Portfolio Companies (${portfolioCompanies.length})`),
-                            h('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4' },
-                                ...portfolioCompanies.map(company =>
-                                    h('div', { key: company.name, className: `${getStatusColor(company.status)} border-2 rounded-lg p-4` },
-                                        h('div', { className: 'flex items-center justify-between mb-3' },
-                                            h('div', null,
-                                                h('h4', { className: 'font-semibold text-white' }, company.name),
-                                                h('p', { className: 'text-sm text-gray-400' }, company.sector)
-                                            ),
-                                            h('div', { className: 'text-xs px-2 py-1 rounded bg-gray-700' }, company.status)
-                                        ),
-                                        h('div', { className: 'grid grid-cols-3 gap-2 mb-3' },
-                                            h('div', null,
-                                                h('div', { className: 'text-lg font-bold text-green-400' }, `${company.roi.toFixed(1)}×`),
-                                                h('div', { className: 'text-xs text-gray-400' }, 'ROI')
-                                            ),
-                                            h('div', null,
-                                                h('div', { className: 'text-lg font-bold text-purple-400' }, company.sse),
-                                                h('div', { className: 'text-xs text-gray-400' }, 'SSE')
-                                            ),
-                                            h('div', null,
-                                                h('div', { className: 'text-lg font-bold text-blue-400' }, `$${(company.value / 1000).toFixed(0)}K`),
-                                                h('div', { className: 'text-xs text-gray-400' }, 'Value')
-                                            )
-                                        ),
-                                        h('div', { className: 'text-xs text-gray-400' }, `Runway: ${company.runway}mo`)
-                                    )
-                                )
-                            )
-                        ),
-                        
-                        // Angel Radar Tab (Premium)
-                        activeTab === 'angelradar' && h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6 relative' },
-                            h('div', { className: 'absolute inset-0 bg-gray-900/80 backdrop-blur-sm rounded-lg z-10 flex items-center justify-center' },
-                                h('div', { className: 'text-center p-6' },
-                                    h('div', { className: 'text-6xl mb-4' }, '🔒'),
-                                    h('h3', { className: 'font-semibold text-white text-xl mb-2' }, 'Angel Radar - Premium Feature'),
-                                    h('p', { className: 'text-gray-400 mb-4' }, 'Get real-time signals on cash flow, sentiment, and exit opportunities'),
-                                    h('button', { className: 'bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-3 rounded-lg font-medium hover:opacity-90' }, '👑 Upgrade to Premium')
-                                )
-                            ),
-                            h('div', { className: 'blur-sm' },
-                                h('h2', { className: 'text-2xl font-bold text-white mb-6' }, '📡 Angel Radar'),
-                                h('div', { className: 'grid grid-cols-3 gap-6' },
-                                    h('div', { className: 'text-center' },
-                                        h('div', { className: 'text-3xl font-bold text-green-400' }, '78'),
-                                        h('div', { className: 'text-sm text-gray-400' }, 'Cash Signals')
-                                    ),
-                                    h('div', { className: 'text-center' },
-                                        h('div', { className: 'text-3xl font-bold text-yellow-400' }, '65'),
-                                        h('div', { className: 'text-sm text-gray-400' }, 'Sentiment')
-                                    ),
-                                    h('div', { className: 'text-center' },
-                                        h('div', { className: 'text-3xl font-bold text-blue-400' }, '82'),
-                                        h('div', { className: 'text-sm text-gray-400' }, 'Exit Signals')
-                                    )
-                                )
-                            )
-                        ),
-                        
-                        // Reports Tab
-                        activeTab === 'reports' && h('div', { className: 'bg-gray-900/50 border border-gray-700 rounded-lg p-6' },
-                            h('div', { className: 'text-center mb-6' },
-                                h('div', { className: 'text-6xl mb-4' }, '📄'),
-                                h('h3', { className: 'text-2xl font-bold text-white mb-2' }, 'Generate Professional Reports'),
-                                h('p', { className: 'text-gray-400' }, 'Create comprehensive portfolio reports for tax purposes or LP updates')
-                            ),
-                            h('div', { className: 'grid grid-cols-2 gap-4 mb-6' },
-                                h('div', { className: 'p-4 bg-gray-800/30 rounded-lg border border-gray-600' },
-                                    h('h4', { className: 'font-semibold text-white mb-2' }, 'Portfolio Summary'),
-                                    h('ul', { className: 'text-sm text-gray-300 space-y-1' },
-                                        h('li', null, '• Performance overview'),
-                                        h('li', null, '• ROI calculations'),
-                                        h('li', null, '• Risk assessment')
-                                    )
-                                ),
-                                h('div', { className: 'p-4 bg-gray-800/30 rounded-lg border border-gray-600' },
-                                    h('h4', { className: 'font-semibold text-white mb-2' }, 'Tax Documentation'),
-                                    h('ul', { className: 'text-sm text-gray-300 space-y-1' },
-                                        h('li', null, '• Capital gains/losses'),
-                                        h('li', null, '• Timeline tracking'),
-                                        h('li', null, '• Professional format')
-                                    )
-                                )
-                            ),
-                            h('button', { className: 'w-full bg-gradient-to-r from-blue-600 to-purple-600 py-3 rounded-lg font-medium hover:opacity-90' }, '⬇️ Generate Report - $29')
-                        )
-                    )
-                );
-            };
-            
-            const root = createRoot(document.getElementById('root'));
-            root.render(h(Dashboard));
-            console.log('✅ Angel Investor Dashboard loaded!');
-        }, 1000);
+            const handler = PaystackPop.setup({
+                key: 'pk_test_your_paystack_public_key',
+                email: 'michael.chen@angelinvestor.com',
+                amount: prices[type],
+                currency: 'USD',
+                ref: `report_${type}_` + Math.floor((Math.random() * 1000000000) + 1),
+                callback: function(response) {
+                    alert(`Report purchased successfully! Reference: ${response.reference}`);
+                    // Generate and download report
+                    generateReport(type);
+                },
+                onClose: function() {
+                    alert('Payment cancelled');
+                }
+            });
+            handler.openIframe();
+        }
+
+        // Update data every 30 seconds
+        setInterval(updateLastUpdated, 30000);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                // Close any open modals
+                const modals = document.querySelectorAll('.modal.show');
+                modals.forEach(modal => {
+                    bootstrap.Modal.getInstance(modal).hide();
+                });
+            }
+        });
     </script>
 </body>
 </html>
