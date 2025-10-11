@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESG Education Impact Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; background: #030712; color: white; }
+        .loading { opacity: 0.5; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Hero Impact Section -->
+        <div class="hero-impact bg-gradient-to-r from-blue-600 to-purple-600 p-8 text-center">
+            <h1 class="text-4xl font-bold mb-4">Education Impact Dashboard</h1>
+            <div class="grid grid-cols-3 gap-6 max-w-4xl mx-auto">
+                <div>
+                    <div class="impact-number text-5xl font-bold" data-bind="students_reached|number">--</div>
+                    <div class="text-sm mt-2">Students Reached</div>
+                </div>
+                <div>
+                    <div class="impact-number text-5xl font-bold" data-bind="teachers_trained|number">--</div>
+                    <div class="text-sm mt-2">Teachers Trained</div>
+                </div>
+                <div>
+                    <div class="impact-number text-5xl font-bold" data-bind="schools_supported|number">--</div>
+                    <div class="text-sm mt-2">Schools Supported</div>
+                </div>
+            </div>
+            
+            <!-- Archive Toggle -->
+            <div class="mt-6">
+                <button id="toggle365" class="bg-white text-blue-600 px-4 py-2 rounded mr-2 font-medium">365 Days</button>
+                <button id="toggle5yr" class="bg-blue-800 text-white px-4 py-2 rounded font-medium">5-Year History</button>
+            </div>
+            
+            <div class="text-sm mt-4 opacity-75">
+                <span data-bind="impact_narrative">Loading...</span> • 
+                <span data-bind="total_startups|number">--</span> active investments
+            </div>
+        </div>
+        
+        <!-- Story Section -->
+        <div class="max-w-6xl mx-auto p-8">
+            <div class="bg-gray-900 rounded-lg p-6 mb-8">
+                <h2 class="text-2xl font-bold mb-4">Impact Story</h2>
+                <div class="story-title text-xl text-blue-400 mb-2" data-bind="story_title">--</div>
+                <p class="text-gray-400">
+                    Real-time data from <span data-bind="total_startups|number">--</span> education technology 
+                    investments driving measurable learning outcomes across <span data-bind="schools_supported|number">--</span> schools.
+                </p>
+            </div>
+            
+            <!-- Metrics Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-green-400" data-bind="sse_score">--</div>
+                    <div class="text-sm text-gray-400">Avg SSE Score</div>
+                </div>
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-blue-400" data-bind="growth_rate">--</div>
+                    <div class="text-sm text-gray-400">Growth Rate %</div>
+                </div>
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-purple-400">$<span data-bind="mrr_total|number">--</span></div>
+                    <div class="text-sm text-gray-400">Total MRR</div>
+                </div>
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-yellow-400" data-bind="days_range">--</div>
+                    <div class="text-sm text-gray-400">Days Range</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentDays = 365;
+        
+        // Data binding function
+        function bindData(data) {
+            document.querySelectorAll('[data-bind]').forEach(el => {
+                const [key, format] = el.getAttribute('data-bind').split('|');
+                const value = data[key];
+                
+                if (format === 'number') {
+                    el.textContent = parseInt(value).toLocaleString();
+                } else {
+                    el.textContent = value;
+                }
+            });
+        }
+        
+        // Fetch and bind data
+        async function loadData(days) {
+            document.getElementById('app').classList.add('loading');
+            
+            try {
+                const response = await fetch(`/api/sim-data?days=${days}`);
+                const data = await response.json();
+                bindData(data[0]);
+                currentDays = days;
+                
+                // Update button states
+                document.getElementById('toggle365').className = 
+                    days === 365 ? 'bg-white text-blue-600 px-4 py-2 rounded mr-2 font-medium' 
+                                 : 'bg-blue-800 text-white px-4 py-2 rounded mr-2 font-medium';
+                document.getElementById('toggle5yr').className = 
+                    days === 1825 ? 'bg-white text-blue-600 px-4 py-2 rounded font-medium' 
+                                  : 'bg-blue-800 text-white px-4 py-2 rounded font-medium';
+            } catch (error) {
+                console.error('Error loading data:', error);
+            } finally {
+                document.getElementById('app').classList.remove('loading');
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('toggle365').addEventListener('click', () => loadData(365));
+        document.getElementById('toggle5yr').addEventListener('click', () => loadData(1825));
+        
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => loadData(365));
+        
+        // Auto-refresh every 5 minutes
+        setInterval(() => loadData(currentDays), 5 * 60 * 1000);
+    </script>
+</body>
+</html>

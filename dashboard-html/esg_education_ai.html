@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESG Education Impact Dashboard - AI-Powered</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; background: #030712; color: white; font-family: system-ui; }
+        .loading { opacity: 0.5; pointer-events: none; }
+        .report-card { transition: all 0.3s; cursor: pointer; }
+        .report-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
+        .locked-overlay { backdrop-filter: blur(8px); }
+        .ai-badge { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold">ESG Education Dashboard</h1>
+                    <p class="text-blue-100 text-sm">AI-Powered Impact Intelligence</p>
+                </div>
+                <div class="flex gap-4">
+                    <div class="text-right">
+                        <div class="text-2xl font-bold" data-bind="profile_completeness">0%</div>
+                        <div class="text-xs text-blue-100">Profile Complete</div>
+                    </div>
+                    <button class="bg-white text-blue-600 px-4 py-2 rounded font-medium hover:bg-blue-50">
+                        Complete Profile →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Nudge Bar -->
+        <div id="nudge-bar" class="bg-yellow-500 text-black p-3 text-center" style="display: none;">
+            <span class="font-medium"> </span>
+            <span data-bind="nudge_message">Complete your profile to unlock personalized AI insights</span>
+            <button class="ml-4 underline font-medium">Take 2 minutes →</button>
+        </div>
+
+        <!-- Impact Stats -->
+        <div class="max-w-7xl mx-auto p-6">
+            <div class="grid grid-cols-4 gap-4 mb-8">
+                <div class="bg-gray-900 rounded-lg p-6 text-center">
+                    <div class="text-4xl font-bold text-blue-400" data-bind="students_reached|number">--</div>
+                    <div class="text-sm text-gray-400 mt-2">Students Reached</div>
+                </div>
+                <div class="bg-gray-900 rounded-lg p-6 text-center">
+                    <div class="text-4xl font-bold text-green-400" data-bind="sse_score">--</div>
+                    <div class="text-sm text-gray-400 mt-2">Avg SSE Score</div>
+                </div>
+                <div class="bg-gray-900 rounded-lg p-6 text-center">
+                    <div class="text-4xl font-bold text-purple-400" data-bind="portfolio_roi">--</div>
+                    <div class="text-sm text-gray-400 mt-2">Portfolio ROI</div>
+                </div>
+                <div class="bg-gray-900 rounded-lg p-6 text-center">
+                    <div class="text-4xl font-bold text-yellow-400" data-bind="impact_score">--</div>
+                    <div class="text-sm text-gray-400 mt-2">Impact Score</div>
+                </div>
+            </div>
+
+            <!-- AI Reports Section -->
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">Your AI-Powered Reports</h2>
+                    <span class="text-sm text-gray-400">Updated daily at 6 AM</span>
+                </div>
+
+                <div id="reports-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Reports loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Report Showcase (20 report types) -->
+            <div class="bg-gray-900 rounded-lg p-8">
+                <h3 class="text-xl font-bold mb-6">Available AI Reports</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="report-catalog">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div id="report-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center p-4" style="z-index: 1000;">
+        <div class="bg-gray-900 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-800">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="ai-badge inline-block px-3 py-1 rounded text-xs font-bold mb-2">AI-GENERATED</div>
+                        <h2 class="text-2xl font-bold" id="modal-title">Report Title</h2>
+                        <p class="text-gray-400 text-sm" id="modal-subtitle">Subtitle</p>
+                    </div>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div id="modal-content">
+                    <!-- Report content -->
+                </div>
+                <div id="locked-overlay" class="locked-overlay bg-gray-800 bg-opacity-90 p-8 rounded-lg text-center mt-4" style="display: none;">
+                    <div class="text-4xl mb-4"> <div class="text-4xl mb-4"> </div>
+                    <h3 class="text-2xl font-bold mb-2">Unlock Full Report</h3>
+                    <p class="text-gray-400 mb-6">Get complete AI-powered analysis with actionable insights</p>
+                    <div class="text-5xl font-bold text-green-400 mb-6">$<span id="unlock-price">49</span></div>
+                    <button class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-bold hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition">
+                        Unlock Now →
+                    </button>
+                    <p class="text-sm text-gray-500 mt-4">One-time payment • Instant access • No subscription</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Report Catalog - 20 AI Report Types
+        const REPORT_CATALOG = [
+            { id: 'daily_digest', name: 'Daily Digest', icon: ' ', free: true, price: 0, desc: 'Top insights & portfolio updates' },
+            { id: 'portfolio_deep_dive', name: 'Portfolio Deep Dive', icon: ' ', free: false, price: 49, desc: 'Company-by-company analysis' },
+            { id: 'market_intelligence', name: 'Market Intelligence', icon: ' ', free: false, price: 79, desc: 'EdTech sector trends & opportunities' },
+            { id: 'impact_story', name: 'Impact Story', icon: ' ', free: true, price: 0, desc: 'Human-centered impact narrative' },
+            { id: 'risk_alert', name: 'Risk Alerts', icon: ' ', free: true, price: 0, desc: 'Real-time portfolio warnings' },
+            { id: 'benchmark_report', name: 'Benchmark Report', icon: ' ', free: false, price: 99, desc: 'Compare vs. top education funds' },
+            { id: 'sdg_alignment', name: 'SDG Alignment', icon: ' ', free: false, price: 59, desc: 'UN SDG impact mapping' },
+            { id: 'due_diligence', name: 'AI Due Diligence', icon: ' ', free: false, price: 149, desc: 'Deep startup evaluation' },
+            { id: 'teacher_impact', name: 'Teacher Impact', icon: ' ', free: false, price: 69, desc: 'Teacher training outcomes' },
+            { id: 'learning_outcomes', name: 'Learning Outcomes', icon: ' ', free: false, price: 79, desc: 'Student achievement analysis' },
+            { id: 'geo_expansion', name: 'Geographic Expansion', icon: ' ', free: false, price: 89, desc: 'New market opportunities' },
+            { id: 'tech_innovation', name: 'Tech Innovation', icon: ' ', free: false, price: 79, desc: 'Emerging EdTech trends' },
+            { id: 'funding_forecast', name: 'Funding Forecast', icon: ' ', free: false, price: 99, desc: 'AI-predicted funding rounds' },
+            { id: 'competitor_analysis', name: 'Competitor Analysis', icon: ' ', free: false, price: 89, desc: 'Competitive landscape mapping' },
+            { id: 'exit_scenarios', name: 'Exit Scenarios', icon: ' ', free: false, price: 129, desc: 'M&A and IPO modeling' },
+            { id: 'impact_valuation', name: 'Impact Valuation', icon: ' ', free: false, price: 149, desc: 'SROI & blended value analysis' },
+            { id: 'esg_scorecard', name: 'ESG Scorecard', icon: ' ', free: false, price: 69, desc: 'Comprehensive ESG ratings' },
+            { id: 'lp_report', name: 'LP Report Generator', icon: ' ', free: false, price: 199, desc: 'Professional investor reports' },
+            { id: 'custom_analysis', name: 'Custom Analysis', icon: ' ', free: false, price: 299, desc: 'Tailored research questions' },
+            { id: 'ai_recommendations', name: 'AI Investment Recs', icon: ' ', free: false, price: 149, desc: 'AI-matched deal flow' },
+        ];
+
+        let currentReports = [];
+        let profileData = {};
+
+        // Initialize dashboard
+        async function init() {
+            await loadProfileData();
+            await loadReports();
+            renderReportCatalog();
+            checkProfileNudges();
+        }
+
+        // Load investor profile
+        async function loadProfileData() {
+            try {
+                const response = await fetch('/api/esg-profile');
+                profileData = await response.json();
+                
+                // Bind profile data
+                document.querySelector('[data-bind="profile_completeness"]').textContent = 
+                    profileData.profileCompleteness + '%';
+                
+                // Show nudge if profile incomplete
+                if (profileData.profileCompleteness < 60) {
+                    showNudge(profileData.nudgeMessage || 'Complete your profile for personalized insights');
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        // Load AI-generated reports
+        async function loadReports() {
+            try {
+                const response = await fetch('/api/ai-reports');
+                currentReports = await response.json();
+                
+                const grid = document.getElementById('reports-grid');
+                grid.innerHTML = '';
+                
+                currentReports.forEach(report => {
+                    const card = createReportCard(report);
+                    grid.appendChild(card);
+                });
+                
+                // Bind impact data from latest report
+                if (currentReports.length > 0) {
+                    const latestData = currentReports[0].keyInsights;
+                    bindImpactData(latestData);
+                }
+            } catch (error) {
+                console.error('Error loading reports:', error);
+            }
+        }
+
+        // Create report card
+        function createReportCard(report) {
+            const card = document.createElement('div');
+            card.className = 'report-card bg-gray-800 rounded-lg p-6 border border-gray-700';
+            card.onclick = () => openReport(report);
+            
+            const catalogItem = REPORT_CATALOG.find(r => r.id === report.reportType);
+            const icon = catalogItem?.icon || ' ';
+            const isFree = !report.requiresPayment;
+            
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-4">
+                    <div class="text-4xl">${icon}</div>
+                    ${isFree ? 
+                        '<span class="bg-green-500 text-white text-xs px-2 py-1 rounded font-bold">FREE</span>' :
+                        `<span class="bg-purple-500 text-white text-xs px-2 py-1 rounded font-bold">$${report.unlockPrice}</span>`
+                    }
+                </div>
+                <h3 class="text-xl font-bold mb-2">${report.title}</h3>
+                <p class="text-gray-400 text-sm mb-4">${report.subtitle || ''}</p>
+                <div class="flex justify-between items-center text-xs text-gray-500">
+                    <span>${new Date(report.generatedAt).toLocaleDateString()}</span>
+                    <span>${report.viewCount} views</span>
+                </div>
+                ${report.isTeaser ? '<div class="mt-4 text-yellow-400 text-sm font-medium"> Teaser Available</div>' : ''}
+            `;
+            
+            return card;
+        }
+
+        // Render report catalog
+        function renderReportCatalog() {
+            const catalog = document.getElementById('report-catalog');
+            catalog.innerHTML = '';
+            
+            REPORT_CATALOG.forEach(report => {
+                const item = document.createElement('div');
+                item.className = 'bg-gray-800 rounded-lg p-4 hover:bg-gray-750 cursor-pointer transition';
+                item.onclick = () => requestReport(report);
+                
+                item.innerHTML = `
+                    <div class="text-3xl mb-2">${report.icon}</div>
+                    <div class="font-bold text-sm mb-1">${report.name}</div>
+                    <div class="text-xs text-gray-400 mb-2">${report.desc}</div>
+                    ${report.free ?
+                        '<div class="text-green-400 text-xs font-bold">FREE</div>' :
+                        `<div class="text-purple-400 text-xs font-bold">$${report.price}</div>`
+                    }
+                `;
+                
+                catalog.appendChild(item);
+            });
+        }
+
+        // Open report modal
+        function openReport(report) {
+            document.getElementById('modal-title').textContent = report.title;
+            document.getElementById('modal-subtitle').textContent = report.subtitle || '';
+            
+            const content = document.getElementById('modal-content');
+            
+            if (report.isTeaser) {
+                // Show teaser content
+                content.innerHTML = `
+                    <div class="prose prose-invert max-w-none">
+                        <h3>Executive Summary</h3>
+                        <p>${report.teaserContent}</p>
+                    </div>
+                `;
+                
+                // Show unlock overlay
+                document.getElementById('unlock-price').textContent = report.unlockPrice;
+                document.getElementById('locked-overlay').style.display = 'block';
+            } else {
+                // Show full report
+                content.innerHTML = `
+                    <div class="prose prose-invert max-w-none">
+                        <h3>Executive Summary</h3>
+                        <p class="text-gray-300">${report.executiveSummary}</p>
+                        
+                        <h3 class="mt-6">Key Insights</h3>
+                        ${report.keyInsights.map(insight => `
+                            <div class="bg-gray-800 p-4 rounded mb-3">
+                                <div class="font-bold text-blue-400">${insight.insight}</div>
+                                <div class="text-2xl font-bold mt-2">${insight.data}</div>
+                            </div>
+                        `).join('')}
+                        
+                        <h3 class="mt-6">Full Analysis</h3>
+                        <div class="text-gray-300 whitespace-pre-line">${report.narrativeBody}</div>
+                        
+                        <h3 class="mt-6">Recommendations</h3>
+                        ${report.recommendations.map((rec, i) => `
+                            <div class="flex items-start gap-3 mb-3">
+                                <div class="text-2xl">${i + 1}.</div>
+                                <div>
+                                    <div class="font-bold">${rec.action}</div>
+                                    <div class="text-sm text-gray-400">Priority: ${rec.priority}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                document.getElementById('locked-overlay').style.display = 'none';
+            }
+            
+            document.getElementById('report-modal').style.display = 'flex';
+            
+            // Track view
+            fetch(`/api/ai-reports/${report.reportId}/view`, { method: 'POST' });
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('report-modal').style.display = 'none';
+        }
+
+        // Request new report generation
+        async function requestReport(reportType) {
+            if (profileData.profileCompleteness < 60 && !reportType.free) {
+                alert('Please complete your profile to unlock premium reports');
+                return;
+            }
+            
+            if (!reportType.free && profileData.tier === 'free') {
+                if (confirm(`Unlock ${reportType.name} for $${reportType.price}?`)) {
+                    window.location.href = `/checkout?report=${reportType.id}&price=${reportType.price}`;
+                }
+                return;
+            }
+            
+            // Generate free report
+            try {
+                const response = await fetch('/api/ai-reports/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reportType: reportType.id }),
+                });
+                
+                const newReport = await response.json();
+                alert(`Report "${newReport.title}" generated! Check your reports.`);
+                loadReports();
+            } catch (error) {
+                console.error('Error generating report:', error);
+                alert('Error generating report. Please try again.');
+            }
+        }
+
+        // Show profile nudge
+        function showNudge(message) {
+            document.querySelector('[data-bind="nudge_message"]').textContent = message;
+            document.getElementById('nudge-bar').style.display = 'block';
+        }
+
+        // Check for profile nudges
+        async function checkProfileNudges() {
+            try {
+                const response = await fetch('/api/profile-nudges');
+                const nudges = await response.json();
+                
+                if (nudges.length > 0) {
+                    showNudge(nudges[0].message);
+                }
+            } catch (error) {
+                console.error('Error loading nudges:', error);
+            }
+        }
+
+        // Bind impact data
+        function bindImpactData(insights) {
+            // Extract data from insights
+            const studentsData = insights.find(i => i.insight.toLowerCase().includes('student'));
+            const sseData = insights.find(i => i.insight.toLowerCase().includes('sse'));
+            
+            if (studentsData) {
+                document.querySelector('[data-bind="students_reached|number"]').textContent = 
+                    parseInt(studentsData.data.replace(/\D/g, '')).toLocaleString();
+            }
+            
+            if (sseData) {
+                document.querySelector('[data-bind="sse_score"]').textContent = 
+                    parseInt(sseData.data.replace(/\D/g, ''));
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Auto-refresh every 5 minutes
+        setInterval(loadReports, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
