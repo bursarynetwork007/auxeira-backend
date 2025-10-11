@@ -3,408 +3,1592 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Startup Founder Dashboard - Auxeira</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <title>Auxeira - Startup Founder Success Engine</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Paystack -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    
     <style>
-        body { margin: 0; background: #030712; min-height: 100vh; color: white; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        .animate-bounce { animation: bounce 1s infinite; }
+        :root {
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #1a1a1a;
+            --accent-bg: #2a2a2a;
+            --neon-blue: #00d4ff;
+            --neon-purple: #8b5cf6;
+            --neon-gold: #fbbf24;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Glass Morphism Effects */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+        }
+
+        /* Header */
+        .dashboard-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand-logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Critical Action Banner */
+        .critical-banner {
+            background: linear-gradient(45deg, var(--danger-red), var(--warning-orange));
+            padding: 12px 24px;
+            margin: 16px 0;
+            border-radius: 12px;
+            animation: pulse 2s infinite;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            border-bottom: 1px solid var(--glass-border);
+            margin-bottom: 24px;
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--text-secondary);
+            border: none;
+            padding: 12px 24px;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--neon-blue);
+            background: var(--glass-bg);
+            border-bottom: 2px solid var(--neon-blue);
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--glass-bg);
+        }
+
+        /* Metrics Cards */
+        .metric-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-trend {
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+
+        .trend-up { color: var(--success-green); }
+        .trend-down { color: var(--danger-red); }
+
+        /* SSE Score Circle */
+        .sse-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--neon-blue) 0deg, var(--neon-blue) 252deg, var(--accent-bg) 252deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            position: relative;
+        }
+
+        .sse-circle::before {
+            content: '';
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: var(--secondary-bg);
+            position: absolute;
+        }
+
+        .sse-score {
+            font-size: 24px;
+            font-weight: 700;
+            z-index: 1;
+            color: var(--neon-blue);
+        }
+
+        /* AI Mentor */
+        .ai-mentor {
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-mentor::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .mentor-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Token System */
+        .token-display {
+            background: linear-gradient(45deg, var(--neon-gold), var(--warning-orange));
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .token-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-bg);
+        }
+
+        /* Progress Bars */
+        .progress-container {
+            background: var(--accent-bg);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* Nudge Cards */
+        .nudge-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nudge-card.urgent {
+            border-color: var(--danger-red);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+            to { box-shadow: 0 0 30px rgba(239, 68, 68, 0.5); }
+        }
+
+        .nudge-card.opportunity {
+            border-color: var(--success-green);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-outline-primary {
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            background: transparent;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--neon-blue);
+            color: var(--primary-bg);
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+
+        /* Daily Q&A */
+        .qa-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .qa-card:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
+        }
+
+        .question-badge {
+            background: var(--neon-gold);
+            color: var(--primary-bg);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .metric-card {
+                margin-bottom: 16px;
+            }
+            
+            .metric-value {
+                font-size: 2rem;
+            }
+            
+            .sse-circle {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .sse-circle::before {
+                width: 75px;
+                height: 75px;
+            }
+        }
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .spinner {
+            border: 2px solid var(--accent-bg);
+            border-top: 2px solid var(--neon-blue);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <div id="root">
-        <div style="display: flex; align-items: center; justify-content: center; height: 100vh;">
-            <div style="text-align: center;">
-                <div style="width: 50px; height: 50px; border: 4px solid rgba(59,130,246,0.3); border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-                <div>Loading Startup Founder Dashboard...</div>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="brand-logo">
+                        <i class="fas fa-rocket me-2"></i>Auxeira
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="d-flex align-items-center justify-content-end">
+                        <div class="me-3">
+                            <small class="text-secondary">Welcome back,</small>
+                            <div class="fw-bold" data-bind="founder_name">Sarah Chen</div>
+                        </div>
+                        <div class="token-display me-3">
+                            <div class="token-amount" data-bind="aux_tokens">1,247</div>
+                            <small>AUX Tokens</small>
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Critical Action Banner -->
+    <div class="container-fluid mt-3">
+        <div class="critical-banner" id="criticalBanner">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Action Required:</strong> Complete customer interview #8 to unlock Series A readiness assessment
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-light btn-sm me-2">Complete Now</button>
+                    <button class="btn btn-outline-light btn-sm" onclick="dismissBanner()">Later</button>
+                </div>
             </div>
         </div>
     </div>
-    
+
+    <!-- Main Dashboard -->
+    <div class="container-fluid mt-4">
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
+                    <i class="fas fa-tachometer-alt me-2"></i>Overview
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="growth-tab" data-bs-toggle="tab" data-bs-target="#growth" type="button" role="tab" aria-controls="growth" aria-selected="false">
+                    <i class="fas fa-chart-line me-2"></i>Growth Metrics
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="funding-tab" data-bs-toggle="tab" data-bs-target="#funding" type="button" role="tab" aria-controls="funding" aria-selected="false">
+                    <i class="fas fa-dollar-sign me-2"></i>Funding Readiness
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="learning-tab" data-bs-toggle="tab" data-bs-target="#learning" type="button" role="tab" aria-controls="learning" aria-selected="false">
+                    <i class="fas fa-graduation-cap me-2"></i>Daily Learning
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="partnerships-tab" data-bs-toggle="tab" data-bs-target="#partnerships" type="button" role="tab" aria-controls="partnerships" aria-selected="false">
+                    <i class="fas fa-handshake me-2"></i>Partnerships
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="dashboardTabContent">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                <div class="row">
+                    <!-- SSE Score -->
+                    <div class="col-md-3">
+                        <div class="glass-card text-center">
+                            <div class="sse-circle">
+                                <div class="sse-score" data-bind="sse_score">78</div>
+                            </div>
+                            <h5>SSE Score</h5>
+                            <div class="metric-trend trend-up">
+                                <i class="fas fa-arrow-up"></i> +5 this week
+                            </div>
+                            <div class="progress-container mt-3">
+                                <div class="progress-bar" style="width: 78%"></div>
+                            </div>
+                            <small class="text-secondary">Series A Ready: 85+</small>
+                        </div>
+                    </div>
+
+                    <!-- Company Valuation -->
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <div class="metric-value text-success" data-bind="company_valuation">$2.4M</div>
+                            <div class="metric-label">Company Valuation</div>
+                            <div class="metric-trend trend-up">
+                                <i class="fas fa-arrow-up"></i> +12.3% this month
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Monthly Recurring Revenue -->
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <div class="metric-value text-primary" data-bind="mrr">$18,500</div>
+                            <div class="metric-label">Monthly Recurring Revenue</div>
+                            <div class="metric-trend trend-up">
+                                <i class="fas fa-arrow-up"></i> +8.7% vs last month
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Acquisition Cost -->
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <div class="metric-value text-warning" data-bind="cac">$127</div>
+                            <div class="metric-label">Customer Acquisition Cost</div>
+                            <div class="metric-trend trend-down">
+                                <i class="fas fa-arrow-down"></i> -15.2% (Good!)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Mentor Section -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="ai-mentor">
+                            <div class="mentor-content">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h4><i class="fas fa-robot me-2"></i>Auxeira AI Mentor</h4>
+                                        <p class="mb-2">Based on your recent metrics, I've identified 3 critical actions to accelerate your Series A readiness:</p>
+                                        <ul class="mb-0">
+                                            <li>Reduce CAC by 20% through referral program optimization</li>
+                                            <li>Complete 2 more customer interviews to reach validation threshold</li>
+                                            <li>Prepare financial projections for next 18 months</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <button class="btn btn-light">
+                                            <i class="fas fa-comments me-2"></i>Chat with Mentor
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Urgent Actions -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <h5 class="mb-3">🚨 Urgent Actions</h5>
+                        <div class="nudge-card urgent">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6>Customer Interview #8</h6>
+                                    <p class="mb-0">Complete to unlock Series A assessment</p>
+                                </div>
+                                <div>
+                                    <span class="badge bg-danger">2 days left</span>
+                                    <button class="btn btn-sm btn-primary ms-2">Start Now</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="nudge-card urgent">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6>Financial Model Update</h6>
+                                    <p class="mb-0">Your projections are 30 days old</p>
+                                </div>
+                                <div>
+                                    <span class="badge bg-warning">Overdue</span>
+                                    <button class="btn btn-sm btn-outline-primary ms-2">Update</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h5 class="mb-3">💡 Opportunities</h5>
+                        <div class="nudge-card opportunity">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6>Partnership with TechCorp</h6>
+                                    <p class="mb-0">Potential 40% CAC reduction</p>
+                                </div>
+                                <div>
+                                    <span class="badge bg-success">+250 AUX</span>
+                                    <button class="btn btn-sm btn-primary ms-2">Explore</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="nudge-card opportunity">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6>Investor Introduction</h6>
+                                    <p class="mb-0">Warm intro to Series A investor</p>
+                                </div>
+                                <div>
+                                    <span class="badge bg-success">+500 AUX</span>
+                                    <button class="btn btn-sm btn-primary ms-2">Accept</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Metrics Chart -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Growth Trajectory</h5>
+                            <div class="chart-container">
+                                <canvas id="growthChart" aria-label="Growth trajectory chart showing MRR, CAC, and SSE score over time"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Growth Metrics Tab -->
+            <div class="tab-pane fade" id="growth" role="tabpanel" aria-labelledby="growth-tab">
+                <div class="row">
+                    <!-- Customer Metrics -->
+                    <div class="col-md-4">
+                        <div class="metric-card">
+                            <div class="metric-value text-primary" data-bind="total_customers">1,247</div>
+                            <div class="metric-label">Total Customers</div>
+                            <div class="metric-trend trend-up">
+                                <i class="fas fa-arrow-up"></i> +23% this month
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="metric-card">
+                            <div class="metric-value text-success" data-bind="ltv">$1,890</div>
+                            <div class="metric-label">Customer Lifetime Value</div>
+                            <div class="metric-trend trend-up">
+                                <i class="fas fa-arrow-up"></i> +5.2% vs last month
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="metric-card">
+                            <div class="metric-value text-info" data-bind="churn_rate">2.3%</div>
+                            <div class="metric-label">Monthly Churn Rate</div>
+                            <div class="metric-trend trend-down">
+                                <i class="fas fa-arrow-down"></i> -0.8% (Good!)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Growth Charts -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Customer Acquisition</h5>
+                            <div class="chart-container">
+                                <canvas id="acquisitionChart" aria-label="Customer acquisition chart showing monthly growth"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Revenue Breakdown</h5>
+                            <div class="chart-container">
+                                <canvas id="revenueChart" aria-label="Revenue breakdown by customer segment"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Growth Actions -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Growth Optimization Actions</h5>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="nudge-card">
+                                        <h6>Referral Program</h6>
+                                        <p>Launch referral program to reduce CAC by 25%</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-success">+200 AUX</span>
+                                            <button class="btn btn-sm btn-primary">Start</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="nudge-card">
+                                        <h6>A/B Test Landing Page</h6>
+                                        <p>Test new landing page to improve conversion</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-success">+150 AUX</span>
+                                            <button class="btn btn-sm btn-primary">Launch</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="nudge-card">
+                                        <h6>Customer Success Program</h6>
+                                        <p>Reduce churn with proactive support</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-success">+300 AUX</span>
+                                            <button class="btn btn-sm btn-primary">Implement</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Funding Readiness Tab -->
+            <div class="tab-pane fade" id="funding" role="tabpanel" aria-labelledby="funding-tab">
+                <div class="row">
+                    <!-- Funding Readiness Score -->
+                    <div class="col-md-4">
+                        <div class="glass-card text-center">
+                            <h5>Funding Readiness</h5>
+                            <div class="sse-circle">
+                                <div class="sse-score" data-bind="funding_readiness">72</div>
+                            </div>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 72%"></div>
+                            </div>
+                            <small class="text-secondary">Target: 85+ for Series A</small>
+                        </div>
+                    </div>
+
+                    <!-- Funding Metrics -->
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="metric-card">
+                                    <div class="metric-value text-primary" data-bind="runway_months">14</div>
+                                    <div class="metric-label">Runway (Months)</div>
+                                    <div class="metric-trend trend-up">
+                                        <i class="fas fa-arrow-up"></i> +2 months
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="metric-card">
+                                    <div class="metric-value text-success" data-bind="burn_rate">$12,500</div>
+                                    <div class="metric-label">Monthly Burn Rate</div>
+                                    <div class="metric-trend trend-down">
+                                        <i class="fas fa-arrow-down"></i> -8.3% (Good!)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="metric-card">
+                                    <div class="metric-value text-warning" data-bind="revenue_multiple">13.2x</div>
+                                    <div class="metric-label">Revenue Multiple</div>
+                                    <div class="metric-trend trend-up">
+                                        <i class="fas fa-arrow-up"></i> Industry: 12x
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="metric-card">
+                                    <div class="metric-value text-info" data-bind="team_size">12</div>
+                                    <div class="metric-label">Team Size</div>
+                                    <div class="metric-trend trend-up">
+                                        <i class="fas fa-arrow-up"></i> +3 this quarter
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Funding Checklist -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Series A Checklist</h5>
+                            <div class="checklist">
+                                <div class="checklist-item completed">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Product-Market Fit Validated
+                                </div>
+                                <div class="checklist-item completed">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    $10K+ MRR Achieved
+                                </div>
+                                <div class="checklist-item completed">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Team of 10+ Employees
+                                </div>
+                                <div class="checklist-item pending">
+                                    <i class="fas fa-clock text-warning me-2"></i>
+                                    Financial Model Complete (80%)
+                                </div>
+                                <div class="checklist-item pending">
+                                    <i class="fas fa-clock text-warning me-2"></i>
+                                    10+ Customer Interviews (8/10)
+                                </div>
+                                <div class="checklist-item pending">
+                                    <i class="fas fa-times-circle text-danger me-2"></i>
+                                    Legal Structure Optimized
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Investor Alignment</h5>
+                            <div class="investor-match">
+                                <div class="match-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6>Sequoia Capital</h6>
+                                            <small class="text-secondary">Series A, SaaS Focus</small>
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-success">94% Match</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="match-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6>Andreessen Horowitz</h6>
+                                            <small class="text-secondary">Series A, B2B SaaS</small>
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-success">89% Match</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="match-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6>Bessemer Venture Partners</h6>
+                                            <small class="text-secondary">Series A, Cloud Software</small>
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-primary">87% Match</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Funding Actions -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="ai-mentor">
+                            <div class="mentor-content">
+                                <h5><i class="fas fa-lightbulb me-2"></i>Funding Acceleration Plan</h5>
+                                <p>Based on your current metrics, here's your personalized roadmap to Series A readiness:</p>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="action-card">
+                                            <h6>Week 1-2</h6>
+                                            <ul>
+                                                <li>Complete remaining 2 customer interviews</li>
+                                                <li>Finalize financial projections</li>
+                                                <li>Prepare pitch deck v3.0</li>
+                                            </ul>
+                                            <button class="btn btn-sm btn-light">Start Tasks</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="action-card">
+                                            <h6>Week 3-4</h6>
+                                            <ul>
+                                                <li>Legal structure optimization</li>
+                                                <li>Data room preparation</li>
+                                                <li>Reference customer calls</li>
+                                            </ul>
+                                            <button class="btn btn-sm btn-outline-light">Schedule</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="action-card">
+                                            <h6>Week 5-6</h6>
+                                            <ul>
+                                                <li>Investor outreach campaign</li>
+                                                <li>Demo day preparation</li>
+                                                <li>Term sheet negotiations</li>
+                                            </ul>
+                                            <button class="btn btn-sm btn-outline-light">Plan</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Learning Tab -->
+            <div class="tab-pane fade" id="learning" role="tabpanel" aria-labelledby="learning-tab">
+                <div class="row">
+                    <!-- Learning Progress -->
+                    <div class="col-md-4">
+                        <div class="glass-card text-center">
+                            <h5>Learning Streak</h5>
+                            <div class="metric-value text-primary" data-bind="learning_streak">15</div>
+                            <div class="metric-label">Days</div>
+                            <div class="progress-container mt-3">
+                                <div class="progress-bar" style="width: 75%"></div>
+                            </div>
+                            <small class="text-secondary">Goal: 30 days</small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="metric-card">
+                            <div class="metric-value text-success" data-bind="aux_earned_today">45</div>
+                            <div class="metric-label">AUX Earned Today</div>
+                            <div class="metric-trend trend-up">
+                                <i class="fas fa-arrow-up"></i> Daily average: 38
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="metric-card">
+                            <div class="metric-value text-warning" data-bind="knowledge_score">87</div>
+                            <div class="metric-label">Knowledge Score</div>
+                            <div class="metric-trend trend-up">
+                                <i class="fas fa-arrow-up"></i> +3 this week
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Q&A -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Today's Learning Challenge</h5>
+                            <div class="qa-card">
+                                <div class="question-badge">Question 1 of 3</div>
+                                <h6>What is the most effective way to reduce customer acquisition cost in a B2B SaaS business?</h6>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <button class="btn btn-outline-primary w-100 mb-2 answer-btn" data-answer="a">
+                                            A) Increase advertising spend
+                                        </button>
+                                        <button class="btn btn-outline-primary w-100 mb-2 answer-btn" data-answer="b">
+                                            B) Implement referral program
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button class="btn btn-outline-primary w-100 mb-2 answer-btn" data-answer="c">
+                                            C) Lower pricing
+                                        </button>
+                                        <button class="btn btn-outline-primary w-100 mb-2 answer-btn" data-answer="d">
+                                            D) Hire more salespeople
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <small class="text-secondary">
+                                        <i class="fas fa-coins me-1"></i>Earn 15 AUX for correct answer
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Learning Resources -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Recommended Reading</h5>
+                            <div class="resource-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6>The Lean Startup - Chapter 3</h6>
+                                        <small class="text-secondary">Build-Measure-Learn</small>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-success">+25 AUX</span>
+                                        <button class="btn btn-sm btn-primary ms-2">Read</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="resource-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6>SaaS Metrics 2.0</h6>
+                                        <small class="text-secondary">David Skok - For Entrepreneurs</small>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-success">+30 AUX</span>
+                                        <button class="btn btn-sm btn-primary ms-2">Read</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="resource-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6>Blitzscaling - Reid Hoffman</h6>
+                                        <small class="text-secondary">Scaling strategies</small>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-success">+35 AUX</span>
+                                        <button class="btn btn-sm btn-primary ms-2">Read</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Video Lessons</h5>
+                            <div class="resource-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6>Customer Development Process</h6>
+                                        <small class="text-secondary">Steve Blank - 15 min</small>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-success">+20 AUX</span>
+                                        <button class="btn btn-sm btn-primary ms-2">Watch</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="resource-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6>Fundraising Fundamentals</h6>
+                                        <small class="text-secondary">Y Combinator - 22 min</small>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-success">+25 AUX</span>
+                                        <button class="btn btn-sm btn-primary ms-2">Watch</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="resource-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6>Building High-Performance Teams</h6>
+                                        <small class="text-secondary">First Round - 18 min</small>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-success">+30 AUX</span>
+                                        <button class="btn btn-sm btn-primary ms-2">Watch</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Partnerships Tab -->
+            <div class="tab-pane fade" id="partnerships" role="tabpanel" aria-labelledby="partnerships-tab">
+                <div class="row">
+                    <!-- Partnership Opportunities -->
+                    <div class="col-md-8">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Share Value Partner Opportunities</h5>
+                            
+                            <div class="partnership-card">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h6>TechCorp Integration Partnership</h6>
+                                        <p class="mb-2">Integrate your API with TechCorp's platform to reach 50K+ potential customers</p>
+                                        <div class="partnership-benefits">
+                                            <span class="badge bg-success me-2">40% CAC Reduction</span>
+                                            <span class="badge bg-primary me-2">$2M ARR Potential</span>
+                                            <span class="badge bg-warning">6-month timeline</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <div class="partnership-reward mb-2">
+                                            <span class="badge bg-gold">+500 AUX</span>
+                                        </div>
+                                        <button class="btn btn-primary btn-sm">Express Interest</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="partnership-card">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h6>CloudScale Reseller Program</h6>
+                                        <p class="mb-2">Become a certified reseller for CloudScale's enterprise solutions</p>
+                                        <div class="partnership-benefits">
+                                            <span class="badge bg-success me-2">25% Revenue Share</span>
+                                            <span class="badge bg-primary me-2">Enterprise Customers</span>
+                                            <span class="badge bg-warning">3-month onboarding</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <div class="partnership-reward mb-2">
+                                            <span class="badge bg-gold">+350 AUX</span>
+                                        </div>
+                                        <button class="btn btn-primary btn-sm">Apply Now</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="partnership-card">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h6>StartupHub Accelerator</h6>
+                                        <p class="mb-2">Join the next cohort for mentorship, funding, and network access</p>
+                                        <div class="partnership-benefits">
+                                            <span class="badge bg-success me-2">$100K Investment</span>
+                                            <span class="badge bg-primary me-2">3-month program</span>
+                                            <span class="badge bg-warning">Application deadline: 15 days</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <div class="partnership-reward mb-2">
+                                            <span class="badge bg-gold">+750 AUX</span>
+                                        </div>
+                                        <button class="btn btn-primary btn-sm">Apply</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Partnership Stats -->
+                    <div class="col-md-4">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Partnership Impact</h5>
+                            <div class="metric-card mb-3">
+                                <div class="metric-value text-success" data-bind="partnership_revenue">$45K</div>
+                                <div class="metric-label">Revenue from Partnerships</div>
+                                <div class="metric-trend trend-up">
+                                    <i class="fas fa-arrow-up"></i> +67% this quarter
+                                </div>
+                            </div>
+
+                            <div class="metric-card mb-3">
+                                <div class="metric-value text-primary" data-bind="active_partnerships">3</div>
+                                <div class="metric-label">Active Partnerships</div>
+                                <div class="metric-trend trend-up">
+                                    <i class="fas fa-arrow-up"></i> +2 this month
+                                </div>
+                            </div>
+
+                            <div class="metric-card">
+                                <div class="metric-value text-warning" data-bind="partnership_leads">127</div>
+                                <div class="metric-label">Leads from Partners</div>
+                                <div class="metric-trend trend-up">
+                                    <i class="fas fa-arrow-up"></i> +34% conversion
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card">
+                            <h5 class="mb-3">Partner Network</h5>
+                            <div class="partner-list">
+                                <div class="partner-item">
+                                    <div class="d-flex justify-content-between">
+                                        <span>TechCorp</span>
+                                        <span class="badge bg-success">Active</span>
+                                    </div>
+                                </div>
+                                <div class="partner-item">
+                                    <div class="d-flex justify-content-between">
+                                        <span>CloudScale</span>
+                                        <span class="badge bg-primary">Negotiating</span>
+                                    </div>
+                                </div>
+                                <div class="partner-item">
+                                    <div class="d-flex justify-content-between">
+                                        <span>DataFlow Inc</span>
+                                        <span class="badge bg-warning">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Partnership Actions -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="ai-mentor">
+                            <div class="mentor-content">
+                                <h5><i class="fas fa-handshake me-2"></i>Partnership Strategy Recommendations</h5>
+                                <p>Based on your current growth metrics and market position, here are the most impactful partnership opportunities:</p>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="strategy-card">
+                                            <h6>Integration Partnerships</h6>
+                                            <p>Focus on API integrations with complementary SaaS platforms to reduce CAC by 40%</p>
+                                            <button class="btn btn-sm btn-light">Explore Options</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="strategy-card">
+                                            <h6>Channel Partnerships</h6>
+                                            <p>Establish reseller relationships to access enterprise customers faster</p>
+                                            <button class="btn btn-sm btn-light">Find Partners</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="strategy-card">
+                                            <h6>Strategic Alliances</h6>
+                                            <p>Form alliances with industry leaders to enhance credibility and reach</p>
+                                            <button class="btn btn-sm btn-light">Identify Leaders</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        setTimeout(() => {
-            const { createElement: h, useState, useEffect } = React;
-            const { createRoot } = ReactDOM;
-            
-            // Founder profile data
-            const founderProfile = {
-                name: 'Sarah Chen',
-                company: 'QuantumAI',
-                stage: 'Series A',
-                founded: '2023-03-15',
-                currentSSE: 78,
-                tokens: 2450,
-                weekNumber: 3,
-                consistencyMultiplier: 1.0,
-                monthlyRecurringRevenue: 45000,
-                currentValuation: 92500000,
-                previousValuation: 82000000,
-                teamSize: 28,
-                runway: 18
-            };
-            
-            // Domains data
-            const domains = {
-                market_access: {
-                    title: 'Market Access',
-                    currentScore: 18,
-                    maxScore: 20,
-                    percentile: 85,
-                    color: 'blue',
-                    behaviors: [{
-                        title: 'Weekly Customer Interviews',
-                        target: 5,
-                        current: 2,
-                        tokens: 85,
-                        status: 'partial'
-                    }]
-                },
-                management: {
-                    title: 'Management Excellence',
-                    currentScore: 15,
-                    maxScore: 20,
-                    percentile: 72,
-                    color: 'green',
-                    behaviors: [{
-                        title: 'Quarterly Team Reviews',
-                        target: 4,
-                        current: 3,
-                        tokens: 170,
-                        status: 'partial'
-                    }]
-                },
-                funding: {
-                    title: 'Funding & Finance',
-                    currentScore: 12,
-                    maxScore: 20,
-                    percentile: 58,
-                    color: 'purple',
-                    behaviors: [{
-                        title: 'Monthly Financial Model Updates',
-                        target: 1,
-                        current: 1,
-                        tokens: 128,
-                        status: 'complete'
-                    }]
-                },
-                operations: {
-                    title: 'Operations & Product',
-                    currentScore: 14,
-                    maxScore: 20,
-                    percentile: 68,
-                    color: 'orange',
-                    behaviors: [{
-                        title: 'Product Roadmap Planning',
-                        target: 1,
-                        current: 0,
-                        tokens: 102,
-                        status: 'incomplete'
-                    }]
-                }
-            };
-            
-            // Financial data for chart
-            const financialData = [
-                { month: 'Jan', revenue: 42, valuation: 85 },
-                { month: 'Feb', revenue: 45, valuation: 87.5 },
-                { month: 'Mar', revenue: 48, valuation: 90 },
-                { month: 'Apr', revenue: 52, valuation: 92.5 },
-                { month: 'May', revenue: 56, valuation: 95 },
-                { month: 'Jun', revenue: 61, valuation: 97.5 }
-            ];
-            
-            const Dashboard = () => {
-                const [activeTab, setActiveTab] = useState('dashboard');
-                const [chartInitialized, setChartInitialized] = useState(false);
-                
-                useEffect(() => {
-                    if (activeTab === 'dashboard' && !chartInitialized) {
-                        setTimeout(() => {
-                            const ctx = document.getElementById('valuationChart');
-                            if (ctx && typeof Chart !== 'undefined') {
-                                new Chart(ctx, {
-                                    type: 'line',
-                                    data: {
-                                        labels: financialData.map(d => d.month),
-                                        datasets: [{
-                                            label: 'Revenue ($K)',
-                                            data: financialData.map(d => d.revenue),
-                                            borderColor: '#10b981',
-                                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                            borderWidth: 3,
-                                            tension: 0.4,
-                                            yAxisID: 'y'
-                                        }, {
-                                            label: 'Valuation ($M)',
-                                            data: financialData.map(d => d.valuation),
-                                            borderColor: '#3b82f6',
-                                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                            borderWidth: 2,
-                                            tension: 0.4,
-                                            yAxisID: 'y1'
-                                        }]
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        plugins: {
-                                            legend: { labels: { color: '#9ca3af' } }
-                                        },
-                                        scales: {
-                                            y: {
-                                                type: 'linear',
-                                                position: 'left',
-                                                ticks: { color: '#9ca3af' },
-                                                grid: { color: '#374151' }
-                                            },
-                                            y1: {
-                                                type: 'linear',
-                                                position: 'right',
-                                                ticks: { color: '#9ca3af' },
-                                                grid: { display: false }
-                                            },
-                                            x: {
-                                                ticks: { color: '#9ca3af' },
-                                                grid: { color: '#374151' }
-                                            }
-                                        }
-                                    }
-                                });
-                                setChartInitialized(true);
-                            }
-                        }, 100);
+        // Dashboard Data Management
+        class DashboardData {
+            constructor() {
+                this.data = {
+                    founder_name: "Sarah Chen",
+                    company_name: "TechFlow Solutions",
+                    sse_score: 78,
+                    company_valuation: "$2.4M",
+                    mrr: "$18,500",
+                    cac: "$127",
+                    aux_tokens: 1247,
+                    total_customers: 1247,
+                    ltv: "$1,890",
+                    churn_rate: "2.3%",
+                    funding_readiness: 72,
+                    runway_months: 14,
+                    burn_rate: "$12,500",
+                    revenue_multiple: "13.2x",
+                    team_size: 12,
+                    learning_streak: 15,
+                    aux_earned_today: 45,
+                    knowledge_score: 87,
+                    partnership_revenue: "$45K",
+                    active_partnerships: 3,
+                    partnership_leads: 127
+                };
+                this.bindData();
+                this.initializeCharts();
+                this.setupEventListeners();
+                this.startDataUpdates();
+            }
+
+            bindData() {
+                document.querySelectorAll('[data-bind]').forEach(element => {
+                    const key = element.getAttribute('data-bind');
+                    if (this.data[key]) {
+                        element.textContent = this.data[key];
                     }
-                }, [activeTab]);
+                });
+            }
+
+            initializeCharts() {
+                // Growth Chart
+                const growthCtx = document.getElementById('growthChart');
+                if (growthCtx) {
+                    new Chart(growthCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                            datasets: [{
+                                label: 'MRR ($K)',
+                                data: [8, 12, 15, 16, 17, 18.5],
+                                borderColor: '#00d4ff',
+                                backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                                tension: 0.4
+                            }, {
+                                label: 'SSE Score',
+                                data: [65, 68, 72, 75, 76, 78],
+                                borderColor: '#8b5cf6',
+                                backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: '#ffffff'
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    ticks: { color: '#a1a1aa' },
+                                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                },
+                                y: {
+                                    ticks: { color: '#a1a1aa' },
+                                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Customer Acquisition Chart
+                const acquisitionCtx = document.getElementById('acquisitionChart');
+                if (acquisitionCtx) {
+                    new Chart(acquisitionCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                            datasets: [{
+                                label: 'New Customers',
+                                data: [45, 67, 89, 123, 156, 187],
+                                backgroundColor: 'rgba(0, 212, 255, 0.8)',
+                                borderColor: '#00d4ff',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: '#ffffff'
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    ticks: { color: '#a1a1aa' },
+                                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                },
+                                y: {
+                                    ticks: { color: '#a1a1aa' },
+                                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Revenue Breakdown Chart
+                const revenueCtx = document.getElementById('revenueChart');
+                if (revenueCtx) {
+                    new Chart(revenueCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Enterprise', 'SMB', 'Startup', 'Individual'],
+                            datasets: [{
+                                data: [45, 30, 20, 5],
+                                backgroundColor: [
+                                    '#00d4ff',
+                                    '#8b5cf6',
+                                    '#fbbf24',
+                                    '#10b981'
+                                ],
+                                borderWidth: 2,
+                                borderColor: '#1a1a1a'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        color: '#ffffff',
+                                        padding: 20
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            setupEventListeners() {
+                // Answer buttons for Q&A
+                document.querySelectorAll('.answer-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const answer = e.target.getAttribute('data-answer');
+                        this.handleAnswer(answer, e.target);
+                    });
+                });
+
+                // Tab switching
+                document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+                    tab.addEventListener('shown.bs.tab', (e) => {
+                        this.trackTabView(e.target.id);
+                    });
+                });
+            }
+
+            handleAnswer(answer, button) {
+                // Correct answer is B (referral program)
+                const isCorrect = answer === 'b';
                 
-                const valuationChange = ((founderProfile.currentValuation - founderProfile.previousValuation) / founderProfile.previousValuation * 100).toFixed(1);
+                if (isCorrect) {
+                    button.classList.add('btn-success');
+                    button.classList.remove('btn-outline-primary');
+                    this.data.aux_tokens += 15;
+                    this.showNotification('Correct! +15 AUX tokens earned', 'success');
+                } else {
+                    button.classList.add('btn-danger');
+                    button.classList.remove('btn-outline-primary');
+                    this.showNotification('Incorrect. The correct answer is B: Implement referral program', 'warning');
+                }
+
+                // Disable all answer buttons
+                document.querySelectorAll('.answer-btn').forEach(btn => {
+                    btn.disabled = true;
+                });
+
+                this.bindData();
+            }
+
+            showNotification(message, type) {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+                notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+                notification.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
                 
-                const tabs = [
-                    { id: 'dashboard', label: 'Dashboard', icon: '🚀' },
-                    { id: 'rewards', label: 'Rewards', icon: '🪙' },
-                    { id: 'analytics', label: 'Analytics', icon: '📊' },
-                    { id: 'partners', label: 'Partners', icon: '🤝' }
-                ];
+                document.body.appendChild(notification);
                 
-                return h('div', { className: 'min-h-screen bg-gray-950' },
-                    // Top Banner
-                    h('div', { className: 'bg-gradient-to-r from-orange-500 to-red-500 text-white p-4 sticky top-0 z-50' },
-                        h('div', { className: 'max-w-7xl mx-auto flex items-center justify-between' },
-                            h('div', { className: 'flex items-center gap-3' },
-                                h('span', { className: 'text-2xl animate-pulse' }, '⚠️'),
-                                h('div', null,
-                                    h('strong', null, 'PRIORITY ACTION: '),
-                                    h('span', null, 'Customer interviews behind schedule (2/5). Complete 3 more by Friday.')
-                                )
-                            ),
-                            h('button', { 
-                                className: 'bg-white text-orange-600 px-4 py-2 rounded font-medium hover:bg-gray-100 transition'
-                            }, '▶ Take Action')
-                        )
-                    ),
-                    
-                    // Navigation
-                    h('div', { className: 'bg-gray-900 border-b border-gray-700 sticky top-16 z-40' },
-                        h('div', { className: 'max-w-7xl mx-auto px-4' },
-                            h('div', { className: 'flex items-center justify-between py-4' },
-                                h('div', { className: 'text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent', style: { backgroundClip: 'text', WebkitBackgroundClip: 'text' } }, 'AUXEIRA'),
-                                h('div', { className: 'flex gap-1' },
-                                    ...tabs.map(tab =>
-                                        h('button', {
-                                            key: tab.id,
-                                            onClick: () => setActiveTab(tab.id),
-                                            className: `flex items-center gap-2 px-4 py-2 rounded-lg transition ${
-                                                activeTab === tab.id ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800'
-                                            }`
-                                        }, tab.icon, ' ', tab.label)
-                                    )
-                                ),
-                                h('div', { className: 'flex items-center gap-3' },
-                                    h('div', { className: 'bg-yellow-500 text-black px-3 py-1 rounded text-sm font-medium' },
-                                        `Week ${founderProfile.weekNumber} • ${founderProfile.consistencyMultiplier}×`
-                                    ),
-                                    h('div', { className: 'bg-green-500 text-white px-3 py-1 rounded text-sm font-medium' },
-                                        `${founderProfile.tokens} AUX`
-                                    ),
-                                    h('div', { className: 'flex items-center gap-1 text-green-400 text-sm' },
-                                        h('div', { className: 'w-2 h-2 bg-green-400 rounded-full animate-pulse' }),
-                                        'LIVE'
-                                    )
-                                )
-                            )
-                        )
-                    ),
-                    
-                    // Main Content
-                    h('div', { className: 'max-w-7xl mx-auto p-6' },
-                        // Welcome Header
-                        h('div', { className: 'mb-8' },
-                            h('h1', { className: 'text-3xl font-bold mb-2' }, `Welcome back, ${founderProfile.name}`),
-                            h('p', { className: 'text-gray-400' },
-                                `${founderProfile.company} • ${founderProfile.stage} • Founded ${new Date(founderProfile.founded).getFullYear()}`
-                            )
-                        ),
-                        
-                        // Dashboard Tab Content
-                        activeTab === 'dashboard' && h('div', { className: 'space-y-6' },
-                            // Top Row: Valuation + Key Metrics
-                            h('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-6' },
-                                // Valuation Widget
-                                h('div', { className: 'bg-gradient-to-r from-green-900/50 to-emerald-900/50 border border-green-400/30 rounded-lg p-6' },
-                                    h('div', { className: 'flex items-center justify-between mb-4' },
-                                        h('h2', { className: 'text-xl font-bold text-green-400 flex items-center gap-2' },
-                                            '📈 Company Valuation'
-                                        )
-                                    ),
-                                    h('div', { className: 'text-center mb-4' },
-                                        h('div', { className: 'text-4xl font-bold text-green-400 mb-2' },
-                                            `$${(founderProfile.currentValuation / 1000000).toFixed(1)}M`
-                                        ),
-                                        h('div', { className: `flex items-center justify-center gap-2 ${valuationChange > 0 ? 'text-green-400' : 'text-red-400'}` },
-                                            valuationChange > 0 ? '📈' : '📉',
-                                            ` ${valuationChange > 0 ? '+' : ''}${valuationChange}% from last month`
-                                        )
-                                    ),
-                                    h('div', { style: { height: '200px' } },
-                                        h('canvas', { id: 'valuationChart' })
-                                    )
-                                ),
-                                
-                                // SSE Score
-                                h('div', { className: 'bg-gray-900/50 border border-blue-400/30 rounded-lg p-6' },
-                                    h('h2', { className: 'text-xl font-bold text-blue-400 mb-4' }, '⚡ SSE Score'),
-                                    h('div', { className: 'text-center' },
-                                        h('div', { className: 'text-6xl font-bold text-blue-400 mb-4' }, founderProfile.currentSSE),
-                                        h('div', { className: 'relative h-4 bg-gray-700 rounded-full overflow-hidden mb-4' },
-                                            h('div', {
-                                                className: 'absolute h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all',
-                                                style: { width: `${founderProfile.currentSSE}%` }
-                                            })
-                                        ),
-                                        h('p', { className: 'text-gray-400' }, 'Top 15% of founders in your region')
-                                    )
-                                )
-                            ),
-                            
-                            // Key Metrics Grid
-                            h('div', { className: 'grid grid-cols-2 md:grid-cols-4 gap-4' },
-                                [
-                                    { label: 'MRR', value: `$${(founderProfile.monthlyRecurringRevenue / 1000).toFixed(0)}K`, color: 'green', icon: '💰' },
-                                    { label: 'Team Size', value: founderProfile.teamSize, color: 'blue', icon: '👥' },
-                                    { label: 'Runway', value: `${founderProfile.runway}mo`, color: 'purple', icon: '⏱️' },
-                                    { label: 'Tokens', value: founderProfile.tokens, color: 'yellow', icon: '🪙' }
-                                ].map((metric, i) =>
-                                    h('div', { key: i, className: `bg-${metric.color}-900/20 border border-${metric.color}-400/30 rounded-lg p-4` },
-                                        h('div', { className: 'flex items-center justify-between mb-2' },
-                                            h('span', { className: 'text-gray-400 text-sm' }, metric.label),
-                                            h('span', { className: 'text-xl' }, metric.icon)
-                                        ),
-                                        h('div', { className: `text-2xl font-bold text-${metric.color}-400` }, metric.value)
-                                    )
-                                )
-                            ),
-                            
-                            // Domains
-                            Object.entries(domains).map(([key, domain]) =>
-                                h('div', { key, className: `bg-gray-900/50 border border-${domain.color}-400/30 rounded-lg p-6` },
-                                    h('div', { className: 'flex items-center justify-between mb-6' },
-                                        h('div', null,
-                                            h('h3', { className: `text-xl font-bold text-${domain.color}-400 mb-1` }, domain.title),
-                                            h('p', { className: 'text-gray-400 text-sm' }, 'Track your progress and earn rewards')
-                                        ),
-                                        h('div', { className: 'text-right' },
-                                            h('div', { className: `text-3xl font-bold text-${domain.color}-400` },
-                                                domain.currentScore, h('span', { className: 'text-gray-400 text-xl' }, `/${domain.maxScore}`)
-                                            ),
-                                            h('div', { className: 'text-sm text-green-400' }, `📈 Top ${100 - domain.percentile}%`)
-                                        )
-                                    ),
-                                    ...domain.behaviors.map(behavior =>
-                                        h('div', {
-                                            key: behavior.title,
-                                            className: `border-2 ${
-                                                behavior.status === 'complete' ? 'border-green-400 bg-green-900/20' :
-                                                behavior.status === 'partial' ? 'border-yellow-400 bg-yellow-900/20' :
-                                                'border-red-400 bg-red-900/20'
-                                            } rounded-lg p-6`
-                                        },
-                                            h('div', { className: 'flex items-center justify-between mb-4' },
-                                                h('h4', { className: 'font-bold text-lg' }, behavior.title),
-                                                h('div', { className: 'bg-yellow-500/20 border border-yellow-400/30 px-3 py-1 rounded' },
-                                                    h('span', { className: 'text-yellow-400 font-bold' }, `${behavior.tokens} AUX`)
-                                                )
-                                            ),
-                                            h('div', { className: 'mb-4' },
-                                                h('div', { className: 'flex justify-between text-sm mb-2' },
-                                                    h('span', { className: 'text-gray-400' }, 'Progress'),
-                                                    h('span', { className: 'font-semibold' }, `${behavior.current}/${behavior.target} (${Math.round((behavior.current / behavior.target) * 100)}%)`)
-                                                ),
-                                                h('div', { className: 'relative h-3 bg-gray-700 rounded-full overflow-hidden' },
-                                                    h('div', {
-                                                        className: 'absolute h-full bg-blue-500 transition-all',
-                                                        style: { width: `${(behavior.current / behavior.target) * 100}%` }
-                                                    })
-                                                )
-                                            ),
-                                            h('button', {
-                                                className: 'w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition',
-                                                disabled: behavior.status === 'complete'
-                                            }, behavior.status === 'complete' ? '✓ Completed' : '▶ Take Action')
-                                        )
-                                    )
-                                )
-                            )
-                        ),
-                        
-                        // Rewards Tab
-                        activeTab === 'rewards' && h('div', { className: 'space-y-6' },
-                            h('h2', { className: 'text-2xl font-bold mb-6' }, '🪙 Token Rewards'),
-                            h('div', { className: 'grid grid-cols-1 md:grid-cols-3 gap-4' },
-                                [
-                                    { label: 'Earned This Week', value: '385 AUX', color: 'from-green-500 to-emerald-500', icon: '🪙' },
-                                    { label: 'Potential Loss', value: '257 AUX', color: 'from-red-500 to-pink-500', icon: '📉' },
-                                    { label: 'Consistency', value: `${founderProfile.consistencyMultiplier}×`, color: 'from-orange-500 to-amber-500', icon: '🔥' }
-                                ].map((card, i) =>
-                                    h('div', { key: i, className: `bg-gradient-to-r ${card.color} text-white rounded-lg p-6` },
-                                        h('div', { className: 'flex items-center justify-between' },
-                                            h('div', null,
-                                                h('p', { className: 'text-sm opacity-90 mb-2' }, card.label),
-                                                h('p', { className: 'text-3xl font-bold' }, card.value)
-                                            ),
-                                            h('span', { className: 'text-4xl' }, card.icon)
-                                        )
-                                    )
-                                )
-                            )
-                        ),
-                        
-                        // Analytics Tab
-                        activeTab === 'analytics' && h('div', { className: 'bg-gray-900/50 border border-blue-400/30 rounded-lg p-6' },
-                            h('h2', { className: 'text-2xl font-bold text-blue-400 mb-6' }, '�� Premium Analytics'),
-                            h('p', { className: 'text-gray-400' }, 'Advanced analytics and insights available in premium tier')
-                        ),
-                        
-                        // Partners Tab
-                        activeTab === 'partners' && h('div', { className: 'bg-gray-900/50 border border-purple-400/30 rounded-lg p-6' },
-                            h('h2', { className: 'text-2xl font-bold text-purple-400 mb-6' }, '🤝 Partner Marketplace'),
-                            h('p', { className: 'text-gray-400' }, 'Connect with strategic partners and unlock exclusive benefits')
-                        )
-                    )
-                );
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 5000);
+            }
+
+            trackTabView(tabId) {
+                // Track user engagement for behavioral analysis
+                console.log(`Tab viewed: ${tabId} at ${new Date().toISOString()}`);
+                
+                // Simulate data collection for personalization
+                const tabData = {
+                    tab: tabId,
+                    timestamp: Date.now(),
+                    session_id: this.getSessionId()
+                };
+                
+                // In production, send to analytics endpoint
+                // fetch('/api/track-engagement', { method: 'POST', body: JSON.stringify(tabData) });
+            }
+
+            getSessionId() {
+                let sessionId = localStorage.getItem('auxeira_session_id');
+                if (!sessionId) {
+                    sessionId = 'session_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('auxeira_session_id', sessionId);
+                }
+                return sessionId;
+            }
+
+            startDataUpdates() {
+                // Simulate real-time data updates
+                setInterval(() => {
+                    this.updateMetrics();
+                }, 30000); // Update every 30 seconds
+            }
+
+            updateMetrics() {
+                // Simulate small metric changes
+                const sseChange = (Math.random() - 0.5) * 2;
+                this.data.sse_score = Math.max(0, Math.min(100, this.data.sse_score + sseChange));
+                
+                // Update MRR with small growth
+                const mrrValue = parseFloat(this.data.mrr.replace('$', '').replace(',', ''));
+                const newMrr = mrrValue + (Math.random() * 100 - 50);
+                this.data.mrr = '$' + Math.round(newMrr).toLocaleString();
+                
+                this.bindData();
+            }
+        }
+
+        // Utility Functions
+        function dismissBanner() {
+            document.getElementById('criticalBanner').style.display = 'none';
+        }
+
+        // Initialize Dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            const dashboard = new DashboardData();
+            
+            // Add loading states
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (!this.disabled) {
+                        this.innerHTML = '<span class="spinner"></span>' + this.innerHTML;
+                        setTimeout(() => {
+                            this.innerHTML = this.innerHTML.replace('<span class="spinner"></span>', '');
+                        }, 1000);
+                    }
+                });
+            });
+        });
+
+        // Paystack Integration (for premium features)
+        function initializePayment(amount, email, callback) {
+            const handler = PaystackPop.setup({
+                key: 'pk_test_your_paystack_public_key', // Replace with your public key
+                email: email,
+                amount: amount * 100, // Amount in kobo
+                currency: 'USD',
+                callback: function(response) {
+                    // Payment successful
+                    callback(true, response);
+                },
+                onClose: function() {
+                    // Payment cancelled
+                    callback(false, null);
+                }
+            });
+            handler.openIframe();
+        }
+
+        // Privacy Controls
+        function updateVisibilitySettings(visible) {
+            const settings = {
+                investor_visibility: visible,
+                timestamp: Date.now()
             };
             
-            const root = createRoot(document.getElementById('root'));
-            root.render(h(Dashboard));
-            console.log('✅ Startup Founder Dashboard loaded!');
-        }, 1000);
+            // In production, save to backend
+            localStorage.setItem('visibility_settings', JSON.stringify(settings));
+            
+            if (visible) {
+                dashboard.showNotification('Your startup is now visible to qualified investors (SSE >70)', 'success');
+            } else {
+                dashboard.showNotification('Your startup is now private to portfolio investors only', 'info');
+            }
+        }
     </script>
-    
-    <style>
-        @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
 </body>
 </html>
