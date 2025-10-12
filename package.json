@@ -1,26 +1,29 @@
 {
   "name": "auxeira-backend",
   "version": "1.0.0",
-  "description": "Auxeira Backend with Dashboard System",
+  "description": "ESG Education Impact Intelligence Platform",
+  "main": "src/app.ts",
   "scripts": {
-    "migrate:dashboard-files": "ts-node scripts/migrate-dashboard-files.ts",
-    "notify:developer": "node scripts/notify-developer.js",
-    "seed:dashboard": "ts-node scripts/seed-dashboard-data.ts",
-    "setup:dashboard": "./setup-dashboard-system.sh",
-    "dev": "ts-node src/server.ts",
-    "start": "node dist/server.js"
+    "dev": "tsx watch src/app.ts",
+    "start": "node dist/app.js",
+    "build": "tsc",
+    "test": "jest",
+    "seed": "tsx scripts/seed-10k-startups.ts",
+    "test:reports": "tsx scripts/test-dynamic-esg-reports.ts",
+    "test:crawler": "tsx scripts/test-thunderbit-crawler.ts"
   },
   "dependencies": {
-    "@prisma/client": "^5.0.0",
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.3",
+    "@prisma/client": "^5.7.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^4.21.2"
   },
   "devDependencies": {
-    "prisma": "^5.0.0",
-    "ts-node": "^10.9.0",
-    "typescript": "^5.0.0"
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.23",
+    "@types/node": "^20.10.5",
+    "prisma": "^5.7.1",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
   }
 }
