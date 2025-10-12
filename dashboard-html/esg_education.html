@@ -422,14 +422,135 @@
             const statusEl = document.getElementById('report-status');
             const messageEl = document.getElementById('status-message');
             
+            const profileData = localStorage.getItem('esgProfile');
+            if (!profileData) {
+                alert('⚠️ Please complete your profile first!\n\nGo to the Profile tab.');
+                switchTab('profile');
+                return;
+            }
+            
+            const profile = JSON.parse(profileData);
             statusEl.style.display = 'block';
             messageEl.textContent = `Generating ${reportType.replace(/_/g, ' ')} report...`;
             
             setTimeout(() => {
-                alert(`✅ Report "${reportType.replace(/_/g, ' ')}" generated!\n\nIn production, this would:\n• Call the API\n• Scrape your website with ScraperAPI\n• Generate personalized report with GPT-4\n• Display full report with visualizations`);
-                statusEl.style.display = 'none';
-            }, 2000);
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    let y = 20;
+                    
+                    // Title
+                    doc.setFontSize(22);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(reportType.replace(/_/g, ' ').toUpperCase() + ' REPORT', 20, y);
+                    y += 15;
+                    
+                    // Organization
+                    doc.setFontSize(14);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(profile.organizationName, 20, y);
+                    y += 8;
+                    
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'normal');
+                    doc.text(`${profile.sectorType} | ${profile.country}`, 20, y);
+                    y += 15;
+                    
+                    // Executive Summary
+                    doc.setFontSize(12);
+                    doc.setFont(undefined, 'bold');
+                    doc.text('Executive Summary', 20, y);
+                    y += 7;
+                    
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'normal');
+                    const summary = `This ${reportType.replace(/_/g, ' ')} report provides comprehensive analysis for ${profile.organizationName}, focusing on ${profile.focusAreas}. Based on your stated goals: "${profile.goalStatement}", this report delivers actionable insights and measurable impact metrics.`;
+                    const summaryLines = doc.splitTextToSize(summary, 170);
+                    doc.text(summaryLines, 20, y);
+                    y += summaryLines.length * 5 + 10;
+                    
+                    // Key Metrics
+                    doc.setFontSize(12);
+                    doc.setFont(undefined, 'bold');
+                    doc.text('Key Metrics', 20, y);
+                    y += 7;
+                    
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'normal');
+                    const metrics = [
+                        `Total Investment: $${profile.annualSpend ? parseInt(profile.annualSpend).toLocaleString() : '500,000'}`,
+                        `Focus Areas: ${profile.focusAreas}`,
+                        `SDG Alignment: SDG ${profile.sdgAlignment || '4, 5, 10'}`,
+                        `Geographic Scope: ${profile.country}`,
+                        `Impact Score: 87/100 (Estimated)`
+                    ];
+                    metrics.forEach(m => {
+                        doc.text(`• ${m}`, 25, y);
+                        y += 6;
+                    });
+                    y += 10;
+                    
+                    // Recommendations
+                    if (y > 240) { doc.addPage(); y = 20; }
+                    doc.setFontSize(12);
+                    doc.setFont(undefined, 'bold');
+                    doc.text('Strategic Recommendations', 20, y);
+                    y += 7;
+                    
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'normal');
+                    const recs = [
+                        'Scale successful pilot programs across additional regions',
+                        'Strengthen partnerships with local education authorities',
+                        'Implement digital monitoring systems for real-time impact tracking',
+                        'Develop teacher training modules aligned with national curriculum'
+                    ];
+                    recs.forEach((r, i) => {
+                        if (y > 270) { doc.addPage(); y = 20; }
+                        const recText = doc.splitTextToSize(`${i+1}. ${r}`, 165);
+                        doc.text(recText, 25, y);
+                        y += recText.length * 5 + 3;
+                    });
+                    
+                    // Note about full reports
+                    doc.addPage();
+                    y = 20;
+                    doc.setFontSize(11);
+                    doc.setFont(undefined, 'bold');
+                    doc.text('Note: Enhanced AI-Powered Reports Available', 20, y);
+                    y += 10;
+                    
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'normal');
+                    const note = `This is a demo report. Full AI-powered reports with real-time web scraping (Thunderbit API) and GPT-4 analysis require backend API deployment. Contact your administrator to enable:\n\n• Real-time website data scraping\n• AI-generated narratives and insights\n• Interactive visualizations\n• Benchmark comparisons\n• Policy alignment analysis`;
+                    const noteLines = doc.splitTextToSize(note, 170);
+                    doc.text(noteLines, 20, y);
+                    
+                    // Footer
+                    const pages = doc.internal.getNumberOfPages();
+                    for (let i = 1; i <= pages; i++) {
+                        doc.setPage(i);
+                        doc.setFontSize(8);
+                        doc.setTextColor(128);
+                        doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 285);
+                        doc.text(`Page ${i} of ${pages}`, 105, 285, {align: 'center'});
+                    }
+                    
+                    // Save
+                    const filename = `${reportType}_${profile.organizationName.replace(/\s+/g,'_')}_${Date.now()}.pdf`;
+                    doc.save(filename);
+                    
+                    statusEl.style.display = 'none';
+                    alert(`✅ Report Generated!\n\nFile: ${filename}\n\nThis is a demo PDF. For AI-powered reports with real-time data scraping and GPT-4 analysis, backend deployment is required.`);
+                    
+                } catch (error) {
+                    console.error('PDF Error:', error);
+                    statusEl.style.display = 'none';
+                    alert(`❌ Error: ${error.message}`);
+                }
+            }, 1500);
         }
+
 
         document.getElementById('profile-form')?.addEventListener('submit', (e) => {
             e.preventDefault();
