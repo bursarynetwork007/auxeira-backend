@@ -1,0 +1,5 @@
+  "scripts": {
+    "invalidate": "bash scripts/invalidate-cloudfront.sh",
+    "invalidate:all": "aws cloudfront create-invalidation --distribution-id E2SK5CDOUJ7KKB --paths '/*'",
+    "deploy:dashboard": "aws s3 cp dashboard-html/esg_education.html s3://dashboard.auxeira.com/esg_education.html && npm run invalidate:all"
+  }
