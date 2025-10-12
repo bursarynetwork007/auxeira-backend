@@ -453,6 +453,14 @@
                 messageEl.textContent = 'AI generating your report with NanoGPT-5...';
                 const reportData = await response.json();
                 
+                // Debug logging
+                console.log('=== REPORT DATA RECEIVED ===');
+                console.log('Full response:', reportData);
+                console.log('Title:', reportData.title);
+                console.log('Executive Summary:', reportData.executive_summary);
+                console.log('Key Metrics:', reportData.key_metrics);
+                console.log('=============================');
+                
                 // Generate PDF from AI response
                 messageEl.textContent = 'Creating your PDF...';
                 const { jsPDF } = window.jspdf;
