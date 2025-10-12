@@ -424,7 +424,7 @@
             
             const profileData = localStorage.getItem('esgProfile');
             if (!profileData) {
-                alert('⚠️ Please complete your profile first!\n\nGo to the Profile tab.');
+                alert('⚠️ Please complete your profile first!');
                 switchTab('profile');
                 return;
             }
@@ -434,54 +434,178 @@
             messageEl.textContent = 'Scraping your website data...';
             
             try {
-                // Call YOUR PRODUCTION API
                 const response = await fetch('https://6qfa3ssb10.execute-api.us-east-1.amazonaws.com/prod/api/reports/generate', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        profile: profile,
-                        reportType: reportType
-                    })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({profile: profile, reportType: reportType})
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`API Error: ${response.status}`);
                 
                 messageEl.textContent = 'AI generating your report with NanoGPT-5...';
                 const reportData = await response.json();
                 
-                // Debug logging
-                console.log('=== REPORT DATA RECEIVED ===');
-                console.log('Full response:', reportData);
-                console.log('Title:', reportData.title);
-                console.log('Executive Summary:', reportData.executive_summary);
-                console.log('Key Metrics:', reportData.key_metrics);
-                console.log('=============================');
+                console.log('=== REPORT DATA ===', reportData);
                 
-                // Generate PDF from AI response
                 messageEl.textContent = 'Creating your PDF...';
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 let y = 20;
                 
-                // [PDF generation code from earlier - full implementation]
-                // ... (I'll include the full PDF code in the actual file)
+                // Title
+                doc.setFontSize(18);
+                doc.setFont(undefined, 'bold');
+                const titleLines = doc.splitTextToSize(reportData.title || 'ESG Impact Report', 170);
+                doc.text(titleLines, 20, y);
+                y += titleLines.length * 8 + 5;
+                
+                // Organization
+                doc.setFontSize(12);
+                doc.text(profile.organizationName, 20, y);
+                y += 6;
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'normal');
+                doc.text(`${profile.country} | ${new Date().toLocaleDateString()}`, 20, y);
+                y += 12;
+                
+                // Executive Summary
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('Executive Summary', 20, y);
+                y += 7;
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'normal');
+                const summaryLines = doc.splitTextToSize(reportData.executive_summary || 'No summary available', 170);
+                doc.text(summaryLines, 20, y);
+                y += summaryLines.length * 5 + 8;
+                
+                // Key Metrics
+                if (reportData.key_metrics && reportData.key_metrics.length > 0) {
+                    if (y > 250) { doc.addPage(); y = 20; }
+                    doc.setFontSize(12);
+                    doc.setFont(undefined, 'bold');
+                    doc.text('Key Metrics', 20, y);
+                    y += 7;
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'normal');
+                    
+                    reportData.key_metrics.forEach(m => {
+                        if (y > 270) { doc.addPage(); y = 20; }
+                        doc.setFont(undefined, 'bold');
+                        doc.text(`${m.metric}:`, 25, y);
+                        doc.setFont(undefined, 'normal');
+                        doc.text(m.value, 90, y);
+                        y += 5;
+                        if (m.source) {
+                            doc.setFontSize(8);
+                            doc.setTextColor(100);
+                            doc.text(`Source: ${m.source}`, 27, y);
+                            doc.setTextColor(0);
+                            doc.setFontSize(10);
+                            y += 5;
+                        }
+                    });
+                    y += 5;
+                }
+                
+                // Full Narrative
+                if (reportData.full_narrative) {
+                    if (y > 240) { doc.addPage(); y = 20; }
+                    doc.setFontSize(12);
+                    doc.setFont(undefined, 'bold');
+                    doc.text('Impact Story', 20, y);
+                    y += 7;
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'normal');
+                    const narrativeLines = doc.splitTextToSize(reportData.full_narrative, 170);
+                    narrativeLines.forEach(line => {
+                        if (y > 280) { doc.addPage(); y = 20; }
+                        doc.text(line, 20, y);
+                        y += 5;
+                    });
+                    y += 5;
+                }
+                
+                // Success Stories
+                if (reportData.success_stories && reportData.success_stories.length > 0) {
+                    doc.addPage();
+                    y = 20;
+                    doc.setFontSize(12);
+                    doc.setFont(undefined, 'bold');
+                    doc.text('Success Stories', 20, y);
+                    y += 7;
+                    
+                    reportData.success_stories.forEach((story, i) => {
+                        if (y > 250) { doc.addPage(); y = 20; }
+                        doc.setFontSize(11);
+                        doc.setFont(undefined, 'bold');
+                        doc.text(`${i+1}. ${story.title}`, 20, y);
+                        y += 6;
+                        doc.setFontSize(10);
+                        doc.setFont(undefined, 'normal');
+                        const storyLines = doc.splitTextToSize(story.narrative, 170);
+                        doc.text(storyLines, 20, y);
+                        y += storyLines.length * 5 + 8;
+                    });
+                }
+                
+                // ROI & Actions
+                if (reportData.roi_projection || reportData.recommended_actions) {
+                    if (y > 200) { doc.addPage(); y = 20; }
+                    
+                    if (reportData.roi_projection) {
+                        doc.setFontSize(12);
+                        doc.setFont(undefined, 'bold');
+                        doc.text('ROI Projection', 20, y);
+                        y += 7;
+                        doc.setFontSize(10);
+                        doc.setFont(undefined, 'normal');
+                        const roiLines = doc.splitTextToSize(reportData.roi_projection, 170);
+                        doc.text(roiLines, 20, y);
+                        y += roiLines.length * 5 + 10;
+                    }
+                    
+                    if (reportData.recommended_actions && reportData.recommended_actions.length > 0) {
+                        if (y > 250) { doc.addPage(); y = 20; }
+                        doc.setFontSize(12);
+                        doc.setFont(undefined, 'bold');
+                        doc.text('Recommended Actions', 20, y);
+                        y += 7;
+                        doc.setFontSize(10);
+                        doc.setFont(undefined, 'normal');
+                        reportData.recommended_actions.forEach((action, i) => {
+                            if (y > 280) { doc.addPage(); y = 20; }
+                            const actionLines = doc.splitTextToSize(`${i+1}. ${action}`, 165);
+                            doc.text(actionLines, 25, y);
+                            y += actionLines.length * 5 + 3;
+                        });
+                    }
+                }
+                
+                // Footer
+                const pages = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= pages; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(8);
+                    doc.setTextColor(128);
+                    doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 285);
+                    doc.text(`Page ${i} of ${pages}`, 105, 285, {align: 'center'});
+                    doc.text('Powered by NanoGPT-5', 190, 285, {align: 'right'});
+                }
                 
                 const filename = `${reportType}_${profile.organizationName.replace(/\s+/g,'_')}_${Date.now()}.pdf`;
                 doc.save(filename);
                 
                 statusEl.style.display = 'none';
-                alert(`✅ AI Report Generated!\n\nFile: ${filename}\n\nPowered by NanoGPT-5 + Thunderbit Web Scraper`);
+                alert(`✅ AI Report Generated!\n\nFile: ${filename}\n\nTokens: ${reportData.tokensUsed || 'N/A'}`);
                 
             } catch (error) {
                 console.error('Error:', error);
                 statusEl.style.display = 'none';
-                alert(`❌ Error: ${error.message}\n\nAPI: https://6qfa3ssb10.execute-api.us-east-1.amazonaws.com/prod`);
+                alert(`❌ Error: ${error.message}`);
             }
         }
+
 
 
 
