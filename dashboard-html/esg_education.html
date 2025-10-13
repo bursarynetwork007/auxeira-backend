@@ -431,21 +431,52 @@
             
             const profile = JSON.parse(profileData);
             statusEl.style.display = 'block';
-            messageEl.textContent = 'Scraping your website data...';
+            
+            // Progress messages array
+            const progressMessages = [
+                'Initializing AI analysis...',
+                'Scraping your website for latest data...',
+                'Analyzing sector benchmarks...',
+                'Generating insights with NanoGPT-5...',
+                'Creating impact narratives...',
+                'Calculating ROI projections...',
+                'Compiling policy insights...',
+                'Generating visualizations...',
+                'Finalizing your report...'
+            ];
+            
+            let messageIndex = 0;
+            messageEl.textContent = progressMessages[0];
+            
+            // Rotate through progress messages every 8 seconds
+            const progressInterval = setInterval(() => {
+                messageIndex = (messageIndex + 1) % progressMessages.length;
+                messageEl.textContent = progressMessages[messageIndex];
+            }, 8000);
             
             try {
+                const startTime = Date.now();
                 const response = await fetch('https://6qfa3ssb10.execute-api.us-east-1.amazonaws.com/prod/api/reports/generate', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({profile: profile, reportType: reportType})
                 });
                 
-                if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                clearInterval(progressInterval);
                 
-                messageEl.textContent = 'AI generating your report with NanoGPT-5...';
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `API Error: ${response.status}`);
+                }
+                
+                messageEl.textContent = 'Processing AI response...';
                 const reportData = await response.json();
                 
-                console.log('=== REPORT DATA ===', reportData);
+                const elapsedTime = Math.round((Date.now() - startTime) / 1000);
+                console.log('=== REPORT GENERATED ===');
+                console.log('Time:', elapsedTime + 's');
+                console.log('Tokens:', reportData.tokensUsed);
+                console.log('Title:', reportData.title);
                 
                 messageEl.textContent = 'Creating your PDF...';
                 const { jsPDF } = window.jspdf;
@@ -549,11 +580,24 @@
                     });
                 }
                 
-                // ROI & Actions
-                if (reportData.roi_projection || reportData.recommended_actions) {
+                // ROI & Policy Insights
+                if (reportData.roi_projection || reportData.policy_insights) {
                     if (y > 200) { doc.addPage(); y = 20; }
                     
+                    if (reportData.policy_insights) {
+                        doc.setFontSize(12);
+                        doc.setFont(undefined, 'bold');
+                        doc.text('Policy Insights', 20, y);
+                        y += 7;
+                        doc.setFontSize(10);
+                        doc.setFont(undefined, 'normal');
+                        const policyLines = doc.splitTextToSize(reportData.policy_insights, 170);
+                        doc.text(policyLines, 20, y);
+                        y += policyLines.length * 5 + 10;
+                    }
+                    
                     if (reportData.roi_projection) {
+                        if (y > 250) { doc.addPage(); y = 20; }
                         doc.setFontSize(12);
                         doc.setFont(undefined, 'bold');
                         doc.text('ROI Projection', 20, y);
@@ -564,22 +608,23 @@
                         doc.text(roiLines, 20, y);
                         y += roiLines.length * 5 + 10;
                     }
-                    
-                    if (reportData.recommended_actions && reportData.recommended_actions.length > 0) {
-                        if (y > 250) { doc.addPage(); y = 20; }
-                        doc.setFontSize(12);
-                        doc.setFont(undefined, 'bold');
-                        doc.text('Recommended Actions', 20, y);
-                        y += 7;
-                        doc.setFontSize(10);
-                        doc.setFont(undefined, 'normal');
-                        reportData.recommended_actions.forEach((action, i) => {
-                            if (y > 280) { doc.addPage(); y = 20; }
-                            const actionLines = doc.splitTextToSize(`${i+1}. ${action}`, 165);
-                            doc.text(actionLines, 25, y);
-                            y += actionLines.length * 5 + 3;
-                        });
-                    }
+                }
+                
+                // Recommended Actions
+                if (reportData.recommended_actions && reportData.recommended_actions.length > 0) {
+                    if (y > 250) { doc.addPage(); y = 20; }
+                    doc.setFontSize(12);
+                    doc.setFont(undefined, 'bold');
+                    doc.text('Recommended Actions', 20, y);
+                    y += 7;
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'normal');
+                    reportData.recommended_actions.forEach((action, i) => {
+                        if (y > 280) { doc.addPage(); y = 20; }
+                        const actionLines = doc.splitTextToSize(`${i+1}. ${action}`, 165);
+                        doc.text(actionLines, 25, y);
+                        y += actionLines.length * 5 + 3;
+                    });
                 }
                 
                 // Footer
@@ -597,14 +642,26 @@
                 doc.save(filename);
                 
                 statusEl.style.display = 'none';
-                alert(`✅ AI Report Generated!\n\nFile: ${filename}\n\nTokens: ${reportData.tokensUsed || 'N/A'}`);
+                alert(`✅ AI Report Generated in ${elapsedTime}s!\n\nFile: ${filename}\n\nTokens: ${reportData.tokensUsed || 'N/A'}\n\nPowered by NanoGPT-5`);
                 
             } catch (error) {
+                clearInterval(progressInterval);
                 console.error('Error:', error);
                 statusEl.style.display = 'none';
-                alert(`❌ Error: ${error.message}`);
+                
+                let errorMsg = '❌ Error generating report:\n\n';
+                if (error.message.includes('504')) {
+                    errorMsg += 'Request timeout. The AI is taking longer than expected.\n\nTip: Try again - the system is processing complex analysis.';
+                } else if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
+                    errorMsg += 'Connection issue. Please refresh and try again.';
+                } else {
+                    errorMsg += error.message;
+                }
+                
+                alert(errorMsg);
             }
         }
+
 
 
 
