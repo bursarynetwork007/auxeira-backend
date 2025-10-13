@@ -18,6 +18,40 @@
         .premium-badge { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); }
         .loading { opacity: 0.5; pointer-events: none; }
     </style>
+<style>
+.progress-container {
+    width: 100%;
+    background: #1f2937;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 20px 0;
+}
+.progress-bar {
+    height: 8px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    width: 0%;
+    transition: width 0.5s ease;
+    animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+.countdown-timer {
+    font-size: 48px;
+    font-weight: bold;
+    color: #3b82f6;
+    margin: 20px 0;
+}
+.ai-thinking {
+    display: inline-block;
+    animation: thinking 1.5s ease-in-out infinite;
+}
+@keyframes thinking {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+</style>
 </head>
 <body>
     <div id="app">
@@ -305,10 +339,14 @@
 
                 <!-- Report Generation Status -->
                 <div id="report-status" class="mt-8 text-center text-gray-400" style="display: none;">
-                    <div class="inline-block bg-gray-900 p-8 rounded-xl border border-gray-800">
-                        <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-500 mx-auto mb-4"></div>
-                        <p id="status-message" class="text-xl">Generating your personalized report...</p>
-                        <p class="text-sm text-gray-500 mt-2">This may take 10-30 seconds</p>
+                    <div class="inline-block bg-gray-900 p-8 rounded-xl border border-gray-800" style="min-width: 400px;">
+                        <div class="ai-thinking text-6xl mb-4">🤖</div>
+                        <div class="countdown-timer" id="countdown-timer">45</div>
+                        <p id="status-message" class="text-xl mb-4">Generating your report...</p>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progress-bar"></div>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-4">Using NanoGPT-5 AI • Please wait</p>
                     </div>
                 </div>
             </div>
