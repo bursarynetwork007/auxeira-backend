@@ -22,6 +22,7 @@
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
+    "openai": "^6.3.0",
     "serverless-http": "^4.0.0"
   },
   "engines": {

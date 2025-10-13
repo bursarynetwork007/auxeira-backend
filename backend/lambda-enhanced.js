@@ -58,8 +58,10 @@ const corsOptions = {
     const allowedOrigins = [
       'https://auxeira.com',
       'https://www.auxeira.com',
+      'https://dashboard.auxeira.com',
       'http://localhost:3000',
       'http://localhost:3001',
+      'http://localhost:8001',
       'http://auxeira-com-frontend-prod.s3-website-us-east-1.amazonaws.com',
       // Add CloudFront and S3 patterns
       /^https:\/\/.*\.cloudfront\.net$/,
@@ -475,6 +477,11 @@ app.post('/api/captcha/verify',
 );
 
 // 404 handler for undefined routes
+// ESG Reports Route
+const reportsRouter = require('./src/routes/reports');
+app.use('/api/reports', reportsRouter);
+
+// Catch-all 404 handler (must be last)
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
@@ -560,3 +567,5 @@ module.exports.app = app;
 
 // Export handler for Lambda
 module.exports.handler = serverless(app);
+
+// Payment routes

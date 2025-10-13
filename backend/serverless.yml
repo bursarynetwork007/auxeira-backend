@@ -28,7 +28,7 @@ provider:
   region: us-east-1
   stage: ${opt:stage, 'dev'}
   memorySize: 2048
-  timeout: 29
+  timeout: 90
   deploymentBucket:
     name: auxeira-backend-deployment-bucket-${self:provider.stage}
   environment:
@@ -84,6 +84,10 @@ functions:
       SESSIONS_TABLE: ${self:service}-sessions-${self:provider.stage}
       JWT_SECRET: ${env:JWT_SECRET, 'your-super-secret-jwt-key-change-in-production'}
       JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET, 'your-super-secret-refresh-key-change-in-production'}
+      OPENAI_API_KEY: ${env:NANOGPT5_API_KEY}
+      NANOGPT5_API_KEY: ${env:NANOGPT5_API_KEY}
+      THUNDERBIT_API_KEY: ${env:THUNDERBIT_API_KEY, 'b7bd3d1f04767a5533a1661977b8c55b'}
+      PAYSTACK_SECRET_KEY: ${env:PAYSTACK_SECRET_KEY, 'sk_live_placeholder'}
 
 resources:
   Resources:        
