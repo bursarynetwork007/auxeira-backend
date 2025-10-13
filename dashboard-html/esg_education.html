@@ -523,14 +523,14 @@
                     reportData.key_metrics.forEach(m => {
                         if (y > 270) { doc.addPage(); y = 20; }
                         doc.setFont(undefined, 'bold');
-                        doc.text(`${m.metric}:`, 25, y);
+                        doc.text(String(m.metric || ''), 25, y);
                         doc.setFont(undefined, 'normal');
-                        doc.text(m.value, 90, y);
+                        doc.text(String(m.value || ''), 90, y);
                         y += 5;
                         if (m.source) {
                             doc.setFontSize(8);
                             doc.setTextColor(100);
-                            doc.text(`Source: ${m.source}`, 27, y);
+                            doc.text('Source: ' + String(m.source), 27, y);
                             doc.setTextColor(0);
                             doc.setFontSize(10);
                             y += 5;
