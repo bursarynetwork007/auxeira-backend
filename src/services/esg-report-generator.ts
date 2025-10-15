@@ -102,8 +102,19 @@ export class ESGReportGenerator {
     return scrapedData;
   }
 
-  private async callOpenAI(prompt: string): Promise<any> {
+  private async callOpenAI(prompt: string | { systemPrompt: string, userPrompt: string }): Promise<any> {
     const apiKey = process.env.NANOGPT5_API_KEY;
+    
+    // Handle both old string format and new structured format
+    let messages;
+    if (typeof prompt === 'string') {
+      messages = [{ role: 'user', content: prompt }];
+    } else {
+      messages = [
+        { role: 'system', content: prompt.systemPrompt },
+        { role: 'user', content: prompt.userPrompt }
+      ];
+    }
     
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -113,13 +124,19 @@ export class ESGReportGenerator {
       },
       body: JSON.stringify({
         model: 'gpt-4',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 3000,
+        messages: messages,
+        max_tokens: 4000,
         temperature: 0.7,
       }),
     });
 
     const data = await response.json();
+    
+    if (!response.ok) {
+      console.error('OpenAI API Error:', data);
+      throw new Error(`OpenAI API error: ${data.error?.message || 'Unknown error'}`);
+    }
+    
     return {
       content: data.choices[0].message.content,
       tokensUsed: data.usage.total_tokens,
@@ -127,6 +144,33 @@ export class ESGReportGenerator {
   }
 
   private parseReportContent(content: string, reportType: string): any {
+    // Try to parse as JSON first (for structured reports like impact_story)
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        
+        // If it has the expected structure, return it
+        if (parsed.title && parsed.executive_summary) {
+          return {
+            title: parsed.title,
+            executiveSummary: parsed.executive_summary,
+            fullNarrative: parsed.full_narrative || content,
+            keyMetrics: parsed.key_metrics || [],
+            visualizations: parsed.visuals || [],
+            recommendations: parsed.recommended_actions || [],
+            successStories: parsed.success_stories || [],
+            policyInsights: parsed.policy_insights || '',
+            roiProjection: parsed.roi_projection || '',
+            trendlineData: parsed.trendline_data || null,
+          };
+        }
+      }
+    } catch (e) {
+      console.log('Not JSON format, using text parsing...');
+    }
+    
+    // Fallback to text parsing
     return {
       title: `${reportType.replace(/_/g, ' ').toUpperCase()} Report`,
       executiveSummary: content.substring(0, 500),

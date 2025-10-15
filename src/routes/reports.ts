@@ -117,38 +117,73 @@ router.get('/profile/:userId', async (req, res) => {
  */
 router.post('/reports/generate', async (req, res) => {
   try {
-    const { userId, reportType } = req.body;
+    const { profile, reportType } = req.body;
 
-    if (!userId || !reportType) {
+    if (!profile || !reportType) {
       return res.status(400).json({
         success: false,
-        error: 'userId and reportType are required',
+        error: 'profile and reportType are required',
       });
     }
 
-    console.log(`📊 Generating ${reportType} for user ${userId}...`);
+    console.log(`📊 Generating ${reportType} for ${profile.organizationName}...`);
 
-    const profile = await prisma.eSGUserProfile.findUnique({
+    // Create/update user profile in database
+    const userId = profile.organizationName.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+    
+    const dbProfile = await prisma.eSGUserProfile.upsert({
       where: { userId },
+      update: {
+        organizationName: profile.organizationName,
+        websiteUrl: profile.websiteUrl,
+        sectorType: profile.sectorType,
+        country: profile.country,
+        educationFocusAreas: JSON.stringify(profile.focusAreas ? profile.focusAreas.split(',').map(s => s.trim()) : []),
+        sdgAlignment: JSON.stringify(profile.sdgAlignment ? profile.sdgAlignment.split(',').map(n => parseInt(n.trim())) : []),
+        goalStatement: profile.goalStatement,
+        annualEducationSpend: profile.annualSpend ? parseFloat(profile.annualSpend) : null,
+        kpisOfInterest: JSON.stringify([]),
+        relevantPolicies: JSON.stringify([]),
+      },
+      create: {
+        userId,
+        organizationName: profile.organizationName,
+        websiteUrl: profile.websiteUrl,
+        sectorType: profile.sectorType,
+        country: profile.country,
+        educationFocusAreas: JSON.stringify(profile.focusAreas ? profile.focusAreas.split(',').map(s => s.trim()) : []),
+        sdgAlignment: JSON.stringify(profile.sdgAlignment ? profile.sdgAlignment.split(',').map(n => parseInt(n.trim())) : []),
+        goalStatement: profile.goalStatement,
+        annualEducationSpend: profile.annualSpend ? parseFloat(profile.annualSpend) : null,
+        kpisOfInterest: JSON.stringify([]),
+        relevantPolicies: JSON.stringify([]),
+      },
     });
 
-    if (!profile) {
-      return res.status(404).json({
-        success: false,
-        error: 'Please complete your profile first',
-      });
-    }
-
     const report = await esgReportGenerator.generateDynamicReport(
-      profile.id,
+      dbProfile.id,
       reportType
     );
 
+    // Parse JSON fields
+    const keyMetrics = JSON.parse(report.keyMetrics || '[]');
+    const visualizations = JSON.parse(report.visualizations || '[]');
+    const recommendedActions = JSON.parse(report.recommendedActions || '[]');
+    
     res.json({
       success: true,
       reportId: report.reportId,
       title: report.title,
+      executive_summary: report.executiveSummary,
       executiveSummary: report.executiveSummary,
+      full_narrative: report.fullNarrative,
+      fullNarrative: report.fullNarrative,
+      key_metrics: keyMetrics,
+      keyMetrics: keyMetrics,
+      visualizations: visualizations,
+      visuals: visualizations,
+      recommended_actions: recommendedActions,
+      recommendedActions: recommendedActions,
       isPremium: report.isPremium,
       unlockPrice: report.unlockPrice,
       isUnlocked: report.isUnlocked,

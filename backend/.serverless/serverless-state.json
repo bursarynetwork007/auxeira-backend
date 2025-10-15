@@ -133,7 +133,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "auxeira-backend-deployment-bucket-prod",
-                "S3Key": "serverless/auxeira-backend/prod/1759166938310-2025-09-29T17:28:58.310Z/auxeira-backend.zip"
+                "S3Key": "serverless/auxeira-backend/prod/1760349225246-2025-10-13T09:53:45.246Z/auxeira-backend.zip"
               },
               "Handler": "lambda-enhanced.handler",
               "Runtime": "nodejs18.x",
@@ -160,14 +160,14 @@
               "ApiLogGroup"
             ]
           },
-          "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY": {
+          "ApiLambdaVersionhBLKnW1qCw6cwzRIhcxAKQnsIG0PJjeynxnexvXDsM": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "FwT7h66gZSupKzYHyWve7Y9No2yJ13mh4Q3AvqYDifM="
+              "CodeSha256": "2sX++taNXBEMrcLrupe5/k8l7dr11CQ39QvFgXUjYMQ="
             }
           },
           "ApiGatewayRestApi": {
@@ -385,7 +385,7 @@
               "ApiLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1759166923205": {
+          "ApiGatewayDeployment1760349210151": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -526,7 +526,7 @@
           "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY"
+              "Ref": "ApiLambdaVersionhBLKnW1qCw6cwzRIhcxAKQnsIG0PJjeynxnexvXDsM"
             },
             "Export": {
               "Name": "sls-auxeira-backend-prod-ApiLambdaFunctionQualifiedArn"
@@ -623,7 +623,7 @@
         "timeout": 29,
         "runtime": "nodejs18.x",
         "vpc": {},
-        "versionLogicalId": "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY"
+        "versionLogicalId": "ApiLambdaVersionhBLKnW1qCw6cwzRIhcxAKQnsIG0PJjeynxnexvXDsM"
       }
     },
     "resources": {
@@ -738,7 +738,7 @@
         "artifactsS3KeyDirname": "serverless/auxeira-backend/prod/code-artifacts",
         "deploymentBucket": "auxeira-backend-deployment-bucket-prod",
         "artifact": "/workspaces/auxeira-backend/backend/.serverless/auxeira-backend.zip",
-        "artifactDirectoryName": "serverless/auxeira-backend/prod/1759166938310-2025-09-29T17:28:58.310Z"
+        "artifactDirectoryName": "serverless/auxeira-backend/prod/1760349225246-2025-10-13T09:53:45.246Z"
       },
       "provider": {
         "$ref": "$[\"service\"][\"provider\"]"
@@ -756,7 +756,7 @@
     "artifact": "/workspaces/auxeira-backend/backend/.serverless/auxeira-backend.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/auxeira-backend/prod/1759166938310-2025-09-29T17:28:58.310Z",
+    "artifactDirectoryName": "serverless/auxeira-backend/prod/1760349225246-2025-10-13T09:53:45.246Z",
     "artifact": "auxeira-backend.zip"
   }
 }

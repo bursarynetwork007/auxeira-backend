@@ -1,6 +1,6 @@
 {
   "/workspaces/auxeira-backend/backend/serverless.yml": {
-    "versionFramework": "4.19.1",
+    "versionFramework": "4.21.0",
     "servicePath": "/workspaces/auxeira-backend/backend/serverless.yml",
     "serviceConfigFileName": "serverless.yml",
     "service": {
@@ -30,7 +30,7 @@
         "artifactsS3KeyDirname": "serverless/auxeira-backend/prod/code-artifacts",
         "deploymentBucket": "auxeira-backend-deployment-bucket-prod",
         "artifact": "/workspaces/auxeira-backend/backend/.serverless/auxeira-backend.zip",
-        "artifactDirectoryName": "serverless/auxeira-backend/prod/1759166938310-2025-09-29T17:28:58.310Z"
+        "artifactDirectoryName": "serverless/auxeira-backend/prod/1760349225246-2025-10-13T09:53:45.246Z"
       },
       "provider": {
         "name": "aws",
@@ -174,7 +174,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "auxeira-backend-deployment-bucket-prod",
-                  "S3Key": "serverless/auxeira-backend/prod/1759166938310-2025-09-29T17:28:58.310Z/auxeira-backend.zip"
+                  "S3Key": "serverless/auxeira-backend/prod/1760349225246-2025-10-13T09:53:45.246Z/auxeira-backend.zip"
                 },
                 "Handler": "lambda-enhanced.handler",
                 "Runtime": "nodejs18.x",
@@ -201,14 +201,14 @@
                 "ApiLogGroup"
               ]
             },
-            "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY": {
+            "ApiLambdaVersionhBLKnW1qCw6cwzRIhcxAKQnsIG0PJjeynxnexvXDsM": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "ApiLambdaFunction"
                 },
-                "CodeSha256": "FwT7h66gZSupKzYHyWve7Y9No2yJ13mh4Q3AvqYDifM="
+                "CodeSha256": "2sX++taNXBEMrcLrupe5/k8l7dr11CQ39QvFgXUjYMQ="
               }
             },
             "ApiGatewayRestApi": {
@@ -426,7 +426,7 @@
                 "ApiLambdaPermissionApiGateway"
               ]
             },
-            "ApiGatewayDeployment1759166923205": {
+            "ApiGatewayDeployment1760349210151": {
               "Type": "AWS::ApiGateway::Deployment",
               "Properties": {
                 "RestApiId": {
@@ -567,7 +567,7 @@
             "ApiLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY"
+                "Ref": "ApiLambdaVersionhBLKnW1qCw6cwzRIhcxAKQnsIG0PJjeynxnexvXDsM"
               },
               "Export": {
                 "Name": "sls-auxeira-backend-prod-ApiLambdaFunctionQualifiedArn"
@@ -663,7 +663,7 @@
           "timeout": 29,
           "runtime": "nodejs18.x",
           "vpc": {},
-          "versionLogicalId": "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY"
+          "versionLogicalId": "ApiLambdaVersionhBLKnW1qCw6cwzRIhcxAKQnsIG0PJjeynxnexvXDsM"
         }
       },
       "resources": {
@@ -892,7 +892,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "auxeira-backend-deployment-bucket-prod",
-                "S3Key": "serverless/auxeira-backend/prod/1759166938310-2025-09-29T17:28:58.310Z/auxeira-backend.zip"
+                "S3Key": "serverless/auxeira-backend/prod/1760349225246-2025-10-13T09:53:45.246Z/auxeira-backend.zip"
               },
               "Handler": "lambda-enhanced.handler",
               "Runtime": "nodejs18.x",
@@ -919,14 +919,14 @@
               "ApiLogGroup"
             ]
           },
-          "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY": {
+          "ApiLambdaVersionhBLKnW1qCw6cwzRIhcxAKQnsIG0PJjeynxnexvXDsM": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "FwT7h66gZSupKzYHyWve7Y9No2yJ13mh4Q3AvqYDifM="
+              "CodeSha256": "2sX++taNXBEMrcLrupe5/k8l7dr11CQ39QvFgXUjYMQ="
             }
           },
           "ApiGatewayRestApi": {
@@ -1144,7 +1144,7 @@
               "ApiLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1759166923205": {
+          "ApiGatewayDeployment1760349210151": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -1285,7 +1285,7 @@
           "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY"
+              "Ref": "ApiLambdaVersionhBLKnW1qCw6cwzRIhcxAKQnsIG0PJjeynxnexvXDsM"
             },
             "Export": {
               "Name": "sls-auxeira-backend-prod-ApiLambdaFunctionQualifiedArn"
@@ -1335,7 +1335,8 @@
       "deploy"
     ],
     "options": {
-      "stage": "prod"
+      "stage": "prod",
+      "region": "us-east-1"
     },
     "orgId": "00a51e9b-62da-43be-8a05-85bc1ba7e140",
     "orgName": "lante",
@@ -1345,12 +1346,12 @@
     "serviceProviderAwsCfStackName": "auxeira-backend-prod",
     "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-1:615608124862:stack/auxeira-backend-prod/c3c7dd70-9d2d-11f0-b120-12eed062793d",
     "serviceProviderAwsCfStackCreated": "2025-09-29T12:13:53.358Z",
-    "serviceProviderAwsCfStackUpdated": "2025-09-29T17:15:52.285Z",
+    "serviceProviderAwsCfStackUpdated": "2025-10-13T09:52:02.917Z",
     "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
     "serviceProviderAwsCfStackOutputs": [
       {
         "OutputKey": "ApiLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:us-east-1:615608124862:function:auxeira-backend-prod-api:6",
+        "OutputValue": "arn:aws:lambda:us-east-1:615608124862:function:auxeira-backend-prod-api:18",
         "Description": "Current Lambda function version",
         "ExportName": "sls-auxeira-backend-prod-ApiLambdaFunctionQualifiedArn"
       },
@@ -1475,7 +1476,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "auxeira-backend-deployment-bucket-prod",
-              "S3Key": "serverless/auxeira-backend/prod/1759166938310-2025-09-29T17:28:58.310Z/auxeira-backend.zip"
+              "S3Key": "serverless/auxeira-backend/prod/1760349225246-2025-10-13T09:53:45.246Z/auxeira-backend.zip"
             },
             "Handler": "lambda-enhanced.handler",
             "Runtime": "nodejs18.x",
@@ -1502,14 +1503,14 @@
             "ApiLogGroup"
           ]
         },
-        "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY": {
+        "ApiLambdaVersionhBLKnW1qCw6cwzRIhcxAKQnsIG0PJjeynxnexvXDsM": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "ApiLambdaFunction"
             },
-            "CodeSha256": "FwT7h66gZSupKzYHyWve7Y9No2yJ13mh4Q3AvqYDifM="
+            "CodeSha256": "2sX++taNXBEMrcLrupe5/k8l7dr11CQ39QvFgXUjYMQ="
           }
         },
         "ApiGatewayRestApi": {
@@ -1727,7 +1728,7 @@
             "ApiLambdaPermissionApiGateway"
           ]
         },
-        "ApiGatewayDeployment1759166923205": {
+        "ApiGatewayDeployment1760349210151": {
           "Type": "AWS::ApiGateway::Deployment",
           "Properties": {
             "RestApiId": {
@@ -1868,7 +1869,7 @@
         "ApiLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "ApiLambdaVersioniLpQ2QM9wfY8F777zdws4x0qIDHL2lJsMoLBC1sgAY"
+            "Ref": "ApiLambdaVersionhBLKnW1qCw6cwzRIhcxAKQnsIG0PJjeynxnexvXDsM"
           },
           "Export": {
             "Name": "sls-auxeira-backend-prod-ApiLambdaFunctionQualifiedArn"
