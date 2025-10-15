@@ -526,212 +526,6 @@
             background-color: rgba(255, 255, 255, 0.05);
             color: var(--text-primary);
         }
-
-        /* NEW STYLES FOR AI FEATURES */
-        
-        /* AI Copilot Interface */
-        .ai-copilot {
-            position: fixed;
-            bottom: 110px;
-            right: 30px;
-            width: 380px;
-            background: var(--secondary-bg);
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            border: 1px solid var(--border-color);
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .ai-copilot.active {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .ai-copilot-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .ai-copilot-body {
-            padding: 20px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .ai-message {
-            margin-bottom: 16px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            max-width: 85%;
-        }
-
-        .ai-message.user {
-            background: rgba(0, 136, 255, 0.2);
-            margin-left: auto;
-            border-bottom-right-radius: 4px;
-        }
-
-        .ai-message.bot {
-            background: rgba(136, 0, 255, 0.2);
-            border-bottom-left-radius: 4px;
-        }
-
-        .ai-copilot-input {
-            display: flex;
-            padding: 16px 20px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .ai-copilot-input input {
-            flex: 1;
-            margin-right: 12px;
-        }
-
-        /* Scenario Simulator */
-        .scenario-controls {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .scenario-slider {
-            margin-bottom: 16px;
-        }
-
-        .scenario-slider label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-        }
-
-        /* Impact Map */
-        .impact-map-container {
-            height: 500px;
-            border-radius: 12px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .impact-map {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0a0a2a, #1a0a2a);
-        }
-
-        /* MPP Widgets */
-        .mpp-widgets {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 24px 0;
-        }
-
-        .mpp-widget {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .mpp-widget:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 136, 255, 0.2);
-        }
-
-        /* Behavioral Badges */
-        .badge-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 16px 0;
-        }
-
-        .behavioral-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
-            background: rgba(255, 170, 0, 0.2);
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .behavioral-badge.blue {
-            background: rgba(0, 136, 255, 0.2);
-        }
-
-        .behavioral-badge.green {
-            background: rgba(0, 255, 136, 0.2);
-        }
-
-        .behavioral-badge.purple {
-            background: rgba(136, 0, 255, 0.2);
-        }
-
-        /* FOMO Alerts */
-        .fomo-alert {
-            background: linear-gradient(135deg, rgba(255, 170, 0, 0.2), rgba(255, 68, 68, 0.2));
-            border: 1px solid var(--terminal-gold);
-            border-radius: 10px;
-            padding: 16px;
-            margin: 16px 0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        /* Social Proof Elements */
-        .social-proof {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            background: rgba(0, 136, 255, 0.1);
-            border-radius: 8px;
-            margin: 12px 0;
-        }
-
-        .social-proof-avatars {
-            display: flex;
-        }
-
-        .social-proof-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--terminal-blue);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-right: -8px;
-            border: 2px solid var(--secondary-bg);
-        }
-
-        /* Scarcity Triggers */
-        .scarcity-trigger {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
-            background: rgba(255, 68, 68, 0.2);
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--terminal-red);
-            animation: pulse 2s infinite;
-        }
     </style>
 </head>
 <body>
@@ -754,9 +548,7 @@
                 <i class="fas fa-pulse me-1"></i>Live
             </span>
             <span class="badge bg-warning text-dark">EXECUTIVE</span>
-            <span class="scarcity-trigger">
-                <i class="fas fa-clock me-1"></i>2 Report Slots Left
-            </span>
+            <span class="badge bg-info">2 Report Slots Left</span>
         </div>
     </div>
 
@@ -776,19 +568,6 @@
                         </p>
                     </div>
                     <div class="d-flex align-items-center gap-3">
-                        <!-- User Focus Toggle -->
-                        <div class="btn-group" role="group">
-                            <input type="radio" class="btn-check" name="userFocus" id="roiFocus" autocomplete="off" checked>
-                            <label class="btn btn-outline-terminal" for="roiFocus">
-                                <i class="fas fa-chart-line me-2"></i>ROI Focus
-                            </label>
-
-                            <input type="radio" class="btn-check" name="userFocus" id="esgFocus" autocomplete="off">
-                            <label class="btn btn-outline-terminal" for="esgFocus">
-                                <i class="fas fa-leaf me-2"></i>ESG Focus
-                            </label>
-                        </div>
-                        
                         <div class="text-end">
                             <div class="small text-muted">Executive Tier</div>
                             <div class="fw-bold fs-5" style="color: var(--terminal-gold);">$1,896/month</div>
@@ -832,16 +611,6 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab">
                     <i class="fas fa-file-alt me-2"></i>Reports Hub
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="ai-tab" data-bs-toggle="tab" data-bs-target="#ai" type="button" role="tab">
-                    <i class="fas fa-robot me-2"></i>AI Features
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="collaboration-tab" data-bs-toggle="tab" data-bs-target="#collaboration" type="button" role="tab">
-                    <i class="fas fa-users me-2"></i>Collaboration Hub
                 </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -901,22 +670,6 @@
                         </div>
                     </div>
 
-                    <!-- Social Proof Element -->
-                    <div class="col-12">
-                        <div class="social-proof">
-                            <div class="social-proof-avatars">
-                                <div class="social-proof-avatar">JD</div>
-                                <div class="social-proof-avatar">AS</div>
-                                <div class="social-proof-avatar">MP</div>
-                                <div class="social-proof-avatar">+5</div>
-                            </div>
-                            <div class="social-proof-text">
-                                <strong>Partners using our AI insights saw 18% faster growth</strong>
-                                <div class="text-muted small">Join peers like Stripe Ventures and AWS Cloud Partners</div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Enhanced Quick Actions -->
                     <div class="col-md-6">
                         <div class="glass-card">
@@ -924,8 +677,8 @@
                                 <i class="fas fa-bolt me-2"></i>Quick Actions
                             </h5>
                             <div class="d-grid gap-2">
-                                <button class="btn btn-terminal" onclick="generateReport('predictive-nudge')">
-                                    <i class="fas fa-file-contract me-2"></i>Generate Predictive Nudge Report
+                                <button class="btn btn-terminal" onclick="generateReport('roi')">
+                                    <i class="fas fa-file-contract me-2"></i>Generate ROI Report
                                 </button>
                                 <button class="btn btn-outline-terminal" onclick="viewActiveAuctions()">
                                     <i class="fas fa-gavel me-2"></i>View Active Auctions (3)
@@ -1374,7 +1127,7 @@
                             <i class="fas fa-file-alt"></i>
                             Reports Hub
                         </div>
-                        <span class="scarcity-trigger">
+                        <span class="badge bg-warning">
                             <i class="fas fa-download me-1"></i>
                             2 Free Downloads Left
                         </span>
@@ -1396,30 +1149,21 @@
                         </div>
                     </div>
 
-                    <!-- NEW AI-ENHANCED REPORTS -->
+                    <!-- Reports Grid -->
                     <div class="pulse-grid">
-                        <!-- Predictive Nudge Report -->
                         <div class="glass-card">
                             <div class="d-flex align-items-start mb-3">
                                 <div class="me-3" style="color: var(--terminal-blue); font-size: 2rem;">
-                                    <i class="fas fa-brain"></i>
+                                    <i class="fas fa-file-invoice-dollar"></i>
                                 </div>
                                 <div>
-                                    <h5 class="mb-1">Predictive Nudge Report</h5>
-                                    <p class="text-muted mb-2">AI forecasts with behavioral hooks to optimize partner engagement and maximize ROI.</p>
-                                    <div class="badge-container mb-2">
-                                        <span class="behavioral-badge blue">
-                                            <i class="fas fa-robot"></i>NanoGPT-5 Enhanced
-                                        </span>
-                                        <span class="behavioral-badge">
-                                            <i class="fas fa-chess"></i>Strategic Nudges
-                                        </span>
-                                    </div>
+                                    <h5 class="mb-1">ROI Report</h5>
+                                    <p class="text-muted mb-2">Quantifies financial returns (CAC, IRR) with causal analysis and industry benchmarks.</p>
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-terminal btn-sm" onclick="generateReport('predictive-nudge')">
+                                        <button class="btn btn-terminal btn-sm" onclick="generateReport('roi')">
                                             <i class="fas fa-bolt me-1"></i>Generate Now
                                         </button>
-                                        <button class="btn btn-outline-terminal btn-sm" onclick="previewReport('predictive-nudge')">
+                                        <button class="btn btn-outline-terminal btn-sm" onclick="previewReport('roi')">
                                             <i class="fas fa-eye me-1"></i>Preview
                                         </button>
                                     </div>
@@ -1427,28 +1171,19 @@
                             </div>
                         </div>
 
-                        <!-- Personalized Retention Scorecard -->
                         <div class="glass-card">
                             <div class="d-flex align-items-start mb-3">
                                 <div class="me-3" style="color: var(--terminal-green); font-size: 2rem;">
-                                    <i class="fas fa-user-check"></i>
+                                    <i class="fas fa-leaf"></i>
                                 </div>
                                 <div>
-                                    <h5 class="mb-1">Personalized Retention Scorecard</h5>
-                                    <p class="text-muted mb-2">Custom metrics with 19% accuracy gains in predicting startup success and retention.</p>
-                                    <div class="badge-container mb-2">
-                                        <span class="behavioral-badge green">
-                                            <i class="fas fa-chart-line"></i>+19% Accuracy
-                                        </span>
-                                        <span class="behavioral-badge">
-                                            <i class="fas fa-user-cog"></i>Personalized
-                                        </span>
-                                    </div>
+                                    <h5 class="mb-1">ESG Impact Report</h5>
+                                    <p class="text-muted mb-2">Details social/environmental outcomes with TCFD alignment and SDG mapping.</p>
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-terminal btn-sm" onclick="generateReport('retention-scorecard')">
+                                        <button class="btn btn-terminal btn-sm" onclick="generateReport('esg')">
                                             <i class="fas fa-bolt me-1"></i>Generate Now
                                         </button>
-                                        <button class="btn btn-outline-terminal btn-sm" onclick="previewReport('retention-scorecard')">
+                                        <button class="btn btn-outline-terminal btn-sm" onclick="previewReport('esg')">
                                             <i class="fas fa-eye me-1"></i>Preview
                                         </button>
                                     </div>
@@ -1456,115 +1191,19 @@
                             </div>
                         </div>
 
-                        <!-- Innovation Pipeline Forecast -->
                         <div class="glass-card">
                             <div class="d-flex align-items-start mb-3">
                                 <div class="me-3" style="color: var(--terminal-purple); font-size: 2rem;">
-                                    <i class="fas fa-rocket"></i>
+                                    <i class="fas fa-handshake"></i>
                                 </div>
                                 <div>
-                                    <h5 class="mb-1">Innovation Pipeline Forecast</h5>
-                                    <p class="text-muted mb-2">Scans market trends with 75% ROI potential identification in emerging tech sectors.</p>
-                                    <div class="badge-container mb-2">
-                                        <span class="behavioral-badge purple">
-                                            <i class="fas fa-bullseye"></i>75% ROI Potential
-                                        </span>
-                                        <span class="behavioral-badge">
-                                            <i class="fas fa-trending-up"></i>Market Trends
-                                        </span>
-                                    </div>
+                                    <h5 class="mb-1">Engagement Report</h5>
+                                    <p class="text-muted mb-2">Tracks startup reward redemption, effort metrics, and partnership health indicators.</p>
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-terminal btn-sm" onclick="generateReport('innovation-pipeline')">
+                                        <button class="btn btn-terminal btn-sm" onclick="generateReport('engagement')">
                                             <i class="fas fa-bolt me-1"></i>Generate Now
                                         </button>
-                                        <button class="btn btn-outline-terminal btn-sm" onclick="previewReport('innovation-pipeline')">
-                                            <i class="fas fa-eye me-1"></i>Preview
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Maximum Precision Impact Report -->
-                        <div class="glass-card">
-                            <div class="d-flex align-items-start mb-3">
-                                <div class="me-3" style="color: var(--terminal-red); font-size: 2rem;">
-                                    <i class="fas fa-crosshairs"></i>
-                                </div>
-                                <div>
-                                    <h5 class="mb-1">Maximum Precision Impact Report</h5>
-                                    <p class="text-muted mb-2">Narrow-focus causal analysis with statistical significance validation.</p>
-                                    <div class="badge-container mb-2">
-                                        <span class="behavioral-badge" style="background: rgba(255, 68, 68, 0.2);">
-                                            <i class="fas fa-bullseye"></i>Maximum Precision
-                                        </span>
-                                        <span class="behavioral-badge">
-                                            <i class="fas fa-chart-bar"></i>Causal Analysis
-                                        </span>
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-terminal btn-sm" onclick="generateReport('precision-impact')">
-                                            <i class="fas fa-bolt me-1"></i>Generate Now
-                                        </button>
-                                        <button class="btn btn-outline-terminal btn-sm" onclick="previewReport('precision-impact')">
-                                            <i class="fas fa-eye me-1"></i>Preview
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Cross-Impact Hybrid Report -->
-                        <div class="glass-card">
-                            <div class="d-flex align-items-start mb-3">
-                                <div class="me-3" style="color: var(--terminal-gold); font-size: 2rem;">
-                                    <i class="fas fa-project-diagram"></i>
-                                </div>
-                                <div>
-                                    <h5 class="mb-1">Cross-Impact Hybrid Report</h5>
-                                    <p class="text-muted mb-2">ESG + SVP data integration for holistic partnership performance assessment.</p>
-                                    <div class="badge-container mb-2">
-                                        <span class="behavioral-badge" style="background: rgba(255, 170, 0, 0.2);">
-                                            <i class="fas fa-leaf"></i>ESG Integration
-                                        </span>
-                                        <span class="behavioral-badge blue">
-                                            <i class="fas fa-network-wired"></i>Cross-Impact
-                                        </span>
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-terminal btn-sm" onclick="generateReport('cross-impact')">
-                                            <i class="fas fa-bolt me-1"></i>Generate Now
-                                        </button>
-                                        <button class="btn btn-outline-terminal btn-sm" onclick="previewReport('cross-impact')">
-                                            <i class="fas fa-eye me-1"></i>Preview
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Behavioral Economics Trigger Report -->
-                        <div class="glass-card">
-                            <div class="d-flex align-items-start mb-3">
-                                <div class="me-3" style="color: var(--terminal-blue); font-size: 2rem;">
-                                    <i class="fas fa-chess-knight"></i>
-                                </div>
-                                <div>
-                                    <h5 class="mb-1">Behavioral Economics Trigger Report</h5>
-                                    <p class="text-muted mb-2">Gamification impact analysis with engagement optimization recommendations.</p>
-                                    <div class="badge-container mb-2">
-                                        <span class="behavioral-badge purple">
-                                            <i class="fas fa-gamepad"></i>Gamification
-                                        </span>
-                                        <span class="behavioral-badge">
-                                            <i class="fas fa-psychology"></i>Behavioral Triggers
-                                        </span>
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-terminal btn-sm" onclick="generateReport('behavioral-triggers')">
-                                            <i class="fas fa-bolt me-1"></i>Generate Now
-                                        </button>
-                                        <button class="btn btn-outline-terminal btn-sm" onclick="previewReport('behavioral-triggers')">
+                                        <button class="btn btn-outline-terminal btn-sm" onclick="previewReport('engagement')">
                                             <i class="fas fa-eye me-1"></i>Preview
                                         </button>
                                     </div>
@@ -1581,362 +1220,6 @@
                                 <h6 class="mb-1" id="reportStatusTitle">Generating Report</h6>
                                 <p class="text-muted mb-0" id="reportStatusMessage">Processing data and generating insights...</p>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- NEW AI Features Tab -->
-            <div class="tab-pane fade" id="ai" role="tabpanel">
-                <div class="terminal-container">
-                    <div class="terminal-header">
-                        <div class="terminal-title">
-                            <i class="fas fa-robot"></i>
-                            Advanced AI Features
-                        </div>
-                        <span class="badge bg-warning">
-                            <i class="fas fa-star me-1"></i>Executive Tier
-                        </span>
-                    </div>
-
-                    <!-- AI Features Overview -->
-                    <div class="qualitative-card">
-                        <div class="statement-header">
-                            <i class="fas fa-brain"></i>
-                            <span>AI-Powered Partnership Intelligence</span>
-                        </div>
-                        <div class="statement-content">
-                            "Our advanced AI suite leverages NanoGPT-5 integration and proprietary machine learning models to deliver 
-                            predictive insights, personalized recommendations, and real-time risk detection. These tools transform 
-                            raw partnership data into actionable intelligence, enabling superior decision-making and maximizing 
-                            your strategic advantage in the competitive startup ecosystem."
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- AI Copilot Section -->
-                        <div class="col-md-6">
-                            <div class="glass-card">
-                                <h5 style="color: var(--terminal-blue);">
-                                    <i class="fas fa-comments me-2"></i>AI Copilot
-                                </h5>
-                                <p class="text-secondary mb-3">
-                                    Voice and text interface powered by NanoGPT-5 for natural language queries and insights.
-                                </p>
-                                <div class="d-grid gap-2">
-                                    <button class="btn btn-terminal" onclick="toggleAICopilot()">
-                                        <i class="fas fa-robot me-2"></i>Launch AI Copilot
-                                    </button>
-                                    <button class="btn btn-outline-terminal" onclick="showSampleQueries()">
-                                        <i class="fas fa-lightbulb me-2"></i>View Sample Queries
-                                    </button>
-                                </div>
-                                <div class="mt-3">
-                                    <h6>Common Use Cases:</h6>
-                                    <ul class="text-secondary small">
-                                        <li>"Show me startups with highest growth potential"</li>
-                                        <li>"Analyze my portfolio risk exposure"</li>
-                                        <li>"Generate ESG impact report for Q3"</li>
-                                        <li>"Compare my performance to Stripe Ventures"</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Interactive Scenario Simulator -->
-                        <div class="col-md-6">
-                            <div class="glass-card">
-                                <h5 style="color: var(--terminal-purple);">
-                                    <i class="fas fa-chart-line me-2"></i>Scenario Simulator
-                                </h5>
-                                <p class="text-secondary mb-3">
-                                    What-if analysis with real-time charts to model different partnership strategies.
-                                </p>
-                                <div class="scenario-controls">
-                                    <div class="scenario-slider">
-                                        <label>Investment Increase (%)</label>
-                                        <input type="range" class="form-range" min="0" max="100" value="25" id="investmentSlider">
-                                        <div class="text-end small text-muted" id="investmentValue">+25%</div>
-                                    </div>
-                                    <div class="scenario-slider">
-                                        <label>ESG Focus (%)</label>
-                                        <input type="range" class="form-range" min="0" max="100" value="40" id="esgSlider">
-                                        <div class="text-end small text-muted" id="esgValue">40%</div>
-                                    </div>
-                                </div>
-                                <button class="btn btn-terminal w-100" onclick="runScenario()">
-                                    <i class="fas fa-play me-2"></i>Run Simulation
-                                </button>
-                                <div class="chart-container mt-3">
-                                    <canvas id="scenarioChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-4">
-                        <!-- Anomaly Detection -->
-                        <div class="col-md-6">
-                            <div class="glass-card">
-                                <h5 style="color: var(--terminal-red);">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>Anomaly Alert Nudges
-                                </h5>
-                                <p class="text-secondary mb-3">
-                                    Real-time AI risk detection with proactive alerts for portfolio anomalies.
-                                </p>
-                                <div id="anomalyAlerts">
-                                    <div class="alert alert-warning d-flex align-items-center">
-                                        <i class="fas fa-exclamation-circle me-2"></i>
-                                        <div>
-                                            <strong>Unusual activity detected</strong>
-                                            <div class="small">3 portfolio startups showing atypical engagement patterns</div>
-                                        </div>
-                                    </div>
-                                    <div class="alert alert-info d-flex align-items-center">
-                                        <i class="fas fa-info-circle me-2"></i>
-                                        <div>
-                                            <strong>Market shift detected</strong>
-                                            <div class="small">AI infrastructure sector showing 15% increased competition</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="btn btn-outline-terminal w-100 mt-2" onclick="viewAllAlerts()">
-                                    <i class="fas fa-list me-2"></i>View All Alerts
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Impact Map -->
-                        <div class="col-md-6">
-                            <div class="glass-card">
-                                <h5 style="color: var(--terminal-green);">
-                                    <i class="fas fa-globe-americas me-2"></i>Impact Map
-                                </h5>
-                                <p class="text-secondary mb-3">
-                                    Global visualization of startup impacts and partnership distribution.
-                                </p>
-                                <div class="impact-map-container">
-                                    <div class="impact-map">
-                                        <!-- Simplified map visualization -->
-                                        <div class="d-flex align-items-center justify-content-center h-100">
-                                            <div class="text-center">
-                                                <i class="fas fa-globe-americas" style="font-size: 4rem; color: var(--terminal-blue); opacity: 0.5;"></i>
-                                                <div class="mt-3">
-                                                    <button class="btn btn-terminal" onclick="loadImpactMap()">
-                                                        <i class="fas fa-sync me-2"></i>Load Interactive Map
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mt-3">
-                                    <div class="row text-center">
-                                        <div class="col-4">
-                                            <div class="fw-bold" style="color: var(--terminal-blue);">32</div>
-                                            <div class="text-muted small">North America</div>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="fw-bold" style="color: var(--terminal-green);">18</div>
-                                            <div class="text-muted small">Europe</div>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="fw-bold" style="color: var(--terminal-purple);">9</div>
-                                            <div class="text-muted small">Asia Pacific</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- MPP Widgets -->
-                    <div class="glass-card mt-4">
-                        <h5 style="color: var(--terminal-gold);">
-                            <i class="fas fa-th me-2"></i>Scalable MPP Widgets
-                        </h5>
-                        <p class="text-secondary mb-3">
-                            Modular precision tools for specialized analytics and insights.
-                        </p>
-                        <div class="mpp-widgets">
-                            <div class="mpp-widget">
-                                <h6 style="color: var(--terminal-blue);">
-                                    <i class="fas fa-filter me-2"></i>Portfolio Filter
-                                </h6>
-                                <p class="text-muted small">Advanced filtering by stage, sector, and performance metrics</p>
-                                <button class="btn btn-outline-terminal btn-sm">Configure</button>
-                            </div>
-                            <div class="mpp-widget">
-                                <h6 style="color: var(--terminal-green);">
-                                    <i class="fas fa-chart-pie me-2"></i>Allocation Optimizer
-                                </h6>
-                                <p class="text-muted small">AI-powered recommendations for optimal capital allocation</p>
-                                <button class="btn btn-outline-terminal btn-sm">Optimize</button>
-                            </div>
-                            <div class="mpp-widget">
-                                <h6 style="color: var(--terminal-purple);">
-                                    <i class="fas fa-balance-scale me-2"></i>Risk Assessor
-                                </h6>
-                                <p class="text-muted small">Comprehensive risk analysis with mitigation strategies</p>
-                                <button class="btn btn-outline-terminal btn-sm">Assess</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- NEW Collaboration Hub Tab -->
-            <div class="tab-pane fade" id="collaboration" role="tabpanel">
-                <div class="terminal-container">
-                    <div class="terminal-header">
-                        <div class="terminal-title">
-                            <i class="fas fa-users"></i>
-                            Role-Based Collaboration Hub
-                        </div>
-                        <span class="badge bg-info">
-                            <i class="fas fa-shield-alt me-1"></i>Secure Workspace
-                        </span>
-                    </div>
-
-                    <!-- Collaboration Overview -->
-                    <div class="qualitative-card">
-                        <div class="statement-header">
-                            <i class="fas fa-network-wired"></i>
-                            <span>Collaborative Partnership Intelligence</span>
-                        </div>
-                        <div class="statement-content">
-                            "The Collaboration Hub enables secure, role-based sharing of insights and strategic coordination across 
-                            your organization. With gamification elements and progress tracking, teams can work together efficiently 
-                            while maintaining appropriate access controls and data security protocols."
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- Team Members -->
-                        <div class="col-md-4">
-                            <div class="glass-card">
-                                <h5 style="color: var(--terminal-blue);">
-                                    <i class="fas fa-user-friends me-2"></i>Team Members
-                                </h5>
-                                <div class="team-list">
-                                    <div class="d-flex align-items-center mb-3 p-2 rounded" style="background: rgba(0, 136, 255, 0.1);">
-                                        <div class="avatar-circle me-3" style="background: var(--terminal-blue);">
-                                            MC
-                                        </div>
-                                        <div>
-                                            <div class="fw-bold">Marcus Chen</div>
-                                            <small class="text-muted">Executive Admin</small>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-3 p-2 rounded">
-                                        <div class="avatar-circle me-3" style="background: var(--terminal-purple);">
-                                            SJ
-                                        </div>
-                                        <div>
-                                            <div class="fw-bold">Sarah Johnson</div>
-                                            <small class="text-muted">Analyst</small>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-center mb-3 p-2 rounded">
-                                        <div class="avatar-circle me-3" style="background: var(--terminal-green);">
-                                            DR
-                                        </div>
-                                        <div>
-                                            <div class="fw-bold">David Rodriguez</div>
-                                            <small class="text-muted">ESG Specialist</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="btn btn-outline-terminal w-100">
-                                    <i class="fas fa-plus me-2"></i>Invite Team Member
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Shared Insights -->
-                        <div class="col-md-8">
-                            <div class="glass-card">
-                                <h5 style="color: var(--terminal-purple);">
-                                    <i class="fas fa-lightbulb me-2"></i>Shared Insights
-                                </h5>
-                                <div class="insights-feed">
-                                    <div class="insight-item mb-3 p-3 rounded" style="background: rgba(136, 0, 255, 0.1);">
-                                        <div class="d-flex justify-content-between">
-                                            <div class="fw-bold">AI Market Expansion Opportunity</div>
-                                            <small class="text-muted">2 hours ago</small>
-                                        </div>
-                                        <p class="text-secondary mb-2">Identified 12 high-potential AI startups in Southeast Asia with 75% ROI potential.</p>
-                                        <div class="d-flex align-items-center">
-                                            <div class="behavioral-badge blue me-2">
-                                                <i class="fas fa-eye me-1"></i>Viewed by 3
-                                            </div>
-                                            <button class="btn btn-terminal btn-sm">
-                                                <i class="fas fa-comment me-1"></i>Comment
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="insight-item mb-3 p-3 rounded" style="background: rgba(0, 255, 136, 0.1);">
-                                        <div class="d-flex justify-content-between">
-                                            <div class="fw-bold">ESG Portfolio Analysis</div>
-                                            <small class="text-muted">1 day ago</small>
-                                        </div>
-                                        <p class="text-secondary mb-2">Our portfolio shows 25% higher ESG scores than industry average.</p>
-                                        <div class="d-flex align-items-center">
-                                            <div class="behavioral-badge green me-2">
-                                                <i class="fas fa-check me-1"></i>Approved
-                                            </div>
-                                            <button class="btn btn-terminal btn-sm">
-                                                <i class="fas fa-comment me-1"></i>Comment
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="d-flex gap-2 mt-3">
-                                    <input type="text" class="form-control" placeholder="Share an insight...">
-                                    <button class="btn btn-terminal">
-                                        <i class="fas fa-paper-plane"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Collaboration Gamification -->
-                    <div class="glass-card mt-4">
-                        <h5 style="color: var(--terminal-gold);">
-                            <i class="fas fa-trophy me-2"></i>Collaboration Gamification
-                        </h5>
-                        <p class="text-secondary mb-3">
-                            Track team progress and unlock achievements through collaborative activities.
-                        </p>
-                        <div class="row text-center">
-                            <div class="col-md-3">
-                                <div class="metric-value" style="color: var(--terminal-blue); font-size: 1.8rem;">87%</div>
-                                <div class="metric-label">Team Engagement</div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="metric-value" style="color: var(--terminal-green); font-size: 1.8rem;">24</div>
-                                <div class="metric-label">Insights Shared</div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="metric-value" style="color: var(--terminal-purple); font-size: 1.8rem;">15</div>
-                                <div class="metric-label">Collaborative Actions</div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="metric-value" style="color: var(--terminal-gold); font-size: 1.8rem;">3/5</div>
-                                <div class="metric-label">Team Badges</div>
-                            </div>
-                        </div>
-                        <div class="badge-container justify-content-center mt-3">
-                            <span class="behavioral-badge blue">
-                                <i class="fas fa-users me-1"></i>Team Player
-                            </span>
-                            <span class="behavioral-badge purple">
-                                <i class="fas fa-lightbulb me-1"></i>Insight Generator
-                            </span>
-                            <span class="behavioral-badge" style="background: rgba(255, 170, 0, 0.2);">
-                                <i class="fas fa-chart-line me-1"></i>Growth Catalyst
-                            </span>
                         </div>
                     </div>
                 </div>
@@ -2008,15 +1291,6 @@
                         </div>
                     </div>
 
-                    <!-- FOMO Alert -->
-                    <div class="fomo-alert">
-                        <i class="fas fa-bolt" style="color: var(--terminal-gold); font-size: 1.5rem;"></i>
-                        <div>
-                            <strong>Partners using our AI features saw 18% faster growth</strong>
-                            <div class="text-muted">Unlock Platinum tier to access advanced predictive analytics</div>
-                        </div>
-                    </div>
-
                     <!-- Top 5 Leaderboard -->
                     <div class="glass-card">
                         <h5 class="mb-3" style="color: var(--terminal-gold);">Top Partners</h5>
@@ -2041,27 +1315,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- NEW AI Copilot Interface -->
-    <div class="ai-copilot" id="aiCopilot">
-        <div class="ai-copilot-header">
-            <h6 class="mb-0" style="color: var(--terminal-blue);">
-                <i class="fas fa-robot me-2"></i>AI Copilot
-            </h6>
-            <button class="btn-close btn-close-white" onclick="toggleAICopilot()"></button>
-        </div>
-        <div class="ai-copilot-body" id="aiCopilotBody">
-            <div class="ai-message bot">
-                Hello! I'm your AI Copilot. How can I help you analyze your partnership portfolio today?
-            </div>
-        </div>
-        <div class="ai-copilot-input">
-            <input type="text" class="form-control" id="aiCopilotInput" placeholder="Ask me anything...">
-            <button class="btn btn-terminal" onclick="sendAIMessage()">
-                <i class="fas fa-paper-plane"></i>
-            </button>
         </div>
     </div>
 
@@ -2163,8 +1416,6 @@
         let isListening = false;
         let approvedBids = new Set();
         let reportSlots = 2;
-        let aiCopilotActive = false;
-        let userFocus = 'roi'; // 'roi' or 'esg'
 
         // Data Objects
         const ecosystemPulse = {
@@ -2267,21 +1518,6 @@
             initializeDashboard();
             startRealTimeUpdates();
             initializeCharts();
-            
-            // Set up user focus toggle
-            document.getElementById('roiFocus').addEventListener('change', function() {
-                if (this.checked) {
-                    userFocus = 'roi';
-                    updateDashboardFocus();
-                }
-            });
-            
-            document.getElementById('esgFocus').addEventListener('change', function() {
-                if (this.checked) {
-                    userFocus = 'esg';
-                    updateDashboardFocus();
-                }
-            });
         });
 
         function initializeDashboard() {
@@ -2289,28 +1525,6 @@
             renderBlindAuctions();
             renderLeaderboard();
             updateMetrics();
-        }
-
-        function updateDashboardFocus() {
-            // Update dashboard content based on user focus
-            if (userFocus === 'roi') {
-                // Emphasize ROI metrics and financial performance
-                document.querySelectorAll('.metric-card').forEach(card => {
-                    if (card.querySelector('.metric-label').textContent.includes('ROI') || 
-                        card.querySelector('.metric-label').textContent.includes('Shadow Value')) {
-                        card.style.borderColor = 'var(--terminal-blue)';
-                        card.style.boxShadow = '0 0 15px rgba(0, 136, 255, 0.3)';
-                    }
-                });
-            } else {
-                // Emphasize ESG metrics and impact
-                document.querySelectorAll('.metric-card').forEach(card => {
-                    if (card.querySelector('.metric-label').textContent.includes('ESG')) {
-                        card.style.borderColor = 'var(--terminal-green)';
-                        card.style.boxShadow = '0 0 15px rgba(0, 255, 136, 0.3)';
-                    }
-                });
-            }
         }
 
         function renderEcosystemPulse() {
@@ -2667,166 +1881,6 @@
                     }
                 }
             });
-
-            // Scenario Simulator Chart
-            new Chart(document.getElementById('scenarioChart'), {
-                type: 'line',
-                data: {
-                    labels: ['Current', '+1 Month', '+2 Months', '+3 Months', '+4 Months', '+5 Months', '+6 Months'],
-                    datasets: [{
-                        label: 'Baseline',
-                        data: [98000, 102000, 107000, 112000, 116000, 119000, 121000],
-                        borderColor: 'var(--terminal-blue)',
-                        backgroundColor: 'rgba(0, 136, 255, 0.1)',
-                        tension: 0.4,
-                        fill: false,
-                        borderWidth: 2,
-                        borderDash: [5, 5]
-                    }, {
-                        label: 'Simulated',
-                        data: [98000, 105000, 113000, 122000, 130000, 137000, 143000],
-                        borderColor: 'var(--terminal-green)',
-                        backgroundColor: 'rgba(0, 255, 136, 0.1)',
-                        tension: 0.4,
-                        fill: false,
-                        borderWidth: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#fff',
-                                font: {
-                                    size: 11
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            ticks: {
-                                color: '#b0b0b0',
-                                callback: function(value) {
-                                    return '$' + (value / 1000) + 'K';
-                                }
-                            },
-                            grid: {
-                                color: '#333333'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: '#b0b0b0'
-                            },
-                            grid: {
-                                color: '#333333'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // NEW AI FEATURE FUNCTIONS
-
-        function toggleAICopilot() {
-            aiCopilotActive = !aiCopilotActive;
-            const copilot = document.getElementById('aiCopilot');
-            
-            if (aiCopilotActive) {
-                copilot.classList.add('active');
-            } else {
-                copilot.classList.remove('active');
-            }
-        }
-
-        function sendAIMessage() {
-            const input = document.getElementById('aiCopilotInput');
-            const message = input.value.trim();
-            
-            if (message === '') return;
-            
-            // Add user message
-            addAIMessage(message, 'user');
-            input.value = '';
-            
-            // Simulate AI response
-            setTimeout(() => {
-                const response = generateAIResponse(message);
-                addAIMessage(response, 'bot');
-            }, 1000);
-        }
-
-        function addAIMessage(text, sender) {
-            const body = document.getElementById('aiCopilotBody');
-            const message = document.createElement('div');
-            message.className = `ai-message ${sender}`;
-            message.textContent = text;
-            
-            body.appendChild(message);
-            body.scrollTop = body.scrollHeight;
-        }
-
-        function generateAIResponse(query) {
-            const lowerQuery = query.toLowerCase();
-            
-            if (lowerQuery.includes('shadow value') || lowerQuery.includes('portfolio value')) {
-                return "Your current shadow value is $98,000, representing a 12.3% increase over industry benchmarks. This is driven by strong performance in cloud infrastructure and AI sectors.";
-            } else if (lowerQuery.includes('roi') || lowerQuery.includes('return')) {
-                return "Your ROI multiple is 18.4x, significantly outperforming the 3.2x industry average. This is primarily driven by strategic partnerships in high-growth technology sectors.";
-            } else if (lowerQuery.includes('esg') || lowerQuery.includes('sustainability')) {
-                return "Your ESG score of 82 places you in the top 10% of partners. Key strengths include diversity initiatives and sustainable technology investments.";
-            } else if (lowerQuery.includes('risk') || lowerQuery.includes('alert')) {
-                return "I've detected moderate risk in your fintech portfolio segment. Recommendation: Diversify with additional AI infrastructure investments to balance exposure.";
-            } else if (lowerQuery.includes('trend') || lowerQuery.includes('market')) {
-                return "Current market trends show strong momentum in AI infrastructure (23.8% YoY growth) and cloud-native solutions. I recommend increasing allocation in these sectors.";
-            } else {
-                return "I understand you're asking about " + query + ". Based on your portfolio data and current market conditions, I recommend focusing on AI infrastructure and cloud-native solutions for maximum growth potential.";
-            }
-        }
-
-        function runScenario() {
-            const investmentValue = document.getElementById('investmentSlider').value;
-            const esgValue = document.getElementById('esgSlider').value;
-            
-            document.getElementById('investmentValue').textContent = `+${investmentValue}%`;
-            document.getElementById('esgValue').textContent = `${esgValue}%`;
-            
-            // Simulate scenario calculation
-            showNotification(`Scenario simulation running with ${investmentValue}% investment increase and ${esgValue}% ESG focus`, 'info');
-            
-            // In a real implementation, this would update the scenario chart with new data
-        }
-
-        function loadImpactMap() {
-            showNotification('Loading interactive global impact visualization...', 'info');
-            // In a real implementation, this would load an interactive map
-        }
-
-        function showSampleQueries() {
-            const queries = [
-                "Show me startups with highest growth potential",
-                "Analyze my portfolio risk exposure", 
-                "Generate ESG impact report for Q3",
-                "Compare my performance to Stripe Ventures",
-                "What are the current market trends in AI?",
-                "How can I optimize my portfolio allocation?"
-            ];
-            
-            let message = "Try asking me:\n\n";
-            queries.forEach((query, index) => {
-                message += `${index + 1}. "${query}"\n`;
-            });
-            
-            alert(message);
-        }
-
-        function viewAllAlerts() {
-            showNotification('Opening comprehensive alert dashboard...', 'info');
-            // In a real implementation, this would navigate to an alerts page
         }
 
         // Event Handlers
@@ -2965,12 +2019,6 @@
             } else if (lowerCommand.includes('report')) {
                 document.getElementById('reports-tab').click();
                 showNotification('Showing Reports Hub', 'success');
-            } else if (lowerCommand.includes('ai') || lowerCommand.includes('copilot')) {
-                document.getElementById('ai-tab').click();
-                showNotification('Showing AI Features', 'success');
-            } else if (lowerCommand.includes('collaboration') || lowerCommand.includes('team')) {
-                document.getElementById('collaboration-tab').click();
-                showNotification('Showing Collaboration Hub', 'success');
             } else if (lowerCommand.includes('leaderboard') || lowerCommand.includes('rank')) {
                 document.getElementById('leaderboard-tab').click();
                 showNotification('Showing Leaderboard', 'success');
@@ -3039,28 +2087,17 @@
             const reportStatusMessage = document.getElementById('reportStatusMessage');
             
             reportStatus.style.display = 'flex';
-            
-            // Set report-specific messages
-            const reportTitles = {
-                'predictive-nudge': 'Predictive Nudge Report',
-                'retention-scorecard': 'Personalized Retention Scorecard', 
-                'innovation-pipeline': 'Innovation Pipeline Forecast',
-                'precision-impact': 'Maximum Precision Impact Report',
-                'cross-impact': 'Cross-Impact Hybrid Report',
-                'behavioral-triggers': 'Behavioral Economics Trigger Report'
-            };
-            
-            reportStatusTitle.textContent = `Generating ${reportTitles[type] || 'Report'}`;
+            reportStatusTitle.textContent = `Generating ${type.toUpperCase()} Report`;
             reportStatusMessage.textContent = 'Processing data with Manus AI and NanoGPT-5...';
             
             // Simulate report generation
             setTimeout(() => {
                 reportSlots--;
                 reportStatus.style.display = 'none';
-                showNotification(`${reportTitles[type] || 'Report'} generated successfully! ${reportSlots} slots remaining.`, 'success');
+                showNotification(`${type.toUpperCase()} report generated successfully! ${reportSlots} slots remaining.`, 'success');
                 
                 // Update banner
-                const badge = document.querySelector('.critical-banner .scarcity-trigger');
+                const badge = document.querySelector('.critical-banner .badge.bg-info');
                 if (badge) {
                     badge.innerHTML = `<i class="fas fa-download me-1"></i>${reportSlots} Report Slots Left`;
                 }
@@ -3068,7 +2105,7 @@
         }
 
         function previewReport(type) {
-            showNotification(`Opening ${type} report preview...`, 'info');
+            showNotification(`Opening ${type.toUpperCase()} report preview...`, 'info');
             // Simulate preview opening
         }
 
@@ -3173,23 +2210,6 @@
                 }
             }, 15000);
         }
-
-        // Avatar circle styling
-        const style = document.createElement('style');
-        style.textContent = `
-            .avatar-circle {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-weight: bold;
-                font-size: 0.9rem;
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
