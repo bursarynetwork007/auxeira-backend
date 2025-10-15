@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auxeira ESG Education Investor Dashboard</title>
+    <title>Auxeira ESG Education Impact Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
             --terminal-dark: #0a0a0a;
@@ -338,7 +339,7 @@
             margin-bottom: 2rem;
         }
 
-        .deal-card {
+        .opportunity-card {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
@@ -347,19 +348,19 @@
             transition: all 0.3s ease;
         }
 
-        .deal-card:hover {
+        .opportunity-card:hover {
             transform: translateX(10px);
             border-color: var(--terminal-blue);
         }
 
-        .deal-header {
+        .opportunity-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
         }
 
-        .deal-title {
+        .opportunity-title {
             font-size: 1.2rem;
             font-weight: bold;
             color: var(--terminal-blue);
@@ -374,24 +375,24 @@
             font-size: 0.9rem;
         }
 
-        .deal-details {
+        .opportunity-details {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 1rem;
             margin-bottom: 1rem;
         }
 
-        .deal-metric {
+        .opportunity-metric {
             text-align: center;
         }
 
-        .deal-metric-value {
+        .opportunity-metric-value {
             font-size: 1.1rem;
             font-weight: bold;
             color: var(--terminal-white);
         }
 
-        .deal-metric-label {
+        .opportunity-metric-label {
             font-size: 0.8rem;
             opacity: 0.7;
         }
@@ -451,15 +452,17 @@
             margin-bottom: 1rem;
         }
 
+        /* Leaderboard Improvements */
         .leaderboard-item {
             display: flex;
             align-items: center;
-            padding: 1rem;
+            padding: 1.5rem;
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
             margin-bottom: 1rem;
             transition: all 0.3s ease;
+            color: var(--terminal-white);
         }
 
         .leaderboard-item:hover {
@@ -467,16 +470,18 @@
         }
 
         .rank-number {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: var(--terminal-gold);
-            margin-right: 1rem;
-            min-width: 40px;
+            margin-right: 1.5rem;
+            min-width: 50px;
+            text-align: center;
         }
 
         .rank-change {
             margin-left: auto;
             font-size: 1.2rem;
+            font-weight: bold;
         }
 
         .rank-up {
@@ -488,6 +493,22 @@
         }
 
         .rank-same {
+            color: var(--terminal-gray);
+        }
+
+        .leaderboard-user {
+            flex: 1;
+        }
+
+        .leaderboard-user-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+            color: var(--terminal-white);
+        }
+
+        .leaderboard-user-details {
+            font-size: 0.9rem;
             color: var(--terminal-gray);
         }
 
@@ -527,6 +548,88 @@
             font-size: 0.9rem;
         }
 
+        /* Collaboration Zone - Events Section */
+        .collaboration-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .collaboration-icon {
+            font-size: 1.5rem;
+            color: var(--terminal-blue);
+            margin-right: 1rem;
+        }
+
+        .collaboration-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--terminal-white);
+        }
+
+        .discussion-item {
+            display: flex;
+            padding: 1.2rem;
+            background: var(--glass-bg);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .discussion-item:hover {
+            background: rgba(0, 212, 255, 0.05);
+            border-left-color: var(--terminal-blue);
+        }
+
+        .discussion-avatar {
+            font-size: 1.8rem;
+            margin-right: 1rem;
+            width: 50px;
+            text-align: center;
+        }
+
+        .discussion-content {
+            flex: 1;
+        }
+
+        .discussion-author {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--terminal-blue);
+            margin-bottom: 0.3rem;
+        }
+
+        .discussion-text {
+            color: var(--terminal-white);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .discussion-meta {
+            font-size: 0.85rem;
+            color: var(--terminal-gray);
+        }
+
+        .event-match-score {
+            background: var(--terminal-green);
+            color: var(--terminal-dark);
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
+        .event-ai-recommendation {
+            font-size: 0.85rem;
+            color: var(--terminal-blue);
+            margin-top: 0.3rem;
+            font-style: italic;
+        }
+
         .report-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -541,6 +644,7 @@
             padding: 2rem;
             transition: all 0.3s ease;
             position: relative;
+            cursor: pointer;
         }
 
         .report-card:hover {
@@ -567,6 +671,53 @@
             color: var(--terminal-gold);
             margin-bottom: 1rem;
         }
+
+        .free-badge {
+            background: var(--terminal-green);
+            color: var(--terminal-dark);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .premium-badge {
+            background: var(--terminal-gold);
+            color: var(--terminal-dark);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .tag {
+            font-size: 0.8rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .tag-narrative { background: rgba(0, 255, 136, 0.2); color: var(--terminal-green); }
+        .tag-sdg { background: rgba(0, 212, 255, 0.2); color: var(--terminal-blue); }
+        .tag-peer { background: rgba(139, 92, 246, 0.2); color: var(--terminal-purple); }
+        .tag-benchmarking { background: rgba(0, 212, 255, 0.2); color: var(--terminal-blue); }
+        .tag-gri { background: rgba(0, 212, 255, 0.2); color: var(--terminal-blue); }
+        .tag-iris { background: rgba(139, 92, 246, 0.2); color: var(--terminal-purple); }
+        .tag-tcfd { background: rgba(255, 69, 58, 0.2); color: #ff453a; }
+        .tag-sasb { background: rgba(255, 159, 10, 0.2); color: #ff9f0a; }
+        .tag-sdg17 { background: rgba(139, 92, 246, 0.2); color: var(--terminal-purple); }
+        .tag-unesco { background: rgba(0, 212, 255, 0.2); color: var(--terminal-blue); }
+        .tag-quantitative { background: rgba(0, 255, 136, 0.2); color: var(--terminal-green); }
+        .tag-multi-sdg { background: rgba(139, 92, 246, 0.2); color: var(--terminal-purple); }
+        .tag-cdp { background: rgba(0, 212, 255, 0.2); color: var(--terminal-blue); }
+        .tag-morningstar { background: rgba(139, 92, 246, 0.2); color: var(--terminal-purple); }
+        .tag-sfdr { background: rgba(255, 69, 58, 0.2); color: #ff453a; }
+        .tag-ifrs { background: rgba(255, 159, 10, 0.2); color: #ff9f0a; }
+        .tag-risk { background: rgba(255, 69, 58, 0.2); color: #ff453a; }
+        .tag-esg { background: rgba(0, 255, 136, 0.2); color: var(--terminal-green); }
+        .tag-benchmarked { background: rgba(0, 212, 255, 0.2); color: var(--terminal-blue); }
 
         .modal {
             background: rgba(0, 0, 0, 0.8);
@@ -680,6 +831,59 @@
             border: none;
         }
 
+        /* Report Generation Status */
+        #report-status {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .report-status-content {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .ai-thinking {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .countdown-timer {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--terminal-blue);
+            margin-bottom: 1rem;
+        }
+
+        .progress-container {
+            width: 100%;
+            background: var(--glass-bg);
+            border-radius: 10px;
+            height: 10px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            height: 100%;
+            background: linear-gradient(45deg, var(--terminal-blue), var(--terminal-purple));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
         @media (max-width: 768px) {
             .main-container {
                 flex-direction: column;
@@ -718,6 +922,19 @@
 
             .calculator-controls {
                 grid-template-columns: 1fr;
+            }
+
+            .report-status-content {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .ai-thinking {
+                font-size: 3rem;
+            }
+
+            .countdown-timer {
+                font-size: 2rem;
             }
         }
 
@@ -768,9 +985,9 @@
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Overview</span>
             </div>
-            <div class="nav-item" onclick="showTab('dealflow')">
+            <div class="nav-item" onclick="showTab('opportunity-ripple')">
                 <i class="fas fa-handshake"></i>
-                <span>Deal Flow</span>
+                <span>Opportunity Ripple</span>
             </div>
             <div class="nav-item" onclick="showTab('portfolio')">
                 <i class="fas fa-briefcase"></i>
@@ -786,7 +1003,7 @@
             </div>
             <div class="nav-item" onclick="showTab('reports')">
                 <i class="fas fa-file-alt"></i>
-                <span>Reports</span>
+                <span>Impact Reports</span>
             </div>
         </div>
 
@@ -821,17 +1038,17 @@
                     </div>
                 </div>
 
-                <!-- Impact Story Report Teaser -->
+                <!-- Impact Report Teaser -->
                 <div class="glass-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h3 style="color: var(--terminal-blue);">
-                            <i class="fas fa-heart"></i> Impact Story Report
+                            <i class="fas fa-heart"></i> Impact Report
                         </h3>
                         <span class="badge bg-warning text-dark">Premium Feature</span>
                     </div>
                     <div class="row">
                         <div class="col-md-8">
-                            <p class="mb-3">Are you maximizing learning outcomes? Our AI-powered Impact Story Report reveals untapped opportunities in your education portfolio, mapping clear actionable strategies for 2024.</p>
+                            <p class="mb-3">Are you maximizing learning outcomes? Our Impact Report reveals untapped opportunities in your education portfolio, mapping clear actionable strategies for 2024.</p>
                             <div class="mb-3">
                                 <strong>What's New:</strong> 
                                 <ul class="mt-2">
@@ -848,7 +1065,7 @@
                             <div style="filter: blur(3px); opacity: 0.7;">
                                 <canvas id="previewChart" width="200" height="150"></canvas>
                             </div>
-                            <button class="btn btn-premium mt-3" onclick="showPremiumModal('impact-story')">
+                            <button class="btn btn-premium mt-3" onclick="showPremiumModal('impact-report')">
                                 Unlock Full Report - $149
                             </button>
                         </div>
@@ -966,44 +1183,44 @@
                 </div>
             </div>
 
-            <!-- Deal Flow Tab -->
-            <div id="dealflow" class="tab-content">
+            <!-- Opportunity Ripple Tab -->
+            <div id="opportunity-ripple" class="tab-content">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 style="color: var(--terminal-blue);">
-                        <i class="fas fa-handshake"></i> Matched Deal Flow
+                        <i class="fas fa-handshake"></i> Opportunity Ripple
                     </h2>
                     <div>
                         <button class="btn btn-outline-primary me-2">
                             <i class="fas fa-filter"></i> Filter
                         </button>
                         <button class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Add Deal Alert
+                            <i class="fas fa-plus"></i> Add Opportunity Alert
                         </button>
                     </div>
                 </div>
 
-                <!-- Deal Cards -->
-                <div class="deal-card">
-                    <div class="deal-header">
-                        <div class="deal-title">EduTech Kenya - Digital Literacy Platform</div>
+                <!-- Opportunity Cards -->
+                <div class="opportunity-card">
+                    <div class="opportunity-header">
+                        <div class="opportunity-title">EduTech Kenya - Digital Literacy Platform</div>
                         <div class="compatibility-score">94% Match</div>
                     </div>
-                    <div class="deal-details">
-                        <div class="deal-metric">
-                            <div class="deal-metric-value">$2.5M</div>
-                            <div class="deal-metric-label">Funding Round</div>
+                    <div class="opportunity-details">
+                        <div class="opportunity-metric">
+                            <div class="opportunity-metric-value">$2.5M</div>
+                            <div class="opportunity-metric-label">Funding Round</div>
                         </div>
-                        <div class="deal-metric">
-                            <div class="deal-metric-value">Series A</div>
-                            <div class="deal-metric-label">Stage</div>
+                        <div class="opportunity-metric">
+                            <div class="opportunity-metric-value">Series A</div>
+                            <div class="opportunity-metric-label">Stage</div>
                         </div>
-                        <div class="deal-metric">
-                            <div class="deal-metric-value">50K</div>
-                            <div class="deal-metric-label">Students Reached</div>
+                        <div class="opportunity-metric">
+                            <div class="opportunity-metric-value">50K</div>
+                            <div class="opportunity-metric-label">Students Reached</div>
                         </div>
-                        <div class="deal-metric">
-                            <div class="deal-metric-value">SDG 4</div>
-                            <div class="deal-metric-label">Primary Goal</div>
+                        <div class="opportunity-metric">
+                            <div class="opportunity-metric-value">SDG 4</div>
+                            <div class="opportunity-metric-label">Primary Goal</div>
                         </div>
                     </div>
                     <p class="mb-3">Revolutionary mobile-first platform bringing quality education to rural Kenya. 89% improvement in math scores, 94% teacher satisfaction. Seeking growth capital for expansion across East Africa.</p>
@@ -1014,27 +1231,27 @@
                     </div>
                 </div>
 
-                <div class="deal-card">
-                    <div class="deal-header">
-                        <div class="deal-title">TeacherTech Nigeria - AI-Powered Training</div>
+                <div class="opportunity-card">
+                    <div class="opportunity-header">
+                        <div class="opportunity-title">TeacherTech Nigeria - AI-Powered Training</div>
                         <div class="compatibility-score">91% Match</div>
                     </div>
-                    <div class="deal-details">
-                        <div class="deal-metric">
-                            <div class="deal-metric-value">$1.8M</div>
-                            <div class="deal-metric-label">Funding Round</div>
+                    <div class="opportunity-details">
+                        <div class="opportunity-metric">
+                            <div class="opportunity-metric-value">$1.8M</div>
+                            <div class="opportunity-metric-label">Funding Round</div>
                         </div>
-                        <div class="deal-metric">
-                            <div class="deal-metric-value">Seed</div>
-                            <div class="deal-metric-label">Stage</div>
+                        <div class="opportunity-metric">
+                            <div class="opportunity-metric-value">Seed</div>
+                            <div class="opportunity-metric-label">Stage</div>
                         </div>
-                        <div class="deal-metric">
-                            <div class="deal-metric-value">5K</div>
-                            <div class="deal-metric-label">Teachers Trained</div>
+                        <div class="opportunity-metric">
+                            <div class="opportunity-metric-value">5K</div>
+                            <div class="opportunity-metric-label">Teachers Trained</div>
                         </div>
-                        <div class="deal-metric">
-                            <div class="deal-metric-value">SDG 4, 5</div>
-                            <div class="deal-metric-label">Impact Goals</div>
+                        <div class="opportunity-metric">
+                            <div class="opportunity-metric-value">SDG 4, 5</div>
+                            <div class="opportunity-metric-label">Impact Goals</div>
                         </div>
                     </div>
                     <p class="mb-3">AI-driven professional development platform for teachers in underserved communities. 78% improvement in teaching effectiveness, 85% retention rate. Focus on female teacher empowerment.</p>
@@ -1045,27 +1262,27 @@
                     </div>
                 </div>
 
-                <div class="deal-card">
-                    <div class="deal-header">
-                        <div class="deal-title">GreenSchools Ghana - Sustainable Education</div>
+                <div class="opportunity-card">
+                    <div class="opportunity-header">
+                        <div class="opportunity-title">GreenSchools Ghana - Sustainable Education</div>
                         <div class="compatibility-score">88% Match</div>
                     </div>
-                    <div class="deal-details">
-                        <div class="deal-metric">
-                            <div class="deal-metric-value">$3.2M</div>
-                            <div class="deal-metric-label">Funding Round</div>
+                    <div class="opportunity-details">
+                        <div class="opportunity-metric">
+                            <div class="opportunity-metric-value">$3.2M</div>
+                            <div class="opportunity-metric-label">Funding Round</div>
                         </div>
-                        <div class="deal-metric">
-                            <div class="deal-metric-value">Series A</div>
-                            <div class="deal-metric-label">Stage</div>
+                        <div class="opportunity-metric">
+                            <div class="opportunity-metric-value">Series A</div>
+                            <div class="opportunity-metric-label">Stage</div>
                         </div>
-                        <div class="deal-metric">
-                            <div class="deal-metric-value">25K</div>
-                            <div class="deal-metric-label">Students Impacted</div>
+                        <div class="opportunity-metric">
+                            <div class="opportunity-metric-value">25K</div>
+                            <div class="opportunity-metric-label">Students Impacted</div>
                         </div>
-                        <div class="deal-metric">
-                            <div class="deal-metric-value">SDG 4, 13</div>
-                            <div class="deal-metric-label">Impact Goals</div>
+                        <div class="opportunity-metric">
+                            <div class="opportunity-metric-value">SDG 4, 13</div>
+                            <div class="opportunity-metric-label">Impact Goals</div>
                         </div>
                     </div>
                     <p class="mb-3">Solar-powered schools with integrated climate education curriculum. 92% energy independence, 40% reduction in operational costs. Expanding to 100 schools across West Africa.</p>
@@ -1318,7 +1535,7 @@
                 </div>
             </div>
 
-            <!-- Leaderboard Tab -->
+            <!-- Leaderboard Tab - IMPROVED -->
             <div id="leaderboard" class="tab-content">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 style="color: var(--terminal-blue);">
@@ -1335,7 +1552,7 @@
                 </div>
 
                 <!-- Your Ranking -->
-                <div class="glass-card mb-4">
+                <div class="glass-card mb-4" style="border: 2px solid var(--terminal-blue);">
                     <h4 style="color: var(--terminal-gold);">Your Current Ranking</h4>
                     <div class="row">
                         <div class="col-md-3 text-center">
@@ -1379,9 +1596,9 @@
                 <!-- Top Performers -->
                 <div class="leaderboard-item">
                     <div class="rank-number">#1</div>
-                    <div>
-                        <div class="fw-bold">Gates Foundation Education Fund</div>
-                        <div class="text-muted">Impact ROI: 8.2x • Students: 2.1M • ESG: 96</div>
+                    <div class="leaderboard-user">
+                        <div class="leaderboard-user-name">Gates Foundation Education Fund</div>
+                        <div class="leaderboard-user-details">Impact ROI: 8.2x • Students: 2.1M • ESG: 96</div>
                     </div>
                     <div class="rank-change rank-same">
                         <i class="fas fa-minus"></i>
@@ -1390,9 +1607,9 @@
 
                 <div class="leaderboard-item">
                     <div class="rank-number">#2</div>
-                    <div>
-                        <div class="fw-bold">Mastercard Foundation</div>
-                        <div class="text-muted">Impact ROI: 7.8x • Students: 1.8M • ESG: 94</div>
+                    <div class="leaderboard-user">
+                        <div class="leaderboard-user-name">Mastercard Foundation</div>
+                        <div class="leaderboard-user-details">Impact ROI: 7.8x • Students: 1.8M • ESG: 94</div>
                     </div>
                     <div class="rank-change rank-up">
                         <i class="fas fa-arrow-up"></i>
@@ -1401,9 +1618,9 @@
 
                 <div class="leaderboard-item">
                     <div class="rank-number">#3</div>
-                    <div>
-                        <div class="fw-bold">Omidyar Network Education</div>
-                        <div class="text-muted">Impact ROI: 7.1x • Students: 950K • ESG: 92</div>
+                    <div class="leaderboard-user">
+                        <div class="leaderboard-user-name">Omidyar Network Education</div>
+                        <div class="leaderboard-user-details">Impact ROI: 7.1x • Students: 950K • ESG: 92</div>
                     </div>
                     <div class="rank-change rank-down">
                         <i class="fas fa-arrow-down"></i>
@@ -1412,9 +1629,9 @@
 
                 <div class="leaderboard-item">
                     <div class="rank-number">#4</div>
-                    <div>
-                        <div class="fw-bold">Chan Zuckerberg Initiative</div>
-                        <div class="text-muted">Impact ROI: 6.9x • Students: 1.2M • ESG: 91</div>
+                    <div class="leaderboard-user">
+                        <div class="leaderboard-user-name">Chan Zuckerberg Initiative</div>
+                        <div class="leaderboard-user-details">Impact ROI: 6.9x • Students: 1.2M • ESG: 91</div>
                     </div>
                     <div class="rank-change rank-up">
                         <i class="fas fa-arrow-up"></i>
@@ -1423,9 +1640,9 @@
 
                 <div class="leaderboard-item">
                     <div class="rank-number">#5</div>
-                    <div>
-                        <div class="fw-bold">NewSchools Venture Fund</div>
-                        <div class="text-muted">Impact ROI: 6.5x • Students: 780K • ESG: 89</div>
+                    <div class="leaderboard-user">
+                        <div class="leaderboard-user-name">NewSchools Venture Fund</div>
+                        <div class="leaderboard-user-details">Impact ROI: 6.5x • Students: 780K • ESG: 89</div>
                     </div>
                     <div class="rank-change rank-same">
                         <i class="fas fa-minus"></i>
@@ -1434,9 +1651,9 @@
 
                 <div class="leaderboard-item">
                     <div class="rank-number">#6</div>
-                    <div>
-                        <div class="fw-bold">Reach Capital</div>
-                        <div class="text-muted">Impact ROI: 6.2x • Students: 650K • ESG: 88</div>
+                    <div class="leaderboard-user">
+                        <div class="leaderboard-user-name">Reach Capital</div>
+                        <div class="leaderboard-user-details">Impact ROI: 6.2x • Students: 650K • ESG: 88</div>
                     </div>
                     <div class="rank-change rank-down">
                         <i class="fas fa-arrow-down"></i>
@@ -1445,9 +1662,42 @@
 
                 <div class="leaderboard-item" style="background: rgba(0, 212, 255, 0.1); border: 2px solid var(--terminal-blue);">
                     <div class="rank-number" style="color: var(--terminal-blue);">#7</div>
-                    <div>
-                        <div class="fw-bold" style="color: var(--terminal-blue);">Your Fund</div>
-                        <div class="text-muted">Impact ROI: 5.8x • Students: 285K • ESG: 87</div>
+                    <div class="leaderboard-user">
+                        <div class="leaderboard-user-name" style="color: var(--terminal-blue);">Your Fund</div>
+                        <div class="leaderboard-user-details">Impact ROI: 5.8x • Students: 285K • ESG: 87</div>
+                    </div>
+                    <div class="rank-change rank-up">
+                        <i class="fas fa-arrow-up"></i> +2
+                    </div>
+                </div>
+
+                <div class="leaderboard-item">
+                    <div class="rank-number">#8</div>
+                    <div class="leaderboard-user">
+                        <div class="leaderboard-user-name">Rockefeller Foundation</div>
+                        <div class="leaderboard-user-details">Impact ROI: 5.6x • Students: 420K • ESG: 86</div>
+                    </div>
+                    <div class="rank-change rank-down">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                </div>
+
+                <div class="leaderboard-item">
+                    <div class="rank-number">#9</div>
+                    <div class="leaderboard-user">
+                        <div class="leaderboard-user-name">Ford Foundation</div>
+                        <div class="leaderboard-user-details">Impact ROI: 5.4x • Students: 380K • ESG: 85</div>
+                    </div>
+                    <div class="rank-change rank-same">
+                        <i class="fas fa-minus"></i>
+                    </div>
+                </div>
+
+                <div class="leaderboard-item">
+                    <div class="rank-number">#10</div>
+                    <div class="leaderboard-user">
+                        <div class="leaderboard-user-name">MacArthur Foundation</div>
+                        <div class="leaderboard-user-details">Impact ROI: 5.2x • Students: 350K • ESG: 84</div>
                     </div>
                     <div class="rank-change rank-up">
                         <i class="fas fa-arrow-up"></i>
@@ -1455,7 +1705,7 @@
                 </div>
             </div>
 
-            <!-- Collaboration Zone Tab -->
+            <!-- Collaboration Zone Tab - IMPROVED -->
             <div id="collaboration" class="tab-content">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 style="color: var(--terminal-blue);">
@@ -1466,6 +1716,84 @@
                     </button>
                 </div>
 
+                <!-- AI-Powered Events Section -->
+                <div class="collaboration-card">
+                    <div class="collaboration-header">
+                        <i class="fas fa-calendar collaboration-icon"></i>
+                        <div class="collaboration-title">AI-Recommended Events</div>
+                    </div>
+                    
+                    <div id="ai-events-container">
+                        <!-- Events will be dynamically populated by AI -->
+                    </div>
+                </div>
+
+                <!-- Network Insights -->
+                <div class="collaboration-card">
+                    <div class="collaboration-header">
+                        <i class="fas fa-chart-network collaboration-icon"></i>
+                        <div class="collaboration-title">Network Insights</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="metric-item">
+                                <div class="metric-value" style="color: var(--terminal-green);">87%</div>
+                                <div class="metric-label">Connection Strength</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="metric-item">
+                                <div class="metric-value" style="color: var(--terminal-blue);">+12</div>
+                                <div class="metric-label">New Connections This Month</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h5>Top Collaboration Opportunities</h5>
+                        <ul>
+                            <li>Gates Foundation - Digital Literacy Initiative (95% alignment)</li>
+                            <li>Mastercard Foundation - Youth Employment Program (92% alignment)</li>
+                            <li>UNESCO - Policy Development Working Group (88% alignment)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Expert Directory -->
+                <div class="collaboration-card">
+                    <div class="collaboration-header">
+                        <i class="fas fa-user-tie collaboration-icon"></i>
+                        <div class="collaboration-title">Expert Directory</div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Search for experts by skill, location, or expertise">
+                        <button class="btn btn-primary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="discussion-item">
+                                <div class="discussion-avatar">👨‍💼</div>
+                                <div class="discussion-content">
+                                    <div class="discussion-author">Dr. Amina Jalloh</div>
+                                    <div class="discussion-text">Education Policy & Curriculum Development</div>
+                                    <div class="discussion-meta">Sierra Leone • Available for Consultancy</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="discussion-item">
+                                <div class="discussion-avatar">👩‍💻</div>
+                                <div class="discussion-content">
+                                    <div class="discussion-author">Prof. Kwame Osei</div>
+                                    <div class="discussion-text">EdTech & Digital Learning Solutions</div>
+                                    <div class="discussion-meta">Ghana • Seeking Research Partners</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Active Collaborations -->
                 <div class="collaboration-card">
                     <div class="collab-header">
@@ -1474,9 +1802,9 @@
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-8">
-                            <p>Seeking co-investors for $2.5M Series A in Kenya's leading digital literacy platform. Strong ESG alignment with SDG 4 focus and proven 89% improvement in math scores.</p>
+                            <p>Seeking co-Impact Donors for $2.5M Series A in Kenya's leading digital literacy platform. Strong ESG alignment with SDG 4 focus and proven 89% improvement in math scores.</p>
                             <div class="mb-2">
-                                <strong>Lead Investor:</strong> Acumen Academy Fund<br>
+                                <strong>Lead Impact Donor:</strong> Acumen Academy Fund<br>
                                 <strong>Target:</strong> $2.5M • <strong>Committed:</strong> $1.8M (72%)
                             </div>
                         </div>
@@ -1527,201 +1855,248 @@
                         <button class="btn btn-outline-info">Join Advisory</button>
                     </div>
                 </div>
-
-                <div class="collaboration-card">
-                    <div class="collab-header">
-                        <div class="collab-title">Climate Education Ghana - Seeking Co-Investors & Researchers</div>
-                        <div class="alignment-score">91% Aligned</div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-8">
-                            <p>$800K initiative to integrate climate education into 50 Ghanaian schools. Seeking additional funding and research partnerships for curriculum development and impact measurement.</p>
-                            <div class="mb-2">
-                                <strong>Lead Investor:</strong> Green Climate Fund<br>
-                                <strong>Status:</strong> Seeking $400K additional + Research Partners
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center">
-                                <div class="progress mb-2">
-                                    <div class="progress-bar" style="width: 50%"></div>
-                                </div>
-                                <div class="metric-value">$400K</div>
-                                <div class="metric-label">Funding Needed</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-primary">View Prospectus</button>
-                        <button class="btn btn-outline-success">Pledge Funding</button>
-                        <button class="btn btn-outline-info">Offer Research</button>
-                    </div>
-                </div>
             </div>
 
-            <!-- Reports Tab -->
+            <!-- Impact Reports Tab -->
             <div id="reports" class="tab-content">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 style="color: var(--terminal-blue);">
-                        <i class="fas fa-file-alt"></i> Premium ESG Education Reports
-                    </h2>
-                    <div>
-                        <button class="btn btn-outline-primary me-2">
-                            <i class="fas fa-history"></i> Report History
-                        </button>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-cog"></i> Custom Report
-                        </button>
+                <div class="mb-5">
+                    <h2 class="mb-3" style="color: var(--terminal-blue); font-size: 2.5rem;">AI-Generated Impact Reports</h2>
+                    <p class="text-gray-400" style="font-size: 1.1rem;">Personalized insights powered by NanoGPT-5 + ScraperAPI • 15 Report Types</p>
+                </div>
+
+                <!-- Free Reports Section -->
+                <div class="mb-5">
+                    <h3 class="mb-4" style="color: var(--terminal-green); font-size: 1.8rem;">🎁 Free Reports</h3>
+                    <div class="report-grid">
+                        
+                        <!-- FREE: Impact Report -->
+                        <div class="report-card" style="border: 2px solid var(--terminal-green);" onclick="generateReport('impact_report')">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div style="font-size: 3rem;">❤️</div>
+                                <span class="free-badge">FREE</span>
+                            </div>
+                            <h3 class="report-title">Impact Report</h3>
+                            <p class="report-description">Immersive 800-word narrative blending your goals with real-world transformation stories and ROI projections</p>
+                            <div class="mb-3">
+                                <span class="tag tag-narrative">Narrative</span>
+                                <span class="tag tag-sdg">SDG Aligned</span>
+                            </div>
+                        </div>
+
+                        <!-- FREE: Comparative Benchmark -->
+                        <div class="report-card" style="border: 2px solid var(--terminal-green);" onclick="generateReport('comparative_benchmark')">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div style="font-size: 3rem;">📊</div>
+                                <span class="free-badge">FREE</span>
+                            </div>
+                            <h3 class="report-title">Comparative Benchmark</h3>
+                            <p class="report-description">Compare your impact metrics to peers with efficiency ratios, policy alignment scores, and recommendations</p>
+                            <div class="mb-3">
+                                <span class="tag tag-peer">Peer Analysis</span>
+                                <span class="tag tag-benchmarking">Benchmarking</span>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
-                <!-- Reports Grid -->
-                <div class="report-grid">
-                    <!-- Impact Story Report -->
-                    <div class="report-card">
-                        <div class="report-title">Impact Story Report</div>
-                        <div class="report-description">
-                            Emotional narratives showcasing real-world impact of your education investments. Perfect for social investors and stakeholder communications.
+                <!-- Premium Reports Section -->
+                <div>
+                    <h3 class="mb-4" style="color: var(--terminal-gold); font-size: 1.8rem;">⭐ Premium Reports</h3>
+                    <div class="report-grid">
+                        
+                        <!-- 1. Scalability & Impact Expansion ($399) -->
+                        <div class="report-card" onclick="generateReport('scalability_expansion')">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div style="font-size: 2.5rem;">📈</div>
+                                <span class="premium-badge">$399</span>
+                            </div>
+                            <h3 class="report-title">Scalability & Impact Expansion</h3>
+                            <p class="report-description">Forecast scalability with growth matrix, cost projections, and 3-year impact scenarios</p>
+                            <div class="mb-3">
+                                <span class="tag tag-gri">GRI</span>
+                                <span class="tag tag-iris">IRIS+</span>
+                            </div>
                         </div>
-                        <div class="report-price">$149</div>
-                        <div class="mb-3">
-                            <small class="text-muted">
-                                <i class="fas fa-clock"></i> Generated in 2-3 minutes
-                                <br><i class="fas fa-chart-bar"></i> Includes 5 interactive visualizations
-                            </small>
-                        </div>
-                        <button class="btn btn-premium" onclick="showPremiumModal('impact-story')">
-                            Generate Report
-                        </button>
-                    </div>
 
-                    <!-- Cross-Impact Opportunity Report -->
-                    <div class="report-card">
-                        <div class="report-title">Cross-Impact Opportunity Report</div>
-                        <div class="report-description">
-                            SDG intersection analysis for NGOs and corporates. Identifies synergies between education investments and other sustainable development goals.
+                        <!-- 2. Stakeholder Engagement ($349) -->
+                        <div class="report-card" onclick="generateReport('stakeholder_engagement')">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div style="font-size: 2.5rem;">🤝</div>
+                                <span class="premium-badge">$349</span>
+                            </div>
+                            <h3 class="report-title">Stakeholder Engagement</h3>
+                            <p class="report-description">Evaluate community and government buy-in with stakeholder maps and engagement scores</p>
+                            <div class="mb-3">
+                                <span class="tag tag-iris">IRIS+</span>
+                                <span class="tag tag-sdg">SDG</span>
+                            </div>
                         </div>
-                        <div class="report-price">$199</div>
-                        <div class="mb-3">
-                            <small class="text-muted">
-                                <i class="fas fa-clock"></i> Generated in 3-4 minutes
-                                <br><i class="fas fa-network-wired"></i> SDG network analysis included
-                            </small>
-                        </div>
-                        <button class="btn btn-premium" onclick="showPremiumModal('cross-impact')">
-                            Generate Report
-                        </button>
-                    </div>
 
-                    <!-- Scalability & Impact Expansion Report -->
-                    <div class="report-card">
-                        <div class="report-title">Scalability & Impact Expansion Report</div>
-                        <div class="report-description">
-                            Forecasting scalability of education initiatives with GRI and IRIS+ alignment. Essential for funds prioritizing growth metrics.
+                        <!-- 3. Risk-Adjusted ROI ($499) -->
+                        <div class="report-card" onclick="generateReport('risk_adjusted_roi')">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div style="font-size: 2.5rem;">⚖️</div>
+                                <span class="premium-badge">$499</span>
+                            </div>
+                            <h3 class="report-title">Risk-Adjusted ROI</h3>
+                            <p class="report-description">Compute risk-adjusted returns with TCFD/SASB compliance and mitigation strategies</p>
+                            <div class="mb-3">
+                                <span class="tag tag-tcfd">TCFD</span>
+                                <span class="tag tag-sasb">SASB</span>
+                            </div>
                         </div>
-                        <div class="report-price">$399</div>
-                        <div class="mb-3">
-                            <small class="text-muted">
-                                <i class="fas fa-clock"></i> Generated in 5-7 minutes
-                                <br><i class="fas fa-chart-line"></i> 3-year growth projections
-                            </small>
-                        </div>
-                        <button class="btn btn-premium" onclick="showPremiumModal('scalability')">
-                            Generate Report
-                        </button>
-                    </div>
 
-                    <!-- Stakeholder Engagement Report -->
-                    <div class="report-card">
-                        <div class="report-title">Stakeholder Engagement Report</div>
-                        <div class="report-description">
-                            Community and government buy-in analysis using IRIS+ and SDG frameworks. Critical for impact funds and policy alignment.
+                        <!-- 4. Cross-Sector Collaboration ($449) -->
+                        <div class="report-card" onclick="generateReport('cross_sector_collaboration')">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div style="font-size: 2.5rem;">🔗</div>
+                                <span class="premium-badge">$449</span>
+                            </div>
+                            <h3 class="report-title">Cross-Sector Collaboration</h3>
+                            <p class="report-description">Identify partnership opportunities with synergy scores and collaboration plans</p>
+                            <div class="mb-3">
+                                <span class="tag tag-sdg17">SDG 17</span>
+                            </div>
                         </div>
-                        <div class="report-price">$349</div>
-                        <div class="mb-3">
-                            <small class="text-muted">
-                                <i class="fas fa-clock"></i> Generated in 4-5 minutes
-                                <br><i class="fas fa-users"></i> Stakeholder mapping included
-                            </small>
-                        </div>
-                        <button class="btn btn-premium" onclick="showPremiumModal('stakeholder')">
-                            Generate Report
-                        </button>
-                    </div>
 
-                    <!-- Risk-Adjusted ROI Report -->
-                    <div class="report-card">
-                        <div class="report-title">Risk-Adjusted ROI Report</div>
-                        <div class="report-description">
-                            TCFD and SASB compliant risk analysis for education investments. Demand-driven by funds requiring risk-adjusted metrics.
+                        <!-- 5. Policy Alignment ($299) -->
+                        <div class="report-card" onclick="generateReport('policy_alignment')">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div style="font-size: 2.5rem;">📜</div>
+                                <span class="premium-badge">$299</span>
+                            </div>
+                            <h3 class="report-title">Policy Alignment</h3>
+                            <p class="report-description">Map investments to compliant policies with risk heatmaps and forecasts</p>
+                            <div class="mb-3">
+                                <span class="tag tag-unesco">UNESCO</span>
+                            </div>
                         </div>
-                        <div class="report-price">$499</div>
-                        <div class="mb-3">
-                            <small class="text-muted">
-                                <i class="fas fa-clock"></i> Generated in 6-8 minutes
-                                <br><i class="fas fa-shield-alt"></i> TCFD/SASB compliance
-                            </small>
-                        </div>
-                        <button class="btn btn-premium" onclick="showPremiumModal('risk-roi')">
-                            Generate Report
-                        </button>
-                    </div>
 
-                    <!-- Cross-Sector Collaboration Report -->
-                    <div class="report-card">
-                        <div class="report-title">Cross-Sector Collaboration Report</div>
-                        <div class="report-description">
-                            Partnership opportunities aligned with SDG 17. Perfect for corporates seeking strategic networking and impact amplification.
+                        <!-- 6. ROI & Metrics Dashboard ($399) -->
+                        <div class="report-card" onclick="generateReport('roi_metrics_dashboard')">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div style="font-size: 2.5rem;">💰</div>
+                                <span class="premium-badge">$399</span>
+                            </div>
+                            <h3 class="report-title">ROI & Metrics Dashboard</h3>
+                            <p class="report-description">Data-rich report with IRR/MOIC analysis and global fund benchmarks</p>
+                            <div class="mb-3">
+                                <span class="tag tag-quantitative">Quantitative</span>
+                            </div>
                         </div>
-                        <div class="report-price">$449</div>
-                        <div class="mb-3">
-                            <small class="text-muted">
-                                <i class="fas fa-clock"></i> Generated in 5-6 minutes
-                                <br><i class="fas fa-handshake"></i> Partnership matching
-                            </small>
-                        </div>
-                        <button class="btn btn-premium" onclick="showPremiumModal('collaboration')">
-                            Generate Report
-                        </button>
-                    </div>
 
-                    <!-- Materiality Assessment Report -->
-                    <div class="report-card">
-                        <div class="report-title">Materiality Assessment Report</div>
-                        <div class="report-description">
-                            Sector-specific risks and opportunities analysis. Essential for funds like BlackRock requiring comprehensive materiality assessments.
+                        <!-- 7. Cross-Impact Opportunity ($449) -->
+                        <div class="report-card" onclick="generateReport('cross_impact_opportunity')">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div style="font-size: 2.5rem;">🌐</div>
+                                <span class="premium-badge">$449</span>
+                            </div>
+                            <h3 class="report-title">Cross-Impact Opportunity</h3>
+                            <p class="report-description">Uncover SDG synergies (education + climate/gender) with opportunity matrices</p>
+                            <div class="mb-3">
+                                <span class="tag tag-multi-sdg">Multi-SDG</span>
+                            </div>
                         </div>
-                        <div class="report-price">$599</div>
-                        <div class="mb-3">
-                            <small class="text-muted">
-                                <i class="fas fa-clock"></i> Generated in 7-9 minutes
-                                <br><i class="fas fa-search"></i> Materiality matrix included
-                            </small>
-                        </div>
-                        <button class="btn btn-premium" onclick="showPremiumModal('materiality')">
-                            Generate Report
-                        </button>
-                    </div>
 
-                    <!-- Regulatory Compliance Report -->
-                    <div class="report-card">
-                        <div class="report-title">Regulatory Compliance Report</div>
-                        <div class="report-description">
-                            SFDR, CSRD, and taxonomy alignment for European funds. Automated compliance checking and gap analysis.
+                        <!-- 8. Materiality Assessment ($499) -->
+                        <div class="report-card" onclick="generateReport('materiality_assessment')">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div style="font-size: 2.5rem;">🎯</div>
+                                <span class="premium-badge">$499</span>
+                            </div>
+                            <h3 class="report-title">Materiality Assessment</h3>
+                            <p class="report-description">Identify financially material ESG issues with SASB/GRI alignment</p>
+                            <div class="mb-3">
+                                <span class="tag tag-sasb">SASB</span>
+                                <span class="tag tag-gri">GRI</span>
+                            </div>
                         </div>
-                        <div class="report-price">$699</div>
-                        <div class="mb-3">
-                            <small class="text-muted">
-                                <i class="fas fa-clock"></i> Generated in 8-10 minutes
-                                <br><i class="fas fa-gavel"></i> EU taxonomy alignment
-                            </small>
+
+                        <!-- 9. Carbon & Decarbonization ($449) -->
+                        <div class="report-card" onclick="generateReport('carbon_decarbonization')">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div style="font-size: 2.5rem;">🌱</div>
+                                <span class="premium-badge">$449</span>
+                            </div>
+                            <h3 class="report-title">Carbon & Decarbonization</h3>
+                            <p class="report-description">Track Scope 1-3 emissions with net-zero alignment and green premium forecasts</p>
+                            <div class="mb-3">
+                                <span class="tag tag-tcfd">TCFD</span>
+                                <span class="tag tag-cdp">CDP</span>
+                            </div>
                         </div>
-                        <button class="btn btn-premium" onclick="showPremiumModal('compliance')">
-                            Generate Report
-                        </button>
+
+                        <!-- 10. Fund Benchmarking ($399) -->
+                        <div class="report-card" onclick="generateReport('fund_benchmarking')">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div style="font-size: 2.5rem;">📉</div>
+                                <span class="premium-badge">$399</span>
+                            </div>
+                            <h3 class="report-title">Fund Benchmarking & Screening</h3>
+                            <p class="report-description">Screen investments vs 50,000+ funds with ESG scores and performance analytics</p>
+                            <div class="mb-3">
+                                <span class="tag tag-morningstar">Morningstar</span>
+                            </div>
+                        </div>
+
+                        <!-- 11. Regulatory Compliance ($499) -->
+                        <div class="report-card" onclick="generateReport('regulatory_compliance')">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div style="font-size: 2.5rem;">⚖️</div>
+                                <span class="premium-badge">$499</span>
+                            </div>
+                            <h3 class="report-title">Regulatory Compliance</h3>
+                            <p class="report-description">Ensure SFDR/CSRD compliance with gap analyses and disclosure templates</p>
+                            <div class="mb-3">
+                                <span class="tag tag-sfdr">SFDR</span>
+                                <span class="tag tag-ifrs">IFRS</span>
+                            </div>
+                        </div>
+
+                        <!-- 12. Policy Risk Watch ($299) -->
+                        <div class="report-card" onclick="generateReport('policy_risk_watch')">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div style="font-size: 2.5rem;">🚨</div>
+                                <span class="premium-badge">$299</span>
+                            </div>
+                            <h3 class="report-title">Policy Influence & Risk Watch</h3>
+                            <p class="report-description">Track policy shifts with risk heatmaps and advocacy opportunities</p>
+                            <div class="mb-3">
+                                <span class="tag tag-risk">Risk Analysis</span>
+                            </div>
+                        </div>
+
+                        <!-- 13. ESG Scorecard ($349) -->
+                        <div class="report-card" onclick="generateReport('esg_scorecard')">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div style="font-size: 2.5rem;">📊</div>
+                                <span class="premium-badge">$349</span>
+                            </div>
+                            <h3 class="report-title">ESG Scorecard</h3>
+                            <p class="report-description">Dashboard-ready scorecard with E-S-G metrics and radar charts</p>
+                            <div class="mb-3">
+                                <span class="tag tag-esg">E-S-G</span>
+                                <span class="tag tag-benchmarked">Benchmarked</span>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Report Generation Status -->
+    <div id="report-status">
+        <div class="report-status-content">
+            <div class="ai-thinking">🤖</div>
+            <div class="countdown-timer" id="countdown-timer">45</div>
+            <p id="status-message" class="text-xl mb-4">Generating your report...</p>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <p class="text-sm text-gray-500 mt-4">Using NanoGPT-5 AI • Please wait</p>
         </div>
     </div>
 
@@ -1737,7 +2112,7 @@
                     <div class="progress mb-4">
                         <div class="progress-bar" style="width: 65%"></div>
                     </div>
-                    <p class="mb-4">Complete your profile to unlock personalized impact stories, tailored deal flow, and customized reports that match your investment focus.</p>
+                    <p class="mb-4">Complete your profile to unlock personalized impact stories, tailored opportunity ripple, and customized reports that match your investment focus.</p>
                     
                     <form id="profileForm">
                         <div class="row">
@@ -1750,7 +2125,7 @@
                                 <select class="form-select" id="orgType">
                                     <option value="">Select type...</option>
                                     <option value="foundation">Foundation</option>
-                                    <option value="fund">Investment Fund</option>
+                                    <option value="fund">Impact Donor Fund</option>
                                     <option value="ngo">NGO</option>
                                     <option value="government">Government Agency</option>
                                     <option value="corporate">Corporate</option>
@@ -1858,7 +2233,7 @@
                 </div>
                 <div class="modal-body text-center">
                     <div class="premium-lock">🔒</div>
-                    <h4 id="reportTitle">Impact Story Report</h4>
+                    <h4 id="reportTitle">Impact Report</h4>
                     <p id="reportDescription">Unlock detailed insights and analysis with our premium report.</p>
                     <div class="mb-3">
                         <span class="h3" style="color: var(--terminal-gold);" id="reportPrice">$149</span>
@@ -1895,7 +2270,7 @@
                         <div class="mb-3">
                             <label class="form-label">Collaboration Type</label>
                             <select class="form-select" id="collabType">
-                                <option value="co-investment">Seeking Co-Investors</option>
+                                <option value="co-investment">Seeking Co-Impact Donors</option>
                                 <option value="entrepreneur">Seeking Entrepreneurs/Researchers</option>
                                 <option value="full-funding">Fully Funded - Seeking Partners</option>
                             </select>
@@ -1963,24 +2338,244 @@
             name: 'Sarah Chen',
             organization: 'Gates Foundation',
             profileComplete: 65,
-            isPremium: false
+            isPremium: false,
+            interests: ['digital-literacy', 'teacher-training', 'stem', 'gender-equity', 'south-africa', 'nigeria', 'kenya']
         };
 
         let currentReportType = '';
         let charts = {};
+        let countdownInterval;
+
+        // Event database
+        const eventsDatabase = [
+            {
+                id: 1,
+                title: "African Education Summit 2024",
+                description: "Join 500+ education leaders in Nairobi. Keynote on 'AI in African Education'",
+                date: "March 15-17, 2024",
+                location: "Nairobi, Kenya",
+                avatar: "📅",
+                tags: ["ai", "leadership", "africa", "policy"],
+                matchScore: 92,
+                recommendation: "High match: Aligns with your focus on digital literacy and AI in education"
+            },
+            {
+                id: 2,
+                title: "ESG Impact Measurement Workshop",
+                description: "Hands-on session on measuring education ROI and social impact metrics",
+                date: "March 22, 2024",
+                location: "Virtual",
+                avatar: "🎯",
+                tags: ["esg", "measurement", "roi", "metrics"],
+                matchScore: 88,
+                recommendation: "Strong match: Enhances your ESG reporting capabilities"
+            },
+            {
+                id: 3,
+                title: "Co-Investment Roundtable",
+                description: "Exclusive session for education Impact Donors. Opportunity ripple and partnership opportunities",
+                date: "April 5, 2024",
+                location: "Cape Town, SA",
+                avatar: "🤝",
+                tags: ["investment", "partnerships", "opportunity-ripple", "south-africa"],
+                matchScore: 95,
+                recommendation: "Perfect match: Direct alignment with your investment focus in South Africa"
+            },
+            {
+                id: 4,
+                title: "UNESCO Global Education Forum",
+                description: "Policy makers and Impact Donors shaping the future of education in Africa",
+                date: "April 18-20, 2024",
+                location: "Paris, France",
+                avatar: "🌍",
+                tags: ["policy", "unesco", "global", "leadership"],
+                matchScore: 85,
+                recommendation: "Good match: Policy focus aligns with your organizational goals"
+            },
+            {
+                id: 5,
+                title: "EdTech Innovation Challenge",
+                description: "Pitch competition for African EdTech startups with $1M in funding available",
+                date: "May 10-12, 2024",
+                location: "Lagos, Nigeria",
+                avatar: "💡",
+                tags: ["edtech", "startups", "innovation", "nigeria", "funding"],
+                matchScore: 90,
+                recommendation: "Excellent match: Direct connection to your Nigerian portfolio and EdTech focus"
+            },
+            {
+                id: 6,
+                title: "Gender Equity in Education Conference",
+                description: "Strategies for advancing girls' education and women's leadership in education",
+                date: "June 5-7, 2024",
+                location: "Kigali, Rwanda",
+                avatar: "⚖️",
+                tags: ["gender", "equity", "leadership", "rwanda"],
+                matchScore: 87,
+                recommendation: "Strong match: Aligns with your gender equity initiatives"
+            }
+        ];
+
+        // Data Architecture Transformation - Smart Formatting Functions
+        const Formatters = {
+            number: (value, decimals = 0) => {
+                return new Intl.NumberFormat('en-US', {
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals
+                }).format(value);
+            },
+            
+            percentage: (value, decimals = 1) => {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'percent',
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals
+                }).format(value / 100);
+            },
+            
+            currency: (value, currency = 'USD', decimals = 0) => {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: currency,
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals
+                }).format(value);
+            },
+            
+            compactNumber: (value) => {
+                return new Intl.NumberFormat('en-US', {
+                    notation: 'compact',
+                    maximumFractionDigits: 1
+                }).format(value);
+            },
+            
+            formatMetric: (value, type) => {
+                switch(type) {
+                    case 'currency':
+                        return Formatters.currency(value);
+                    case 'percentage':
+                        return Formatters.percentage(value);
+                    case 'compact':
+                        return Formatters.compactNumber(value);
+                    default:
+                        return Formatters.number(value);
+                }
+            }
+        };
 
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
             initializeCharts();
             updateTimestamp();
             personalizeContent();
+            loadAIRecommendedEvents();
+            applySmartFormatting();
             
             // Update timestamp every hour
             setInterval(updateTimestamp, 3600000);
             
             // Initialize calculator
             initializeCalculator();
+            
+            // Check for existing profile
+            const savedProfile = localStorage.getItem('esgProfile');
+            if (savedProfile) {
+                const profile = JSON.parse(savedProfile);
+                // Populate profile modal if needed
+                Object.keys(profile).forEach(key => {
+                    const input = document.querySelector(`[name="${key}"]`);
+                    if (input) {
+                        if (Array.isArray(profile[key])) {
+                            input.value = profile[key].join(', ');
+                        } else {
+                            input.value = profile[key];
+                        }
+                    }
+                });
+            }
         });
+
+        // Apply smart formatting to all metrics
+        function applySmartFormatting() {
+            // Format all metric values
+            document.querySelectorAll('.metric-value').forEach(element => {
+                const text = element.textContent.trim();
+                let formattedValue = text;
+                
+                // Detect and format different value types
+                if (text.includes('$')) {
+                    const numericValue = parseFloat(text.replace(/[$,]/g, ''));
+                    if (!isNaN(numericValue)) {
+                        formattedValue = Formatters.currency(numericValue);
+                    }
+                } else if (text.includes('%')) {
+                    const numericValue = parseFloat(text.replace('%', ''));
+                    if (!isNaN(numericValue)) {
+                        formattedValue = Formatters.percentage(numericValue);
+                    }
+                } else if (text.includes('K') || text.includes('M') || text.includes('B')) {
+                    // Already compact formatted
+                } else {
+                    const numericValue = parseFloat(text.replace(/,/g, ''));
+                    if (!isNaN(numericValue) && numericValue > 1000) {
+                        formattedValue = Formatters.compactNumber(numericValue);
+                    }
+                }
+                
+                element.textContent = formattedValue;
+            });
+
+            // Format opportunity metrics
+            document.querySelectorAll('.opportunity-metric-value').forEach(element => {
+                const text = element.textContent.trim();
+                let formattedValue = text;
+                
+                if (text.includes('$')) {
+                    const numericValue = parseFloat(text.replace(/[$,]/g, ''));
+                    if (!isNaN(numericValue)) {
+                        formattedValue = Formatters.currency(numericValue);
+                    }
+                } else if (!isNaN(parseFloat(text))) {
+                    const numericValue = parseFloat(text);
+                    if (numericValue > 1000) {
+                        formattedValue = Formatters.compactNumber(numericValue);
+                    }
+                }
+                
+                element.textContent = formattedValue;
+            });
+        }
+
+        // Load AI recommended events
+        function loadAIRecommendedEvents() {
+            const container = document.getElementById('ai-events-container');
+            if (!container) return;
+            
+            // Sort events by match score (highest first)
+            const sortedEvents = [...eventsDatabase].sort((a, b) => b.matchScore - a.matchScore);
+            
+            // Clear container
+            container.innerHTML = '';
+            
+            // Add events to container
+            sortedEvents.forEach(event => {
+                const eventElement = document.createElement('div');
+                eventElement.className = 'discussion-item';
+                eventElement.innerHTML = `
+                    <div class="discussion-avatar">${event.avatar}</div>
+                    <div class="discussion-content">
+                        <div class="discussion-author">
+                            ${event.title}
+                            <span class="event-match-score">${Formatters.percentage(event.matchScore)} Match</span>
+                        </div>
+                        <div class="discussion-text">${event.description}</div>
+                        <div class="discussion-meta">${event.date} • ${event.location}</div>
+                        <div class="event-ai-recommendation">${event.recommendation}</div>
+                    </div>
+                `;
+                container.appendChild(eventElement);
+            });
+        }
 
         // Tab navigation
         function showTab(tabName) {
@@ -1999,6 +2594,14 @@
             
             // Add active class to clicked nav item
             event.target.closest('.nav-item').classList.add('active');
+            
+            // Special handling for collaboration tab
+            if (tabName === 'collaboration') {
+                loadAIRecommendedEvents();
+            }
+            
+            // Apply formatting when switching tabs
+            setTimeout(applySmartFormatting, 100);
         }
 
         // Initialize charts
@@ -2035,13 +2638,23 @@
                         },
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Students: ${Formatters.number(context.parsed.y)}`;
+                                }
+                            }
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
                             ticks: {
-                                color: 'rgba(255, 255, 255, 0.7)'
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                callback: function(value) {
+                                    return Formatters.compactNumber(value);
+                                }
                             },
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.1)'
@@ -2079,13 +2692,23 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `ROI: ${Formatters.number(context.parsed.y, 1)}x`;
+                                }
+                            }
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
                             ticks: {
-                                color: 'rgba(255, 255, 255, 0.7)'
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                callback: function(value) {
+                                    return Formatters.number(value, 1) + 'x';
+                                }
                             },
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.1)'
@@ -2178,12 +2801,19 @@
                     plugins: {
                         title: {
                             display: true,
-                            text: '5-Year Portfolio Value Projection ($M)',
+                            text: '5-Year Portfolio Value Projection',
                             color: 'rgba(255, 255, 255, 0.9)'
                         },
                         legend: {
                             labels: {
                                 color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${Formatters.currency(context.parsed.y, 'USD', 1)}`;
+                                }
                             }
                         }
                     },
@@ -2191,7 +2821,10 @@
                         y: {
                             beginAtZero: true,
                             ticks: {
-                                color: 'rgba(255, 255, 255, 0.7)'
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                callback: function(value) {
+                                    return Formatters.currency(value, 'USD', 0);
+                                }
                             },
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.1)'
@@ -2218,8 +2851,8 @@
             const risk = document.getElementById('riskSelect').value;
             const geography = document.getElementById('geoSelect').value;
 
-            // Update display values
-            document.getElementById('investmentValue').textContent = `$${investment}M`;
+            // Update display values with formatting
+            document.getElementById('investmentValue').textContent = Formatters.currency(investment, 'USD', 1);
             document.getElementById('timeValue').textContent = `${timeHorizon} years`;
 
             // Calculate projections based on inputs
@@ -2261,9 +2894,9 @@
             const finalStudents = Math.round(investment * studentsMultiplier);
             const finalESG = Math.min(95, esgScore + (timeHorizon * 2));
 
-            // Update display
+            // Update display with formatted values
             document.getElementById('projectedROI').textContent = `${finalROI}x`;
-            document.getElementById('projectedStudents').textContent = `${finalStudents.toLocaleString()}`;
+            document.getElementById('projectedStudents').textContent = Formatters.compactNumber(finalStudents);
             document.getElementById('projectedESG').textContent = finalESG;
             document.getElementById('projectedRisk').textContent = riskLevel;
 
@@ -2370,55 +3003,124 @@
             return Array.from(document.querySelectorAll(selector)).map(cb => cb.id);
         }
 
+        // Generate report function
+        async function generateReport(reportType) {
+            const statusEl = document.getElementById('report-status');
+            const messageEl = document.getElementById('status-message');
+            const countdownEl = document.getElementById('countdown-timer');
+            const progressBar = document.getElementById('progress-bar');
+            
+            const profileData = localStorage.getItem('esgProfile');
+            if (!profileData) {
+                alert('⚠️ Please complete your profile first!');
+                showProfileModal();
+                return;
+            }
+            
+            const profile = JSON.parse(profileData);
+            statusEl.style.display = 'flex';
+            
+            // Progress messages array
+            const progressMessages = [
+                'Initializing AI analysis...',
+                'Scraping your website for latest data...',
+                'Analyzing sector benchmarks...',
+                'Generating insights with NanoGPT-5...',
+                'Creating impact narratives...',
+                'Calculating ROI projections...',
+                'Compiling policy insights...',
+                'Generating visualizations...',
+                'Finalizing your report...'
+            ];
+            
+            let messageIndex = 0;
+            messageEl.textContent = progressMessages[0];
+            let countdown = 45;
+            countdownEl.textContent = countdown;
+            
+            // Start countdown
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                countdown--;
+                countdownEl.textContent = countdown;
+                
+                // Update progress bar
+                const progress = ((45 - countdown) / 45) * 100;
+                progressBar.style.width = `${progress}%`;
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                }
+            }, 1000);
+            
+            // Rotate through progress messages every 8 seconds
+            const progressInterval = setInterval(() => {
+                messageIndex = (messageIndex + 1) % progressMessages.length;
+                messageEl.textContent = progressMessages[messageIndex];
+            }, 8000);
+            
+            try {
+                const startTime = Date.now();
+                
+                // Simulate API call (replace with actual API call)
+                await new Promise(resolve => setTimeout(resolve, 45000));
+                
+                clearInterval(progressInterval);
+                clearInterval(countdownInterval);
+                
+                // Generate PDF report
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add content to PDF
+                doc.setFontSize(18);
+                doc.text(`Impact Report - ${reportType.replace(/_/g, ' ').toUpperCase()}`, 20, 20);
+                doc.setFontSize(12);
+                doc.text(`Generated for: ${profile.orgName}`, 20, 40);
+                doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 50);
+                doc.text('Powered by NanoGPT-5 AI + Auxeira Analytics', 20, 80);
+                
+                const filename = `${reportType}_${profile.orgName.replace(/\s+/g,'_')}_${Date.now()}.pdf`;
+                doc.save(filename);
+                
+                statusEl.style.display = 'none';
+                
+                const elapsedTime = Math.round((Date.now() - startTime) / 1000);
+                alert(`✅ AI Report Generated in ${elapsedTime}s!\n\nFile: ${filename}\n\nPowered by NanoGPT-5`);
+                
+            } catch (error) {
+                clearInterval(progressInterval);
+                clearInterval(countdownInterval);
+                console.error('Error:', error);
+                statusEl.style.display = 'none';
+                
+                let errorMsg = '❌ Error generating report:\n\n';
+                if (error.message.includes('504')) {
+                    errorMsg += 'Request timeout. The AI is taking longer than expected.\n\nTip: Try again - the system is processing complex analysis.';
+                } else if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
+                    errorMsg += 'Connection issue. Please refresh and try again.';
+                } else {
+                    errorMsg += error.message;
+                }
+                
+                alert(errorMsg);
+            }
+        }
+
         // Show premium modal
         function showPremiumModal(reportType) {
             currentReportType = reportType;
             
             const reportData = {
-                'impact-story': {
-                    title: 'Impact Story Report',
+                'impact-report': {
+                    title: 'Impact Report',
                     description: 'Emotional narratives showcasing real-world impact of your education investments.',
                     price: '$149'
-                },
-                'cross-impact': {
-                    title: 'Cross-Impact Opportunity Report',
-                    description: 'SDG intersection analysis for NGOs and corporates.',
-                    price: '$199'
                 },
                 'portfolio-analysis': {
                     title: 'Executive Portfolio Analysis',
                     description: 'Comprehensive portfolio analysis with strategic opportunities and risk assessment.',
                     price: '$299'
-                },
-                'scalability': {
-                    title: 'Scalability & Impact Expansion Report',
-                    description: 'Forecasting scalability of education initiatives with GRI and IRIS+ alignment.',
-                    price: '$399'
-                },
-                'stakeholder': {
-                    title: 'Stakeholder Engagement Report',
-                    description: 'Community and government buy-in analysis using IRIS+ and SDG frameworks.',
-                    price: '$349'
-                },
-                'risk-roi': {
-                    title: 'Risk-Adjusted ROI Report',
-                    description: 'TCFD and SASB compliant risk analysis for education investments.',
-                    price: '$499'
-                },
-                'collaboration': {
-                    title: 'Cross-Sector Collaboration Report',
-                    description: 'Partnership opportunities aligned with SDG 17.',
-                    price: '$449'
-                },
-                'materiality': {
-                    title: 'Materiality Assessment Report',
-                    description: 'Sector-specific risks and opportunities analysis.',
-                    price: '$599'
-                },
-                'compliance': {
-                    title: 'Regulatory Compliance Report',
-                    description: 'SFDR, CSRD, and taxonomy alignment for European funds.',
-                    price: '$699'
                 }
             };
 
@@ -2436,22 +3138,15 @@
         // Process payment with Paystack
         function processPayment() {
             const reportPrices = {
-                'impact-story': 14900, // $149 in kobo
-                'cross-impact': 19900,
-                'portfolio-analysis': 29900,
-                'scalability': 39900,
-                'stakeholder': 34900,
-                'risk-roi': 49900,
-                'collaboration': 44900,
-                'materiality': 59900,
-                'compliance': 69900
+                'impact-report': 14900,
+                'portfolio-analysis': 29900
             };
 
             const amount = reportPrices[currentReportType] || 14900;
 
             const handler = PaystackPop.setup({
-                key: 'pk_test_your_paystack_public_key', // Replace with your Paystack public key
-                email: 'user@example.com', // User's email
+                key: 'pk_test_your_paystack_public_key',
+                email: 'user@example.com',
                 amount: amount,
                 currency: 'USD',
                 ref: 'auxeira_report_' + Math.floor((Math.random() * 1000000000) + 1),
@@ -2460,13 +3155,8 @@
                     userId: currentUser.id || 'demo_user'
                 },
                 callback: function(response) {
-                    // Payment successful
                     console.log('Payment successful:', response);
-                    
-                    // Close premium modal
                     bootstrap.Modal.getInstance(document.getElementById('premiumModal')).hide();
-                    
-                    // Show success message and generate report
                     alert('Payment successful! Generating your report...');
                     generateReport(currentReportType);
                 },
@@ -2476,30 +3166,6 @@
             });
 
             handler.openIframe();
-        }
-
-        // Generate report (simulated)
-        function generateReport(reportType) {
-            // Show loading state
-            const loadingHtml = `
-                <div class="text-center p-4">
-                    <div class="spinner-border text-primary mb-3" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p>Generating your report using NanoGPT-5 and Thunderbit data...</p>
-                </div>
-            `;
-            
-            // Simulate report generation
-            setTimeout(() => {
-                alert('Report generated successfully! Check your email for the download link.');
-                
-                // Mark user as premium for this report type
-                currentUser.isPremium = true;
-                
-                // You would typically redirect to the report or show it inline
-                console.log(`Report ${reportType} generated for user ${currentUser.name}`);
-            }, 3000);
         }
 
         // Play story audio (simulated)
@@ -2540,7 +3206,7 @@
             bootstrap.Modal.getInstance(document.getElementById('createCollabModal')).hide();
             
             // Show success message
-            alert('Collaboration created successfully! Other investors will be notified of this opportunity.');
+            alert('Collaboration created successfully! Other Impact Donors will be notified of this opportunity.');
             
             // Reset form
             document.getElementById('collabForm').reset();
@@ -2548,7 +3214,6 @@
 
         // Accessibility enhancements
         document.addEventListener('keydown', function(e) {
-            // Keyboard navigation for tabs
             if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
                 const activeTab = document.querySelector('.nav-item.active');
                 if (activeTab) {
@@ -2584,72 +3249,6 @@
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             document.documentElement.style.setProperty('--animation-duration', '0.01ms');
         }
-
-        // WebSocket connection for real-time updates (simulated)
-        function initializeWebSocket() {
-            // This would connect to your WebSocket server
-            console.log('WebSocket connection initialized for real-time updates');
-            
-            // Simulate real-time data updates
-            setInterval(() => {
-                // Update hero impact number with slight variations
-                const currentNumber = parseInt(document.getElementById('heroImpactNumber').textContent.replace(',', ''));
-                const variation = Math.floor(Math.random() * 100) - 50;
-                const newNumber = Math.max(0, currentNumber + variation);
-                document.getElementById('heroImpactNumber').textContent = newNumber.toLocaleString();
-            }, 30000); // Update every 30 seconds
-        }
-
-        // Initialize WebSocket on page load
-        setTimeout(initializeWebSocket, 2000);
-
-        // NanoGPT-5 and Thunderbit integration placeholders
-        const NanoGPT5 = {
-            generateReport: async function(prompt, reportType) {
-                // This would call your NanoGPT-5 API
-                console.log(`Generating report with NanoGPT-5: ${reportType}`);
-                return new Promise(resolve => {
-                    setTimeout(() => {
-                        resolve({
-                            title: `Generated ${reportType} Report`,
-                            content: 'AI-generated content...',
-                            charts: [],
-                            insights: []
-                        });
-                    }, 3000);
-                });
-            }
-        };
-
-        const ThunderbitCrawler = {
-            crawlData: async function(urls) {
-                // This would call your Thunderbit crawler API
-                console.log('Crawling data with Thunderbit:', urls);
-                return new Promise(resolve => {
-                    setTimeout(() => {
-                        resolve({
-                            data: 'Crawled data...',
-                            timestamp: new Date().toISOString()
-                        });
-                    }, 2000);
-                });
-            }
-        };
-
-        // Cron job simulation for daily data updates
-        function simulateDailyUpdate() {
-            console.log('Running daily data update...');
-            
-            // This would trigger Thunderbit crawls and NanoGPT-5 report regeneration
-            ThunderbitCrawler.crawlData(['https://unesco.org', 'https://worldbank.org'])
-                .then(data => {
-                    console.log('Data crawled successfully');
-                    updateTimestamp();
-                });
-        }
-
-        // Run daily update simulation
-        setTimeout(simulateDailyUpdate, 5000);
     </script>
 </body>
 </html>
