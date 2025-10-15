@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDG 12: Responsible Consumption and Production Dashboard</title>
+    <style>
+        /* SDG 12 Styling */
+        :root {
+            --sdg12-color: #BF8D2C;
+            --sdg12-light-color: #DDA73A;
+            --sdg12-dark-color: #A37020;
+            --text-color: #333;
+            --background-color: #f8f8f8;
+            --card-background: #ffffff;
+            --footer-background: #2c3e50;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: var(--sdg12-color);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        nav {
+            background-color: var(--footer-background);
+            padding: 10px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        nav a:hover {
+            color: var(--sdg12-light-color);
+        }
+        .hero {
+            background: linear-gradient(45deg, var(--sdg12-color), var(--sdg12-light-color));
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        .hero h2 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        .hero p {
+            font-size: 1.2em;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .section {
+            background-color: var(--card-background);
+            margin-bottom: 30px;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: var(--sdg12-dark-color);
+            font-size: 2em;
+            margin-top: 0;
+            border-bottom: 2px solid var(--sdg12-light-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .section h3 {
+            color: var(--sdg12-color);
+            font-size: 1.5em;
+            margin-top: 25px;
+        }
+        .section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .section ul li {
+            background-color: #f0f0f0;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-left: 5px solid var(--sdg12-color);
+            border-radius: 4px;
+        }
+        footer {
+            background-color: var(--footer-background);
+            color: white;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 40px;
+            font-size: 0.9em;
+        }
+        footer p {
+            margin: 5px 0;
+        }
+        .chart-placeholder {
+            width: 100%;
+            height: 300px;
+            background-color: #e9e9e9;
+            border: 1px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://raw.githubusercontent.com/bursarynetwork007/auxeira-backend/main/sdg12_icon.png" alt="SDG 12 Icon" style="height: 80px; margin-bottom: 10px;">
+        <h1>SDG 12: Responsible Consumption and Production</h1>
+    </header>
+    <nav>
+        <a href="#hero">Overview</a>
+        <a href="#impact-numbers">Impact Numbers</a>
+        <a href="#success-stories">Success Stories</a>
+        <a href="#portfolio">Living Portfolio</a>
+        <a href="#opportunities">Investment Opportunities</a>
+        <a href="#metrics">Impact Metrics</a>
+        <a href="#insights">AI Insights</a>
+    </nav>
+    <div class="container">
+        <section id="hero" class="section hero">
+            <h2>Ensuring Sustainable Consumption and Production Patterns</h2>
+            <p>Driving circular economy, waste reduction, sustainable supply chains, and resource efficiency.</p>
+            <!-- Hero section with relevant impact numbers will go here -->
+        </section>
+
+        <section id="impact-numbers" class="section">
+            <h2>Key Impact Numbers</h2>
+            <p>In 2022, global food waste reached <strong>1.05 billion metric tons</strong>, with 60% from households. An estimated <strong>1 billion meals</strong> are wasted daily. Food loss and waste generate <strong>8 to 10 percent of greenhouse gas emissions</strong>.</p>
+            <p>E-waste generation rose from 6.3 to <strong>7.8 kilograms per capita</strong> from 2015 to 2022, totaling <strong>62 million metric tons</strong> in 2022. Only <strong>1.7 kilograms per capita</strong> was collected and managed in an environmentally sound manner. By 2030, e-waste generation is projected to increase to <strong>10 kilograms per capita per year</strong>.</p>
+            <p>Domestic material consumption grew by <strong>69 percent</strong> from 2000 to 2022, reaching <strong>96.0 billion metric tons</strong>. The global material footprint increased by <strong>71 percent</strong> from 2000 to 2022, reaching <strong>98.0 billion metric tons</strong>.</p>
+        </section>
+
+        <section id="success-stories" class="section">
+            <h2>Compelling Success Stories</h2>
+            <h3>Beyond the Bag</h3>
+            <p>A collaborative effort between direct competitors to drive customers away from single-use bags, accelerating innovation in reusable packaging solutions.</p>
+            <h3>PALPA (Finland)</h3>
+            <p>Collaboration that led to Finland's successful deposit return system for beverage containers, demonstrating how competitors can collectively drive market change.</p>
+            <h3>HolyGrail 2.0</h3>
+            <p>Uniting the value chain to advance sorting technology for plastic waste, addressing a bottleneck in post-consumer recycling.</p>
+            <h3>ZEMBA (Zero Emission Maritime Buyers Alliance)</h3>
+            <p>A collective procurement initiative by buyers to unlock zero-emission shipping, showcasing efforts towards sustainable supply chains.</p>
+        </section>
+
+        <section id="portfolio" class="section">
+            <h2>Living Portfolio</h2>
+            <ul>
+                <li><strong>IKEA:</strong> Global leader in sustainable supply chains, focusing on reducing Scope 3 emissions and achieving net-zero targets.</li>
+                <li><strong>Patagonia:</strong> Renowned for using organic cotton, recycled materials, and fair wage practices throughout its supply chain.</li>
+                <li><strong>Danone:</strong> Recognized for its comprehensive efforts in sustainable supply chain management and responsible sourcing.</li>
+                <li><strong>Interface:</strong> A pioneer in sustainable manufacturing and supply chain practices, committed to circular economy principles.</li>
+                <li><strong>Walmart:</strong> Actively working to enhance the sustainability of its vast global supply chains.</li>
+            </ul>
+        </section>
+
+        <section id="opportunities" class="section">
+            <h2>New Investment Opportunities</h2>
+            <ul>
+                <li><strong>Zero-Waste Packaging-as-a-Service:</strong> Investment in companies developing reusable, automated, and shape-adjusting packaging solutions for online retailers, reducing waste and shipping costs.</li>
+                <li><strong>Circular Battery Energy Storage Systems:</strong> Opportunities in startups repurposing retired EV batteries into BESS, maximizing existing potential and reducing the need for new battery production.</li>
+                <li><strong>Industrial Carbon Upcycling:</strong> Investment in companies that upcycle industrial carbon emissions into sustainable fuels and chemical feedstocks, enabling carbon-negative supply chains.</li>
+                <li><strong>AI-based Food Waste Prediction:</strong> Opportunities in startups developing AI-powered prediction apps for businesses to sell surplus food, leading to better waste management and reduced greenhouse gas emissions.</li>
+            </ul>
+        </section>
+
+        <section id="metrics" class="section">
+            <h2>Comprehensive Impact Metrics with Charts</h2>
+            <div class="chart-placeholder">Placeholder for Impact Metrics Chart 1</div>
+            <div class="chart-placeholder">Placeholder for Impact Metrics Chart 2</div>
+            <div class="chart-placeholder">Placeholder for Impact Metrics Chart 3</div>
+        </section>
+
+        <section id="insights" class="section">
+            <h2>AI-Powered Insights and Recommendations</h2>
+            <h3>Insights from Data and Trends:</h3>
+            <ul>
+                <li><strong>Persistent Waste Challenges:</strong> Global food waste (1.05 billion metric tons in 2022) and e-waste (7.8 kg per capita in 2022, projected to reach 10 kg by 2030) remain significant issues, indicating a gap between policy and effective implementation.</li>
+                <li><strong>Resource Consumption Growth:</strong> Domestic material consumption and global material footprint continue to grow, highlighting the ongoing challenge of decoupling economic growth from resource depletion.</li>
+                <li><strong>Regional Disparities:</strong> Significant regional inequalities exist in material consumption and e-waste management, particularly in lower-income countries, necessitating equitable solutions.</li>
+                <li><strong>Circular Economy Momentum:</strong> The rise of innovative circular economy startups and successful case studies demonstrates a growing market and technological capacity for sustainable practices.</li>
+                <li><strong>Investment Potential:</strong> Diverse investment opportunities exist in circular economy solutions, indicating a fertile ground for impact investing aligned with SDG 12.</li>
+            </ul>
+            <h3>AI-Powered Recommendations:</h3>
+            <ul>
+                <li><strong>Predictive Waste Management Systems:</strong> Deploy AI-powered predictive analytics to optimize waste collection, forecast generation patterns, and identify intervention areas.</li>
+                <li><strong>Material Flow Optimization with AI:</strong> Implement AI algorithms to map and optimize material flows within industrial ecosystems, enhancing resource efficiency.</li>
+                <li><strong>Personalized Sustainable Consumption Nudges:</strong> Utilize AI to develop personalized recommendations for consumers to adopt more sustainable consumption patterns.</li>
+                <li><strong>AI-driven Supply Chain Transparency and Optimization:</strong> Employ AI and blockchain to enhance transparency, identify risks, and optimize sustainable sourcing and production.</li>
+                <li><strong>Automated Waste Sorting and Recycling:</strong> Invest in AI-powered robotics and computer vision for advanced waste sorting, increasing material purity and recycling effectiveness.</li>
+            </ul>
+        </section>
+    </div>
+    <footer>
+        <p>&copy; 2025 SDG 12 Dashboard. All rights reserved.</p>
+        <p>Disclaimer: The content of this publication has not been approved by the United Nations and does not reflect the views of the United Nations or its officials or Member States.</p>
+    </footer>
+</body>
+</html>

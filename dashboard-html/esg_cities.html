@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDG 13: Climate Action Dashboard</title>
+    <style>
+        :root {
+            --sdg13-color-primary: #28a745; /* Green for climate action */
+            --sdg13-color-secondary: #1e7e34;
+            --sdg13-color-accent: #007bff; /* Blue for energy/innovation */
+            --sdg13-color-text: #333;
+            --sdg13-color-background: #f8f9fa;
+            --sdg13-color-light: #e2e6ea;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--sdg13-color-background);
+            color: var(--sdg13-color-text);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        header {
+            background-color: var(--sdg13-color-primary);
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            background-color: var(--sdg13-color-secondary);
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            background-color: var(--sdg13-color-accent);
+        }
+
+        main {
+            padding: 20px 0;
+        }
+
+        section {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        section h2 {
+            color: var(--sdg13-color-primary);
+            border-bottom: 2px solid var(--sdg13-color-light);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://via.placeholder.com/1500x500/28a745/ffffff?text=Climate+Action+Hero') no-repeat center center/cover;
+            color: white;
+            text-align: center;
+            padding: 100px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .hero h2 {
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            border-bottom: none;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+        }
+
+        .impact-numbers {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .impact-number-item {
+            background-color: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px;
+            flex: 1 1 calc(33% - 40px);
+            min-width: 250px;
+        }
+
+        .impact-number-item h3 {
+            font-size: 2.5rem;
+            margin: 0 0 5px 0;
+            color: var(--sdg13-color-accent);
+        }
+
+        .impact-number-item p {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .story-card, .company-card, .opportunity-card {
+            border: 1px solid var(--sdg13-color-light);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .story-card img, .company-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-right: 20px;
+            object-fit: cover;
+        }
+
+        .story-card .content, .company-card .content, .opportunity-card .content {
+            flex: 1;
+        }
+
+        .story-card h3, .company-card h3, .opportunity-card h3 {
+            color: var(--sdg13-color-secondary);
+            margin-top: 0;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .metric-item {
+            background-color: var(--sdg13-color-light);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-item h3 {
+            color: var(--sdg13-color-secondary);
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .metric-item p {
+            font-size: 1.1rem;
+        }
+
+        .chart-container {
+            background-color: var(--sdg13-color-light);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .chart-container img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        footer {
+            background-color: var(--sdg13-color-secondary);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+
+        footer p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>SDG 13: Climate Action</h1>
+            <p>Take urgent action to combat climate change and its impacts</p>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#hero">Overview</a></li>
+            <li><a href="#stories">Success Stories</a></li>
+            <li><a href="#portfolio">Living Portfolio</a></li>
+            <li><a href="#opportunities">Investments</a></li>
+            <li><a href="#metrics">Impact Metrics</a></li>
+            <li><a href="#insights">AI Insights</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="hero" class="hero">
+            <div class="container">
+                <h2>Driving Global Climate Solutions</h2>
+                <p>Addressing the most pressing challenge of our time through mitigation, adaptation, and sustainable innovation.</p>
+                <div class="impact-numbers">
+                    <div class="impact-number-item">
+                        <h3>1.55°C</h3>
+                        <p>Global Temperature Increase (2024)</p>
+                    </div>
+                    <div class="impact-number-item">
+                        <h3>$1.3 Trillion</h3>
+                        <p>Annual Climate Finance (2021-2022)</p>
+                    </div>
+                    <div class="impact-number-item">
+                        <h3>131 Countries</h3>
+                        <p>With Disaster Risk Reduction Strategies</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="stories">
+            <div class="container">
+                <h2>Compelling Success Stories</h2>
+                <div class="story-card">
+                    <img src="https://via.placeholder.com/100" alt="Story 1">
+                    <div class="content">
+                        <h3>Scaling Renewable Energy in Developing Nations</h3>
+                        <p>Project GreenLight deployed 500MW of solar capacity in rural communities, reducing 1.2 million tons of CO2 emissions annually and providing clean energy to 500,000 households. This initiative also created 2,500 local jobs.</p>
+                        <p><em>Metrics: 500MW solar capacity, 1.2M tons CO2 reduced, 500K households powered, 2.5K jobs.</em></p>
+                    </div>
+                </div>
+                <div class="story-card">
+                    <img src="https://via.placeholder.com/100" alt="Story 2">
+                    <div class="content">
+                        <h3>Innovative Carbon Capture Technology</h3>
+                        <p>CarbonCapture Solutions Inc. developed a direct air capture plant that removes 10,000 tons of CO2 from the atmosphere per year. Their modular design allows for rapid deployment and scalability, attracting significant investment for expansion.</p>
+                        <p><em>Metrics: 10,000 tons CO2 removed/year, scalable technology, significant investment.</em></p>
+                    </div>
+                </div>
+                <div class="story-card">
+                    <img src="https://via.placeholder.com/100" alt="Story 3">
+                    <div class="content">
+                        <h3>Coastal Resilience and Adaptation Project</h3>
+                        <p>The "Blue Shield" project in vulnerable coastal regions implemented nature-based solutions like mangrove restoration and coral reef protection across 1,000 hectares. This has enhanced biodiversity, protected 200,000 residents from storm surges, and sequestered an estimated 50,000 tons of carbon.</p>
+                        <p><em>Metrics: 1,000 hectares restored, 200K residents protected, 50K tons carbon sequestered.</em></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio">
+            <div class="container">
+                <h2>Living Portfolio: Companies Making a Difference</h2>
+                <div class="company-card">
+                    <img src="https://via.placeholder.com/100" alt="Company 1 Logo">
+                    <div class="content">
+                        <h3>EcoPower Renewables</h3>
+                        <p>A leader in utility-scale solar and wind farm development, committed to accelerating the global transition to clean energy. Recent projects include a 300MW wind farm in Texas and a 200MW solar plant in India.</p>
+                        <p><em>Focus: Renewable Energy Generation</em></p>
+                    </div>
+                </div>
+                <div class="company-card">
+                    <img src="https://via.placeholder.com/100" alt="Company 2 Logo">
+                    <div class="content">
+                        <h3>AquaAdapt Solutions</h3>
+                        <p>Specializes in water management and climate adaptation technologies, providing smart irrigation systems and flood resilience infrastructure for agricultural and urban areas.</p>
+                        <p><em>Focus: Climate Adaptation, Water Management</em></p>
+                    </div>
+                </div>
+                <div class="company-card">
+                    <img src="https://via.placeholder.com/100" alt="Company 3 Logo">
+                    <div class="content">
+                        <h3>GreenBuild Innovations</h3>
+                        <p>Develops sustainable building materials and energy-efficient construction practices, reducing the carbon footprint of new developments by up to 40%.</p>
+                        <p><em>Focus: Sustainable Infrastructure, Mitigation</em></p>
+                    </div>
+                </div>
+                <div class="company-card">
+                    <img src="https://via.placeholder.com/100" alt="Company 4 Logo">
+                    <div class="content">
+                        <h3>CarbonCycle Technologies</h3>
+                        <p>Pioneering advanced carbon capture, utilization, and storage (CCUS) solutions for industrial emissions, turning captured CO2 into valuable products.</p>
+                        <p><em>Focus: Carbon Capture, Industrial Decarbonization</em></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="opportunities">
+            <div class="container">
+                <h2>New Investment Opportunities</h2>
+                <div class="opportunity-card">
+                    <h3>OceanGuard Plastics Recycling Initiative</h3>
+                    <p>Investment in a cutting-edge facility that converts ocean plastics into sustainable building materials, preventing pollution and creating a circular economy. Seeking $15M for phase 2 expansion.</p>
+                    <p><em>Impact: Ocean cleanup, waste-to-value, circular economy.</em></p>
+                </div>
+                <div class="opportunity-card">
+                    <h3>AgriClimate Tech Fund</h3>
+                    <p>A fund dedicated to startups developing climate-resilient agriculture technologies, including drought-resistant crops, precision farming, and sustainable livestock management. Target fund size: $50M.</p>
+                    <p><em>Impact: Food security, climate adaptation in agriculture.</em></p>
+                </div>
+                <div class="opportunity-card">
+                    <h3>GeoThermal Energy Development in East Africa</h3>
+                    <p>Funding for a series of geothermal power plants in East Africa, leveraging abundant natural resources to provide reliable, clean baseload power and reduce reliance on fossil fuels. Project value: $100M.</p>
+                    <p><em>Impact: Clean energy access, economic development, mitigation.</em></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="metrics">
+            <div class="container">
+                <h2>Comprehensive Impact Metrics</h2>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <h3>151%</h3>
+                        <p>CO2 Levels Above Pre-Industrial (2023)</p>
+                    </div>
+                    <div class="metric-item">
+                        <h3>28% Increase</h3>
+                        <p>Adaptation Finance (2021-2022)</p>
+                    </div>
+                    <div class="metric-item">
+                        <h3>96% Increase</h3>
+                        <p>Sustainable Transport Investment</p>
+                    </div>
+                    <div class="metric-item">
+                        <h3>53% Increase</h3>
+                        <p>Clean Energy Investment</p>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>Global Greenhouse Gas Emissions Trend</h3>
+                    <img src="https://via.placeholder.com/800x400/cccccc/333333?text=Placeholder+Chart:+Global+Emissions" alt="Global Emissions Chart">
+                    <p><em>Source: IPCC Reports, UN Stats</em></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="insights">
+            <div class="container">
+                <h2>AI-Powered Insights and Recommendations</h2>
+                <p><strong>Insight 1: Accelerated Decarbonization Needed:</strong> Current global efforts, while increasing, are insufficient to meet the 1.5°C target. AI models predict a significant overshoot without more aggressive policy implementation and technological adoption. Focus areas for immediate action include industrial decarbonization and rapid deployment of grid-scale energy storage.</p>
+                <p><strong>Recommendation 1: Policy Incentives for Green Hydrogen:</strong> Governments should implement stronger incentives and regulatory frameworks to accelerate the production and adoption of green hydrogen, particularly in hard-to-abate sectors like heavy industry and long-haul transport.</p>
+                <p><strong>Insight 2: Adaptation Funding Gap:</strong> Despite increases, adaptation finance still lags significantly behind mitigation funding and the estimated needs of vulnerable nations. Climate models indicate that without substantial investment in resilient infrastructure and early warning systems, economic losses from extreme weather events will continue to escalate.</p>
+                <p><strong>Recommendation 2: Blended Finance for Climate Resilience:</strong> Develop innovative blended finance mechanisms that combine public, private, and philanthropic capital to de-risk adaptation projects in developing countries, focusing on nature-based solutions and community-led initiatives.</p>
+                <p><strong>Insight 3: Supply Chain Vulnerability:</strong> AI-driven supply chain analysis reveals increasing vulnerability to climate disruptions, impacting global food security and manufacturing. Diversification and localized production are emerging as critical strategies.</p>
+                <p><strong>Recommendation 3: Invest in Climate-Smart Agriculture & Localized Production:</strong> Support R&D and investment in climate-smart agricultural practices and incentivize localized, resilient supply chains to reduce dependencies on climate-vulnerable regions.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 SDG 13 Climate Action Dashboard. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

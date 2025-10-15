@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDG 15: Life on Land Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sdg15-primary-color: #52B052; /* Green for Life on Land */
+            --sdg15-secondary-color: #388E3C; /* Darker green */
+            --sdg15-accent-color: #8BC34A; /* Lighter green */
+            --text-color: #333;
+            --background-color: #f9f9f9;
+            --card-background: #fff;
+            --border-color: #ddd;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: var(--sdg15-primary-color);
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        nav {
+            background-color: var(--sdg15-secondary-color);
+            padding: 0.75rem 0;
+            text-align: center;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            padding: 5px 10px;
+            transition: background-color 0.3s ease;
+        }
+        nav ul li a:hover {
+            background-color: var(--sdg15-accent-color);
+            border-radius: 5px;
+        }
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://via.placeholder.com/1200x400/52B052/FFFFFF?text=Life+on+Land+Hero') no-repeat center center/cover;
+            color: white;
+            text-align: center;
+            padding: 100px 20px;
+            margin-bottom: 30px;
+        }
+        .hero-section h2 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+        .hero-section p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 30px auto;
+        }
+        .impact-numbers {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+        .impact-number-card {
+            background-color: rgba(255,255,255,0.9);
+            color: var(--sdg15-secondary-color);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px;
+            flex: 1;
+            min-width: 200px;
+            max-width: 28%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .impact-number-card h3 {
+            font-size: 2.5rem;
+            margin: 0;
+        }
+        .impact-number-card p {
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--sdg15-secondary-color);
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            width: 80px;
+            height: 4px;
+            background-color: var(--sdg15-primary-color);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: -10px;
+            border-radius: 2px;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        .card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 5px solid var(--sdg15-primary-color);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .card h3 {
+            color: var(--sdg15-secondary-color);
+            font-size: 1.8rem;
+            margin-top: 0;
+        }
+        .card p {
+            font-size: 1rem;
+            color: #555;
+        }
+        .card .metrics {
+            font-weight: 700;
+            color: var(--sdg15-primary-color);
+            margin-top: 15px;
+        }
+        .portfolio-item img, .investment-opportunity img {
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .chart-container {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 50px;
+            border-top: 5px solid var(--sdg15-primary-color);
+        }
+        .chart-container h3 {
+            color: var(--sdg15-secondary-color);
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .ai-insights {
+            background-color: var(--sdg15-primary-color);
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+        .ai-insights h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .ai-insights p {
+            font-size: 1.1rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        footer {
+            background-color: var(--sdg15-secondary-color);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 50px;
+        }
+        footer p {
+            margin: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 60px 20px;
+            }
+            .hero-section h2 {
+                font-size: 2.5rem;
+            }
+            .impact-number-card {
+                max-width: 45%;
+            }
+            .section-title {
+                font-size: 2rem;
+            }
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 480px) {
+            .impact-number-card {
+                max-width: 90%;
+            }
+            nav ul li {
+                margin: 5px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>SDG 15: Life on Land Dashboard</h1>
+        </div>
+    </header>
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="#hero">Overview</a></li>
+                <li><a href="#success-stories">Success Stories</a></li>
+                <li><a href="#portfolio">Living Portfolio</a></li>
+                <li><a href="#investments">Investments</a></li>
+                <li><a href="#metrics">Impact Metrics</a></li>
+                <li><a href="#insights">AI Insights</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="hero" class="hero-section">
+            <h2>Protect, Restore and Promote Sustainable Use of Terrestrial Ecosystems</h2>
+            <p>SDG 15 focuses on managing forests sustainably, combating desertification, halting and reversing land degradation, and halting biodiversity loss.</p>
+            <div class="impact-numbers">
+                <div class="impact-number-card">
+                    <h3>13M Ha</h3>
+                    <p>Forests lost annually (pre-2020)</p>
+                </div>
+                <div class="impact-number-card">
+                    <h3>3.6B Ha</h3>
+                    <p>Degraded drylands (pre-2020)</p>
+                </div>
+                <div class="impact-number-card">
+                    <h3>80%</h3>
+                    <p>Terrestrial species in forests</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="success-stories">
+            <h2 class="section-title">Compelling Success Stories</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>Mozambique's Chimanimani National Park</h3>
+                    <p>Designated in 2020, this park actively safeguards numerous threatened amphibian and plant species, demonstrating effective biodiversity conservation through protected areas.</p>
+                    <p class="metrics"><strong>Impact:</strong> Protection of critical habitats, species preservation.</p>
+                </div>
+                <div class="card">
+                    <h3>Redonda Island Restoration (Antigua and Barbuda)</h3>
+                    <p>Following the removal of invasive species, 30,000 hectares of land on Redonda Island have been restored and protected, leading to a resurgence of native flora and fauna.</p>
+                    <p class="metrics"><strong>Impact:</strong> 30,000 Ha restored, native species rebound.</p>
+                </div>
+                <div class="card">
+                    <h3>Madagascar's Kianjavato Classified Forest Reforestation</h3>
+                    <p>Over 3 million trees have been planted in the Kianjavato Classified Forest, significantly contributing to ecosystem restoration and combating deforestation in a critical biodiversity hotspot.</p>
+                    <p class="metrics"><strong>Impact:</strong> 3M+ trees planted, habitat restoration.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio">
+            <h2 class="section-title">Living Portfolio: Companies Making a Difference</h2>
+            <div class="card-grid">
+                <div class="card portfolio-item">
+                    <img src="https://via.placeholder.com/300x200/52B052/FFFFFF?text=Company+A" alt="Company A Logo">
+                    <h3>EcoForestry Solutions</h3>
+                    <p>Specializes in sustainable forest management and reforestation projects, utilizing advanced techniques to restore degraded lands and promote biodiversity.</p>
+                    <p class="metrics"><strong>Focus:</strong> Sustainable Forestry, Reforestation</p>
+                </div>
+                <div class="card portfolio-item">
+                    <img src="https://via.placeholder.com/300x200/52B052/FFFFFF?text=Company+B" alt="Company B Logo">
+                    <h3>BioDiversity Guardians</h3>
+                    <p>Invests in conservation initiatives, wildlife protection, and anti-poaching technologies across critical ecosystems worldwide.</p>
+                    <p class="metrics"><strong>Focus:</strong> Wildlife Protection, Conservation</p>
+                </div>
+                <div class="card portfolio-item">
+                    <img src="https://via.placeholder.com/300x200/52B052/FFFFFF?text=Company+C" alt="Company C Logo">
+                    <h3>LandRestore Innovations</h3>
+                    <p>Develops and implements innovative solutions for soil regeneration, combating desertification, and enhancing agricultural sustainability.</p>
+                    <p class="metrics"><strong>Focus:</strong> Land Restoration, Desertification Combat</p>
+                </div>
+                <div class="card portfolio-item">
+                    <img src="https://via.placeholder.com/300x200/52B052/FFFFFF?text=Company+D" alt="Company D Logo">
+                    <h3>AquaTerra Conservation</h3>
+                    <p>Focuses on integrated terrestrial and freshwater ecosystem restoration, ensuring the health of wetlands, rivers, and surrounding land.</p>
+                    <p class="metrics"><strong>Focus:</strong> Ecosystem Restoration, Freshwater Health</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="investments">
+            <h2 class="section-title">New Investment Opportunities</h2>
+            <div class="card-grid">
+                <div class="card investment-opportunity">
+                    <img src="https://via.placeholder.com/300x200/52B052/FFFFFF?text=Investment+1" alt="Investment Opportunity 1">
+                    <h3>Sustainable Agroforestry Fund</h3>
+                    <p>An investment fund supporting agroforestry projects that integrate trees and shrubs into agricultural landscapes, improving soil health and biodiversity.</p>
+                    <p class="metrics"><strong>Expected ROI:</strong> 8-12% annually, significant carbon sequestration.</p>
+                </div>
+                <div class="card investment-opportunity">
+                    <img src="https://via.placeholder.com/300x200/52B052/FFFFFF?text=Investment+2" alt="Investment Opportunity 2">
+                    <h3>Wildlife Corridor Development</h3>
+                    <p>Funding for projects creating and maintaining wildlife corridors to connect fragmented habitats, crucial for species migration and genetic diversity.</p>
+                    <p class="metrics"><strong>Expected Impact:</strong> Increased wildlife populations, enhanced ecosystem resilience.</p>
+                </div>
+                <div class="card investment-opportunity">
+                    <img src="https://via.placeholder.com/300x200/52B052/FFFFFF?text=Investment+3" alt="Investment Opportunity 3">
+                    <h3>Mangrove Restoration Bonds</h3>
+                    <p>Green bonds to finance large-scale mangrove restoration, protecting coastlines, supporting marine life, and sequestering blue carbon.</p>
+                    <p class="metrics"><strong>Expected Return:</strong> Stable, long-term environmental and financial returns.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="metrics">
+            <h2 class="section-title">Comprehensive Impact Metrics</h2>
+            <div class="chart-container">
+                <h3>Global Forest Area Change (Million Hectares)</h3>
+                <img src="https://quickchart.io/chart?c={type:'bar',data:{labels:['2000','2005','2010','2015','2020'],datasets:[{label:'Forest Area (Million Ha)',data:[4100,4087,4074,4061,4048],backgroundColor:'%2352B052'}]}}" alt="Global Forest Area Chart">
+                <p><em>Source: FAO, Global Forest Resources Assessment. Data indicates a continuous decline in global forest area, though the rate has slowed.</em></p>
+            </div>
+            <div class="chart-container">
+                <h3>Protected Terrestrial and Freshwater Areas (% of total area)</h3>
+                <img src="https://quickchart.io/chart?c={type:'line',data:{labels:['2000','2005','2010','2015','2020','2024'],datasets:[{label:'Protected Areas (%)',data:[10,12,14,15,16,17],borderColor:'%23388E3C',fill:false}]}}" alt="Protected Areas Chart">
+                <p><em>Source: UNEP-WCMC, World Database on Protected Areas. Shows a steady increase in protected areas, crucial for biodiversity.</em></p>
+            </div>
+        </section>
+
+        <section id="insights" class="ai-insights">
+            <h2>AI-Powered Insights and Recommendations</h2>
+            <p><strong>Insight:</strong> Satellite imagery analysis reveals a 15% increase in illegal logging activities in unprotected forest areas over the past year, particularly in regions with high biodiversity. This trend is exacerbated by insufficient local monitoring and enforcement.</p>
+            <p><strong>Recommendation:</strong> Implement AI-driven predictive analytics for deforestation hotspots to deploy rapid response teams more effectively. Invest in drone technology for real-time surveillance and integrate blockchain for transparent timber supply chain tracking to deter illegal activities.</p>
+            <p><strong>Insight:</strong> Machine learning models predict a 20% acceleration in species extinction rates in fragmented habitats due to climate change and human encroachment. Current conservation efforts are not adequately addressing the interconnectedness of ecosystems.</p>
+            <p><strong>Recommendation:</strong> Prioritize funding for large-scale ecological corridor projects, utilizing AI to identify optimal land connections. Develop a global biodiversity monitoring platform that uses AI to track species movement and habitat health, providing early warnings for at-risk populations.</p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 SDG 15 Dashboard. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira SDG 17: Partnerships for the Goals Impact Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --terminal-dark: #0a0a0a;
+            --terminal-darker: #050505;
+            --terminal-blue: #00d4ff;
+            --terminal-purple: #8b5cf6;
+            --terminal-green: #00ff88;
+            --terminal-gold: #ffd700;
+            --terminal-white: #ffffff;
+            --terminal-gray: #666666;
+            --partnership-orange: #ff6b35;
+            --collaboration-blue: #4299e1;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--terminal-dark) 0%, var(--terminal-darker) 100%);
+            color: var(--terminal-white);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .terminal-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--partnership-orange), var(--collaboration-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .profile-completion {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-completion:hover {
+            background: var(--terminal-blue);
+            color: var(--terminal-dark);
+        }
+
+        .data-refresh {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            color: var(--terminal-green);
+        }
+
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            padding: 2rem 0;
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--glass-bg);
+            border-left-color: var(--partnership-orange);
+            color: var(--partnership-orange);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(255, 107, 53, 0.1);
+        }
+
+        .hero-impact {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(135deg, var(--partnership-orange), var(--collaboration-blue));
+            border-radius: 20px;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-impact::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .impact-number {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--terminal-white);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .impact-label {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        .story-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .story-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .story-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(45deg, var(--partnership-orange), var(--collaboration-blue));
+        }
+
+        .story-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(255, 107, 53, 0.2);
+        }
+
+        .story-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: var(--partnership-orange);
+        }
+
+        .story-content {
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .story-metrics {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .metric-item {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--collaboration-blue);
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .chart-container {
+            background: var(--glass-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .chart-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: var(--partnership-orange);
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--partnership-orange), var(--collaboration-blue));
+            border: none;
+            border-radius: 25px;
+            padding: 0.8rem 2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .portfolio-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .portfolio-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 30px rgba(255, 107, 53, 0.1);
+        }
+
+        .portfolio-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .company-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--partnership-orange);
+        }
+
+        .health-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--collaboration-blue);
+        }
+
+        .health-indicator.warning {
+            background: var(--terminal-gold);
+        }
+
+        .health-indicator.danger {
+            background: #ff4757;
+        }
+
+        .portfolio-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .opportunity-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .opportunity-card:hover {
+            transform: translateX(10px);
+            border-color: var(--partnership-orange);
+        }
+
+        .opportunity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .opportunity-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--partnership-orange);
+        }
+
+        .compatibility-score {
+            background: var(--collaboration-blue);
+            color: var(--terminal-dark);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .partnership-network {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .partner-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .partner-card:hover {
+            transform: scale(1.05);
+            border-color: var(--partnership-orange);
+        }
+
+        .partner-logo {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--collaboration-blue);
+        }
+
+        .partner-name {
+            font-weight: bold;
+            color: var(--partnership-orange);
+            margin-bottom: 0.5rem;
+        }
+
+        .partner-type {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="terminal-header">
+        <div class="logo">
+            <i class="fas fa-handshake me-2"></i>Auxeira SDG 17: Partnerships for the Goals
+        </div>
+        <div class="user-info">
+            <div class="profile-completion">Partnership Profile: 92% Complete</div>
+            <div class="data-refresh">Last updated: 1 min ago</div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="nav-item active" onclick="showTab('overview')">
+                <i class="fas fa-chart-line"></i>
+                <span>Partnership Overview</span>
+            </div>
+            <div class="nav-item" onclick="showTab('stories')">
+                <i class="fas fa-users"></i>
+                <span>Collaboration Stories</span>
+            </div>
+            <div class="nav-item" onclick="showTab('portfolio')">
+                <i class="fas fa-briefcase"></i>
+                <span>Partnership Portfolio</span>
+            </div>
+            <div class="nav-item" onclick="showTab('network')">
+                <i class="fas fa-network-wired"></i>
+                <span>Partner Network</span>
+            </div>
+            <div class="nav-item" onclick="showTab('opportunities')">
+                <i class="fas fa-lightbulb"></i>
+                <span>New Partnerships</span>
+            </div>
+            <div class="nav-item" onclick="showTab('metrics')">
+                <i class="fas fa-analytics"></i>
+                <span>Impact Metrics</span>
+            </div>
+            <div class="nav-item" onclick="showTab('insights')">
+                <i class="fas fa-brain"></i>
+                <span>AI Insights</span>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="content-area">
+            <!-- Overview Tab -->
+            <div id="overview" class="tab-content active">
+                <div class="hero-impact">
+                    <div class="hero-content">
+                        <div class="impact-number">847</div>
+                        <div class="impact-label">Active Strategic Partnerships</div>
+                        <p class="mt-3">Accelerating SDG achievement through collaborative innovation</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="glass-card text-center">
+                            <h3 style="color: #ff6b35;">$2.3B</h3>
+                            <p>Collaborative Capital</p>
+                            <small class="text-success">+34% this year</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card text-center">
+                            <h3 style="color: #4299e1;">156</h3>
+                            <p>Countries Reached</p>
+                            <small class="text-success">+23 new markets</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card text-center">
+                            <h3 class="text-warning">67M</h3>
+                            <p>Lives Impacted</p>
+                            <small class="text-success">Through partnerships</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card text-center">
+                            <h3 class="text-info">94%</h3>
+                            <p>Partnership Success Rate</p>
+                            <small class="text-success">Above industry avg</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Partnership Growth & Impact Over Time</div>
+                    <canvas id="partnershipGrowthChart" height="100"></canvas>
+                </div>
+            </div>
+
+            <!-- Success Stories Tab -->
+            <div id="stories" class="tab-content">
+                <h2 class="mb-4">Transformative Partnership Stories</h2>
+                <div class="story-grid">
+                    <div class="story-card">
+                        <div class="story-title">Global Health Alliance Initiative</div>
+                        <div class="story-content">
+                            Our partnership with WHO, Gates Foundation, and 23 pharmaceutical companies has revolutionized vaccine distribution in developing countries. Through shared logistics networks, joint R&D investments, and coordinated policy advocacy, we've achieved 89% vaccination coverage in previously underserved regions, preventing an estimated 2.3 million deaths.
+                        </div>
+                        <div class="story-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">23</div>
+                                <div class="metric-label">Partner Organizations</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">89%</div>
+                                <div class="metric-label">Coverage Achieved</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">2.3M</div>
+                                <div class="metric-label">Lives Saved</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="story-card">
+                        <div class="story-title">Climate Finance Consortium</div>
+                        <div class="story-content">
+                            The Climate Finance Consortium brings together 45 financial institutions, development banks, and impact investors to mobilize $12B for climate adaptation projects. Our collaborative due diligence framework and shared risk assessment tools have accelerated project approval times by 67% while maintaining rigorous environmental and social standards.
+                        </div>
+                        <div class="story-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">45</div>
+                                <div class="metric-label">Financial Partners</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">$12B</div>
+                                <div class="metric-label">Capital Mobilized</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">67%</div>
+                                <div class="metric-label">Faster Approvals</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="story-card">
+                        <div class="story-title">Digital Education Coalition</div>
+                        <div class="story-content">
+                            Our partnership with UNESCO, Microsoft, Google, and 78 educational institutions has created the world's largest open-source digital learning platform. Serving 34 million students across 89 countries, the platform provides AI-personalized learning experiences in 47 languages, with particular focus on reaching girls and marginalized communities.
+                        </div>
+                        <div class="story-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">34M</div>
+                                <div class="metric-label">Students Served</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">89</div>
+                                <div class="metric-label">Countries</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">47</div>
+                                <div class="metric-label">Languages</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="story-card">
+                        <div class="story-title">Sustainable Agriculture Network</div>
+                        <div class="story-content">
+                            The Sustainable Agriculture Network connects 156 agtech companies, research institutions, and farmer cooperatives across 67 countries. Through shared research, joint technology development, and coordinated market access programs, we've helped 4.2 million smallholder farmers increase yields by 78% while reducing environmental impact by 45%.
+                        </div>
+                        <div class="story-metrics">
+                            <div class="metric-item">
+                                <div class="metric-value">4.2M</div>
+                                <div class="metric-label">Farmers Helped</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">78%</div>
+                                <div class="metric-label">Yield Increase</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">45%</div>
+                                <div class="metric-label">Impact Reduction</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Partnership Portfolio Tab -->
+            <div id="portfolio" class="tab-content">
+                <h2 class="mb-4">Active Partnership Portfolio</h2>
+                <div class="portfolio-grid">
+                    <div class="portfolio-item">
+                        <div class="portfolio-header">
+                            <div class="company-name">Global Health Alliance</div>
+                            <div class="health-indicator"></div>
+                        </div>
+                        <div class="portfolio-metrics">
+                            <div>
+                                <strong>Investment:</strong> $340M
+                            </div>
+                            <div>
+                                <strong>Partners:</strong> 23 orgs
+                            </div>
+                            <div>
+                                <strong>Countries:</strong> 67
+                            </div>
+                            <div>
+                                <strong>Lives Impacted:</strong> 12.4M
+                            </div>
+                        </div>
+                        <p><strong>Focus:</strong> Vaccine distribution and healthcare access</p>
+                        <p><strong>Next Milestone:</strong> Launch maternal health initiative Q1 2024</p>
+                    </div>
+
+                    <div class="portfolio-item">
+                        <div class="portfolio-header">
+                            <div class="company-name">Climate Finance Consortium</div>
+                            <div class="health-indicator"></div>
+                        </div>
+                        <div class="portfolio-metrics">
+                            <div>
+                                <strong>Capital Pool:</strong> $12B
+                            </div>
+                            <div>
+                                <strong>Partners:</strong> 45 institutions
+                            </div>
+                            <div>
+                                <strong>Projects:</strong> 234 active
+                            </div>
+                            <div>
+                                <strong>CO2 Avoided:</strong> 45M tons
+                            </div>
+                        </div>
+                        <p><strong>Focus:</strong> Climate adaptation and mitigation financing</p>
+                        <p><strong>Next Milestone:</strong> $5B additional commitments by Q3</p>
+                    </div>
+
+                    <div class="portfolio-item">
+                        <div class="portfolio-header">
+                            <div class="company-name">Digital Education Coalition</div>
+                            <div class="health-indicator"></div>
+                        </div>
+                        <div class="portfolio-metrics">
+                            <div>
+                                <strong>Investment:</strong> $890M
+                            </div>
+                            <div>
+                                <strong>Partners:</strong> 78 institutions
+                            </div>
+                            <div>
+                                <strong>Students:</strong> 34M
+                            </div>
+                            <div>
+                                <strong>Completion Rate:</strong> 87%
+                            </div>
+                        </div>
+                        <p><strong>Focus:</strong> Open-source digital learning platform</p>
+                        <p><strong>Next Milestone:</strong> AI tutoring system launch</p>
+                    </div>
+
+                    <div class="portfolio-item">
+                        <div class="portfolio-header">
+                            <div class="company-name">Sustainable Agriculture Network</div>
+                            <div class="health-indicator"></div>
+                        </div>
+                        <div class="portfolio-metrics">
+                            <div>
+                                <strong>Investment:</strong> $567M</div>
+                            <div>
+                                <strong>Partners:</strong> 156 companies
+                            </div>
+                            <div>
+                                <strong>Farmers:</strong> 4.2M
+                            </div>
+                            <div>
+                                <strong>Yield Increase:</strong> 78%
+                            </div>
+                        </div>
+                        <p><strong>Focus:</strong> Agtech innovation and farmer support</p>
+                        <p><strong>Next Milestone:</strong> Carbon credit marketplace launch</p>
+                    </div>
+
+                    <div class="portfolio-item">
+                        <div class="portfolio-header">
+                            <div class="company-name">Clean Water Partnership</div>
+                            <div class="health-indicator warning"></div>
+                        </div>
+                        <div class="portfolio-metrics">
+                            <div>
+                                <strong>Investment:</strong> $234M
+                            </div>
+                            <div>
+                                <strong>Partners:</strong> 34 orgs
+                            </div>
+                            <div>
+                                <strong>People Served:</strong> 8.9M
+                            </div>
+                            <div>
+                                <strong>Systems Built:</strong> 2,340
+                            </div>
+                        </div>
+                        <p><strong>Focus:</strong> Water infrastructure and sanitation systems</p>
+                        <p><strong>Next Milestone:</strong> Expand to 12 new regions</p>
+                    </div>
+
+                    <div class="portfolio-item">
+                        <div class="portfolio-header">
+                            <div class="company-name">Financial Inclusion Alliance</div>
+                            <div class="health-indicator"></div>
+                        </div>
+                        <div class="portfolio-metrics">
+                            <div>
+                                <strong>Investment:</strong> $445M
+                            </div>
+                            <div>
+                                <strong>Partners:</strong> 67 institutions
+                            </div>
+                            <div>
+                                <strong>Accounts Opened:</strong> 23M
+                            </div>
+                            <div>
+                                <strong>Loans Disbursed:</strong> $8.9B
+                            </div>
+                        </div>
+                        <p><strong>Focus:</strong> Digital financial services for the unbanked</p>
+                        <p><strong>Next Milestone:</strong> Blockchain identity system pilot</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Partner Network Tab -->
+            <div id="network" class="tab-content">
+                <h2 class="mb-4">Strategic Partner Network</h2>
+                
+                <div class="partnership-network">
+                    <div class="partner-card">
+                        <div class="partner-logo">🏛️</div>
+                        <div class="partner-name">United Nations</div>
+                        <div class="partner-type">Multilateral Organization</div>
+                    </div>
+                    
+                    <div class="partner-card">
+                        <div class="partner-logo">🏦</div>
+                        <div class="partner-name">World Bank Group</div>
+                        <div class="partner-type">Development Finance</div>
+                    </div>
+                    
+                    <div class="partner-card">
+                        <div class="partner-logo">💼</div>
+                        <div class="partner-name">Gates Foundation</div>
+                        <div class="partner-type">Philanthropic Partner</div>
+                    </div>
+                    
+                    <div class="partner-card">
+                        <div class="partner-logo">🏢</div>
+                        <div class="partner-name">Microsoft</div>
+                        <div class="partner-type">Technology Partner</div>
+                    </div>
+                    
+                    <div class="partner-card">
+                        <div class="partner-logo">🔬</div>
+                        <div class="partner-name">MIT</div>
+                        <div class="partner-type">Research Institution</div>
+                    </div>
+                    
+                    <div class="partner-card">
+                        <div class="partner-logo">🌍</div>
+                        <div class="partner-name">African Union</div>
+                        <div class="partner-type">Regional Organization</div>
+                    </div>
+                    
+                    <div class="partner-card">
+                        <div class="partner-logo">🏭</div>
+                        <div class="partner-name">Unilever</div>
+                        <div class="partner-type">Corporate Partner</div>
+                    </div>
+                    
+                    <div class="partner-card">
+                        <div class="partner-logo">🎓</div>
+                        <div class="partner-name">UNESCO</div>
+                        <div class="partner-type">UN Specialized Agency</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Partnership Network Growth</div>
+                    <canvas id="networkGrowthChart" height="100"></canvas>
+                </div>
+            </div>
+
+            <!-- New Opportunities Tab -->
+            <div id="opportunities" class="tab-content">
+                <h2 class="mb-4">New Partnership Opportunities</h2>
+                
+                <div class="opportunity-card">
+                    <div class="opportunity-header">
+                        <div class="opportunity-title">Ocean Conservation Alliance</div>
+                        <div class="compatibility-score">96% Match</div>
+                    </div>
+                    <p>Multi-stakeholder partnership to address marine plastic pollution through innovative cleanup technologies and circular economy solutions. Seeking $450M commitment over 5 years.</p>
+                    <div class="row mt-3">
+                        <div class="col-md-3">
+                            <strong>Potential Impact:</strong> 15M tons plastic removed
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Investment:</strong> $450M
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Partners:</strong> 67 organizations
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Timeline:</strong> 5 years
+                        </div>
+                    </div>
+                </div>
+
+                <div class="opportunity-card">
+                    <div class="opportunity-header">
+                        <div class="opportunity-title">AI for Good Consortium</div>
+                        <div class="compatibility-score">93% Match</div>
+                    </div>
+                    <p>Global partnership to develop and deploy AI solutions for humanitarian challenges. Focus on disaster response, healthcare diagnostics, and educational accessibility.</p>
+                    <div class="row mt-3">
+                        <div class="col-md-3">
+                            <strong>Potential Impact:</strong> 100M people
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Investment:</strong> $680M
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Partners:</strong> 89 tech companies
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Timeline:</strong> 7 years
+                        </div>
+                    </div>
+                </div>
+
+                <div class="opportunity-card">
+                    <div class="opportunity-header">
+                        <div class="opportunity-title">Renewable Energy Transition Fund</div>
+                        <div class="compatibility-score">91% Match</div>
+                    </div>
+                    <p>Collaborative financing mechanism to accelerate renewable energy deployment in emerging markets. Combines public, private, and philanthropic capital.</p>
+                    <div class="row mt-3">
+                        <div class="col-md-3">
+                            <strong>Potential Impact:</strong> 50GW capacity
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Investment:</strong> $2.3B
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Partners:</strong> 123 institutions
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Timeline:</strong> 10 years
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Impact Metrics Tab -->
+            <div id="metrics" class="tab-content">
+                <h2 class="mb-4">Partnership Impact Metrics</h2>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <div class="chart-title">Partnership Types Distribution</div>
+                            <canvas id="partnershipTypesChart" height="150"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <div class="chart-title">Geographic Partnership Reach</div>
+                            <canvas id="geographicReachChart" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="chart-container">
+                            <div class="chart-title">Collaborative Capital Deployment</div>
+                            <canvas id="capitalDeploymentChart" height="100"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Insights Tab -->
+            <div id="insights" class="tab-content">
+                <h2 class="mb-4">AI-Powered Partnership Insights</h2>
+                
+                <div class="glass-card">
+                    <h4 style="color: #ff6b35;" class="mb-3">🎯 Strategic Recommendations</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <strong>Expand Climate Partnerships:</strong> AI analysis shows 67% higher impact potential by increasing climate-focused partnerships, particularly in renewable energy and carbon capture technologies.
+                        </li>
+                        <li class="mb-3">
+                            <strong>Strengthen South-South Collaboration:</strong> Partnerships between developing countries show 2.4x higher sustainability rates and 34% lower operational costs compared to traditional North-South models.
+                        </li>
+                        <li class="mb-3">
+                            <strong>Technology Integration Focus:</strong> Partnerships incorporating AI and blockchain technologies achieve 78% better outcome tracking and 45% improved resource allocation efficiency.
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="glass-card">
+                    <h4 class="text-warning mb-3">⚠️ Partnership Risk Alerts</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <strong>Clean Water Partnership:</strong> Regulatory changes in 3 key markets may impact 15% of projects. Recommend engaging local government partners for policy alignment.
+                        </li>
+                        <li class="mb-3">
+                            <strong>Coordination Complexity:</strong> Partnerships with >50 members show 23% higher coordination costs. Consider implementing AI-powered collaboration platforms.
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="glass-card">
+                    <h4 style="color: #4299e1;" class="mb-3">🚀 Emerging Opportunities</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <strong>Space Technology for Development:</strong> Satellite-based solutions for agriculture, disaster response, and connectivity present $890M partnership opportunity with 45M people impact potential.
+                        </li>
+                        <li class="mb-3">
+                            <strong>Quantum Computing Applications:</strong> Early-stage partnerships in quantum computing for drug discovery and climate modeling could accelerate breakthrough solutions by 5-7 years.
+                        </li>
+                        <li class="mb-3">
+                            <strong>Circular Economy Ecosystems:</strong> Multi-sector partnerships in circular economy could unlock $1.2B in value while reducing waste by 67% across partner networks.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked nav item
+            event.target.closest('.nav-item').classList.add('active');
+        }
+
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Partnership Growth Chart
+            const growthCtx = document.getElementById('partnershipGrowthChart').getContext('2d');
+            new Chart(growthCtx, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024'],
+                    datasets: [
+                        {
+                            label: 'Active Partnerships',
+                            data: [156, 234, 378, 567, 847],
+                            borderColor: '#ff6b35',
+                            backgroundColor: 'rgba(255, 107, 53, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Lives Impacted (Millions)',
+                            data: [12, 23, 34, 48, 67],
+                            borderColor: '#4299e1',
+                            backgroundColor: 'rgba(66, 153, 225, 0.1)',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+
+            // Network Growth Chart
+            const networkCtx = document.getElementById('networkGrowthChart').getContext('2d');
+            new Chart(networkCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['UN Agencies', 'Governments', 'Corporations', 'NGOs', 'Academia', 'Foundations'],
+                    datasets: [{
+                        label: 'Partnership Strength',
+                        data: [89, 76, 92, 84, 78, 87],
+                        borderColor: '#ff6b35',
+                        backgroundColor: 'rgba(255, 107, 53, 0.2)',
+                        pointBackgroundColor: '#ff6b35'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { color: '#ffffff' }
+                        }
+                    }
+                }
+            });
+
+            // Partnership Types Chart
+            const typesCtx = document.getElementById('partnershipTypesChart').getContext('2d');
+            new Chart(typesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Multi-stakeholder', 'Bilateral', 'Consortium', 'Alliance', 'Network'],
+                    datasets: [{
+                        data: [234, 189, 156, 134, 134],
+                        backgroundColor: ['#ff6b35', '#4299e1', '#00ff88', '#ffd700', '#8b5cf6']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    }
+                }
+            });
+
+            // Geographic Reach Chart
+            const geoCtx = document.getElementById('geographicReachChart').getContext('2d');
+            new Chart(geoCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Africa', 'Asia', 'Europe', 'N. America', 'S. America', 'Oceania'],
+                    datasets: [{
+                        label: 'Active Partnerships',
+                        data: [234, 189, 156, 123, 98, 47],
+                        backgroundColor: '#4299e1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+
+            // Capital Deployment Chart
+            const capitalCtx = document.getElementById('capitalDeploymentChart').getContext('2d');
+            new Chart(capitalCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [
+                        {
+                            label: 'Collaborative Capital ($M)',
+                            data: [89, 123, 156, 189, 234, 278, 312, 345, 389, 423, 456, 489],
+                            borderColor: '#ff6b35',
+                            backgroundColor: 'rgba(255, 107, 53, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'New Partnerships',
+                            data: [12, 18, 23, 29, 34, 41, 47, 52, 58, 63, 67, 71],
+                            borderColor: '#4299e1',
+                            backgroundColor: 'rgba(66, 153, 225, 0.1)',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
