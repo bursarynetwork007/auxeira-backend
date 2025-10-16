@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira SDG 6: Clean Water & Sanitation - Institutional ESG Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <style>
+        :root {
+            --primary-color: #0ea5e9;
+            --secondary-color: #38bdf8;
+            --dark-bg: #0a0a0a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --text-primary: #ffffff;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #050505 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        .live-update-bar {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            padding: 0.5rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .dashboard-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            padding: 2rem 0;
+        }
+        .sdg-badge {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .metric-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .chart-container { height: 400px; margin: 1rem 0; }
+    </style>
+</head>
+<body>
+    <div class="live-update-bar">
+        <span>Live Water Data Feed - Last updated: 2024-10-16 14:23:45 UTC</span>
+    </div>
+    
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="sdg-badge">
+                <i class="fas fa-tint"></i>
+                SDG 6: Clean Water & Sanitation
+            </div>
+            <h1><span id="orgName">BlackRock</span> Water Security Dashboard</h1>
+            <p class="lead">Institutional-grade analytics for water access and sanitation investments</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="glass-card text-center">
+                    <div class="metric-number">45.2M</div>
+                    <div class="text-muted">People with Water Access</div>
+                    <small class="text-success">+8.4M this year</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass-card text-center">
+                    <div class="metric-number">89%</div>
+                    <div class="text-muted">Water Quality Index</div>
+                    <small class="text-success">+12% improvement</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass-card text-center">
+                    <div class="metric-number">340%</div>
+                    <div class="text-muted">Infrastructure ROI</div>
+                    <small class="text-success">+67% vs benchmark</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass-card text-center">
+                    <div class="metric-number">94</div>
+                    <div class="text-muted">Sustainability Score</div>
+                    <small class="text-success">+11 points</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="glass-card">
+            <h4>Water Access Analytics & AI Projections</h4>
+            <div class="chart-container">
+                <canvas id="mainChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="glass-card">
+            <h4>Premium Water Intelligence Reports</h4>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="border rounded p-3 mb-3">
+                        <h6>SDG 6 Quarterly Water Report</h6>
+                        <p class="small">Comprehensive water access and quality analysis...</p>
+                        <button class="btn btn-success btn-sm">Free Download</button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded p-3 mb-3">
+                        <h6>Advanced Water Risk Analytics</h6>
+                        <p class="small">Climate-adjusted water stress modeling...</p>
+                        <button class="btn btn-warning btn-sm">$49 - Unlock</button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded p-3 mb-3">
+                        <h6>Water Infrastructure Optimization</h6>
+                        <p class="small">Portfolio optimization for water investments...</p>
+                        <button class="btn btn-danger btn-sm">$199 - Unlock</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['2020', '2021', '2022', '2023', '2024', '2025 (Proj)'],
+                datasets: [{
+                    label: 'Water Access (%)',
+                    data: [67, 72, 78, 83, 89, 94],
+                    borderColor: '#0ea5e9',
+                    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: '#ffffff' } } },
+                scales: {
+                    y: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                    x: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
