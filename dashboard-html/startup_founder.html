@@ -2743,5 +2743,207 @@
         }
 
     </script>
+
+    <!-- Profile Completion Modal -->
+    <div class="modal fade" id="profileCompletionModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="profileCompletionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid rgba(255, 255, 255, 0.1);">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="profileCompletionModalLabel">
+                        <i class="fas fa-user-circle me-2 text-primary"></i>Complete Your Founder Profile
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <p class="text-secondary mb-4">
+                        To access your dashboard and start earning AUX tokens, please complete your founder profile. This helps us personalize your experience and match you with the right investors.
+                    </p>
+                    
+                    <form id="founderProfileForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="founderName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="founderEmail" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Startup Name *</label>
+                                <input type="text" class="form-control" id="startupName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Industry/Sector *</label>
+                                <select class="form-select" id="industry" required>
+                                    <option value="">Select industry...</option>
+                                    <option value="fintech">FinTech</option>
+                                    <option value="saas">SaaS</option>
+                                    <option value="healthtech">HealthTech</option>
+                                    <option value="edtech">EdTech</option>
+                                    <option value="ecommerce">E-commerce</option>
+                                    <option value="cleantech">CleanTech</option>
+                                    <option value="ai">AI/ML</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Team Size *</label>
+                                <input type="number" class="form-control" id="teamSize" min="1" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Monthly Revenue (MRR) *</label>
+                                <input type="number" class="form-control" id="mrr" min="0" placeholder="USD" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Funding Raised *</label>
+                                <input type="number" class="form-control" id="fundingRaised" min="0" placeholder="USD" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">One-line Description *</label>
+                            <input type="text" class="form-control" id="description" placeholder="What does your startup do?" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Fundraising Stage *</label>
+                            <select class="form-select" id="fundraisingStage" required>
+                                <option value="">Select stage...</option>
+                                <option value="bootstrap">Bootstrapped</option>
+                                <option value="preseed">Pre-Seed</option>
+                                <option value="seed">Seed</option>
+                                <option value="seriesa">Series A</option>
+                                <option value="seriesb">Series B+</option>
+                            </select>
+                        </div>
+                        
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Your subscription tier will be automatically determined based on your profile.</strong>
+                            <br>
+                            <small>Founder (FREE) • Startup ($149/mo) • Growth ($499/mo) • Scale ($999/mo)</small>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-check me-2"></i>Complete Profile & Access Dashboard
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Upgrade Modal -->
+    <div class="modal fade" id="subscriptionUpgradeModal" tabindex="-1" aria-labelledby="subscriptionUpgradeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid rgba(255, 255, 255, 0.1);">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="subscriptionUpgradeModalLabel">
+                        <i class="fas fa-crown me-2 text-warning"></i>Upgrade Your Subscription
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Founder Tier -->
+                        <div class="col-md-3">
+                            <div class="glass-card text-center h-100" style="border: 2px solid rgba(59, 130, 246, 0.3);">
+                                <div class="badge bg-success mb-3">FREE</div>
+                                <h6 class="mb-2">Founder</h6>
+                                <div class="h3 text-primary mb-1">$0</div>
+                                <div class="small text-secondary mb-3">Always FREE</div>
+                                <hr style="border-color: rgba(255,255,255,0.1);">
+                                <div class="text-start small mb-3">
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>Bootstrap/Pre-revenue</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>Raised &lt;$10K</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>&lt;$5K MRR</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>&lt;5 employees</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>Basic dashboard</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>AUX rewards (1.0x)</div>
+                                </div>
+                                <button class="btn btn-outline-primary btn-sm w-100" disabled>Current Plan</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Startup Tier -->
+                        <div class="col-md-3">
+                            <div class="glass-card text-center h-100" style="border: 2px solid rgba(16, 185, 129, 0.5);">
+                                <div class="badge bg-primary mb-3">POPULAR</div>
+                                <h6 class="mb-2">Startup</h6>
+                                <div class="h3 text-success mb-1">$149<small>/mo</small></div>
+                                <div class="small text-secondary mb-3">$119/mo billed annually (20% off)</div>
+                                <hr style="border-color: rgba(255,255,255,0.1);">
+                                <div class="text-start small mb-3">
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>Pre-Seed to Seed</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>$10K-$500K raised</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>&lt;$25K MRR</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>5-15 employees</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>AI Growth Simulator</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>AUX rewards (1.5x)</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>Investor matching</div>
+                                </div>
+                                <button class="btn btn-success btn-sm w-100" onclick="upgradeSubscription('startup')">
+                                    <i class="fas fa-arrow-up me-1"></i>Upgrade Now
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Growth Tier -->
+                        <div class="col-md-3">
+                            <div class="glass-card text-center h-100" style="border: 2px solid rgba(251, 191, 36, 0.5);">
+                                <div class="badge bg-warning text-dark mb-3">SCALING</div>
+                                <h6 class="mb-2">Growth</h6>
+                                <div class="h3 text-warning mb-1">$499<small>/mo</small></div>
+                                <div class="small text-secondary mb-3">$399/mo billed annually (20% off)</div>
+                                <hr style="border-color: rgba(255,255,255,0.1);">
+                                <div class="text-start small mb-3">
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>Series A</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>$500K-$5M raised</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>$25K-$100K MRR</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>15-50 employees</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>All Startup features</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>AUX rewards (2.0x)</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>Priority support</div>
+                                </div>
+                                <button class="btn btn-warning btn-sm w-100" onclick="upgradeSubscription('growth')">
+                                    <i class="fas fa-arrow-up me-1"></i>Upgrade Now
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Scale Tier -->
+                        <div class="col-md-3">
+                            <div class="glass-card text-center h-100" style="border: 2px solid rgba(139, 92, 246, 0.5);">
+                                <div class="badge bg-danger mb-3">ENTERPRISE</div>
+                                <h6 class="mb-2">Scale</h6>
+                                <div class="h3 text-danger mb-1">$999<small>/mo</small></div>
+                                <div class="small text-secondary mb-3">$799/mo billed annually (20% off)</div>
+                                <hr style="border-color: rgba(255,255,255,0.1);">
+                                <div class="text-start small mb-3">
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>Series B+</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>$5M+ raised</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>$100K+ MRR</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>50+ employees</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>All Growth features</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>AUX rewards (2.5x)</div>
+                                    <div class="mb-2"><i class="fas fa-check text-success me-2"></i>Dedicated manager</div>
+                                </div>
+                                <button class="btn btn-danger btn-sm w-100" onclick="upgradeSubscription('scale')">
+                                    <i class="fas fa-arrow-up me-1"></i>Upgrade Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
