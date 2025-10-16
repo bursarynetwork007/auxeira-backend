@@ -482,6 +482,12 @@
                     <i class="fas fa-handshake me-2"></i>Partnerships
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="rewards-tab" data-bs-toggle="tab" data-bs-target="#rewards" type="button" role="tab" aria-controls="rewards" aria-selected="false">
+                    <i class="fas fa-award me-2"></i>Good Practices
+                    <span class="badge bg-warning text-dark ms-2">Earn Tokens</span>
+                </button>
+            </li>
         </ul>
 
         <!-- Tab Content -->
@@ -1734,7 +1740,89 @@
                     </div>
                 </div>
             </div>
-        </div>
+        
+            <!-- Good Practices Rewards Tab -->
+            <div class="tab-pane fade" id="rewards" role="tabpanel" aria-labelledby="rewards-tab">
+                                        <p class="small text-secondary mb-2">Cross-training and documentation</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-secondary">Risk management</small>
+                                            <button class="btn btn-sm btn-info" onclick="startActivity('bus_factor', 143)">
+                                                <i class="fas fa-play me-1"></i>Start
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="nudge-card" style="border-left: 4px solid var(--neon-blue);">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="mb-1">Post-Mortem Documentation</h6>
+                                            <span class="badge bg-info">+98 AUX</span>
+                                        </div>
+                                        <p class="small text-secondary mb-2">Team retrospectives and learnings</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-secondary">After major events</small>
+                                            <button class="btn btn-sm btn-info" onclick="startActivity('post_mortem', 98)">
+                                                <i class="fas fa-play me-1"></i>Start
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tier Progression Tracker -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="glass-card" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));">
+                            <h6 class="mb-3"><i class="fas fa-arrow-up me-2 text-primary"></i>Tier Progression Tracker</h6>
+                            <p class="text-secondary mb-3">Complete these requirements to unlock Tier 3: Growth (2,500 AUX bonus)</p>
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="p-3" style="background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="small">Team Size</span>
+                                            <span class="badge bg-success">7/10</span>
+                                        </div>
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 70%; background: var(--success-green);"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="p-3" style="background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="small">Monthly Revenue</span>
+                                            <span class="badge bg-warning text-dark">$8.5K/$10K</span>
+                                        </div>
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 85%; background: var(--neon-gold);"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="p-3" style="background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="small">Funding Raised</span>
+                                            <span class="badge bg-primary">$500K/$2M</span>
+                                        </div>
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 25%; background: var(--neon-blue);"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+</div>
     </div>
 
     <!-- Bootstrap JS -->
@@ -2422,6 +2510,238 @@
                 dashboard.showNotification('Your startup is now private to portfolio investors only', 'info');
             }
         }
+
+        // ========================================================================
+        // TIER-BASED REWARD FRAMEWORK FUNCTIONS
+        // ========================================================================
+        
+        const TIER_CRITERIA = {
+            founder: {
+                max_team: 3,
+                max_revenue: 0,
+                max_funding: 50000,
+                multiplier: 1.0,
+                quality_bonus: 1.25,
+                streak_weeks: 8
+            },
+            startup: {
+                min_team: 3,
+                max_team: 10,
+                min_revenue: 1000,
+                max_revenue: 10000,
+                min_funding: 50000,
+                max_funding: 2000000,
+                multiplier: 1.5,
+                quality_bonus: 1.5,
+                streak_weeks: 10
+            },
+            growth: {
+                min_team: 10,
+                max_team: 50,
+                min_revenue: 10000,
+                max_revenue: 100000,
+                min_funding: 2000000,
+                max_funding: 15000000,
+                multiplier: 2.0,
+                quality_bonus: 1.75,
+                streak_weeks: 12
+            },
+            scale: {
+                min_team: 50,
+                min_revenue: 100000,
+                min_funding: 15000000,
+                multiplier: 2.5,
+                quality_bonus: 2.0,
+                streak_weeks: 14
+            }
+        };
+        
+        const TIER_TRANSITION_BONUSES = {
+            'founder_to_startup': 1000,
+            'startup_to_growth': 2500,
+            'growth_to_scale': 5000
+        };
+        
+        let currentTier = 'startup';
+        let totalTokensEarned = 12450;
+        let currentStreak = 3;
+        
+        function startActivity(activityId, baseTokens) {
+            const tier = TIER_CRITERIA[currentTier];
+            const multiplier = tier.multiplier;
+            const potentialReward = Math.round(baseTokens * multiplier);
+            
+            // Show activity modal
+            showNotification(
+                `Activity started: ${activityId.replace(/_/g, ' ').toUpperCase()}. ` +
+                `Complete and verify to earn ${potentialReward} AUX tokens (${multiplier}x multiplier).`,
+                'info'
+            );
+            
+            // In production, open activity modal with upload/verification form
+            console.log('Activity started:', {
+                activityId,
+                baseTokens,
+                tier: currentTier,
+                multiplier,
+                potentialReward
+            });
+        }
+        
+        function showTierInfo() {
+            const tierInfo = `
+                <div style="padding: 20px;">
+                    <h5 class="mb-3">Startup Tier System</h5>
+                    
+                    <div class="mb-3">
+                        <h6 class="text-primary">Tier 1: Founder</h6>
+                        <p class="small mb-1">• Team: Solo or 2-3 co-founders</p>
+                        <p class="small mb-1">• Revenue: $0 (Pre-revenue)</p>
+                        <p class="small mb-1">• Funding: Bootstrapped/Pre-seed (&lt;$50K)</p>
+                        <p class="small mb-1">• Multiplier: 1.0x | Quality Bonus: up to 1.25x</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="text-success">Tier 2: Startup (Current)</h6>
+                        <p class="small mb-1">• Team: 3-10 people</p>
+                        <p class="small mb-1">• Revenue: $1K-$10K MRR</p>
+                        <p class="small mb-1">• Funding: Pre-seed/Seed ($50K-$2M)</p>
+                        <p class="small mb-1">• Multiplier: 1.5x | Quality Bonus: up to 1.5x</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="text-warning">Tier 3: Growth</h6>
+                        <p class="small mb-1">• Team: 10-50 people</p>
+                        <p class="small mb-1">• Revenue: $10K-$100K MRR</p>
+                        <p class="small mb-1">• Funding: Series A ($2M-$15M)</p>
+                        <p class="small mb-1">• Multiplier: 2.0x | Quality Bonus: up to 1.75x</p>
+                        <p class="small mb-1">• Transition Bonus: 2,500 AUX</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="text-danger">Tier 4: Scale</h6>
+                        <p class="small mb-1">• Team: 50+ people</p>
+                        <p class="small mb-1">• Revenue: $100K+ MRR</p>
+                        <p class="small mb-1">• Funding: Series B+ ($15M+)</p>
+                        <p class="small mb-1">• Multiplier: 2.5x | Quality Bonus: up to 2.0x</p>
+                        <p class="small mb-1">• Transition Bonus: 5,000 AUX</p>
+                    </div>
+                </div>
+            `;
+            
+            // In production, show in modal
+            alert('Tier Information:
+
+' + 
+                'Tier 1: Founder (1.0x multiplier)
+' +
+                'Tier 2: Startup (1.5x multiplier) - CURRENT
+' +
+                'Tier 3: Growth (2.0x multiplier) - Next: 2,500 AUX bonus
+' +
+                'Tier 4: Scale (2.5x multiplier) - Ultimate: 5,000 AUX bonus'
+            );
+        }
+        
+        function checkTierProgression() {
+            // Current startup stats (would come from backend)
+            const currentStats = {
+                team_size: 7,
+                monthly_revenue: 8500,
+                funding_raised: 500000
+            };
+            
+            // Check if eligible for next tier
+            const nextTier = getNextTier(currentTier);
+            if (!nextTier) {
+                showNotification('You are at the highest tier: Scale!', 'success');
+                return;
+            }
+            
+            const nextTierCriteria = TIER_CRITERIA[nextTier];
+            const eligible = checkTierEligibility(currentStats, nextTier);
+            
+            if (eligible) {
+                const bonus = TIER_TRANSITION_BONUSES[`${currentTier}_to_${nextTier}`];
+                showNotification(
+                    `Congratulations! You're eligible for Tier ${nextTier.toUpperCase()}! ` +
+                    `Claim your ${bonus} AUX transition bonus now!`,
+                    'success'
+                );
+            } else {
+                const requirements = getTierRequirements(currentStats, nextTier);
+                showNotification(
+                    `Progress toward Tier ${nextTier.toUpperCase()}: ${requirements}`,
+                    'info'
+                );
+            }
+        }
+        
+        function getNextTier(current) {
+            const tiers = ['founder', 'startup', 'growth', 'scale'];
+            const currentIndex = tiers.indexOf(current);
+            return currentIndex < tiers.length - 1 ? tiers[currentIndex + 1] : null;
+        }
+        
+        function checkTierEligibility(stats, tier) {
+            const criteria = TIER_CRITERIA[tier];
+            
+            // Check team size
+            if (criteria.min_team && stats.team_size < criteria.min_team) return false;
+            if (criteria.max_team && stats.team_size > criteria.max_team) return false;
+            
+            // Check revenue
+            if (criteria.min_revenue && stats.monthly_revenue < criteria.min_revenue) return false;
+            if (criteria.max_revenue && stats.monthly_revenue > criteria.max_revenue) return false;
+            
+            // Check funding
+            if (criteria.min_funding && stats.funding_raised < criteria.min_funding) return false;
+            if (criteria.max_funding && stats.funding_raised > criteria.max_funding) return false;
+            
+            return true;
+        }
+        
+        function getTierRequirements(stats, tier) {
+            const criteria = TIER_CRITERIA[tier];
+            const requirements = [];
+            
+            if (criteria.min_team && stats.team_size < criteria.min_team) {
+                requirements.push(`Team: ${stats.team_size}/${criteria.min_team}`);
+            }
+            
+            if (criteria.min_revenue && stats.monthly_revenue < criteria.min_revenue) {
+                requirements.push(`Revenue: $${(stats.monthly_revenue/1000).toFixed(1)}K/$${(criteria.min_revenue/1000).toFixed(0)}K MRR`);
+            }
+            
+            if (criteria.min_funding && stats.funding_raised < criteria.min_funding) {
+                requirements.push(`Funding: $${(stats.funding_raised/1000).toFixed(0)}K/$${(criteria.min_funding/1000).toFixed(0)}K`);
+            }
+            
+            return requirements.join(', ') || 'All requirements met!';
+        }
+        
+        function calculateTierDifficulty(baseTokens, tier, activityComplexity) {
+            const tierMultipliers = {
+                'founder': 1.0,
+                'startup': 1.5,
+                'growth': 2.0,
+                'scale': 2.5
+            };
+            
+            const complexityFactors = {
+                'simple': 1.0,
+                'medium': 1.2,
+                'complex': 1.5,
+                'strategic': 2.0
+            };
+            
+            return Math.round(
+                baseTokens * 
+                tierMultipliers[tier] * 
+                complexityFactors[activityComplexity]
+            );
+        }
+
     </script>
 </body>
 </html>
