@@ -525,6 +525,95 @@
                 padding: 1rem;
             }
         }
+    
+        /* Innovation Thesis Builder Styles */
+        .thesis-canvas {
+            min-height: 300px;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .thesis-canvas.drag-over {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .sector-palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .sector-chip {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            cursor: move;
+            transition: all 0.3s ease;
+        }
+
+        .sector-chip:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .sector-chip i {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--accent-blue);
+        }
+
+        .sector-chip.in-thesis {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .thesis-sector {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .thesis-sector .remove-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        .risk-meter {
+            height: 20px;
+            background: linear-gradient(90deg, var(--accent-green) 0%, var(--accent-yellow) 50%, var(--accent-red) 100%);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .risk-level {
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: width 0.5s ease;
+        }
+
     </style>
 </head>
 <body>
@@ -1564,44 +1653,152 @@
                                 </div>
                             </div>
                         </div>
+                    
+
+                <!-- Innovation Thesis Builder -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="glass-card p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-lightbulb me-2" style="color: var(--accent-gold);"></i>
+                                    Innovation Thesis Builder
+                                </h5>
+                                <button class="btn btn-sm btn-primary" onclick="uploadStartupOpportunity()">
+                                    <i class="fas fa-upload me-2"></i>Upload Startup Opportunity
+                                </button>
+                            </div>
+
+                            <!-- Drag and Drop Sector Mapping -->
+                            <div class="mb-4">
+                                <h6 class="mb-3">Sector Focus Areas</h6>
+                                <p class="text-muted small mb-3">Drag sectors to build your investment thesis. Click to adjust allocation.</p>
+                                
+                                <div class="thesis-canvas mb-4" id="thesisCanvas">
+                                    <div class="text-center text-muted py-5">
+                                        <i class="fas fa-mouse-pointer fa-2x mb-3"></i>
+                                        <p>Drag sectors from below to build your thesis</p>
+                                    </div>
+                                </div>
+
+                                <div class="sector-palette">
+                                    <div class="sector-chip" draggable="true" data-sector="AI/ML" data-growth="32" data-risk="medium">
+                                        <i class="fas fa-brain"></i>
+                                        <span>AI/ML</span>
+                                        <small class="d-block">32% growth</small>
+                                    </div>
+                                    <div class="sector-chip" draggable="true" data-sector="Quantum" data-growth="45" data-risk="high">
+                                        <i class="fas fa-atom"></i>
+                                        <span>Quantum Computing</span>
+                                        <small class="d-block">45% growth</small>
+                                    </div>
+                                    <div class="sector-chip" draggable="true" data-sector="Climate Tech" data-growth="28" data-risk="medium">
+                                        <i class="fas fa-leaf"></i>
+                                        <span>Climate Tech</span>
+                                        <small class="d-block">28% growth</small>
+                                    </div>
+                                    <div class="sector-chip" draggable="true" data-sector="Fintech" data-growth="22" data-risk="low">
+                                        <i class="fas fa-coins"></i>
+                                        <span>Fintech</span>
+                                        <small class="d-block">22% growth</small>
+                                    </div>
+                                    <div class="sector-chip" draggable="true" data-sector="Healthtech" data-growth="26" data-risk="medium">
+                                        <i class="fas fa-heartbeat"></i>
+                                        <span>Healthtech</span>
+                                        <small class="d-block">26% growth</small>
+                                    </div>
+                                    <div class="sector-chip" draggable="true" data-sector="Cybersecurity" data-growth="35" data-risk="low">
+                                        <i class="fas fa-shield-alt"></i>
+                                        <span>Cybersecurity</span>
+                                        <small class="d-block">35% growth</small>
+                                    </div>
+                                    <div class="sector-chip" draggable="true" data-sector="Web3" data-growth="40" data-risk="high">
+                                        <i class="fas fa-cubes"></i>
+                                        <span>Web3/Blockchain</span>
+                                        <small class="d-block">40% growth</small>
+                                    </div>
+                                    <div class="sector-chip" draggable="true" data-sector="Enterprise SaaS" data-growth="18" data-risk="low">
+                                        <i class="fas fa-building"></i>
+                                        <span>Enterprise SaaS</span>
+                                        <small class="d-block">18% growth</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Risk & IRR Analysis -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="glass-card p-3 mb-3">
+                                        <h6 class="mb-3">Portfolio Risk Score</h6>
+                                        <div class="risk-indicator mb-3">
+                                            <div class="risk-meter">
+                                                <div class="risk-level" id="riskLevel" style="width: 0%"></div>
+                                            </div>
+                                            <div class="d-flex justify-content-between mt-2">
+                                                <small class="text-success">Low</small>
+                                                <small class="text-warning">Medium</small>
+                                                <small class="text-danger">High</small>
+                                            </div>
+                                        </div>
+                                        <div id="riskScore" class="text-center">
+                                            <span class="fs-3 fw-bold">-</span>
+                                            <p class="text-muted small mb-0">Add sectors to calculate risk</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="glass-card p-3 mb-3">
+                                        <h6 class="mb-3">Projected IRR</h6>
+                                        <div id="irrProjection" class="text-center">
+                                            <span class="fs-3 fw-bold text-success">-</span>
+                                            <p class="text-muted small mb-0">Based on sector growth & risk profiles</p>
+                                        </div>
+                                        <div class="mt-3">
+                                            <div class="d-flex justify-content-between small mb-1">
+                                                <span>Conservative</span>
+                                                <span id="irrConservative">-</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between small mb-1">
+                                                <span>Base Case</span>
+                                                <span id="irrBase">-</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between small">
+                                                <span>Optimistic</span>
+                                                <span id="irrOptimistic">-</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- AI Suggestions -->
+                            <div class="glass-card p-3 mt-3" id="aiSuggestions" style="display: none;">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-robot me-2 text-primary"></i>AI Thesis Optimization Suggestions
+                                </h6>
+                                <div id="suggestionsList"></div>
+                            </div>
+
+                            <!-- Save Thesis Button -->
+                            <div class="text-end mt-3">
+                                <button class="btn btn-outline-secondary me-2" onclick="clearThesis()">
+                                    <i class="fas fa-trash me-2"></i>Clear
+                                </button>
+                                <button class="btn btn-primary" onclick="saveThesis()">
+                                    <i class="fas fa-save me-2"></i>Save Thesis
+                                </button>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+</div>
                 </div>
             </div>
         </div>
 
-        <!-- Integration & Workflow Enhancements -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="glass-card p-4">
-                    <h5 class="mb-4">
-                        <i class="fas fa-puzzle-piece me-2"></i>Integration & Workflow Enhancements
-                    </h5>
-                    <div class="integration-icons">
-                        <div class="integration-icon">
-                            <i class="fas fa-plug"></i>
-                            <div class="small">CRM Integration</div>
-                        </div>
-                        <div class="integration-icon">
-                            <i class="fas fa-link"></i>
-                            <div class="small">Blockchain Layer</div>
-                        </div>
-                        <div class="integration-icon">
-                            <i class="fas fa-globe"></i>
-                            <div class="small">Global Compliance</div>
-                        </div>
-                        <div class="integration-icon">
-                            <i class="fas fa-gamepad"></i>
-                            <div class="small">VC Gamification</div>
-                        </div>
-                        <div class="integration-icon">
-                            <i class="fas fa-robot"></i>
-                            <div class="small">Gina Copilot</div>
-                        </div>
-                        <div class="integration-icon">
-                            <i class="fas fa-chart-line"></i>
-                            <div class="small">Analytics</div>
-                        </div>
-                    </div>
+        
                 </div>
             </div>
         </div>
@@ -2695,5 +2892,389 @@
             }, 5000);
         }
     </script>
+
+    
+    <!-- Startup Upload Modal -->
+    <div class="modal fade" id="startupUploadModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">
+                        <i class="fas fa-rocket me-2"></i>Upload Startup Investment Opportunity
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="startupUploadForm">
+                        <div class="mb-3">
+                            <label class="form-label">Startup Name *</label>
+                            <input type="text" class="form-control" id="startupOppName" required placeholder="Enter startup name">
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Sector *</label>
+                                <select class="form-select" id="startupOppSector" required>
+                                    <option value="">Select Sector</option>
+                                    <option value="AI/ML">AI/ML</option>
+                                    <option value="Quantum">Quantum Computing</option>
+                                    <option value="Climate Tech">Climate Tech</option>
+                                    <option value="Fintech">Fintech</option>
+                                    <option value="Healthtech">Healthtech</option>
+                                    <option value="Cybersecurity">Cybersecurity</option>
+                                    <option value="Web3">Web3/Blockchain</option>
+                                    <option value="Enterprise SaaS">Enterprise SaaS</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Stage *</label>
+                                <select class="form-select" id="startupOppStage" required>
+                                    <option value="">Select Stage</option>
+                                    <option value="Pre-Seed">Pre-Seed</option>
+                                    <option value="Seed">Seed</option>
+                                    <option value="Series A">Series A</option>
+                                    <option value="Series B">Series B</option>
+                                    <option value="Series C+">Series C+</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Funding Needed *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="startupOppFunding" required placeholder="e.g., 2000000">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description *</label>
+                            <textarea class="form-control" id="startupOppDescription" rows="4" required placeholder="Describe the opportunity, value proposition, and why you're leading this investment..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Investment Role</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="investmentRole" id="roleLeadInvestor" value="Lead Investor" checked>
+                                <label class="form-check-label" for="roleLeadInvestor">
+                                    Lead Investor
+                                </label>
+                            </div>
+                            <small class="text-muted">As the lead investor, you'll coordinate the round and set terms</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Pitch Deck / Documents</label>
+                            <input type="file" class="form-control" id="startupOppDocs" accept=".pdf,.ppt,.pptx" multiple>
+                            <small class="text-muted">Upload pitch deck, financials, or other supporting documents</small>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Lead Investor Benefits:</strong> Priority access to deal flow, ability to set investment terms, and coordination of syndicate members.
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitStartupOpportunity()">
+                        <i class="fas fa-upload me-2"></i>Upload Opportunity
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+        // ===== INNOVATION THESIS BUILDER =====
+        let selectedSectors = [];
+
+        // Initialize drag and drop
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('thesisCanvas');
+            const chips = document.querySelectorAll('.sector-chip');
+
+            chips.forEach(chip => {
+                chip.addEventListener('dragstart', handleDragStart);
+                chip.addEventListener('dragend', handleDragEnd);
+            });
+
+            if (canvas) {
+                canvas.addEventListener('dragover', handleDragOver);
+                canvas.addEventListener('drop', handleDrop);
+                canvas.addEventListener('dragleave', handleDragLeave);
+            }
+        });
+
+        function handleDragStart(e) {
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+            e.dataTransfer.setData('sector', this.dataset.sector);
+            e.dataTransfer.setData('growth', this.dataset.growth);
+            e.dataTransfer.setData('risk', this.dataset.risk);
+        }
+
+        function handleDragEnd(e) {
+            // Remove drag-over class
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('drag-over');
+            return false;
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            e.preventDefault();
+
+            const canvas = document.getElementById('thesisCanvas');
+            canvas.classList.remove('drag-over');
+
+            const sector = e.dataTransfer.getData('sector');
+            const growth = parseFloat(e.dataTransfer.getData('growth'));
+            const risk = e.dataTransfer.getData('risk');
+
+            // Check if sector already added
+            if (selectedSectors.find(s => s.name === sector)) {
+                alert('Sector already added to thesis');
+                return false;
+            }
+
+            // Add sector to thesis
+            selectedSectors.push({ name: sector, growth, risk });
+
+            // Update canvas
+            updateThesisCanvas();
+
+            // Calculate risk and IRR
+            calculateRiskAndIRR();
+
+            // Generate AI suggestions
+            generateAISuggestions();
+
+            return false;
+        }
+
+        function updateThesisCanvas() {
+            const canvas = document.getElementById('thesisCanvas');
+            
+            if (selectedSectors.length === 0) {
+                canvas.innerHTML = `
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-mouse-pointer fa-2x mb-3"></i>
+                        <p>Drag sectors from below to build your thesis</p>
+                    </div>
+                `;
+                return;
+            }
+
+            canvas.innerHTML = selectedSectors.map((sector, index) => `
+                <div class="thesis-sector">
+                    <span>${sector.name}</span>
+                    <small class="d-block">${sector.growth}% growth</small>
+                    <div class="remove-btn" onclick="removeSector(${index})">
+                        <i class="fas fa-times"></i>
+                    </div>
+                </div>
+            `).join('');
+
+            // Mark chips as in-thesis
+            document.querySelectorAll('.sector-chip').forEach(chip => {
+                if (selectedSectors.find(s => s.name === chip.dataset.sector)) {
+                    chip.classList.add('in-thesis');
+                } else {
+                    chip.classList.remove('in-thesis');
+                }
+            });
+        }
+
+        function removeSector(index) {
+            selectedSectors.splice(index, 1);
+            updateThesisCanvas();
+            calculateRiskAndIRR();
+            
+            if (selectedSectors.length === 0) {
+                document.getElementById('aiSuggestions').style.display = 'none';
+            } else {
+                generateAISuggestions();
+            }
+        }
+
+        function calculateRiskAndIRR() {
+            if (selectedSectors.length === 0) {
+                document.getElementById('riskScore').innerHTML = `
+                    <span class="fs-3 fw-bold">-</span>
+                    <p class="text-muted small mb-0">Add sectors to calculate risk</p>
+                `;
+                document.getElementById('riskLevel').style.width = '0%';
+                document.getElementById('irrProjection').innerHTML = `
+                    <span class="fs-3 fw-bold text-success">-</span>
+                    <p class="text-muted small mb-0">Based on sector growth & risk profiles</p>
+                `;
+                document.getElementById('irrConservative').textContent = '-';
+                document.getElementById('irrBase').textContent = '-';
+                document.getElementById('irrOptimistic').textContent = '-';
+                return;
+            }
+
+            // Calculate weighted risk score
+            const riskWeights = { low: 1, medium: 2, high: 3 };
+            const avgRisk = selectedSectors.reduce((sum, s) => sum + riskWeights[s.risk], 0) / selectedSectors.length;
+            const riskScore = Math.round((avgRisk / 3) * 100);
+            const riskLevel = avgRisk < 1.5 ? 'Low' : avgRisk < 2.5 ? 'Medium' : 'High';
+            const riskColor = avgRisk < 1.5 ? 'success' : avgRisk < 2.5 ? 'warning' : 'danger';
+
+            document.getElementById('riskScore').innerHTML = `
+                <span class="fs-3 fw-bold text-${riskColor}">${riskScore}</span>
+                <p class="text-muted small mb-0">${riskLevel} Risk Portfolio</p>
+            `;
+            document.getElementById('riskLevel').style.width = `${riskScore}%`;
+
+            // Calculate IRR based on growth rates and risk
+            const avgGrowth = selectedSectors.reduce((sum, s) => sum + s.growth, 0) / selectedSectors.length;
+            const riskAdjustment = avgRisk * 2; // Risk reduces IRR
+            
+            const conservativeIRR = Math.max(0, avgGrowth * 0.6 - riskAdjustment);
+            const baseIRR = Math.max(0, avgGrowth * 0.8 - riskAdjustment * 0.7);
+            const optimisticIRR = avgGrowth * 1.2 - riskAdjustment * 0.5;
+
+            document.getElementById('irrProjection').innerHTML = `
+                <span class="fs-3 fw-bold text-success">${baseIRR.toFixed(1)}%</span>
+                <p class="text-muted small mb-0">Projected Base Case IRR</p>
+            `;
+            document.getElementById('irrConservative').textContent = `${conservativeIRR.toFixed(1)}%`;
+            document.getElementById('irrBase').textContent = `${baseIRR.toFixed(1)}%`;
+            document.getElementById('irrOptimistic').textContent = `${optimisticIRR.toFixed(1)}%`;
+        }
+
+        function generateAISuggestions() {
+            if (selectedSectors.length === 0) {
+                document.getElementById('aiSuggestions').style.display = 'none';
+                return;
+            }
+
+            const suggestions = [];
+
+            // Diversification suggestion
+            if (selectedSectors.length < 3) {
+                suggestions.push({
+                    type: 'diversification',
+                    title: 'Increase Diversification',
+                    message: 'Consider adding more sectors to reduce concentration risk. Aim for 4-6 sectors for optimal diversification.',
+                    impact: 'High'
+                });
+            }
+
+            // Risk balance suggestion
+            const highRiskCount = selectedSectors.filter(s => s.risk === 'high').length;
+            if (highRiskCount > selectedSectors.length / 2) {
+                suggestions.push({
+                    type: 'risk',
+                    title: 'Balance Risk Profile',
+                    message: 'Your portfolio has high concentration in high-risk sectors. Consider adding low-risk sectors like Fintech or Enterprise SaaS.',
+                    impact: 'Medium'
+                });
+            }
+
+            // Growth opportunity suggestion
+            const hasQuantum = selectedSectors.find(s => s.name === 'Quantum');
+            const hasWeb3 = selectedSectors.find(s => s.name === 'Web3');
+            if (!hasQuantum && !hasWeb3) {
+                suggestions.push({
+                    type: 'opportunity',
+                    title: 'High-Growth Opportunity',
+                    message: 'Quantum Computing and Web3 show exceptional growth potential (40-45%). Consider allocating 10-15% to capture upside.',
+                    impact: 'High'
+                });
+            }
+
+            // Display suggestions
+            if (suggestions.length > 0) {
+                document.getElementById('aiSuggestions').style.display = 'block';
+                document.getElementById('suggestionsList').innerHTML = suggestions.map(s => `
+                    <div class="alert alert-info mb-2">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>${s.title}</strong>
+                                <p class="mb-0 small">${s.message}</p>
+                            </div>
+                            <span class="badge bg-primary">${s.impact} Impact</span>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('aiSuggestions').style.display = 'none';
+            }
+        }
+
+        function clearThesis() {
+            if (selectedSectors.length === 0) return;
+            
+            if (confirm('Are you sure you want to clear your thesis?')) {
+                selectedSectors = [];
+                updateThesisCanvas();
+                calculateRiskAndIRR();
+                document.getElementById('aiSuggestions').style.display = 'none';
+            }
+        }
+
+        function saveThesis() {
+            if (selectedSectors.length === 0) {
+                alert('Please add sectors to your thesis before saving');
+                return;
+            }
+
+            const thesisData = {
+                sectors: selectedSectors,
+                timestamp: new Date().toISOString(),
+                riskScore: document.getElementById('riskScore').textContent,
+                baseIRR: document.getElementById('irrBase').textContent
+            };
+
+            console.log('Thesis saved:', thesisData);
+            alert('Investment thesis saved successfully!');
+        }
+
+        // Upload Startup Opportunity Modal
+        function uploadStartupOpportunity() {
+            const modal = new bootstrap.Modal(document.getElementById('startupUploadModal'));
+            modal.show();
+        }
+
+        function submitStartupOpportunity() {
+            const form = document.getElementById('startupUploadForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const opportunityData = {
+                name: document.getElementById('startupOppName').value,
+                sector: document.getElementById('startupOppSector').value,
+                stage: document.getElementById('startupOppStage').value,
+                fundingNeeded: document.getElementById('startupOppFunding').value,
+                description: document.getElementById('startupOppDescription').value,
+                role: 'Lead Investor',
+                timestamp: new Date().toISOString()
+            };
+
+            console.log('Startup Opportunity Uploaded:', opportunityData);
+            alert('Startup opportunity uploaded successfully! Our team will review and add to your pipeline.');
+
+            bootstrap.Modal.getInstance(document.getElementById('startupUploadModal')).hide();
+            form.reset();
+        }
+    </script>
+
 </body>
 </html>
