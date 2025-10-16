@@ -1,0 +1,2215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira Share Value Partners - Executive Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <style>
+        :root {
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #1a1a1a;
+            --accent-bg: #2a2a2a;
+            --terminal-green: #00ff88;
+            --terminal-blue: #0088ff;
+            --terminal-purple: #8800ff;
+            --terminal-gold: #ffaa00;
+            --terminal-red: #ff4444;
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --text-muted: #888888;
+            --border-color: #444444;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, #1a0a2a 100%);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Improved Text Visibility */
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--text-primary);
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        .text-secondary {
+            color: var(--text-secondary) !important;
+        }
+
+        /* Enhanced Contrast Cards */
+        .terminal-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 16px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .terminal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--terminal-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .live-indicator {
+            width: 10px;
+            height: 10px;
+            background: var(--terminal-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px var(--terminal-green);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        /* Critical Action Banner with Better Contrast */
+        .critical-banner {
+            background: linear-gradient(90deg, var(--terminal-blue), var(--terminal-purple));
+            color: white;
+            padding: 18px;
+            margin-bottom: 24px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.5s ease-out;
+            box-shadow: 0 4px 20px rgba(0, 136, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .critical-banner.success {
+            background: linear-gradient(90deg, var(--terminal-blue), var(--terminal-purple));
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Enhanced Glass Cards */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 136, 255, 0.25);
+            border-color: var(--terminal-blue);
+        }
+
+        /* Improved Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--terminal-blue), var(--terminal-purple));
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--terminal-blue);
+            box-shadow: 0 8px 25px rgba(0, 136, 255, 0.2);
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        /* Enhanced Pulse Grid */
+        .pulse-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+
+        .signal-card {
+            background: var(--glass-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .signal-card:hover {
+            border-color: var(--terminal-blue);
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 136, 255, 0.2);
+        }
+
+        .signal-card.critical {
+            border-color: var(--terminal-red);
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 25px rgba(255, 68, 68, 0.4);
+        }
+
+        .signal-card.high {
+            border-color: var(--terminal-gold);
+            box-shadow: 0 0 20px rgba(255, 170, 0, 0.25);
+        }
+
+        /* Enhanced Shadow Ticker */
+        .shadow-ticker {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            border: 2px solid var(--terminal-gold);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(255, 170, 0, 0.2);
+        }
+
+        .shadow-ticker::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 170, 0, 0.15), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .shadow-value {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--terminal-gold);
+            margin-bottom: 12px;
+            text-shadow: 0 0 25px rgba(255, 170, 0, 0.6);
+        }
+
+        /* Improved Tab Navigation */
+        .nav-tabs {
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--text-secondary);
+            border: none;
+            padding: 16px 28px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-radius: 8px 8px 0 0;
+            font-size: 0.95rem;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: var(--terminal-blue);
+            background: rgba(0, 136, 255, 0.1);
+            border-color: transparent;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--terminal-blue);
+            background: transparent;
+            border-bottom: 3px solid var(--terminal-blue);
+            font-weight: 700;
+        }
+
+        /* Enhanced Buttons */
+        .btn-terminal {
+            background: linear-gradient(135deg, var(--terminal-blue), var(--terminal-purple));
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 136, 255, 0.3);
+        }
+
+        .btn-terminal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 136, 255, 0.4);
+            color: white;
+        }
+
+        .btn-outline-terminal {
+            background: transparent;
+            border: 2px solid var(--terminal-blue);
+            color: var(--terminal-blue);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-terminal:hover {
+            background: var(--terminal-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 136, 255, 0.3);
+        }
+
+        /* Improved Progress Bars */
+        .progress-bar-custom {
+            height: 10px;
+            background: var(--accent-bg);
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 12px 0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--terminal-green), var(--terminal-blue));
+            border-radius: 6px;
+            transition: width 0.5s ease;
+            box-shadow: 0 2px 8px rgba(0, 255, 136, 0.3);
+        }
+
+        /* Enhanced Badges */
+        .badge {
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        /* Voice Command Interface */
+        .voice-interface {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .voice-btn {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--terminal-blue), var(--terminal-purple));
+            border: none;
+            color: white;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 25px rgba(0, 136, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .voice-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(0, 136, 255, 0.6);
+        }
+
+        .voice-btn.listening {
+            animation: pulse 1s infinite;
+            background: linear-gradient(135deg, var(--terminal-red), #ff6600);
+        }
+
+        /* Qualitative Statement Cards */
+        .qualitative-card {
+            background: linear-gradient(135deg, rgba(0, 136, 255, 0.1), rgba(136, 0, 255, 0.1));
+            border-left: 4px solid var(--terminal-blue);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-style: italic;
+        }
+
+        .qualitative-card .statement-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: var(--terminal-blue);
+            font-weight: 600;
+        }
+
+        .qualitative-card .statement-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Enhanced Responsive Design */
+        @media (max-width: 768px) {
+            .pulse-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .shadow-value {
+                font-size: 2.5rem;
+            }
+            
+            .voice-interface {
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .voice-btn {
+                width: 55px;
+                height: 55px;
+                font-size: 1.3rem;
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .terminal-container {
+                padding: 18px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .shadow-value {
+                font-size: 2rem;
+            }
+        }
+
+        /* Enhanced Chart Container */
+        .chart-container {
+            position: relative;
+            height: 320px;
+            margin: 24px 0;
+        }
+
+        /* Improved Loading Spinner */
+        .loading-spinner {
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--terminal-blue);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 30px auto;
+            box-shadow: 0 0 20px rgba(0, 136, 255, 0.3);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Enhanced Notification System */
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification-toast.show {
+            transform: translateX(0);
+        }
+
+        /* Improved Form Controls */
+        .form-control {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 12px 16px;
+        }
+
+        .form-control:focus {
+            background: var(--glass-bg);
+            border-color: var(--terminal-blue);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.2rem rgba(0, 136, 255, 0.25);
+        }
+
+        /* Enhanced Table Styling */
+        .table {
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Enhanced Critical Action Banner -->
+    <div id="criticalBanner" class="critical-banner success">
+        <div class="d-flex align-items-center">
+            <div class="live-indicator me-3"></div>
+            <div>
+                <strong>PARTNER IMPACT LIVE:</strong>
+                <span class="ms-2">
+                    Shadow Value: $<span id="shadowValueBanner">98,000</span> • 
+                    ROI: <span id="roiBanner">18.4x</span> • 
+                    ESG Score: <span id="esgBanner">82</span> • 
+                    Rank: #<span id="rankBanner">7</span>
+                </span>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-success">
+                <i class="fas fa-pulse me-1"></i>Live
+            </span>
+            <span class="badge bg-warning text-dark">EXECUTIVE</span>
+            <span class="badge bg-info">2 Report Slots Left</span>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <!-- Enhanced Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="mb-2" style="color: var(--terminal-blue);">
+                            <i class="fas fa-chart-network me-2"></i>
+                            Auxeira Share Value Partners
+                        </h1>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-user me-1"></i>
+                            Welcome, Marcus Chen - AWS Cloud Services Executive
+                        </p>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="text-end">
+                            <div class="small text-muted">Executive Tier</div>
+                            <div class="fw-bold fs-5" style="color: var(--terminal-gold);">$1,896/month</div>
+                        </div>
+                        <button class="btn btn-outline-terminal" onclick="showPaymentModal()">
+                            <i class="fas fa-credit-card me-2"></i>
+                            Billing & Reports
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Navigation Tabs -->
+        <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                    <i class="fas fa-tachometer-alt me-2"></i>Executive Overview
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="impact-tab" data-bs-toggle="tab" data-bs-target="#impact" type="button" role="tab">
+                    <i class="fas fa-chart-line me-2"></i>Partnership Impact
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pulse-tab" data-bs-toggle="tab" data-bs-target="#pulse" type="button" role="tab">
+                    <i class="fas fa-radar me-2"></i>Ecosystem Pulse
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="auctions-tab" data-bs-toggle="tab" data-bs-target="#auctions" type="button" role="tab">
+                    <i class="fas fa-gavel me-2"></i>Blind Auctions
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="shadow-tab" data-bs-toggle="tab" data-bs-target="#shadow" type="button" role="tab">
+                    <i class="fas fa-chart-area me-2"></i>Shadow Value
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab">
+                    <i class="fas fa-file-alt me-2"></i>Reports Hub
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="leaderboard-tab" data-bs-toggle="tab" data-bs-target="#leaderboard" type="button" role="tab">
+                    <i class="fas fa-trophy me-2"></i>Leaderboard
+                </button>
+            </li>
+        </ul>
+
+        <!-- Enhanced Tab Content -->
+        <div class="tab-content" id="dashboardTabContent">
+            <!-- Executive Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <div class="row">
+                    <!-- Executive Summary Statement -->
+                    <div class="col-12">
+                        <div class="qualitative-card">
+                            <div class="statement-header">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Executive Performance Summary</span>
+                            </div>
+                            <div class="statement-content">
+                                "Your partnership demonstrates exceptional strategic alignment with high-growth market segments, 
+                                generating an 18.4x ROI that significantly outpaces the 3.2x industry benchmark. The $98,000 shadow value 
+                                represents substantial unrealized potential, while your 82 ESG score places you in the top decile of 
+                                socially-responsible technology partners. This performance profile indicates strong portfolio health 
+                                with sustainable growth trajectories across your investment categories."
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Key Metrics -->
+                    <div class="col-12">
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-value" style="color: var(--terminal-gold);" id="shadowValueMetric">$98,000</div>
+                                <div class="metric-label">Shadow Value</div>
+                                <div class="small text-success">
+                                    <i class="fas fa-arrow-up me-1"></i>+12.3% vs Industry
+                                </div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" style="color: var(--terminal-blue);" id="roiMultipleMetric">18.4x</div>
+                                <div class="metric-label">ROI Multiple</div>
+                                <div class="small text-success">vs 3.2x Benchmark</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" style="color: var(--terminal-purple);" id="esgScoreMetric">82</div>
+                                <div class="metric-label">ESG Score</div>
+                                <div class="small text-info">Top 10% Partners</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" style="color: var(--terminal-green);" id="rankMetric">#7</div>
+                                <div class="metric-label">Leaderboard Rank</div>
+                                <div class="small text-warning">Gold Tier</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Quick Actions -->
+                    <div class="col-md-6">
+                        <div class="glass-card">
+                            <h5 class="mb-3" style="color: var(--terminal-blue);">
+                                <i class="fas fa-bolt me-2"></i>Quick Actions
+                            </h5>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-terminal" onclick="generateReport('roi')">
+                                    <i class="fas fa-file-contract me-2"></i>Generate ROI Report
+                                </button>
+                                <button class="btn btn-outline-terminal" onclick="viewActiveAuctions()">
+                                    <i class="fas fa-gavel me-2"></i>View Active Auctions (3)
+                                </button>
+                                <button class="btn btn-outline-terminal" onclick="boostEngagement()">
+                                    <i class="fas fa-rocket me-2"></i>Boost Startup Engagement
+                                </button>
+                                <button class="btn btn-outline-terminal" onclick="viewImpact()">
+                                    <i class="fas fa-chart-line me-2"></i>View Causal Impact
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Recent Activity -->
+                    <div class="col-md-6">
+                        <div class="glass-card">
+                            <h5 class="mb-3" style="color: var(--terminal-purple);">
+                                <i class="fas fa-history me-2"></i>Recent Activity
+                            </h5>
+                            <div class="activity-feed">
+                                <div class="d-flex align-items-center mb-3 p-2 rounded" style="background: rgba(0, 255, 136, 0.1);">
+                                    <div class="badge bg-success me-3">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">Approved cloud startup bid</div>
+                                        <small class="text-muted">$3,500 value • 2 hours ago</small>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center mb-3 p-2 rounded" style="background: rgba(0, 136, 255, 0.1);">
+                                    <div class="badge bg-info me-3">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">Shadow value increased</div>
+                                        <small class="text-muted">+$2,100 • 4 hours ago</small>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center mb-3 p-2 rounded" style="background: rgba(255, 170, 0, 0.1);">
+                                    <div class="badge bg-warning me-3">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">Influence decay started</div>
+                                        <small class="text-muted">17 days until tier drop • 1 day ago</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Partner Spotlight -->
+                    <div class="col-12 mt-3">
+                        <div class="glass-card">
+                            <h5 class="mb-3" style="color: var(--terminal-gold);">
+                                <i class="fas fa-star me-2"></i>Partner Spotlight
+                            </h5>
+                            <div class="qualitative-card mb-4">
+                                <div class="statement-header">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span>Strategic Partnership Insights</span>
+                                </div>
+                                <div class="statement-content">
+                                    "Your AWS cloud enablement strategy has created exceptional market leverage, reducing time-to-market 
+                                    by 30% for 32 portfolio companies while generating $89K in infrastructure savings. This demonstrates 
+                                    the power of platform partnerships in accelerating startup success and creating sustainable competitive 
+                                    advantages in the technology ecosystem."
+                                </div>
+                            </div>
+                            <div id="spotlightCarousel" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <h6 style="color: var(--terminal-blue);">Stripe Payment Integration</h6>
+                                                <p class="text-muted mb-2">"Saved startups $50K in payment processing fees, boosting growth by 20% and reducing CAC by 15%."</p>
+                                                <small class="text-success">
+                                                    <i class="fas fa-check-circle me-1"></i>
+                                                    47 startups impacted • $125K total value created
+                                                </small>
+                                            </div>
+                                            <div class="col-md-4 text-center">
+                                                <div class="metric-value" style="color: var(--terminal-green); font-size: 2rem;">20%</div>
+                                                <div class="metric-label">Growth Boost</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="carousel-item">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <h6 style="color: var(--terminal-blue);">AWS Cloud Enablement</h6>
+                                                <p class="text-muted mb-2">"Enabled 15 MVPs with cloud credits, reducing time-to-market by 30% and infrastructure costs by 45%."</p>
+                                                <small class="text-success">
+                                                    <i class="fas fa-check-circle me-1"></i>
+                                                    32 startups accelerated • $89K infrastructure savings
+                                                </small>
+                                            </div>
+                                            <div class="col-md-4 text-center">
+                                                <div class="metric-value" style="color: var(--terminal-green); font-size: 2rem;">30%</div>
+                                                <div class="metric-label">Faster Launch</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#spotlightCarousel" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#spotlightCarousel" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Partnership Impact Tab -->
+            <div class="tab-pane fade" id="impact" role="tabpanel">
+                <div class="terminal-container">
+                    <div class="terminal-header">
+                        <div class="terminal-title">
+                            <i class="fas fa-chart-line"></i>
+                            Partnership Impact Analysis
+                        </div>
+                        <button class="btn btn-sm btn-outline-terminal" onclick="toggleImpactDetails()">
+                            <i class="fas fa-info-circle me-1"></i>
+                            <span id="impactToggle">Show Methodology</span>
+                        </button>
+                    </div>
+
+                    <!-- Impact Analysis Statement -->
+                    <div class="qualitative-card">
+                        <div class="statement-header">
+                            <i class="fas fa-analytics"></i>
+                            <span>Causal Impact Assessment</span>
+                        </div>
+                        <div class="statement-content">
+                            "Our rigorous causal analysis demonstrates that your partnership interventions have created statistically 
+                            significant improvements across multiple startup success metrics. The 15% reduction in Customer Acquisition 
+                            Cost (CAC) represents a fundamental improvement in go-to-market efficiency, while the 20% revenue uplift 
+                            indicates enhanced monetization capabilities. These effects persist beyond initial interventions, suggesting 
+                            sustainable improvements to startup operating models rather than temporary performance boosts."
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="glass-card">
+                                <h5 style="color: var(--terminal-green);">
+                                    <i class="fas fa-calculator me-2"></i>Causal Impact Analysis
+                                </h5>
+                                <p class="text-secondary mb-3">
+                                    Your discounts caused <strong class="text-success">15% CAC reduction</strong> 
+                                    (95% CI: 12–18%) across 47 startups in your portfolio.
+                                </p>
+                                <div class="chart-container">
+                                    <canvas id="causalChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="glass-card">
+                                <h5 style="color: var(--terminal-blue);">
+                                    <i class="fas fa-project-diagram me-2"></i>Counterfactual Scenario
+                                </h5>
+                                <p class="text-secondary mb-3">
+                                    Without your rewards, startup growth would be <strong class="text-danger">30% lower</strong>, 
+                                    costing approximately <strong class="text-danger">$45K</strong> in lost enterprise value.
+                                </p>
+                                <div class="chart-container">
+                                    <canvas id="counterfactualChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Impact Methodology -->
+                    <div id="impactDetails" class="glass-card" style="display: none;">
+                        <h5 style="color: var(--terminal-purple);">
+                            <i class="fas fa-cogs me-2"></i>Methodology & Data Sources
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="mb-2">Statistical Model</h6>
+                                <ul class="text-secondary">
+                                    <li>Difference-in-differences analysis using Auxeira SSE data</li>
+                                    <li>Propensity score matching for causal inference</li>
+                                    <li>Bayesian structural time series for counterfactuals</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="mb-2">Data Sources</h6>
+                                <ul class="text-secondary">
+                                    <li>Auxeira Startup Success Engine (SSE) database</li>
+                                    <li>Scraped benchmarks from Crunchbase & AngelList</li>
+                                    <li>Partner reward redemption tracking system</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ecosystem Pulse Tab -->
+            <div class="tab-pane fade" id="pulse" role="tabpanel">
+                <div class="terminal-container">
+                    <div class="terminal-header">
+                        <div class="terminal-title">
+                            <i class="fas fa-radar"></i>
+                            Ecosystem Pulse
+                            <span class="badge bg-primary ms-2" id="totalSignals">39 Signals</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button class="btn btn-sm btn-outline-terminal" onclick="toggleAutoRefresh()">
+                                <i class="fas fa-sync-alt me-1" id="refreshIcon"></i>
+                                <span id="refreshStatus">Live</span>
+                            </button>
+                            <small class="text-muted" id="lastUpdated">Updated now</small>
+                        </div>
+                    </div>
+
+                    <!-- Market Intelligence Statement -->
+                    <div class="qualitative-card">
+                        <div class="statement-header">
+                            <i class="fas fa-satellite-dish"></i>
+                            <span>Market Intelligence Synthesis</span>
+                        </div>
+                        <div class="statement-content">
+                            "Current market signals indicate strong momentum in AI and cloud infrastructure segments, with conversion 
+                            rates exceeding 90% in high-priority categories. The 23.8% YoY growth rate reflects sustained enterprise 
+                            digital transformation initiatives, while our 12.5% market share demonstrates effective category positioning. 
+                            Critical signals in the AI segment suggest immediate allocation opportunities, with average deal sizes of 
+                            $5,000 representing premium partnership value in emerging technology verticals."
+                        </div>
+                    </div>
+
+                    <!-- Market Intelligence Summary -->
+                    <div class="metrics-grid mb-4">
+                        <div class="metric-card" style="border-color: var(--terminal-blue);">
+                            <div class="metric-value" style="color: var(--terminal-blue);">$2.4M</div>
+                            <div class="metric-label">Total Market Size</div>
+                        </div>
+                        <div class="metric-card" style="border-color: var(--terminal-green);">
+                            <div class="metric-value" style="color: var(--terminal-green);">12.5%</div>
+                            <div class="metric-label">Auxeira Market Share</div>
+                        </div>
+                        <div class="metric-card" style="border-color: var(--terminal-purple);">
+                            <div class="metric-value" style="color: var(--terminal-purple);">23.8%</div>
+                            <div class="metric-label">YoY Growth Rate</div>
+                        </div>
+                    </div>
+
+                    <!-- Signal Categories -->
+                    <div class="pulse-grid" id="signalGrid">
+                        <!-- Signals will be populated by JavaScript -->
+                    </div>
+
+                    <!-- Innovation Radar -->
+                    <div class="glass-card" style="background: linear-gradient(135deg, rgba(136, 0, 255, 0.1), rgba(255, 0, 136, 0.1));">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-1" style="color: var(--terminal-purple);">
+                                    <i class="fas fa-satellite me-2"></i>Innovation Radar
+                                </h5>
+                                <p class="mb-0 text-muted">
+                                    AI startups showing 75% ROI potential (Scraped from Crunchbase, 10/13/2025)
+                                </p>
+                            </div>
+                            <button class="btn btn-terminal" onclick="unlockTrends()">
+                                <i class="fas fa-lock-open me-2"></i>Unlock Full Trends
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blind Auctions Tab -->
+            <div class="tab-pane fade" id="auctions" role="tabpanel">
+                <div class="terminal-container">
+                    <div class="terminal-header">
+                        <div class="terminal-title">
+                            <i class="fas fa-fingerprint"></i>
+                            Blind Auction Engine
+                            <span class="badge bg-warning ms-2" id="slotsRemaining">3 slots left</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button class="btn btn-sm btn-outline-terminal" onclick="toggleEncryption()">
+                                <i class="fas fa-key me-1"></i>
+                                <span id="encryptionToggle">Show Encryption</span>
+                            </button>
+                            <span class="badge bg-success">75% Success Rate</span>
+                        </div>
+                    </div>
+
+                    <!-- Auction Strategy Statement -->
+                    <div class="qualitative-card">
+                        <div class="statement-header">
+                            <i class="fas fa-chess-knight"></i>
+                            <span>Strategic Allocation Framework</span>
+                        </div>
+                        <div class="statement-content">
+                            "The blind auction mechanism creates optimal market conditions for partnership formation by eliminating 
+                            selection bias and information asymmetry. Your current 75% success rate indicates strong pattern recognition 
+                            in identifying high-potential startups. The 340% average ROI demonstrates the efficiency of this capital 
+                            allocation approach, significantly outperforming traditional venture investment models. With 3 allocation 
+                            slots remaining this cycle, strategic prioritization of AI and cloud infrastructure opportunities is 
+                            recommended based on current signal strength and market momentum."
+                        </div>
+                    </div>
+
+                    <!-- Auction Stats -->
+                    <div class="metrics-grid mb-4">
+                        <div class="metric-card" style="border-color: var(--terminal-blue);">
+                            <div class="metric-value" style="color: var(--terminal-blue);" id="activeAuctions">3</div>
+                            <div class="metric-label">Active Auctions</div>
+                        </div>
+                        <div class="metric-card" style="border-color: var(--terminal-green);">
+                            <div class="metric-value" style="color: var(--terminal-green);" id="approvedThisMonth">9</div>
+                            <div class="metric-label">Approved This Month</div>
+                        </div>
+                        <div class="metric-card" style="border-color: var(--terminal-purple);">
+                            <div class="metric-value" style="color: var(--terminal-purple);">340%</div>
+                            <div class="metric-label">Average ROI</div>
+                        </div>
+                        <div class="metric-card" style="border-color: var(--terminal-gold);">
+                            <div class="metric-value" style="color: var(--terminal-gold);" id="slotsRemainingMetric">3</div>
+                            <div class="metric-label">Slots Remaining</div>
+                        </div>
+                    </div>
+
+                    <!-- Active Auctions -->
+                    <div id="auctionsList">
+                        <!-- Auctions will be populated by JavaScript -->
+                    </div>
+
+                    <!-- Scarcity Warning -->
+                    <div id="scarcityWarning" class="glass-card" style="background: rgba(255, 68, 68, 0.1); border-color: var(--terminal-red); display: none;">
+                        <div class="text-center">
+                            <div class="text-danger fw-bold d-flex align-items-center justify-content-center gap-2">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Only <span id="remainingSlots">1</span> slot remaining this month!
+                            </div>
+                            <div class="text-muted mt-1">Act fast to secure your preferred startups</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shadow Value Tab -->
+            <div class="tab-pane fade" id="shadow" role="tabpanel">
+                <div class="terminal-container">
+                    <div class="terminal-header">
+                        <div class="terminal-title">
+                            <i class="fas fa-chart-area"></i>
+                            Silent Shareholder Mode
+                            <span class="badge bg-warning ms-2 animate-pulse">Live Ticker</span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-terminal" onclick="toggleValueBreakdown()">
+                            <i class="fas fa-calculator me-1"></i>
+                            <span id="breakdownToggle">Show Breakdown</span>
+                        </button>
+                    </div>
+
+                    <!-- Shadow Value Statement -->
+                    <div class="qualitative-card">
+                        <div class="statement-header">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Portfolio Valuation Analysis</span>
+                        </div>
+                        <div class="statement-content">
+                            "The $98,000 shadow value represents sophisticated actuarial modeling of your partnership's unrealized 
+                            potential, incorporating time-value adjustments, market multiple expansions, and platform network effects. 
+                            This valuation methodology captures the compound growth characteristics of your portfolio, where early-stage 
+                            interventions create exponential returns through follow-on funding rounds and strategic acquisitions. The 
+                            18.4x ROI multiple reflects both immediate financial returns and strategic positioning in high-growth 
+                            technology ecosystems, creating durable competitive advantages beyond pure monetary metrics."
+                        </div>
+                    </div>
+
+                    <!-- Shadow Value Ticker -->
+                    <div class="shadow-ticker mb-4">
+                        <div class="shadow-value" id="shadowValueTicker">$98,000</div>
+                        <div class="text-muted">Unrealized Paper Gains</div>
+                        <div class="mt-3">
+                            <span class="badge bg-success me-2">
+                                <i class="fas fa-arrow-up me-1"></i>+12.3% Today
+                            </span>
+                            <span class="badge bg-info me-2">18.4x ROI Multiple</span>
+                            <span class="badge bg-warning">vs 3.2x Industry Avg</span>
+                        </div>
+                    </div>
+
+                    <!-- Value Chart -->
+                    <div class="glass-card">
+                        <h5 class="mb-3" style="color: var(--terminal-gold);">Shadow Value History</h5>
+                        <div class="chart-container">
+                            <canvas id="shadowValueChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Value Breakdown -->
+                    <div id="valueBreakdown" class="glass-card" style="display: none;">
+                        <h5 class="mb-3" style="color: var(--terminal-blue);">Actuarial Breakdown</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="text-muted">Base Investment (6 months)</label>
+                                    <div class="fw-bold" style="color: var(--terminal-blue);">$11,376</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted">Market Uplift (2.1x)</label>
+                                    <div class="fw-bold" style="color: var(--terminal-green);">$23,890</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted">Partner Tier Weight (1.8x)</label>
+                                    <div class="fw-bold" style="color: var(--terminal-purple);">$43,002</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="text-muted">Time Appreciation (2% monthly)</label>
+                                    <div class="fw-bold" style="color: var(--terminal-gold);">$54,998</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted">Platform Bonus</label>
+                                    <div class="fw-bold" style="color: var(--terminal-red);">$43,002</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted"><strong>Total Shadow Value</strong></label>
+                                    <div class="fw-bold fs-4" style="color: var(--terminal-gold);">$98,000</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Hub Tab -->
+            <div class="tab-pane fade" id="reports" role="tabpanel">
+                <div class="terminal-container">
+                    <div class="terminal-header">
+                        <div class="terminal-title">
+                            <i class="fas fa-file-alt"></i>
+                            Reports Hub
+                        </div>
+                        <span class="badge bg-warning">
+                            <i class="fas fa-download me-1"></i>
+                            2 Free Downloads Left
+                        </span>
+                    </div>
+
+                    <!-- Reporting Framework Statement -->
+                    <div class="qualitative-card">
+                        <div class="statement-header">
+                            <i class="fas fa-file-contract"></i>
+                            <span>Comprehensive Reporting Framework</span>
+                        </div>
+                        <div class="statement-content">
+                            "Our reporting suite transforms raw partnership data into actionable strategic intelligence through 
+                            advanced analytics and machine learning. Each report leverages proprietary algorithms to identify 
+                            patterns, correlations, and causal relationships that inform optimal partnership strategies. The 
+                            integration of Manus AI for data scraping and NanoGPT-5 for qualitative analysis ensures both 
+                            comprehensive market coverage and deep contextual understanding, providing executive-level insights 
+                            for partnership optimization and portfolio management decisions."
+                        </div>
+                    </div>
+
+                    <!-- Reports Grid -->
+                    <div class="pulse-grid">
+                        <div class="glass-card">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="me-3" style="color: var(--terminal-blue); font-size: 2rem;">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-1">ROI Report</h5>
+                                    <p class="text-muted mb-2">Quantifies financial returns (CAC, IRR) with causal analysis and industry benchmarks.</p>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-terminal btn-sm" onclick="generateReport('roi')">
+                                            <i class="fas fa-bolt me-1"></i>Generate Now
+                                        </button>
+                                        <button class="btn btn-outline-terminal btn-sm" onclick="previewReport('roi')">
+                                            <i class="fas fa-eye me-1"></i>Preview
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="me-3" style="color: var(--terminal-green); font-size: 2rem;">
+                                    <i class="fas fa-leaf"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-1">ESG Impact Report</h5>
+                                    <p class="text-muted mb-2">Details social/environmental outcomes with TCFD alignment and SDG mapping.</p>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-terminal btn-sm" onclick="generateReport('esg')">
+                                            <i class="fas fa-bolt me-1"></i>Generate Now
+                                        </button>
+                                        <button class="btn btn-outline-terminal btn-sm" onclick="previewReport('esg')">
+                                            <i class="fas fa-eye me-1"></i>Preview
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="me-3" style="color: var(--terminal-purple); font-size: 2rem;">
+                                    <i class="fas fa-handshake"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-1">Engagement Report</h5>
+                                    <p class="text-muted mb-2">Tracks startup reward redemption, effort metrics, and partnership health indicators.</p>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-terminal btn-sm" onclick="generateReport('engagement')">
+                                            <i class="fas fa-bolt me-1"></i>Generate Now
+                                        </button>
+                                        <button class="btn btn-outline-terminal btn-sm" onclick="previewReport('engagement')">
+                                            <i class="fas fa-eye me-1"></i>Preview
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Report Generation Status -->
+                    <div id="reportStatus" class="glass-card" style="display: none;">
+                        <div class="d-flex align-items-center">
+                            <div class="loading-spinner me-3"></div>
+                            <div>
+                                <h6 class="mb-1" id="reportStatusTitle">Generating Report</h6>
+                                <p class="text-muted mb-0" id="reportStatusMessage">Processing data and generating insights...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaderboard Tab -->
+            <div class="tab-pane fade" id="leaderboard" role="tabpanel">
+                <div class="terminal-container">
+                    <div class="terminal-header">
+                        <div class="terminal-title">
+                            <i class="fas fa-trophy"></i>
+                            Ghost Leaderboard
+                            <span class="badge bg-warning ms-2">Gold Tier</span>
+                        </div>
+                        <div class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            17 days until influence decay
+                        </div>
+                    </div>
+
+                    <!-- Competitive Positioning Statement -->
+                    <div class="qualitative-card">
+                        <div class="statement-header">
+                            <i class="fas fa-chess-board"></i>
+                            <span>Competitive Landscape Analysis</span>
+                        </div>
+                        <div class="statement-content">
+                            "Your #7 ranking in the Gold Tier reflects strong competitive positioning within the partner ecosystem, 
+                            with particular strength in cloud infrastructure and AI market segments. The 28-point impact score 
+                            demonstrates consistent value creation across multiple portfolio companies, while the 72% influence 
+                            metric indicates substantial network effects and platform leverage. The current 4% daily decay rate 
+                            suggests the need for continued active engagement to maintain competitive positioning, with three 
+                            strategic actions required to achieve Platinum Tier status and unlock additional allocation privileges."
+                        </div>
+                    </div>
+
+                    <!-- Personal Stats -->
+                    <div class="glass-card mb-4" style="background: linear-gradient(135deg, rgba(255, 170, 0, 0.1), rgba(255, 215, 0, 0.1));">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="metric-value" style="color: var(--terminal-gold);">#7</div>
+                                <div class="metric-label">Current Rank</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-value" style="color: var(--terminal-blue);">28</div>
+                                <div class="metric-label">Impact Score</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-value" style="color: var(--terminal-purple);">72%</div>
+                                <div class="metric-label">Influence</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-value" style="color: var(--terminal-red);">-4%</div>
+                                <div class="metric-label">Daily Decay</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress to Next Tier -->
+                    <div class="glass-card mb-4">
+                        <h5 class="mb-3" style="color: var(--terminal-gold);">Your Progress to Platinum</h5>
+                        <div class="progress-bar-custom">
+                            <div class="progress-fill" style="width: 70%;"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <span class="text-muted">Gold Tier</span>
+                            <span class="text-muted">3 actions to Platinum</span>
+                            <span class="text-muted">Platinum Tier</span>
+                        </div>
+                    </div>
+
+                    <!-- Top 5 Leaderboard -->
+                    <div class="glass-card">
+                        <h5 class="mb-3" style="color: var(--terminal-gold);">Top Partners</h5>
+                        <div id="leaderboardList">
+                            <!-- Leaderboard will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Influence Decay Warning -->
+                    <div class="glass-card" style="background: rgba(255, 170, 0, 0.1); border-color: var(--terminal-gold);">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h6 class="mb-1" style="color: var(--terminal-gold);">
+                                    <i class="fas fa-hourglass-half me-2"></i>Influence Decay Active
+                                </h6>
+                                <p class="mb-0 text-muted">Your influence drops 4% daily. Take action to maintain your Gold tier status.</p>
+                            </div>
+                            <button class="btn btn-terminal" onclick="boostInfluence()">
+                                <i class="fas fa-bolt me-2"></i>Boost Influence
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voice Command Interface (Executive Tier Only) -->
+    <div class="voice-interface">
+        <button class="voice-btn" id="voiceBtn" onclick="toggleVoiceCommand()" title="Voice Commands (Executive Feature)">
+            <i class="fas fa-microphone" id="voiceIcon"></i>
+        </button>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="background: var(--secondary-bg); border: 1px solid var(--border-color);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                    <h5 class="modal-title" style="color: var(--terminal-blue);">
+                        <i class="fas fa-credit-card me-2"></i>Billing & Subscription Management
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="qualitative-card">
+                        <div class="statement-header">
+                            <i class="fas fa-crown"></i>
+                            <span>Executive Tier Value Proposition</span>
+                        </div>
+                        <div class="statement-content">
+                            "Your Executive Tier subscription delivers exceptional value with an 18.4x ROI multiple, generating 
+                            $96,104 in net returns against your $1,896 monthly investment. This represents one of the highest 
+                            efficiency ratios in the technology partnership ecosystem. The premium features, including advanced 
+                            analytics, priority allocation rights, and comprehensive reporting capabilities, create sustainable 
+                            competitive advantages in identifying and capturing high-value partnership opportunities."
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 style="color: var(--terminal-purple);">Current Plan</h6>
+                            <div class="glass-card">
+                                <div class="fw-bold fs-5">Executive Tier</div>
+                                <div class="text-muted">3 Base Seats + 1 Executive Seat</div>
+                                <div class="fs-3 fw-bold mt-2" style="color: var(--terminal-gold);">$1,896/month</div>
+                                <div class="mt-2">
+                                    <small class="text-success">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        Includes premium reports and analytics
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 style="color: var(--terminal-green);">ROI Metrics</h6>
+                            <div class="glass-card">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Shadow Value:</span>
+                                    <span class="fw-bold text-success">$98,000</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>ROI Multiple:</span>
+                                    <span class="fw-bold text-info">18.4x</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Monthly Savings:</span>
+                                    <span class="fw-bold text-warning">$2,250</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Net ROI:</span>
+                                    <span class="fw-bold text-success">+$96,104</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-terminal" onclick="processPayment()">
+                            <i class="fas fa-credit-card me-2"></i>Update Payment Method
+                        </button>
+                        <button class="btn btn-outline-terminal" onclick="downloadInvoice()">
+                            <i class="fas fa-download me-2"></i>Download Invoice
+                        </button>
+                        <button class="btn btn-outline-terminal" onclick="upgradePlan()">
+                            <i class="fas fa-rocket me-2"></i>Upgrade to Platinum Tier
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Global State
+        let selectedCategory = null;
+        let autoRefresh = true;
+        let showEncryption = false;
+        let showBreakdown = false;
+        let isListening = false;
+        let approvedBids = new Set();
+        let reportSlots = 2;
+
+        // Data Objects
+        const ecosystemPulse = {
+            totalSignals: 39,
+            signals: [
+                { 
+                    category: 'cloud', 
+                    count: 14, 
+                    conversionOdds: 87, 
+                    urgency: 'high',
+                    trend: 'up',
+                    change: 15,
+                    avgDeal: 2400,
+                    timeToClose: '3-5 days'
+                },
+                { 
+                    category: 'payment', 
+                    count: 8, 
+                    conversionOdds: 92, 
+                    urgency: 'medium',
+                    trend: 'up',
+                    change: 8,
+                    avgDeal: 1800,
+                    timeToClose: '1-2 days'
+                },
+                { 
+                    category: 'analytics', 
+                    count: 12, 
+                    conversionOdds: 78, 
+                    urgency: 'high',
+                    trend: 'stable',
+                    change: 2,
+                    avgDeal: 1200,
+                    timeToClose: '2-4 days'
+                },
+                { 
+                    category: 'ai', 
+                    count: 5, 
+                    conversionOdds: 95, 
+                    urgency: 'critical',
+                    trend: 'up',
+                    change: 25,
+                    avgDeal: 5000,
+                    timeToClose: '1-3 days'
+                }
+            ]
+        };
+
+        const blindAuctions = {
+            active: [
+                { 
+                    id: 'auction_1', 
+                    category: 'cloud', 
+                    commitment: '90-day exclusive lock', 
+                    score: 82, 
+                    timeLeft: '2h 15m',
+                    estimatedValue: 3500,
+                    startupSSE: 78,
+                    encrypted: true
+                },
+                { 
+                    id: 'auction_2', 
+                    category: 'payment', 
+                    commitment: '60-day priority access', 
+                    score: 91, 
+                    timeLeft: '1h 30m',
+                    estimatedValue: 2200,
+                    startupSSE: 85,
+                    encrypted: true
+                },
+                { 
+                    id: 'auction_3', 
+                    category: 'ai', 
+                    commitment: '120-day strategic partnership', 
+                    score: 96, 
+                    timeLeft: '4h 45m',
+                    estimatedValue: 8500,
+                    startupSSE: 92,
+                    encrypted: true
+                }
+            ],
+            slotsRemaining: 3,
+            approvedThisMonth: 9,
+            successRate: 75
+        };
+
+        const leaderboard = {
+            personal: { rank: 7, score: 28, tier: 'gold' },
+            top5: [
+                { name: 'Alpha Architect', score: 42, revealed: true, tier: 'platinum' },
+                { name: 'Stripe Ventures', score: 38, revealed: true, tier: 'platinum' },
+                { name: 'Tech Angels', score: 31, revealed: true, tier: 'gold' },
+                { name: 'Anonymous Partner', score: 30, revealed: false, tier: 'gold' },
+                { name: 'Anonymous Partner', score: 29, revealed: false, tier: 'gold' }
+            ]
+        };
+
+        // Initialize Dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+            startRealTimeUpdates();
+            initializeCharts();
+        });
+
+        function initializeDashboard() {
+            renderEcosystemPulse();
+            renderBlindAuctions();
+            renderLeaderboard();
+            updateMetrics();
+        }
+
+        function renderEcosystemPulse() {
+            const signalGrid = document.getElementById('signalGrid');
+            signalGrid.innerHTML = '';
+
+            ecosystemPulse.signals.forEach((signal, index) => {
+                const urgencyClass = signal.urgency === 'critical' ? 'critical' : signal.urgency === 'high' ? 'high' : '';
+                const trendIcon = signal.trend === 'up' ? 'fa-arrow-up text-success' : 
+                                signal.trend === 'down' ? 'fa-arrow-down text-danger' : 'fa-minus text-muted';
+
+                const signalCard = document.createElement('div');
+                signalCard.className = `signal-card ${urgencyClass}`;
+                signalCard.onclick = () => selectCategory(signal.category);
+                
+                signalCard.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <h6 class="mb-0 text-capitalize fw-bold" style="color: var(--text-primary);">${signal.category}</h6>
+                            <i class="fas ${trendIcon}"></i>
+                        </div>
+                        <span class="badge ${signal.urgency === 'critical' ? 'bg-danger' : signal.urgency === 'high' ? 'bg-warning' : 'bg-secondary'} animate-pulse">
+                            ${signal.count} signals
+                        </span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between text-sm mb-1">
+                            <span class="text-muted">Conversion Rate:</span>
+                            <span class="fw-bold text-success">${signal.conversionOdds}%</span>
+                        </div>
+                        <div class="progress-bar-custom">
+                            <div class="progress-fill" style="width: ${signal.conversionOdds}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="text-muted small">Avg Deal</div>
+                            <div class="fw-bold" style="color: var(--terminal-blue);">$${signal.avgDeal}</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted small">Close Time</div>
+                            <div class="fw-bold" style="color: var(--terminal-purple);">${signal.timeToClose}</div>
+                        </div>
+                    </div>
+                    
+                    ${signal.urgency === 'critical' ? `
+                        <div class="mt-2 p-2 bg-danger bg-opacity-10 rounded text-center">
+                            <small class="text-danger">
+                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                Critical urgency - immediate action required
+                            </small>
+                        </div>
+                    ` : ''}
+                `;
+                
+                signalGrid.appendChild(signalCard);
+            });
+        }
+
+        function renderBlindAuctions() {
+            const auctionsList = document.getElementById('auctionsList');
+            auctionsList.innerHTML = '';
+
+            blindAuctions.active.forEach(auction => {
+                const urgency = getTimeUrgency(auction.timeLeft);
+                const isApproved = approvedBids.has(auction.id);
+                const urgencyClass = isApproved ? 'approved' : urgency === 'critical' ? 'urgent' : '';
+
+                const auctionCard = document.createElement('div');
+                auctionCard.className = `auction-card ${urgencyClass}`;
+                
+                auctionCard.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="d-flex align-items-center justify-content-center" 
+                                 style="width: 40px; height: 40px; background: rgba(0, 136, 255, 0.2); border-radius: 8px;">
+                                <i class="fas fa-crosshairs" style="color: var(--terminal-blue);"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 text-capitalize" style="color: var(--text-primary);">${auction.category}</h6>
+                                <small class="text-muted">${auction.commitment}</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fs-4 fw-bold" style="color: var(--terminal-blue);">${auction.score}</div>
+                            <small class="text-muted">Match Score</small>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <div class="text-muted small">Estimated Value</div>
+                            <div class="fw-bold text-success">$${auction.estimatedValue.toLocaleString()}</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted small">Startup SSE</div>
+                            <div class="fw-bold" style="color: var(--terminal-purple);">${auction.startupSSE}/100</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2 text-muted small">
+                            <i class="fas fa-clock"></i>
+                            <span>${auction.timeLeft} remaining</span>
+                            ${urgency === 'critical' ? '<span class="badge bg-danger ms-2 animate-pulse">URGENT</span>' : ''}
+                        </div>
+                        
+                        ${isApproved ? `
+                            <span class="badge bg-success d-flex align-items-center gap-1">
+                                <i class="fas fa-check-circle"></i>Approved
+                            </span>
+                        ` : `
+                            <button class="btn btn-terminal btn-sm" onclick="approveBid('${auction.id}')" 
+                                    ${blindAuctions.slotsRemaining <= 0 ? 'disabled' : ''}>
+                                <i class="fas fa-check-circle me-1"></i>Approve Bid
+                            </button>
+                        `}
+                    </div>
+
+                    ${showEncryption ? `
+                        <div class="mt-3 p-3 rounded" style="background: var(--accent-bg); border: 1px solid var(--border-color);">
+                            <div class="font-monospace small text-muted text-break">
+                                enc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}
+                            </div>
+                            <div class="text-muted small mt-1 d-flex align-items-center gap-1">
+                                <i class="fas fa-shield-alt"></i>AES-GCM Encrypted Startup Identity
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+                
+                auctionsList.appendChild(auctionCard);
+            });
+
+            // Show scarcity warning if low slots
+            const scarcityWarning = document.getElementById('scarcityWarning');
+            if (blindAuctions.slotsRemaining <= 1) {
+                scarcityWarning.style.display = 'block';
+                document.getElementById('remainingSlots').textContent = blindAuctions.slotsRemaining;
+            } else {
+                scarcityWarning.style.display = 'none';
+            }
+        }
+
+        function renderLeaderboard() {
+            const leaderboardList = document.getElementById('leaderboardList');
+            leaderboardList.innerHTML = '';
+
+            leaderboard.top5.forEach((partner, index) => {
+                const rank = index + 1;
+                const isCurrentUser = rank === leaderboard.personal.rank;
+                
+                const partnerCard = document.createElement('div');
+                partnerCard.className = `leaderboard-card ${isCurrentUser ? 'border-warning' : ''}`;
+                
+                partnerCard.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="fw-bold fs-4" style="color: var(--terminal-gold); width: 30px;">
+                                #${rank}
+                            </div>
+                            <div>
+                                <div class="fw-bold ${isCurrentUser ? 'text-warning' : 'text-primary'}">
+                                    ${partner.revealed ? partner.name : 'Anonymous Partner'}
+                                    ${isCurrentUser ? ' (You)' : ''}
+                                </div>
+                                <span class="rank-badge ${partner.tier}">${partner.tier}</span>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-bold fs-5" style="color: var(--terminal-blue);">${partner.score}</div>
+                            <small class="text-muted">Score</small>
+                        </div>
+                    </div>
+                `;
+                
+                leaderboardList.appendChild(partnerCard);
+            });
+        }
+
+        function initializeCharts() {
+            // Shadow Value Chart
+            const ctx = document.getElementById('shadowValueChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['9:00', '10:00', '11:00', '12:00', '13:00', '14:00'],
+                    datasets: [{
+                        label: 'Shadow Value',
+                        data: [95000, 96500, 97200, 98000, 97800, 98000],
+                        borderColor: '#ffaa00',
+                        backgroundColor: 'rgba(255, 170, 0, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff',
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#b0b0b0',
+                                font: {
+                                    size: 11
+                                }
+                            },
+                            grid: {
+                                color: '#333333'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#b0b0b0',
+                                callback: function(value) {
+                                    return '$' + (value / 1000) + 'K';
+                                },
+                                font: {
+                                    size: 11
+                                }
+                            },
+                            grid: {
+                                color: '#333333'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Causal Impact Chart
+            new Chart(document.getElementById('causalChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['CAC Reduction', 'Revenue Uplift', 'User Growth'],
+                    datasets: [{
+                        label: 'Your Impact',
+                        data: [15, 20, 18],
+                        backgroundColor: 'rgba(0, 255, 136, 0.7)',
+                        borderColor: 'rgba(0, 255, 136, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Industry Avg',
+                        data: [5, 8, 6],
+                        backgroundColor: 'rgba(255, 68, 68, 0.7)',
+                        borderColor: 'rgba(255, 68, 68, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#fff',
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#b0b0b0',
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            },
+                            grid: {
+                                color: '#333333'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#b0b0b0'
+                            },
+                            grid: {
+                                color: '#333333'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Counterfactual Chart
+            new Chart(document.getElementById('counterfactualChart'), {
+                type: 'line',
+                data: {
+                    labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                    datasets: [{
+                        label: 'With Rewards',
+                        data: [100, 130, 160, 190],
+                        borderColor: 'var(--terminal-green)',
+                        backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 3
+                    }, {
+                        label: 'Without Rewards',
+                        data: [100, 110, 112, 115],
+                        borderColor: 'var(--terminal-red)',
+                        backgroundColor: 'rgba(255, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#fff',
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                color: '#b0b0b0'
+                            },
+                            grid: {
+                                color: '#333333'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#b0b0b0'
+                            },
+                            grid: {
+                                color: '#333333'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event Handlers
+        function selectCategory(category) {
+            selectedCategory = category;
+            document.getElementById('boostBtn').disabled = false;
+            document.getElementById('boostBtn').innerHTML = `<i class="fas fa-bolt me-2"></i>Boost ${category}`;
+            
+            // Visual feedback
+            document.querySelectorAll('.signal-card').forEach(card => {
+                card.style.borderColor = card.onclick.toString().includes(category) ? 'var(--terminal-purple)' : 'var(--border-color)';
+            });
+        }
+
+        function boostCategory(category) {
+            console.log(`Boosting category: ${category}`);
+            // Simulate API call
+            showNotification(`${category} category boosted! Unlocking blind tier access...`, 'success');
+        }
+
+        function boostSelectedCategory() {
+            if (selectedCategory) {
+                boostCategory(selectedCategory);
+            }
+        }
+
+        function approveBid(bidId) {
+            approvedBids.add(bidId);
+            blindAuctions.slotsRemaining = Math.max(0, blindAuctions.slotsRemaining - 1);
+            blindAuctions.approvedThisMonth++;
+            
+            updateMetrics();
+            renderBlindAuctions();
+            
+            showNotification(`Bid ${bidId} approved! Slot reserved for startup partnership.`, 'success');
+        }
+
+        function toggleAutoRefresh() {
+            autoRefresh = !autoRefresh;
+            const refreshIcon = document.getElementById('refreshIcon');
+            const refreshStatus = document.getElementById('refreshStatus');
+            
+            if (autoRefresh) {
+                refreshIcon.classList.add('fa-spin');
+                refreshStatus.textContent = 'Live';
+                refreshStatus.className = 'text-success';
+            } else {
+                refreshIcon.classList.remove('fa-spin');
+                refreshStatus.textContent = 'Paused';
+                refreshStatus.className = 'text-muted';
+            }
+        }
+
+        function toggleEncryption() {
+            showEncryption = !showEncryption;
+            document.getElementById('encryptionToggle').textContent = showEncryption ? 'Hide Encryption' : 'Show Encryption';
+            renderBlindAuctions();
+        }
+
+        function toggleValueBreakdown() {
+            showBreakdown = !showBreakdown;
+            const breakdown = document.getElementById('valueBreakdown');
+            const toggle = document.getElementById('breakdownToggle');
+            
+            if (showBreakdown) {
+                breakdown.style.display = 'block';
+                toggle.textContent = 'Hide Breakdown';
+            } else {
+                breakdown.style.display = 'none';
+                toggle.textContent = 'Show Breakdown';
+            }
+        }
+
+        function toggleImpactDetails() {
+            const details = document.getElementById('impactDetails');
+            const toggle = document.getElementById('impactToggle');
+            
+            if (details.style.display === 'none') {
+                details.style.display = 'block';
+                toggle.textContent = 'Hide Methodology';
+            } else {
+                details.style.display = 'none';
+                toggle.textContent = 'Show Methodology';
+            }
+        }
+
+        function toggleVoiceCommand() {
+            if (!isListening) {
+                startVoiceListening();
+            } else {
+                stopVoiceListening();
+            }
+        }
+
+        function startVoiceListening() {
+            isListening = true;
+            const voiceBtn = document.getElementById('voiceBtn');
+            const voiceIcon = document.getElementById('voiceIcon');
+            
+            voiceBtn.classList.add('listening');
+            voiceIcon.className = 'fas fa-stop';
+            
+            // Simulate voice recognition
+            setTimeout(() => {
+                processVoiceCommand('show pulse');
+                stopVoiceListening();
+            }, 3000);
+            
+            showNotification('Listening for voice command...', 'info');
+        }
+
+        function stopVoiceListening() {
+            isListening = false;
+            const voiceBtn = document.getElementById('voiceBtn');
+            const voiceIcon = document.getElementById('voiceIcon');
+            
+            voiceBtn.classList.remove('listening');
+            voiceIcon.className = 'fas fa-microphone';
+        }
+
+        function processVoiceCommand(command) {
+            const lowerCommand = command.toLowerCase();
+            
+            if (lowerCommand.includes('pulse') || lowerCommand.includes('signals')) {
+                document.getElementById('pulse-tab').click();
+                showNotification('Showing Ecosystem Pulse', 'success');
+            } else if (lowerCommand.includes('auction') || lowerCommand.includes('bid')) {
+                document.getElementById('auctions-tab').click();
+                showNotification('Showing Blind Auctions', 'success');
+            } else if (lowerCommand.includes('shadow') || lowerCommand.includes('value')) {
+                document.getElementById('shadow-tab').click();
+                showNotification('Showing Shadow Value', 'success');
+            } else if (lowerCommand.includes('impact') || lowerCommand.includes('causal')) {
+                document.getElementById('impact-tab').click();
+                showNotification('Showing Partnership Impact', 'success');
+            } else if (lowerCommand.includes('report')) {
+                document.getElementById('reports-tab').click();
+                showNotification('Showing Reports Hub', 'success');
+            } else if (lowerCommand.includes('leaderboard') || lowerCommand.includes('rank')) {
+                document.getElementById('leaderboard-tab').click();
+                showNotification('Showing Leaderboard', 'success');
+            } else {
+                showNotification('Command not recognized. Try "show pulse" or "show impact".', 'warning');
+            }
+        }
+
+        function showPaymentModal() {
+            const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
+            modal.show();
+        }
+
+        function processPayment() {
+            // Simulate Paystack payment
+            const handler = PaystackPop.setup({
+                key: 'pk_test_your_paystack_public_key', // Replace with actual key
+                email: 'marcus.chen@aws.com',
+                amount: 189600, // Amount in kobo (cents)
+                currency: 'USD',
+                callback: function(response) {
+                    showNotification('Payment successful! Subscription updated.', 'success');
+                    console.log('Payment successful:', response);
+                },
+                onClose: function() {
+                    showNotification('Payment cancelled.', 'warning');
+                }
+            });
+            handler.openIframe();
+        }
+
+        function downloadInvoice() {
+            showNotification('Invoice downloaded successfully.', 'success');
+            // Simulate invoice download
+        }
+
+        function upgradePlan() {
+            showNotification('Plan upgrade initiated. Redirecting to upgrade portal...', 'info');
+            // Simulate upgrade flow
+        }
+
+        function boostInfluence() {
+            showNotification('Influence boosted! Decay paused for 24 hours.', 'success');
+        }
+
+        function viewActiveAuctions() {
+            document.getElementById('auctions-tab').click();
+        }
+
+        function viewImpact() {
+            document.getElementById('impact-tab').click();
+        }
+
+        function boostEngagement() {
+            showNotification('Startup engagement boosted! Increased conversion rates by 12%.', 'success');
+        }
+
+        function generateReport(type) {
+            if (reportSlots <= 0) {
+                showNotification('No report slots remaining. Please upgrade your plan.', 'warning');
+                return;
+            }
+
+            const reportStatus = document.getElementById('reportStatus');
+            const reportStatusTitle = document.getElementById('reportStatusTitle');
+            const reportStatusMessage = document.getElementById('reportStatusMessage');
+            
+            reportStatus.style.display = 'flex';
+            reportStatusTitle.textContent = `Generating ${type.toUpperCase()} Report`;
+            reportStatusMessage.textContent = 'Processing data with Manus AI and NanoGPT-5...';
+            
+            // Simulate report generation
+            setTimeout(() => {
+                reportSlots--;
+                reportStatus.style.display = 'none';
+                showNotification(`${type.toUpperCase()} report generated successfully! ${reportSlots} slots remaining.`, 'success');
+                
+                // Update banner
+                const badge = document.querySelector('.critical-banner .badge.bg-info');
+                if (badge) {
+                    badge.innerHTML = `<i class="fas fa-download me-1"></i>${reportSlots} Report Slots Left`;
+                }
+            }, 3000);
+        }
+
+        function previewReport(type) {
+            showNotification(`Opening ${type.toUpperCase()} report preview...`, 'info');
+            // Simulate preview opening
+        }
+
+        function unlockTrends() {
+            showNotification('Unlocking full innovation trends for $299...', 'info');
+            // Simulate purchase flow
+        }
+
+        // Utility Functions
+        function getTimeUrgency(timeLeft) {
+            const hours = parseInt(timeLeft.split('h')[0]);
+            if (hours <= 1) return 'critical';
+            if (hours <= 3) return 'high';
+            return 'medium';
+        }
+
+        function updateMetrics() {
+            // Update various metrics displays
+            document.getElementById('slotsRemaining').textContent = `${blindAuctions.slotsRemaining} slots left`;
+            document.getElementById('slotsRemainingMetric').textContent = blindAuctions.slotsRemaining;
+            document.getElementById('approvedThisMonth').textContent = blindAuctions.approvedThisMonth;
+            document.getElementById('activeAuctions').textContent = blindAuctions.active.length;
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create enhanced notification
+            const notification = document.createElement('div');
+            notification.className = `notification-toast show`;
+            notification.style.background = type === 'success' ? 'rgba(0, 255, 136, 0.1)' : 
+                                          type === 'warning' ? 'rgba(255, 170, 0, 0.1)' : 
+                                          type === 'danger' ? 'rgba(255, 68, 68, 0.1)' : 
+                                          'rgba(0, 136, 255, 0.1)';
+            notification.style.borderColor = type === 'success' ? 'var(--terminal-green)' : 
+                                           type === 'warning' ? 'var(--terminal-gold)' : 
+                                           type === 'danger' ? 'var(--terminal-red)' : 
+                                           'var(--terminal-blue)';
+            
+            const icon = type === 'success' ? 'fa-check-circle' : 
+                        type === 'warning' ? 'fa-exclamation-triangle' : 
+                        type === 'danger' ? 'fa-times-circle' : 
+                        'fa-info-circle';
+            
+            const iconColor = type === 'success' ? 'var(--terminal-green)' : 
+                            type === 'warning' ? 'var(--terminal-gold)' : 
+                            type === 'danger' ? 'var(--terminal-red)' : 
+                            'var(--terminal-blue)';
+            
+            notification.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="me-3" style="color: ${iconColor}; font-size: 1.5rem;">
+                        <i class="fas ${icon}"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold">${message}</div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" onclick="this.parentElement.parentElement.remove()"></button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        function startRealTimeUpdates() {
+            // Simulate real-time updates every 15 seconds
+            setInterval(() => {
+                if (autoRefresh) {
+                    // Update shadow value
+                    const currentValue = parseInt(document.getElementById('shadowValueTicker').textContent.replace(/[$,]/g, ''));
+                    const change = Math.random() > 0.6 ? 
+                        Math.floor(Math.random() * 500) + 100 : 
+                        -Math.floor(Math.random() * 200);
+                    const newValue = Math.max(50000, currentValue + change);
+                    
+                    document.getElementById('shadowValueTicker').textContent = `$${newValue.toLocaleString()}`;
+                    document.getElementById('shadowValueMetric').textContent = `$${newValue.toLocaleString()}`;
+                    document.getElementById('shadowValueBanner').textContent = newValue.toLocaleString();
+                    
+                    // Update ROI and ESG
+                    document.getElementById('roiBanner').textContent = (18.4 + (Math.random() * 0.2 - 0.1)).toFixed(1) + 'x';
+                    document.getElementById('esgBanner').textContent = Math.floor(80 + Math.random() * 5);
+                    
+                    // Update last updated timestamp
+                    document.getElementById('lastUpdated').textContent = 'Updated now';
+                    
+                    // Randomly update signal counts
+                    ecosystemPulse.signals.forEach(signal => {
+                        signal.count = Math.max(1, signal.count + Math.floor(Math.random() * 3) - 1);
+                        signal.conversionOdds = Math.min(99, Math.max(50, signal.conversionOdds + Math.floor(Math.random() * 6) - 3));
+                    });
+                    
+                    // Re-render ecosystem pulse if on that tab
+                    if (document.getElementById('pulse-tab').classList.contains('active')) {
+                        renderEcosystemPulse();
+                    }
+                }
+            }, 15000);
+        }
+    </script>
+</body>
+</html>
