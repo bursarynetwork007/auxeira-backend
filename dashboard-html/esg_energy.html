@@ -3,217 +3,480 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SDG 8: Decent Work and Economic Growth Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Auxeira SDG 7: Affordable & Clean Energy - Institutional ESG Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <style>
+        :root {
+            --primary-color: #eab308;
+            --secondary-color: #fbbf24;
+            --dark-bg: #0a0a0a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #050505 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        
+        .accessibility-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .accessibility-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .live-update-bar {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            padding: 0.5rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .dashboard-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 2rem 0;
+        }
+        
+        .sdg-badge {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .compliance-badges {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .compliance-badge {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary-color);
+        }
+        
+        .glass-card.ai-powered::before {
+            content: '🤖 AI-Generated';
+            position: absolute;
+            top: -10px;
+            right: 15px;
+            background: linear-gradient(45deg, #1e40af, #7c3aed);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+        
+        .metric-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        
+        .chart-container {
+            height: 400px;
+            margin: 1rem 0;
+        }
+        
+        .report-preview {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        
+        .report-preview.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+        .btn-unlock {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+        
+        .story-card {
+            background: linear-gradient(135deg, rgba(234, 179, 8, 0.1), rgba(251, 191, 36, 0.1));
+            border: 1px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .nav-tabs {
+            background: var(--glass-bg);
+            border-radius: 12px;
+            padding: 0.5rem;
+            margin: 2rem 0;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            margin: 0 0.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-primary);
+        }
+    </style>
+    <script src="ai_dashboard_administrator.js"></script>
+    <style>
+        .chart-container { margin: 20px 0; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px; }
+        .chart-title { color: var(--terminal-green); margin-bottom: 15px; }
+        .premium-report-card { position: relative; padding: 20px; margin-bottom: 15px; }
+        .price-tag { position: absolute; top: 10px; right: 10px; background: var(--terminal-green); color: var(--terminal-dark); padding: 4px 8px; border-radius: 12px; font-weight: bold; }
+        .update-indicator { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .locked-content { border: 2px dashed var(--terminal-yellow); }
+        .generate-report-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    </style>
+    <link rel="stylesheet" href="leaderboard_styles.css">
 </head>
 <body>
-    <header class="navbar">
+    <div class="accessibility-controls">
+        <button class="accessibility-btn" onclick="toggleHighContrast()" aria-label="Toggle high contrast">
+            <i class="fas fa-adjust"></i>
+        </button>
+        <button class="accessibility-btn" onclick="increaseFontSize()" aria-label="Increase font size">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+    
+    <div class="live-update-bar">
+        <span>Live Energy Data Feed Active</span>
+        <span>Last updated: <span id="timestamp">2024-10-16 14:23:45 UTC</span></span>
+    </div>
+    
+    <header class="dashboard-header">
         <div class="container">
-            <div class="logo">SDG 8</div>
-            <nav>
-                <ul>
-                    <li><a href="#hero">Overview</a></li>
-                    <li><a href="#success-stories">Success Stories</a></li>
-                    <li><a href="#portfolio">Living Portfolio</a></li>
-                    <li><a href="#investment">Investment Opportunities</a></li>
-                    <li><a href="#metrics">Impact Metrics</a></li>
-                    <li><a href="#insights">AI Insights</a></li>
-                </ul>
-            </nav>
+            <div class="sdg-badge">
+                <i class="fas fa-bolt"></i>
+                SDG 7: Affordable & Clean Energy
+            </div>
+            <h1><span id="orgName">BlackRock</span> Clean Energy Impact Dashboard</h1>
+            <p class="lead">Institutional-grade analytics for renewable energy investments with real-time grid monitoring</p>
+            <div class="compliance-badges">
+                <div class="compliance-badge">SFDR Article 9 Compliant</div>
+                <div class="compliance-badge">CSRD Reporting Ready</div>
+                <div class="compliance-badge">TCFD Aligned</div>
+            </div>
         </div>
     </header>
-
-    <section id="hero" class="hero-section">
-        <div class="container">
-            <div class="hero-content">
-                <div class="sdg-icon"><i class="fas fa-chart-line"></i></div>
-                <h1>SDG 8: Decent Work and Economic Growth</h1>
-                <p class="subtitle">Promoting sustained, inclusive and sustainable economic growth, full and productive employment and decent work for all.</p>
-                <div class="impact-numbers">
-                    <div class="impact-card">
-                        <h3>5.3%</h3>
-                        <p>Global Unemployment Rate (2023)</p>
+    
+    <div class="container">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#overview">
+                    <i class="fas fa-chart-line me-2"></i>Energy Overview
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#stories">
+                    <i class="fas fa-book-open me-2"></i>Success Stories
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#portfolio">
+                    <i class="fas fa-briefcase me-2"></i>Energy Portfolio
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#reports">
+                    <i class="fas fa-file-alt me-2"></i>Premium Reports
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="overview">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="glass-card text-center">
+                            <div class="metric-number">127GW</div>
+                            <div class="metric-label">Clean Energy Capacity</div>
+                            <small class="text-success">+23GW this year</small>
+                        </div>
                     </div>
-                    <div class="impact-card">
-                        <h3>58.0%</h3>
-                        <p>Informal Employment Share (2023)</p>
+                    <div class="col-md-3">
+                        <div class="glass-card text-center">
+                            <div class="metric-number">89M</div>
+                            <div class="metric-label">People with Energy Access</div>
+                            <small class="text-success">+12M connected</small>
+                        </div>
                     </div>
-                    <div class="impact-card">
-                        <h3>>50%</h3>
-                        <p>SME Contribution to Global GDP</p>
+                    <div class="col-md-3">
+                        <div class="glass-card text-center">
+                            <div class="metric-number">67%</div>
+                            <div class="metric-label">Renewable Energy Share</div>
+                            <small class="text-success">+15% increase</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card text-center">
+                            <div class="metric-number">340%</div>
+                            <div class="metric-label">Energy ROI</div>
+                            <small class="text-success">+89% vs benchmark</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card ai-powered">
+                    <h4>Clean Energy Analytics & AI Grid Predictions</h4>
+                    <div class="chart-container">
+                        <canvas id="mainChart" aria-label="Clean energy capacity and projections"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="stories">
+                <div class="story-card">
+                    <div class="d-flex justify-content-between mb-3">
+                        <div>
+                            <h5>Solar Microgrids Transform Rural Kenya</h5>
+                            <small class="text-muted">M-KOPA Solar Partnership • 2022-2024</small>
+                        </div>
+                        <span class="badge bg-success">97% Impact Score</span>
+                    </div>
+                    <p>Revolutionary solar microgrid network serving 2.3 million people across remote villages. AI-optimized energy distribution and mobile payment integration have achieved 99.7% uptime while reducing energy costs by 45%. The program demonstrates scalable clean energy access for underserved communities.</p>
+                    <div class="row text-center mt-3">
+                        <div class="col-3">
+                            <div class="h5 text-warning">2.3M</div>
+                            <small>People Connected</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="h5 text-warning">45%</div>
+                            <small>Cost Reduction</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="h5 text-warning">99.7%</div>
+                            <small>Grid Uptime</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="h5 text-warning">$890M</div>
+                            <small>Economic Impact</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="portfolio">
+                <div class="glass-card">
+                    <h4>Active Clean Energy Investments</h4>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="glass-card">
+                                <h6>Solar Power Systems</h6>
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <div class="h4 text-warning">$2.1B</div>
+                                        <small>Investment</small>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="h4 text-info">45GW</div>
+                                        <small>Capacity</small>
+                                    </div>
+                                </div>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar bg-warning" style="width: 94%"></div>
+                                </div>
+                                <small>Impact Score: 94/100</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="glass-card">
+                                <h6>Wind Energy Projects</h6>
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <div class="h4 text-warning">$1.8B</div>
+                                        <small>Investment</small>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="h4 text-info">38GW</div>
+                                        <small>Capacity</small>
+                                    </div>
+                                </div>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar bg-warning" style="width: 91%"></div>
+                                </div>
+                                <small>Impact Score: 91/100</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="glass-card">
+                                <h6>Energy Storage</h6>
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <div class="h4 text-warning">$890M</div>
+                                        <small>Investment</small>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="h4 text-info">15GWh</div>
+                                        <small>Storage</small>
+                                    </div>
+                                </div>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar bg-warning" style="width: 89%"></div>
+                                </div>
+                                <small>Impact Score: 89/100</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="reports">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="report-preview">
+                            <h6>SDG 7 Quarterly Energy Report</h6>
+                            <p class="small">Comprehensive clean energy market analysis with grid stability metrics and renewable capacity tracking...</p>
+                            <button class="btn btn-success">Free Download</button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="report-preview locked">
+                            <h6>Advanced Energy Grid Analytics</h6>
+                            <p class="small">AI-powered grid optimization insights with demand forecasting and storage recommendations...</p>
+                            <button class="btn-unlock" onclick="purchaseReport('grid-analytics', 49)">$49 - Unlock</button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="report-preview locked">
+                            <h6>Clean Energy Investment Strategy</h6>
+                            <p class="small">Portfolio optimization for renewable energy investments with regulatory compliance roadmaps...</p>
+                            <button class="btn-unlock" onclick="purchaseReport('investment-strategy', 199)">$199 - Unlock</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-
-    <section id="success-stories" class="section-padding">
-        <div class="container">
-            <h2>Compelling Success Stories</h2>
-            <div class="story-grid">
-                <div class="story-card">
-                    <h3>Crafting Futures: Empowering Rural Artisans Through Fair Trade</h3>
-                    <p>ArtisanConnect partnered with local cooperatives in underserved regions to provide training, market access, and fair wages to traditional artisans. By connecting them directly to global markets, ArtisanConnect has revitalized local economies and preserved cultural heritage.</p>
-                    <ul>
-                        <li><strong>2,500+ artisans</strong> (70% women) gained sustainable livelihoods</li>
-                        <li><strong>30% average increase</strong> in household income</li>
-                        <li><strong>15 new product lines</strong> launched in 10+ countries</li>
-                    </ul>
-                </div>
-                <div class="story-card">
-                    <h3>Code for Impact: Training Youth for the Digital Economy</h3>
-                    <p>DigitalFutures, a non-profit organization, launched intensive coding bootcamps and digital literacy programs targeting unemployed youth and marginalized communities. The program focuses on in-demand skills like web development, data analytics, and cybersecurity, ensuring graduates are job-ready.</p>
-                    <ul>
-                        <li><strong>1,800+ youth</strong> trained</li>
-                        <li><strong>85% employment rate</strong> within 6 months of graduation</li>
-                        <li><strong>Average starting salaries 2x</strong> regional minimum wage</li>
-                    </ul>
-                </div>
-                <div class="story-card">
-                    <h3>Green Harvest: Boosting Rural Economies Through Sustainable Farming</h3>
-                    <p>AgriGrow Innovations implemented sustainable farming practices and provided micro-financing to smallholder farmers, enabling them to adopt eco-friendly techniques, improve crop yields, and access better markets. This initiative reduced post-harvest losses and increased food security.</p>
-                    <ul>
-                        <li><strong>1,200 farmers</strong> adopted sustainable practices</li>
-                        <li><strong>40% increase</strong> in crop yields</li>
-                        <li><strong>50% increase</strong> in farmer incomes</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="portfolio" class="section-padding bg-light">
-        <div class="container">
-            <h2>Living Portfolio: Investments Making a Difference</h2>
-            <div class="portfolio-grid">
-                <div class="portfolio-card">
-                    <h3>Eco-Build Solutions</h3>
-                    <p>A construction company specializing in sustainable and affordable housing using local, recycled materials. They prioritize hiring and training local youth and women in construction trades.</p>
-                    <ul>
-                        <li><strong>300+ affordable homes</strong> built</li>
-                        <li><strong>500+ local jobs</strong> created (40% for women)</li>
-                        <li><strong>20% reduction</strong> in construction waste</li>
-                    </ul>
-                </div>
-                <div class="portfolio-card">
-                    <h3>FairWear Apparel</h3>
-                    <p>An ethical fashion brand committed to fair labor practices and transparent supply chains. They work directly with garment workers, ensuring fair wages, safe working conditions, and skill development programs.</p>
-                    <ul>
-                        <li><strong>1,000+ garment workers</strong> receive living wages</li>
-                        <li><strong>100% supply chain transparency</strong></li>
-                        <li><strong>50% reduction</strong> in worker turnover</li>
-                    </ul>
-                </div>
-                <div class="portfolio-card">
-                    <h3>FutureFounders Incubator</h3>
-                    <p>A startup incubator focused on supporting social enterprises and tech startups that address sustainable development challenges. They provide mentorship, seed funding, and access to networks.</p>
-                    <ul>
-                        <li><strong>50+ startups</strong> launched</li>
-                        <li><strong>200+ new jobs</strong> created</li>
-                        <li><strong>$5M+ in follow-on funding</strong> secured</li>
-                    </ul>
-                </div>
-                <div class="portfolio-card">
-                    <h3>GreenCycle Waste Management</h3>
-                    <p>A company providing innovative waste management and recycling solutions, creating green jobs in waste collection, sorting, and processing. They also educate communities on waste reduction.</p>
-                    <ul>
-                        <li><strong>10,000+ tons of waste</strong> diverted annually</li>
-                        <li><strong>250+ green jobs</strong> created</li>
-                        <li><strong>15 community recycling centers</strong> established</li>
-                    </ul>
-                </div>
-                <div class="portfolio-card">
-                    <h3>SkillUp Online</h3>
-                    <p>An e-learning platform offering vocational training and upskilling courses for underserved populations, focusing on digital skills, entrepreneurship, and green economy jobs.</p>
-                    <ul>
-                        <li><strong>15,000+ individuals</strong> trained annually</li>
-                        <li><strong>70% course completion rate</strong></li>
-                        <li><strong>40% increase</strong> in employability for graduates</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="investment" class="section-padding">
-        <div class="container">
-            <h2>New Investment Opportunities</h2>
-            <div class="investment-grid">
-                <div class="investment-card">
-                    <h3>Bridging the Digital Divide: Expanding Rural Digital Hubs</h3>
-                    <p>Investment in establishing and expanding community-based digital hubs in remote rural areas. These hubs provide internet access, digital literacy training, and co-working spaces, fostering local entrepreneurship and remote work opportunities.</p>
-                    <ul>
-                        <li>Potential to create <strong>5,000+ indirect jobs</strong></li>
-                        <li>Empower <strong>1,000+ rural entrepreneurs</strong></li>
-                        <li>Increase digital inclusion for <strong>50,000+ individuals</strong></li>
-                    </ul>
-                </div>
-                <div class="investment-card">
-                    <h3>Innovating Sustainable Textiles: Circular Economy Manufacturing Plant</h3>
-                    <p>Funding for a new textile manufacturing plant that utilizes circular economy principles, including textile recycling, upcycling, and sustainable production methods. This will create green manufacturing jobs and reduce environmental impact.</p>
-                    <ul>
-                        <li>Potential to create <strong>800+ green manufacturing jobs</strong></li>
-                        <li>Divert <strong>10,000+ tons of textile waste</strong> from landfills annually</li>
-                        <li>Reduce carbon emissions by <strong>30%</strong></li>
-                    </ul>
-                </div>
-                <div class="investment-card">
-                    <h3>Seeding Green Futures: Youth Entrepreneurship Fund</h3>
-                    <p>Establishment of a dedicated fund to provide seed capital, mentorship, and business development support to young entrepreneurs (18-30) launching green businesses (e.g., renewable energy, sustainable agriculture, eco-tourism).</p>
-                    <ul>
-                        <li>Support <strong>100+ youth-led green startups</strong></li>
-                        <li>Create <strong>1,500+ new jobs</strong></li>
-                        <li>Generate <strong>$10M+ in sustainable economic value</strong></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="metrics" class="section-padding bg-light">
-        <div class="container">
-            <h2>Comprehensive Impact Metrics</h2>
-            <div class="chart-container">
-                <!-- Placeholder for charts -->
-                <p>Charts will be dynamically loaded here using JavaScript libraries like Chart.js or Plotly.js.</p>
-                <div class="chart-placeholder" id="chart1"></div>
-                <div class="chart-placeholder" id="chart2"></div>
-                <div class="chart-placeholder" id="chart3"></div>
-                <div class="chart-placeholder" id="chart4"></div>
-                <div class="chart-placeholder" id="chart5"></div>
-            </div>
-        </div>
-    </section>
-
-    <section id="insights" class="section-padding">
-        <div class="container">
-            <h2>AI-Powered Insights and Recommendations</h2>
-            <div class="insight-card">
-                <h3>Insight 1: The informal economy remains a significant challenge, particularly for vulnerable populations.</h3>
-                <p><strong>Recommendation:</strong> Implement policies that incentivize formalization of businesses, provide social protection for informal workers, and offer skill development programs to transition workers into formal employment.</p>
-            </div>
-            <div class="insight-card">
-                <h3>Insight 2: Youth unemployment and underemployment persist despite overall economic growth.</h3>
-                <p><strong>Recommendation:</strong> Invest in targeted vocational training, apprenticeship programs, and entrepreneurship support specifically designed for youth, aligning skills with future job market demands, especially in green and digital sectors.</p>
-            </div>
-            <div class="insight-card">
-                <h3>Insight 3: Small and Medium-sized Enterprises (SMEs) are critical drivers of job creation but often face barriers to growth.</h3>
-                <p><strong>Recommendation:</strong> Enhance access to affordable finance, provide business development services, and streamline regulatory processes for SMEs to foster their growth and job creation potential.</p>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 SDG 8 Dashboard. All rights reserved.</p>
-            <p>Powered by Manus AI</p>
-            <p><a href="#">SDG Resources</a> | <a href="#">Contact</a></p>
-        </div>
-    </footer>
-
-    <script src="script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['2020', '2021', '2022', '2023', '2024', '2025 (Proj)', '2026 (Proj)'],
+                datasets: [{
+                    label: 'Clean Energy Capacity (GW)',
+                    data: [78, 89, 98, 112, 127, 145, 167],
+                    borderColor: '#eab308',
+                    backgroundColor: 'rgba(234, 179, 8, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'AI Projection',
+                    data: [null, null, null, null, 127, 145, 167],
+                    borderColor: '#f59e0b',
+                    borderDash: [5, 5],
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: '#ffffff' } } },
+                scales: {
+                    y: { 
+                        ticks: { color: '#ffffff' }, 
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        title: { display: true, text: 'Capacity (GW)', color: '#ffffff' }
+                    },
+                    x: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                }
+            }
+        });
+        
+        function toggleHighContrast() {
+            document.body.classList.toggle('high-contrast');
+        }
+        
+        function increaseFontSize() {
+            const currentSize = parseFloat(getComputedStyle(document.body).fontSize);
+            document.body.style.fontSize = (currentSize + 2) + 'px';
+        }
+        
+        function purchaseReport(type, price) {
+            alert(`Report purchase: $${price} - Paystack integration ready`);
+        }
+        
+        setInterval(() => {
+            document.getElementById('timestamp').textContent = new Date().toISOString().replace('T', ' ').substr(0, 19) + ' UTC';
+        }, 30000);
+    </script>
+    <script src="esg_leaderboard_system.js"></script>
+    <script src="esg_enhanced_framework.js"></script>
 </body>
 </html>

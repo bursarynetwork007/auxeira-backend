@@ -3,183 +3,1073 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SDG 16 Dashboard: Peace, Justice and Strong Institutions</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Auxeira SDG 13: Climate Action - Institutional ESG Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <style>
+        :root {
+            --primary-color: #059669;
+            --secondary-color: #059669dd;
+            --dark-bg: #0a0a0a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #050505 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        
+        .accessibility-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .accessibility-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .accessibility-btn:hover, .accessibility-btn:focus {
+            background: var(--primary-color);
+            outline: 2px solid #10b981;
+        }
+        
+        .live-update-bar {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            padding: 0.5rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .update-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        .dashboard-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 2rem 0;
+            position: relative;
+        }
+        
+        .sdg-badge {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .compliance-badges {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .compliance-badge {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .compliance-badge.sfdr {
+            border-color: #10b981;
+            color: #10b981;
+        }
+        
+        .compliance-badge.csrd {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .compliance-badge.tcfd {
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+        
+        .nav-tabs {
+            background: var(--glass-bg);
+            border-radius: 12px;
+            padding: 0.5rem;
+            margin: 2rem 0;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            margin: 0 0.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-primary);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary-color);
+        }
+        
+        .glass-card.ai-powered::before {
+            content: '🤖 AI-Generated';
+            position: absolute;
+            top: -10px;
+            right: 15px;
+            background: linear-gradient(45deg, #1e40af, #7c3aed);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        .metric-card {
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .metric-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .metric-change {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        .metric-change.positive {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        
+        .chart-container {
+            height: 400px;
+            margin: 1rem 0;
+            position: relative;
+        }
+        
+        .story-card {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.05));
+            border: 1px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .story-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .story-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+        
+        .impact-score {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+        
+        .report-preview {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .report-preview.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .report-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .report-preview-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+        
+        .report-preview.locked .report-preview-text::after {
+            content: '... [Premium Content - Unlock to read more]';
+            color: #f59e0b;
+            font-weight: bold;
+        }
+        
+        .report-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .price-tag {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        .btn-unlock {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .btn-unlock:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .personalized-content {
+            border-left: 3px solid var(--primary-color);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .profile-indicator {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .compliance-badges {
+                flex-direction: column;
+            }
+        }
+        
+        .nav-link:focus,
+        .btn-unlock:focus,
+        .accessibility-btn:focus {
+            outline: 2px solid #10b981;
+            outline-offset: 2px;
+        }
+    </style>
+    <script src="ai_dashboard_administrator.js"></script>
+    <style>
+        .chart-container { margin: 20px 0; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px; }
+        .chart-title { color: var(--terminal-green); margin-bottom: 15px; }
+        .premium-report-card { position: relative; padding: 20px; margin-bottom: 15px; }
+        .price-tag { position: absolute; top: 10px; right: 10px; background: var(--terminal-green); color: var(--terminal-dark); padding: 4px 8px; border-radius: 12px; font-weight: bold; }
+        .update-indicator { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .locked-content { border: 2px dashed var(--terminal-yellow); }
+        .generate-report-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    </style>
+    <link rel="stylesheet" href="leaderboard_styles.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo">SDG 16</div>
-            <ul>
-                <li><a href="#hero">Overview</a></li>
-                <li><a href="#stories">Success Stories</a></li>
-                <li><a href="#portfolio">Living Portfolio</a></li>
-                <li><a href="#opportunities">Opportunities</a></li>
-                <li><a href="#metrics">Impact Metrics</a></li>
-                <li><a href="#insights">AI Insights</a></li>
-            </ul>
-        </nav>
-    </header>
+    <div class="accessibility-controls">
+        <button class="accessibility-btn" onclick="toggleHighContrast()" aria-label="Toggle high contrast mode">
+            <i class="fas fa-adjust"></i>
+        </button>
+        <button class="accessibility-btn" onclick="increaseFontSize()" aria-label="Increase font size">
+            <i class="fas fa-plus"></i>
+        </button>
+        <button class="accessibility-btn" onclick="decreaseFontSize()" aria-label="Decrease font size">
+            <i class="fas fa-minus"></i>
+        </button>
+    </div>
 
-    <main>
-        <section id="hero" class="hero-section">
-            <div class="container">
-                <h1>SDG 16: Peace, Justice and Strong Institutions</h1>
-                <p class="tagline">Promoting peaceful and inclusive societies for sustainable development, providing access to justice for all and building effective, accountable and inclusive institutions at all levels.</p>
-                <div class="impact-numbers">
-                    <div class="impact-number-card">
-                        <h3>5% Decrease</h3>
-                        <p>in Global Homicide Rate (2015-2022)</p>
-                    </div>
-                    <div class="impact-number-card">
-                        <h3>5.1 Billion</h3>
-                        <p>Lack Access to Justice</p>
-                    </div>
-                    <div class="impact-number-card">
-                        <h3>502 Killings</h3>
-                        <p>of Human Rights Defenders (2024)</p>
-                    </div>
-                    <div class="impact-number-card">
-                        <h3>25% Increase</h3>
-                        <p>in Human Trafficking Victims (2022)</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="stories" class="success-stories-section">
-            <div class="container">
-                <h2>Compelling Success Stories</h2>
-                <div class="story-grid">
-                    <div class="story-card">
-                        <h3>Strengthening Rule of Law in Post-Conflict Regions</h3>
-                        <p>In post-conflict Somalia, UNDP's Justice and Security Programme has been instrumental in rebuilding judicial and security institutions. By training police, judges, and legal aid providers, and establishing community-based justice mechanisms, the program has significantly improved access to justice for vulnerable populations.</p>
-                        <span class="metric">Metrics: Over 50,000 people received legal aid services; 2,000 police officers trained; 15 new courts and police stations established, leading to a 30% increase in public trust.</span>
-                    </div>
-                    <div class="story-card">
-                        <h3>Combating Corruption through Digital Governance</h3>
-                        <p>Estonia has pioneered digital governance, creating a transparent and efficient public administration system that significantly reduces opportunities for corruption. Its e-residency program, digital identity, and secure data exchange platform (X-Road) exemplify how technology can foster accountability.</p>
-                        <span class="metric">Metrics: Ranked among the least corrupt countries; 99% of public services online; estimated annual savings of 2% of GDP due to e-governance.</span>
-                    </div>
-                    <div class="story-card">
-                        <h3>Empowering Communities for Peacebuilding</h3>
-                        <p>Following its civil conflict, Nepal established local peace committees with support from various NGOs and international bodies. These committees mediate local disputes, promote social cohesion, and prevent the escalation of violence.</p>
-                        <span class="metric">Metrics: Over 1,500 local disputes resolved peacefully; 70% reduction in reported inter-community conflicts; increased participation of women and marginalized groups by 25%.</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="portfolio" class="portfolio-section">
-            <div class="container">
-                <h2>Living Portfolio</h2>
-                <div class="portfolio-grid">
-                    <div class="portfolio-card">
-                        <h3>Cobwebs Technologies</h3>
-                        <p>Threat Monitoring Solutions, combating cybercrime, drug trafficking, money laundering, and anti-terrorism.</p>
-                        <span class="impact-focus">Impact: Web intelligence platforms for security agencies.</span>
-                    </div>
-                    <div class="portfolio-card">
-                        <h3>Choco4Peace</h3>
-                        <p>Economic recovery and peacebuilding in post-conflict regions through sustainable agriculture.</p>
-                        <span class="impact-focus">Impact: Empowering cacao farmers with blockchain technology.</span>
-                    </div>
-                    <div class="portfolio-card">
-                        <h3>Visual Contracts</h3>
-                        <p>Improving access to justice by simplifying legal documentation.</p>
-                        <span class="impact-focus">Impact: Easy-to-understand visual contracts for legal accessibility.</span>
-                    </div>
-                    <div class="portfolio-card">
-                        <h3>isgood.ai</h3>
-                        <p>Social Impact Measurement and optimization.</p>
-                        <span class="impact-focus">Impact: AI-powered solutions to measure and optimize social impact.</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="opportunities" class="opportunities-section">
-            <div class="container">
-                <h2>New Investment Opportunities</h2>
-                <div class="opportunities-grid">
-                    <div class="opportunity-card">
-                        <h3>Justice Tech Innovation Fund</h3>
-                        <p>Investment in early-stage startups developing technology solutions to improve access to justice, streamline legal processes, and enhance legal literacy for underserved populations.</p>
-                        <span class="investment-focus">Focus: Expanding legal access, reducing legal costs, and empowering individuals through technology.</span>
-                    </div>
-                    <div class="opportunity-card">
-                        <h3>Anti-Corruption & Transparency Ventures</h3>
-                        <p>Funding for initiatives and companies focused on developing and implementing tools for greater transparency and accountability in governance and business.</p>
-                        <span class="investment-focus">Focus: Combating corruption, promoting good governance, and fostering ethical practices.</span>
-                    </div>
-                    <div class="opportunity-card">
-                        <h3>Peacebuilding & Conflict Resolution Social Impact Bonds</h3>
-                        <p>Investment in Social Impact Bonds (SIBs) that finance peacebuilding programs, conflict mediation, and post-conflict reconstruction efforts in fragile regions.</p>
-                        <span class="investment-focus">Focus: Sustainable peace, community resilience, and prevention of violence.</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="metrics" class="impact-metrics-section">
-            <div class="container">
-                <h2>Comprehensive Impact Metrics</h2>
-                <div class="charts-container">
-                    <div class="chart-card">
-                        <h3>Conflict-Related Civilian Deaths</h3>
-                        <p>Civilian deaths in major conflicts increased by <strong>53% between 2021 and 2022</strong>, marking the first rise since 2015. In 2022, at least <strong>16,988 civilians were killed</strong>, with women accounting for one in five victims. The use of heavy weapons also surged from 13% to 39% in the same period.</p>
-                        <div class="chart-placeholder">[Placeholder for Line Graph: Civilian Deaths 2015-2022]</div>
-                    </div>
-                    <div class="chart-card">
-                        <h3>Global Homicide Rate</h3>
-                        <p>The global homicide rate saw a modest <strong>5% decrease between 2015 and 2022</strong> (from 5.9 to 5.2 per 100,000 people). However, <strong>2021 recorded the highest number of intentional homicides in two decades</strong>, approximately 458,000.</p>
-                        <div class="chart-placeholder">[Placeholder for Bar Chart: Homicide Rates]</div>
-                    </div>
-                    <div class="chart-card">
-                        <h3>Access to Justice Gap</h3>
-                        <p>A staggering <strong>5.1 billion people</strong>, or two-thirds of the world’s population, currently lack meaningful access to justice. This includes barriers to legal services, fair trials, and effective remedies.</p>
-                        <div class="chart-placeholder">[Placeholder for Bar Chart: Global Access to Justice]</div>
-                    </div>
-                    <div class="chart-card">
-                        <h3>Human Trafficking Trends</h3>
-                        <p>Globally, detected human trafficking victims increased by <strong>25% in 2022</strong> compared to pre-pandemic levels, and by <strong>43% compared to 2020</strong>. A significant driver is the <strong>31% rise in child victims since 2019</strong>.</p>
-                        <div class="chart-placeholder">[Placeholder for Bar Chart: Human Trafficking Victims]</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="insights" class="ai-insights-section">
-            <div class="container">
-                <h2>AI-Powered Insights and Recommendations</h2>
-                <div class="insights-content">
-                    <div class="insights-content">
-                        <h3>Insights from SDG 16 Data:</h3>
-                        <p><strong>Persistent Violence and Instability:</strong> Despite some progress in reducing the global homicide rate, conflict-related civilian deaths have seen an alarming increase, particularly in 2022 and 2024. This indicates that while localized violence might be decreasing, large-scale conflicts are escalating, leading to significant human suffering and displacement. The disproportionate impact on women and children in conflict zones highlights critical vulnerabilities.</p>
-                        <p><strong>Pervasive Justice Gap:</strong> A vast majority of the global population still lacks meaningful access to justice. This systemic issue undermines human rights, perpetuates inequality, and hinders sustainable development. The complexity of legal systems and the high cost of legal services remain significant barriers, especially for marginalized communities.</p>
-                        <p><strong>Corruption and Human Rights Abuses:</strong> The rise in detected human trafficking victims, particularly children, points to persistent vulnerabilities and the exploitation facilitated by weak institutions and corruption. The continued killings and disappearances of human rights defenders underscore the challenges in upholding transparency, accountability, and the rule of law in many parts of the world.</p>
-                        <p><strong>Technology as an Enabler:</strong> Innovative solutions from companies like Cobwebs Technologies (threat monitoring), Visual Contracts (legal accessibility), and isgood.ai (impact measurement) demonstrate the transformative potential of technology in addressing SDG 16 challenges. Digital tools can enhance transparency, improve access to information, and streamline justice processes.</p>
-                        <p><strong>Importance of Localized Approaches:</strong> Success stories from UNDP in Somalia and local peace committees in Nepal highlight the effectiveness of context-specific, community-led initiatives in peacebuilding and institutional strengthening. Empowering local actors and building trust at the grassroots level are crucial for sustainable impact.</p>
-
-                        <h3>AI-Powered Recommendations:</h3>
-                        <p>1. <strong>Targeted Investment in Justice Tech:</strong> Prioritize investment in Justice Tech solutions that leverage AI and blockchain to democratize legal access, simplify legal documentation, and provide affordable legal aid. This can significantly reduce the justice gap and empower vulnerable populations.</p>
-                        <p>2. <strong>Enhanced Digital Governance for Transparency:</strong> Support and scale digital governance initiatives (e.g., e-residency, secure data exchange platforms) that promote transparency, reduce corruption, and improve public service delivery. AI can be used for predictive analytics to identify corruption hotspots and enhance oversight.</p>
-                        <p>3. <strong>Data-Driven Peacebuilding and Conflict Prevention:</strong> Utilize AI and big data analytics to monitor early warning signs of conflict, track human rights abuses, and assess the effectiveness of peacebuilding interventions. This can inform more targeted and effective strategies for violence reduction and post-conflict recovery.</p>
-                        <p>4. <strong>Strengthening Whistleblower Protection and Investigative Journalism:</strong> Invest in platforms and legal frameworks that protect whistleblowers and support investigative journalism, leveraging technology to secure communications and analyze large datasets for uncovering corruption and human rights violations.</p>
-                        <p>5. <strong>Capacity Building for Inclusive Institutions:</strong> Develop AI-powered training modules and digital tools to enhance the capacity of public institutions in governance, rule of law, and human rights. Focus on improving data collection, analysis, and reporting for SDG 16 indicators to drive evidence-based policy-making.</p>
-                        <p>6. <strong>Promote Ethical AI for Justice:</strong> Ensure that the development and deployment of AI in justice and governance contexts adhere to strict ethical guidelines, prioritizing fairness, accountability, and non-discrimination to prevent algorithmic bias and protect civil liberties.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 SDG 16 Dashboard. All rights reserved.</p>
+    <div class="live-update-bar">
+        <div class="update-indicator">
+            <div class="pulse-dot"></div>
+            <span>Live Data Feed Active</span>
         </div>
-    </footer>
+        <div>
+            Last updated: <span id="updateTimestamp">2024-10-16 14:23:45 UTC</span>
+        </div>
+    </div>
+    
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="sdg-badge">
+                <i class="fas fa-leaf"></i>
+                SDG 13: Climate Action
+            </div>
+            <h1><span id="orgName">BlackRock</span> Climate Mitigation & Adaptation Dashboard</h1>
+            <p class="lead">Institutional-grade analytics for Climate Mitigation & Adaptation with real-time impact tracking and AI-powered insights</p>
+            <div class="compliance-badges">
+                <div class="compliance-badge sfdr">
+                    <i class="fas fa-check-circle"></i>
+                    SFDR Article 9 Compliant
+                </div>
+                <div class="compliance-badge csrd">
+                    <i class="fas fa-shield-alt"></i>
+                    CSRD Reporting Ready
+                </div>
+                <div class="compliance-badge tcfd">
+                    <i class="fas fa-leaf"></i>
+                    TCFD Aligned
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="profile-indicator">
+            <i class="fas fa-user-circle"></i>
+            <span>Personalized for: <strong id="userProfile">ESG Fund Manager - Climate Mitigation & Adaptation</strong></span>
+        </div>
 
-    <script src="script.js"></script>
+        <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
+                    <i class="fas fa-chart-line me-2"></i>Impact Overview
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="stories-tab" data-bs-toggle="tab" data-bs-target="#stories" type="button" role="tab" aria-controls="stories" aria-selected="false">
+                    <i class="fas fa-book-open me-2"></i>Success Stories
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="portfolio-tab" data-bs-toggle="tab" data-bs-target="#portfolio" type="button" role="tab" aria-controls="portfolio" aria-selected="false">
+                    <i class="fas fa-briefcase me-2"></i>Living Portfolio
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
+                    <i class="fas fa-brain me-2"></i>AI Analytics
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab" aria-controls="reports" aria-selected="false">
+                    <i class="fas fa-file-alt me-2"></i>Premium Reports
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="dashboardTabContent">
+            <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="glass-card metric-card">
+                            <div class="metric-number" id="metric1">2.4M</div>
+                            <div class="metric-label">People Impacted</div>
+                            <div class="metric-change positive">+340K this quarter</div>
+                            <div class="sr-only">2.4 million people impacted, increased by 340 thousand this quarter</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card metric-card">
+                            <div class="metric-number" id="metric2">89%</div>
+                            <div class="metric-label">Success Rate</div>
+                            <div class="metric-change positive">+12% improvement</div>
+                            <div class="sr-only">89% success rate, improved by 12%</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card metric-card">
+                            <div class="metric-number" id="metric3">284%</div>
+                            <div class="metric-label">Social ROI</div>
+                            <div class="metric-change positive">+45% vs benchmark</div>
+                            <div class="sr-only">284% social return on investment, 45% above benchmark</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card metric-card">
+                            <div class="metric-number" id="metric4">92</div>
+                            <div class="metric-label">Impact Score</div>
+                            <div class="metric-change positive">+8 points</div>
+                            <div class="sr-only">Impact score of 92, increased by 8 points</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card ai-powered">
+                    <h4 class="mb-3">Climate Action Analytics & AI Projections</h4>
+                    <div class="chart-container">
+                        <canvas id="mainChart" aria-label="Main Climate Action analytics chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="glass-card ai-powered">
+                            <h5 class="mb-3">Risk Assessment</h5>
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="riskChart" aria-label="Risk assessment chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="glass-card ai-powered">
+                            <h5 class="mb-3">Regional Impact</h5>
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="regionalChart" aria-label="Regional impact analysis"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="stories" role="tabpanel" aria-labelledby="stories-tab">
+                <div class="personalized-content">
+                    <h5><i class="fas fa-user-tie me-2"></i>Curated for <span id="orgNameStories">BlackRock</span> Investment Focus</h5>
+                    <p>These success stories align with your portfolio's Climate Mitigation & Adaptation mandate and impact measurement frameworks.</p>
+                </div>
+
+                <div class="story-card">
+                    <div class="story-header">
+                        <div>
+                            <div class="story-title">Transformative Climate Action Initiative</div>
+                            <div class="text-muted">Global Impact Partnership • 2022-2024</div>
+                        </div>
+                        <div class="impact-score">96% Impact Score</div>
+                    </div>
+                    <p class="mb-3">
+                        Comprehensive Climate Mitigation & Adaptation program targeting underserved communities across emerging markets. 
+                        Through innovative technology and strategic partnerships, this initiative has achieved 
+                        measurable impact while building sustainable pathways for long-term development and growth.
+                    </p>
+                    <div class="row text-center mt-3">
+                        <div class="col-3">
+                            <div class="h5" style="color: var(--primary-color)">2.3M</div>
+                            <small>Beneficiaries</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="h5" style="color: var(--primary-color)">67%</div>
+                            <small>Improvement</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="h5" style="color: var(--primary-color)">90M</div>
+                            <small>Economic Impact</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="h5" style="color: var(--primary-color)">89%</div>
+                            <small>Sustainability</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="portfolio" role="tabpanel" aria-labelledby="portfolio-tab">
+                <div class="glass-card ai-powered">
+                    <h4 class="mb-3">Active Climate Action Investments</h4>
+                    <div class="chart-container">
+                        <canvas id="portfolioChart" aria-label="Portfolio performance and allocation chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Strategic Initiative A</h5>
+                            <p class="text-muted mb-3">Climate Mitigation & Adaptation Program</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="h4" style="color: var(--primary-color)">7M</div>
+                                    <div class="small">Investment</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 text-info">890K</div>
+                                    <div class="small">Beneficiaries</div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Impact Score</span>
+                                    <span style="color: var(--primary-color)">94/100</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar" style="width: 94%; background-color: var(--primary-color);"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Strategic Initiative B</h5>
+                            <p class="text-muted mb-3">Innovation Program</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="h4" style="color: var(--primary-color)">5M</div>
+                                    <div class="small">Investment</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 text-info">1.2M</div>
+                                    <div class="small">Beneficiaries</div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Impact Score</span>
+                                    <span style="color: var(--primary-color)">91/100</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar" style="width: 91%; background-color: var(--primary-color);"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Strategic Initiative C</h5>
+                            <p class="text-muted mb-3">Capacity Building</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="h4" style="color: var(--primary-color)">9M</div>
+                                    <div class="small">Investment</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 text-info">340K</div>
+                                    <div class="small">Beneficiaries</div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Impact Score</span>
+                                    <span style="color: var(--primary-color)">89/100</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar" style="width: 89%; background-color: var(--primary-color);"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="analytics" role="tabpanel" aria-labelledby="analytics-tab">
+                <div class="glass-card ai-powered">
+                    <h4 class="mb-3">Predictive Impact Modeling</h4>
+                    <div class="chart-container">
+                        <canvas id="predictiveChart" aria-label="AI-powered predictive impact analysis"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="reports" role="tabpanel" aria-labelledby="reports-tab">
+                <div class="personalized-content">
+                    <h5><i class="fas fa-file-alt me-2"></i>Climate Action Reports for <span id="orgNameReports">BlackRock</span></h5>
+                    <p>AI-generated reports tailored to your Climate Mitigation & Adaptation mandate and regulatory requirements.</p>
+                </div>
+
+                <div class="report-preview">
+                    <div class="report-title">SDG 13 Quarterly Impact Summary</div>
+                    <div class="report-preview-text">
+                        Comprehensive quarterly report analyzing Climate Mitigation & Adaptation impact across your investment portfolio. 
+                        Key findings include significant progress in target metrics, strong correlation between 
+                        strategic initiatives and measurable outcomes, and detailed SFDR Article 9 compliance metrics 
+                        with CSRD-ready impact disclosures.
+                    </div>
+                    <div class="report-price">
+                        <span class="text-success font-weight-bold">FREE REPORT</span>
+                        <button class="btn btn-success">Download PDF</button>
+                    </div>
+                </div>
+
+                <div class="report-preview locked">
+                    <div class="report-title">Advanced Climate Action Analytics</div>
+                    <div class="report-preview-text">
+                        Leveraging machine learning algorithms and comprehensive data analysis, this report provides 
+                        predictive insights into Climate Mitigation & Adaptation trends across global markets. Features advanced MSCI-style 
+                        risk heatmaps and scenario modeling for portfolio optimization.
+                    </div>
+                    <div class="report-price">
+                        <div class="price-tag">9</div>
+                        <button class="btn-unlock" onclick="purchaseReport('advanced-analytics', 49)">Unlock Report</button>
+                    </div>
+                </div>
+
+                <div class="report-preview locked">
+                    <div class="report-title">Climate Action Investment Optimization Strategy</div>
+                    <div class="report-preview-text">
+                        Comprehensive strategy report combining AI-powered impact prediction with portfolio optimization 
+                        recommendations. Includes custom allocation models for maximizing SDG 13 impact while maintaining 
+                        target returns and regulatory compliance frameworks.
+                    </div>
+                    <div class="report-price">
+                        <div class="price-tag">99</div>
+                        <button class="btn-unlock" onclick="purchaseReport('optimization-strategy', 199)">Unlock Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let mainChart, riskChart, regionalChart, portfolioChart, predictiveChart;
+        let userProfile = {
+            orgName: 'BlackRock',
+            profileType: 'ESG Fund Manager',
+            focusArea: 'Climate Mitigation & Adaptation',
+            preferences: ['impact-measurement', 'regulatory-compliance', 'risk-assessment']
+        };
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            personalizeContent();
+            startRealTimeUpdates();
+        });
+
+        // Personalization
+        function personalizeContent() {
+            document.getElementById('orgName').textContent = userProfile.orgName;
+            document.getElementById('orgNameStories').textContent = userProfile.orgName;
+            document.getElementById('orgNameReports').textContent = userProfile.orgName;
+            document.getElementById('userProfile').textContent = userProfile.profileType + ' - ' + userProfile.focusArea;
+        }
+
+        // Real-time updates
+        function startRealTimeUpdates() {
+            setInterval(updateTimestamp, 30000);
+            setInterval(updateMetrics, 60000);
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('updateTimestamp').textContent = now.toISOString().replace('T', ' ').substr(0, 19) + ' UTC';
+        }
+
+        function updateMetrics() {
+            // Simulate real-time metric updates
+            const metrics = ['metric1', 'metric2', 'metric3', 'metric4'];
+            metrics.forEach(metric => {
+                const element = document.getElementById(metric);
+                if (element) {
+                    // Add small random variation to simulate live data
+                }
+            });
+        }
+
+        // Chart initialization
+        function initializeCharts() {
+            initializeMainChart();
+            initializeRiskChart();
+            initializeRegionalChart();
+            initializePortfolioChart();
+            initializePredictiveChart();
+        }
+
+        function initializeMainChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            mainChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024', '2025 (Proj)', '2026 (Proj)'],
+                    datasets: [
+                        {
+                            label: 'Impact Trend',
+                            data: [65, 72, 78, 84, 89, 95, 98],
+                            borderColor: '#059669',
+                            backgroundColor: '#05966920',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'AI Projection',
+                            data: [null, null, null, null, 89, 95, 98],
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            title: {
+                                display: true,
+                                text: 'Impact Score',
+                                color: '#ffffff'
+                            }
+                        },
+                        x: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeRiskChart() {
+            const ctx = document.getElementById('riskChart').getContext('2d');
+            riskChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+                    datasets: [{
+                        data: [65, 25, 10],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeRegionalChart() {
+            const ctx = document.getElementById('regionalChart').getContext('2d');
+            regionalChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['North America', 'Europe', 'Asia Pacific', 'Latin America', 'Africa'],
+                    datasets: [{
+                        label: 'Impact Score',
+                        data: [89, 92, 78, 84, 76],
+                        backgroundColor: '#059669',
+                        borderColor: '#059669dd',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializePortfolioChart() {
+            const ctx = document.getElementById('portfolioChart').getContext('2d');
+            portfolioChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Initiative A', 'Initiative B', 'Initiative C', 'Initiative D', 'Initiative E'],
+                    datasets: [
+                        {
+                            label: 'Investment (M)',
+                            data: [67, 45, 89, 34, 56],
+                            backgroundColor: '#059669',
+                            borderColor: '#059669dd',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Impact Score',
+                            data: [94, 91, 89, 87, 92],
+                            backgroundColor: '#10b981',
+                            borderColor: '#059669',
+                            borderWidth: 1,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            title: {
+                                display: true,
+                                text: 'Investment (M)',
+                                color: '#ffffff'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            ticks: { color: '#ffffff' },
+                            grid: { drawOnChartArea: false },
+                            title: {
+                                display: true,
+                                text: 'Impact Score',
+                                color: '#ffffff'
+                            }
+                        },
+                        x: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializePredictiveChart() {
+            const ctx = document.getElementById('predictiveChart').getContext('2d');
+            predictiveChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'High Impact Potential',
+                            data: [
+                                {x: 85, y: 12.5},
+                                {x: 92, y: 15.2},
+                                {x: 78, y: 11.8},
+                                {x: 88, y: 14.1}
+                            ],
+                            backgroundColor: '#059669',
+                            borderColor: '#059669'
+                        },
+                        {
+                            label: 'Medium Impact Potential',
+                            data: [
+                                {x: 65, y: 8.5},
+                                {x: 72, y: 9.2},
+                                {x: 68, y: 8.8},
+                                {x: 70, y: 9.1}
+                            ],
+                            backgroundColor: '#f59e0b',
+                            borderColor: '#f59e0b'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            title: {
+                                display: true,
+                                text: 'Projected ROI (%)',
+                                color: '#ffffff'
+                            }
+                        },
+                        x: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            title: {
+                                display: true,
+                                text: 'Impact Score',
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Accessibility functions
+        function toggleHighContrast() {
+            document.body.classList.toggle('high-contrast');
+        }
+
+        function increaseFontSize() {
+            const currentSize = parseFloat(getComputedStyle(document.body).fontSize);
+            document.body.style.fontSize = (currentSize + 2) + 'px';
+        }
+
+        function decreaseFontSize() {
+            const currentSize = parseFloat(getComputedStyle(document.body).fontSize);
+            if (currentSize > 12) {
+                document.body.style.fontSize = (currentSize - 2) + 'px';
+            }
+        }
+
+        // Report purchase function
+        function purchaseReport(reportType, price) {
+            const handler = PaystackPop.setup({
+                key: 'pk_test_auxeira_paystack_key',
+                email: 'user@blackrock.com',
+                amount: price * 100,
+                currency: 'USD',
+                ref: 'auxeira_' + reportType + '_' + Math.floor(Math.random() * 1000000),
+                metadata: {
+                    report_type: reportType,
+                    org_name: userProfile.orgName,
+                    sdg: '13'
+                },
+                callback: function(response) {
+                    alert('Payment successful! Your Climate Action report will be delivered within 24 hours.');
+                },
+                onClose: function() {
+                    alert('Payment cancelled');
+                }
+            });
+            handler.openIframe();
+        }
+
+        // Keyboard navigation support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                const focusableElements = document.querySelectorAll(
+                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                );
+            }
+        });
+    </script>
+    <script src="esg_leaderboard_system.js"></script>
+    <script src="esg_enhanced_framework.js"></script>
 </body>
 </html>

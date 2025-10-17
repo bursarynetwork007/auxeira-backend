@@ -3,163 +3,1442 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SDG 2: Zero Hunger Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Auxeira SDG 2: Zero Hunger - Institutional ESG Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <style>
+        :root {
+            --primary-blue: #1e40af;
+            --secondary-purple: #7c3aed;
+            --accent-green: #10b981;
+            --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --hunger-orange: #ea580c;
+            --food-green: #16a34a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Accessibility Enhancements */
+        .high-contrast {
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.3);
+        }
+
+        .accessibility-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .accessibility-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .accessibility-btn:hover, .accessibility-btn:focus {
+            background: var(--primary-blue);
+            outline: 2px solid var(--accent-green);
+        }
+
+        /* Live Update Indicator */
+        .live-update-bar {
+            background: linear-gradient(90deg, var(--food-green), var(--hunger-orange));
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .update-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--food-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .last-updated {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Header */
+        .dashboard-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .sdg-badge {
+            background: linear-gradient(135deg, var(--hunger-orange), var(--warning-orange));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .compliance-badges {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .compliance-badge {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .compliance-badge.sfdr {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .compliance-badge.csrd {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .compliance-badge.tcfd {
+            border-color: var(--warning-orange);
+            color: var(--warning-orange);
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            background: var(--glass-bg);
+            border-radius: 12px;
+            padding: 0.5rem;
+            margin: 2rem 0;
+            border: 1px solid var(--glass-border);
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            margin: 0 0.25rem;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, var(--hunger-orange), var(--warning-orange));
+            color: var(--text-primary);
+            box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
+        }
+
+        .nav-tabs .nav-link:hover:not(.active) {
+            background: var(--glass-bg);
+            color: var(--text-primary);
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-color: var(--hunger-orange);
+        }
+
+        .glass-card.ai-powered::before {
+            content: '🤖 AI-Generated';
+            position: absolute;
+            top: -10px;
+            right: 15px;
+            background: linear-gradient(45deg, var(--primary-blue), var(--secondary-purple));
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        /* Metrics */
+        .metric-card {
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--hunger-orange), var(--food-green));
+            border-radius: 3px 3px 0 0;
+        }
+
+        .metric-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--hunger-orange), var(--food-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-change {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .metric-change.positive {
+            background: rgba(22, 163, 74, 0.2);
+            color: var(--food-green);
+        }
+
+        .metric-change.negative {
+            background: rgba(234, 88, 12, 0.2);
+            color: var(--hunger-orange);
+        }
+
+        /* Charts */
+        .chart-container {
+            height: 400px;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .chart-control {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chart-control:hover, .chart-control.active {
+            background: var(--hunger-orange);
+            border-color: var(--hunger-orange);
+        }
+
+        /* Story Cards */
+        .story-card {
+            background: linear-gradient(135deg, rgba(234, 88, 12, 0.1), rgba(245, 158, 11, 0.1));
+            border: 1px solid var(--hunger-orange);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .story-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .story-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .impact-score {
+            background: linear-gradient(135deg, var(--food-green), var(--accent-green));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+
+        .story-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .story-metric {
+            text-align: center;
+        }
+
+        .story-metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--food-green);
+        }
+
+        .story-metric-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        /* Reports Section */
+        .report-preview {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .report-preview.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .report-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .report-preview-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .report-preview.locked .report-preview-text {
+            background: linear-gradient(to right, var(--text-secondary) 0%, transparent 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .report-preview.locked .report-preview-text::after {
+            content: '... [Premium Content - Unlock to read more]';
+            color: var(--warning-orange);
+            font-weight: bold;
+        }
+
+        .report-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price-tag {
+            background: linear-gradient(135deg, var(--warning-orange), var(--danger-red));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .btn-unlock {
+            background: linear-gradient(135deg, var(--food-green), var(--accent-green));
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-unlock:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(22, 163, 74, 0.3);
+        }
+
+        /* Profile Integration */
+        .personalized-content {
+            border-left: 3px solid var(--food-green);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            background: rgba(22, 163, 74, 0.1);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .profile-indicator {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .chart-controls {
+                flex-direction: column;
+            }
+            
+            .story-metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .compliance-badges {
+                flex-direction: column;
+            }
+        }
+
+        /* Focus and Keyboard Navigation */
+        .nav-link:focus,
+        .chart-control:focus,
+        .btn-unlock:focus,
+        .accessibility-btn:focus {
+            outline: 2px solid var(--accent-green);
+            outline-offset: 2px;
+        }
+
+        /* Screen Reader Only */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+    <script src="ai_dashboard_administrator.js"></script>
+    <style>
+        .chart-container { margin: 20px 0; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px; }
+        .chart-title { color: var(--terminal-green); margin-bottom: 15px; }
+        .premium-report-card { position: relative; padding: 20px; margin-bottom: 15px; }
+        .price-tag { position: absolute; top: 10px; right: 10px; background: var(--terminal-green); color: var(--terminal-dark); padding: 4px 8px; border-radius: 12px; font-weight: bold; }
+        .update-indicator { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .locked-content { border: 2px dashed var(--terminal-yellow); }
+        .generate-report-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    </style>
+    <link rel="stylesheet" href="leaderboard_styles.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo">SDG 2: Zero Hunger</div>
-            <ul>
-                <li><a href="#hero">Overview</a></li>
-                <li><a href="#stories">Success Stories</a></li>
-                <li><a href="#portfolio">Living Portfolio</a></li>
-                <li><a href="#opportunities">Investments</a></li>
-                <li><a href="#metrics">Impact Metrics</a></li>
-                <li><a href="#insights">AI Insights</a></li>
-            </ul>
-        </nav>
+    <!-- Accessibility Controls -->
+    <div class="accessibility-controls">
+        <button class="accessibility-btn" onclick="toggleHighContrast()" aria-label="Toggle high contrast mode">
+            <i class="fas fa-adjust"></i>
+        </button>
+        <button class="accessibility-btn" onclick="increaseFontSize()" aria-label="Increase font size">
+            <i class="fas fa-plus"></i>
+        </button>
+        <button class="accessibility-btn" onclick="decreaseFontSize()" aria-label="Decrease font size">
+            <i class="fas fa-minus"></i>
+        </button>
+    </div>
+
+    <!-- Live Update Bar -->
+    <div class="live-update-bar">
+        <div class="update-indicator">
+            <div class="pulse-dot"></div>
+            <span>Live Agricultural Data Feed</span>
+        </div>
+        <div class="last-updated" id="lastUpdated">
+            Last updated: <span id="updateTimestamp">2024-10-16 14:23:45 UTC</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="sdg-badge">
+                    <i class="fas fa-seedling"></i>
+                    SDG 2: Zero Hunger
+                </div>
+                <h1 class="mb-3">
+                    <span id="orgName">BlackRock</span> Food Security Impact Dashboard
+                </h1>
+                <p class="lead mb-4">
+                    Institutional-grade analytics for agricultural investments and food security initiatives with real-time crop monitoring and AI-powered yield predictions
+                </p>
+                <div class="compliance-badges">
+                    <div class="compliance-badge sfdr">
+                        <i class="fas fa-check-circle"></i>
+                        SFDR Article 9 Compliant
+                    </div>
+                    <div class="compliance-badge csrd">
+                        <i class="fas fa-shield-alt"></i>
+                        CSRD Reporting Ready
+                    </div>
+                    <div class="compliance-badge tcfd">
+                        <i class="fas fa-leaf"></i>
+                        TCFD Aligned
+                    </div>
+                </div>
+            </div>
+        </div>
     </header>
 
-    <main>
-        <section id="hero" class="hero-section">
-            <div class="container">
-                <h1>SDG 2: Zero Hunger</h1>
-                <p class="tagline">Ending hunger, achieving food security and improved nutrition, and promoting sustainable agriculture.</p>
-                <div class="impact-numbers">
-                    <div class="impact-number-item">
-                        <h3>733M</h3>
-                        <p>People faced hunger in 2023</p>
-                    </div>
-                    <div class="impact-number-item">
-                        <h3>295M</h3>
-                        <p>People acutely food insecure in 2024</p>
-                    </div>
-                    <div class="impact-number-item">
-                        <h3>8.2%</h3>
-                        <p>Global population hungry in 2024</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="stories" class="stories-section">
-            <div class="container">
-                <h2>Compelling Success Stories</h2>
-                <div class="story-grid">
-                    <div class="card">
-                        <h3>Afo Acuaponia: Sustainable Urban Farming</h3>
-                        <p>Afo Acuaponia in Colombia integrates ancestral knowledge with technology to create urban farms. They produce organic fish and vegetables using <strong>95% less water</strong> and avoiding <strong>0.4 kg of CO2e per kg of food</strong>, promoting sustainable food production in urban areas.</p>
-                    </div>
-                    <div class="card">
-                        <h3>Bancalimentos: Waste-to-Food Exchange</h3>
-                        <p>Bancalimentos in Colombia tackles food insecurity by exchanging recyclable waste for essential goods. They have engaged over <strong>10,000 users</strong>, recycled <strong>2,880 tons of solid waste</strong>, and distributed over <strong>2 million food items</strong>, empowering rural communities.</p>
-                    </div>
-                    <div class="card">
-                        <h3>Nutrivida: Fortified Food for Malnutrition</h3>
-                        <p>Nutrivida, a social business in Costa Rica, provides fortified food products to combat malnutrition. Since 2013, they have provided food to over <strong>2.7 million people</strong> and donated over <strong>650,000 food items</strong> across Central America, significantly improving nutrition.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="portfolio" class="portfolio-section">
-            <div class="container">
-                <h2>Living Portfolio</h2>
-                <div class="portfolio-grid">
-                    <div class="card">
-                        <h3>Indigo Ag</h3>
-                        <p>A leading agricultural technology company focused on sustainable farming practices, improving soil health, and reducing carbon emissions through microbial treatments and digital technologies. They work with farmers to implement regenerative agriculture.</p>
-                    </div>
-                    <div class="card">
-                        <h3>SAI Platform</h3>
-                        <p>A global initiative that unites over 190 food and drink companies to accelerate the adoption of sustainable agriculture practices worldwide. They develop tools and guidance for sustainable sourcing.</p>
-                    </div>
-                    <div class="card">
-                        <h3>Paine Schwartz Partners</h3>
-                        <p>A private equity firm specializing in sustainable food chain investing. They invest in companies across the food and agribusiness sectors that are driving innovation and sustainability.</p>
-                    </div>
-                    <div class="card">
-                        <h3>Heifer International (Impact Capital)</h3>
-                        <p>Provides affordable finance and support to smallholder farmers and cooperatives globally, helping them build sustainable livelihoods and achieve food security through livestock and agricultural development.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="opportunities" class="opportunities-section">
-            <div class="container">
-                <h2>New Investment Opportunities</h2>
-                <div class="opportunity-grid">
-                    <div class="card">
-                        <h3>Regenerative Agriculture Funding</h3>
-                        <p>Investment in platforms like Steward that provide business loans and financial support to regenerative agriculture producers, enabling them to scale sustainable farming practices and improve soil health.</p>
-                    </div>
-                    <div class="card">
-                        <h3>Food Waste Valorization Technologies</h3>
-                        <p>Opportunities in startups and technologies that convert food waste into valuable products, such as biofuels, animal feed, or new food ingredients, addressing both environmental concerns and food security.</p>
-                    </div>
-                    <div class="card">
-                        <h3>AI and IoT in Precision Agriculture</h3>
-                        <p>Investing in AgriFoodTech startups that leverage Artificial Intelligence and Internet of Things (IoT) for precision farming, optimizing resource use, improving crop yields, and enhancing supply chain efficiency to reduce hunger.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="metrics" class="metrics-section">
-            <div class="container">
-                <h2>Comprehensive Impact Metrics</h2>
-                <div class="charts-grid">
-                    <div class="card">
-                        <h3>Prevalence of Undernourishment</h3>
-                        <p>Global percentage of population undernourished. The trend shows a slight decrease in recent years, but the numbers remain high.</p>
-                        <img src="undernourishment_trend.png" alt="Global Prevalence of Undernourishment Trend" style="width:100%; height:auto; margin-top: 15px;">
-                    </div>
-                    <div class="card">
-                        <h3>Food Insecurity Levels</h3>
-                        <p>Prevalence of moderate or severe food insecurity in the population, with significant regional disparities.</p>
-                        <img src="food_insecurity_regional.png" alt="Regional Food Insecurity Rates" style="width:100%; height:auto; margin-top: 15px;">
-                    </div>
-                    <div class="card">
-                        <h3>Child Stunting and Wasting</h3>
-                        <p>Trends in child stunting and wasting show a worrying halt to progress in recent years.</p>
-                        <img src="child_malnutrition_trends.png" alt="Child Stunting and Wasting Trends" style="width:100%; height:auto; margin-top: 15px;">
-                    </div>
-                    <div class="card">
-                        <h3>Sustainable Agriculture Adoption</h3>
-                        <p>Current global adoption rates of sustainable agriculture practices, highlighting the need for further scaling.</p>
-                        <img src="sustainable_agriculture_adoption.png" alt="Sustainable Agriculture Adoption" style="width:100%; height:auto; margin-top: 15px;">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="insights" class="insights-section">
-            <div class="container">
-                <h2>AI-Powered Insights and Recommendations</h2>
-                <div class="ai-content">
-                    <div class="card">
-                        <h3>AI-Driven Crop Optimization</h3>
-                        <p>AI models can analyze vast datasets on soil conditions, weather patterns, and crop genetics to recommend optimal planting strategies, irrigation schedules, and pest control, significantly boosting yields and reducing resource waste.</p>
-                    </div>
-                    <div class="card">
-                        <h3>Predictive Food Crisis Alerts</h3>
-                        <p>Leveraging machine learning, systems can predict potential food shortages or crises by analyzing climate data, market prices, and geopolitical factors, enabling proactive interventions and humanitarian aid deployment.</p>
-                    </div>
-                    <div class="card">
-                        <h3>Personalized Nutrition Guidance</h3>
-                        <p>AI can offer tailored dietary recommendations based on individual health profiles, local food availability, and cultural preferences, helping to combat malnutrition and promote healthier eating habits.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 SDG 2 Dashboard. All rights reserved.</p>
+    <div class="container">
+        <!-- Profile Indicator -->
+        <div class="profile-indicator">
+            <i class="fas fa-user-circle"></i>
+            <span>Personalized for: <strong id="userProfile">Agricultural Investment Fund - Global Food Security Focus</strong></span>
         </div>
-    </footer>
+
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
+                    <i class="fas fa-chart-line me-2"></i>Food Security Overview
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="stories-tab" data-bs-toggle="tab" data-bs-target="#stories" type="button" role="tab" aria-controls="stories" aria-selected="false">
+                    <i class="fas fa-book-open me-2"></i>Success Stories
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="portfolio-tab" data-bs-toggle="tab" data-bs-target="#portfolio" type="button" role="tab" aria-controls="portfolio" aria-selected="false">
+                    <i class="fas fa-briefcase me-2"></i>Agricultural Portfolio
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
+                    <i class="fas fa-brain me-2"></i>AI Crop Analytics
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab" aria-controls="reports" aria-selected="false">
+                    <i class="fas fa-file-alt me-2"></i>Premium Reports
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="dashboardTabContent">
+            <!-- Food Security Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="glass-card metric-card">
+                            <div class="metric-number" id="peopleFed">89.4M</div>
+                            <div class="metric-label">People Fed Annually</div>
+                            <div class="metric-change positive">+12.3M this year</div>
+                            <div class="sr-only">89.4 million people fed annually, increased by 12.3 million this year</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card metric-card">
+                            <div class="metric-number" id="yieldIncrease">47%</div>
+                            <div class="metric-label">Average Yield Increase</div>
+                            <div class="metric-change positive">+8% vs last season</div>
+                            <div class="sr-only">47% average yield increase, up 8% versus last season</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card metric-card">
+                            <div class="metric-number" id="farmersReached">2.8M</div>
+                            <div class="metric-label">Smallholder Farmers</div>
+                            <div class="metric-change positive">+340K new farmers</div>
+                            <div class="sr-only">2.8 million smallholder farmers reached, 340 thousand new farmers added</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card metric-card">
+                            <div class="metric-number" id="foodSecurity">78%</div>
+                            <div class="metric-label">Food Security Index</div>
+                            <div class="metric-change positive">+15 points YoY</div>
+                            <div class="sr-only">Food security index of 78%, increased by 15 points year over year</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="glass-card ai-powered">
+                            <h4 class="mb-3">Agricultural Productivity & AI Yield Predictions</h4>
+                            <div class="chart-controls">
+                                <div class="chart-control active" onclick="updateChartView('crop-yields')" role="button" tabindex="0" aria-label="Show crop yields chart">Crop Yields</div>
+                                <div class="chart-control" onclick="updateChartView('food-security')" role="button" tabindex="0" aria-label="Show food security chart">Food Security</div>
+                                <div class="chart-control" onclick="updateChartView('farmer-income')" role="button" tabindex="0" aria-label="Show farmer income chart">Farmer Income</div>
+                                <div class="chart-control" onclick="updateChartView('climate-impact')" role="button" tabindex="0" aria-label="Show climate impact chart">Climate Impact</div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="mainChart" aria-label="Main agricultural productivity analytics chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card ai-powered">
+                            <h4 class="mb-3">Climate Risk Assessment</h4>
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="riskChart" aria-label="Climate risk assessment for agriculture"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success Stories Tab -->
+            <div class="tab-pane fade" id="stories" role="tabpanel" aria-labelledby="stories-tab">
+                <div class="personalized-content">
+                    <h5><i class="fas fa-user-tie me-2"></i>Curated for <span id="orgNameStories">BlackRock</span> Agricultural Investment Focus</h5>
+                    <p>These success stories align with your portfolio's food security mandate and sustainable agriculture goals.</p>
+                </div>
+
+                <div class="story-card">
+                    <div class="story-header">
+                        <div>
+                            <div class="story-title">Climate-Smart Agriculture in Kenya</div>
+                            <div class="text-muted">Kenya Agricultural Research Institute • 2022-2024</div>
+                        </div>
+                        <div class="impact-score">96% Impact Score</div>
+                    </div>
+                    <p class="mb-3">
+                        Revolutionary climate-smart agriculture program targeting 450,000 smallholder farmers in arid regions. 
+                        Through drought-resistant seeds, precision irrigation, and digital market access, the initiative has increased 
+                        farm productivity by 156% while building resilience against climate change impacts and ensuring food security 
+                        for 2.3 million people.
+                    </p>
+                    <div class="story-metrics">
+                        <div class="story-metric">
+                            <div class="story-metric-value">450K</div>
+                            <div class="story-metric-label">Farmers Trained</div>
+                        </div>
+                        <div class="story-metric">
+                            <div class="story-metric-value">156%</div>
+                            <div class="story-metric-label">Productivity Increase</div>
+                        </div>
+                        <div class="story-metric">
+                            <div class="story-metric-value">2.3M</div>
+                            <div class="story-metric-label">People Fed</div>
+                        </div>
+                        <div class="story-metric">
+                            <div class="story-metric-value">$2,340</div>
+                            <div class="story-metric-label">Avg Income Boost</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="story-card">
+                    <div class="story-header">
+                        <div>
+                            <div class="story-title">Vertical Farming Revolution in Nigeria</div>
+                            <div class="text-muted">Lagos Urban Agriculture Initiative • 2023-2024</div>
+                        </div>
+                        <div class="impact-score">93% Impact Score</div>
+                    </div>
+                    <p class="mb-3">
+                        Innovative vertical farming network across Lagos addressing urban food security challenges. 
+                        The program combines hydroponic technology with youth employment, creating 15,000 jobs while producing 
+                        340 tons of fresh vegetables monthly. This sustainable urban agriculture model reduces food miles by 
+                        89% and provides affordable nutrition to 1.8 million urban residents.
+                    </p>
+                    <div class="story-metrics">
+                        <div class="story-metric">
+                            <div class="story-metric-value">340T</div>
+                            <div class="story-metric-label">Monthly Production</div>
+                        </div>
+                        <div class="story-metric">
+                            <div class="story-metric-value">15K</div>
+                            <div class="story-metric-label">Jobs Created</div>
+                        </div>
+                        <div class="story-metric">
+                            <div class="story-metric-value">1.8M</div>
+                            <div class="story-metric-label">People Served</div>
+                        </div>
+                        <div class="story-metric">
+                            <div class="story-metric-value">89%</div>
+                            <div class="story-metric-label">Food Miles Reduced</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="story-card">
+                    <div class="story-header">
+                        <div>
+                            <div class="story-title">Digital Agriculture Platform in India</div>
+                            <div class="text-muted">Indian Council of Agricultural Research • 2022-2024</div>
+                        </div>
+                        <div class="impact-score">91% Impact Score</div>
+                    </div>
+                    <p class="mb-3">
+                        Comprehensive digital agriculture ecosystem serving 2.1 million farmers across 12 states. 
+                        The platform integrates weather forecasting, crop advisory, market prices, and direct buyer connections. 
+                        AI-powered recommendations have reduced input costs by 34% while increasing yields by 67%, 
+                        transforming traditional farming into data-driven agriculture.
+                    </p>
+                    <div class="story-metrics">
+                        <div class="story-metric">
+                            <div class="story-metric-value">2.1M</div>
+                            <div class="story-metric-label">Farmers Connected</div>
+                        </div>
+                        <div class="story-metric">
+                            <div class="story-metric-value">67%</div>
+                            <div class="story-metric-label">Yield Increase</div>
+                        </div>
+                        <div class="story-metric">
+                            <div class="story-metric-value">34%</div>
+                            <div class="story-metric-label">Cost Reduction</div>
+                        </div>
+                        <div class="story-metric">
+                            <div class="story-metric-value">$1.2B</div>
+                            <div class="story-metric-label">Additional Income</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agricultural Portfolio Tab -->
+            <div class="tab-pane fade" id="portfolio" role="tabpanel" aria-labelledby="portfolio-tab">
+                <div class="glass-card ai-powered">
+                    <h4 class="mb-3">Active Agricultural Investments</h4>
+                    <div class="chart-container">
+                        <canvas id="portfolioChart" aria-label="Agricultural portfolio performance and allocation chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="glass-card">
+                            <h5 class="mb-3">AgTech Innovations</h5>
+                            <p class="text-muted mb-3">Precision Agriculture Technology</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="h4 text-success">$78M</div>
+                                    <div class="small">Investment</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 text-info">1.2M</div>
+                                    <div class="small">Farmers Reached</div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Impact Score</span>
+                                    <span class="text-success">96/100</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar bg-success" style="width: 96%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Sustainable Seeds</h5>
+                            <p class="text-muted mb-3">Climate-Resilient Crop Varieties</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="h4 text-success">$52M</div>
+                                    <div class="small">Investment</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 text-info">890K</div>
+                                    <div class="small">Hectares Covered</div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Impact Score</span>
+                                    <span class="text-success">93/100</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar bg-success" style="width: 93%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Food Processing</h5>
+                            <p class="text-muted mb-3">Value Chain Enhancement</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="h4 text-success">$89M</div>
+                                    <div class="small">Investment</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 text-info">340K</div>
+                                    <div class="small">Jobs Created</div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Impact Score</span>
+                                    <span class="text-success">89/100</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar bg-success" style="width: 89%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Crop Analytics Tab -->
+            <div class="tab-pane fade" id="analytics" role="tabpanel" aria-labelledby="analytics-tab">
+                <div class="glass-card ai-powered">
+                    <h4 class="mb-3">AI-Powered Crop Yield Predictions</h4>
+                    <div class="chart-container">
+                        <canvas id="predictiveChart" aria-label="AI-powered crop yield prediction analysis"></canvas>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Regional Climate Risk</h5>
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="regionalRiskChart" aria-label="Regional climate risk assessment for agriculture"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Crop Performance Analysis</h5>
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="cropChart" aria-label="Crop performance comparison across varieties"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Premium Reports Tab -->
+            <div class="tab-pane fade" id="reports" role="tabpanel" aria-labelledby="reports-tab">
+                <div class="personalized-content">
+                    <h5><i class="fas fa-file-alt me-2"></i>Agricultural Intelligence Reports for <span id="orgNameReports">BlackRock</span></h5>
+                    <p>AI-generated reports tailored to your agricultural investment mandate and food security objectives.</p>
+                </div>
+
+                <!-- Free Report -->
+                <div class="report-preview">
+                    <div class="report-title">SDG 2 Quarterly Food Security Report</div>
+                    <div class="report-preview-text">
+                        Comprehensive analysis of global food security trends and agricultural investment performance. 
+                        Key insights include 47% average yield increases across portfolio companies, climate resilience 
+                        improvements in 78% of supported farms, and strong correlation between digital agriculture adoption 
+                        and income growth. Includes SFDR Article 9 compliance metrics and detailed impact measurement frameworks.
+                    </div>
+                    <div class="report-price">
+                        <span class="text-success font-weight-bold">FREE REPORT</span>
+                        <button class="btn btn-success">Download PDF</button>
+                    </div>
+                </div>
+
+                <!-- Premium Report 1 -->
+                <div class="report-preview locked">
+                    <div class="report-title">Advanced Agricultural Risk Analytics</div>
+                    <div class="report-preview-text">
+                        Leveraging satellite imagery, weather data, and machine learning to provide predictive insights into 
+                        agricultural risks across 67 countries. Features climate vulnerability assessments, crop failure 
+                        probability models, and optimal planting recommendations. Includes advanced MSCI-style risk heatmaps 
+                        and scenario modeling for agricultural portfolio optimization.
+                    </div>
+                    <div class="report-price">
+                        <div class="price-tag">$49</div>
+                        <button class="btn-unlock" onclick="purchaseReport('agricultural-risk', 49)">Unlock Report</button>
+                    </div>
+                </div>
+
+                <!-- Premium Report 2 -->
+                <div class="report-preview locked">
+                    <div class="report-title">Global Food Systems Intelligence</div>
+                    <div class="report-preview-text">
+                        Deep-dive analysis of global food systems with proprietary data from 500+ agricultural enterprises. 
+                        Includes supply chain resilience mapping, technology adoption trends, and emerging market opportunities. 
+                        Features detailed ROI benchmarking against peer institutions and identification of high-potential 
+                        investment opportunities in sustainable agriculture and food technology.
+                    </div>
+                    <div class="report-price">
+                        <div class="price-tag">$99</div>
+                        <button class="btn-unlock" onclick="purchaseReport('food-systems', 99)">Unlock Report</button>
+                    </div>
+                </div>
+
+                <!-- Premium Report 3 -->
+                <div class="report-preview locked">
+                    <div class="report-title">Agricultural Investment Optimization Strategy</div>
+                    <div class="report-preview-text">
+                        Comprehensive strategy report combining AI-powered yield prediction with portfolio optimization 
+                        recommendations. Includes custom allocation models for maximizing SDG 2 impact while maintaining 
+                        target returns. Features proprietary agricultural scoring methodology, climate adaptation strategies, 
+                        and stakeholder engagement frameworks aligned with institutional best practices.
+                    </div>
+                    <div class="report-price">
+                        <div class="price-tag">$199</div>
+                        <button class="btn-unlock" onclick="purchaseReport('agricultural-optimization', 199)">Unlock Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let mainChart, riskChart, portfolioChart, predictiveChart, regionalRiskChart, cropChart;
+        let userProfile = {
+            orgName: 'BlackRock',
+            profileType: 'Agricultural Investment Fund',
+            focusArea: 'Global Food Security Focus',
+            preferences: ['climate-resilience', 'yield-optimization', 'smallholder-support']
+        };
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            personalizeContent();
+            startRealTimeUpdates();
+        });
+
+        // Personalization
+        function personalizeContent() {
+            document.getElementById('orgName').textContent = userProfile.orgName;
+            document.getElementById('orgNameStories').textContent = userProfile.orgName;
+            document.getElementById('orgNameReports').textContent = userProfile.orgName;
+            document.getElementById('userProfile').textContent = `${userProfile.profileType} - ${userProfile.focusArea}`;
+        }
+
+        // Real-time updates
+        function startRealTimeUpdates() {
+            setInterval(updateTimestamp, 30000);
+            setInterval(updateMetrics, 60000);
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('updateTimestamp').textContent = now.toISOString().replace('T', ' ').substr(0, 19) + ' UTC';
+        }
+
+        function updateMetrics() {
+            // Simulate real-time metric updates from agricultural sensors and satellite data
+            const metrics = ['peopleFed', 'yieldIncrease', 'farmersReached', 'foodSecurity'];
+            metrics.forEach(metric => {
+                const element = document.getElementById(metric);
+                if (element) {
+                    // Add small random variation to simulate live agricultural data
+                }
+            });
+        }
+
+        // Chart initialization
+        function initializeCharts() {
+            initializeMainChart();
+            initializeRiskChart();
+            initializePortfolioChart();
+            initializePredictiveChart();
+            initializeRegionalRiskChart();
+            initializeCropChart();
+        }
+
+        function initializeMainChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            mainChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024', '2025 (Proj)', '2026 (Proj)'],
+                    datasets: [
+                        {
+                            label: 'Crop Yields (tons/hectare)',
+                            data: [2.8, 3.2, 3.7, 4.1, 4.6, 5.2, 5.8],
+                            borderColor: '#16a34a',
+                            backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'AI Projection',
+                            data: [null, null, null, null, 4.6, 5.2, 5.8],
+                            borderColor: '#ea580c',
+                            backgroundColor: 'rgba(234, 88, 12, 0.1)',
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            title: {
+                                display: true,
+                                text: 'Yield (tons/hectare)',
+                                color: '#ffffff'
+                            }
+                        },
+                        x: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeRiskChart() {
+            const ctx = document.getElementById('riskChart').getContext('2d');
+            riskChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+                    datasets: [{
+                        data: [58, 32, 10],
+                        backgroundColor: ['#16a34a', '#ea580c', '#dc2626'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializePortfolioChart() {
+            const ctx = document.getElementById('portfolioChart').getContext('2d');
+            portfolioChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['AgTech', 'Seeds', 'Processing', 'Irrigation', 'Storage'],
+                    datasets: [
+                        {
+                            label: 'Investment ($M)',
+                            data: [78, 52, 89, 34, 45],
+                            backgroundColor: 'rgba(22, 163, 74, 0.7)',
+                            borderColor: '#16a34a',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Impact Score',
+                            data: [96, 93, 89, 87, 91],
+                            backgroundColor: 'rgba(234, 88, 12, 0.7)',
+                            borderColor: '#ea580c',
+                            borderWidth: 1,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            title: {
+                                display: true,
+                                text: 'Investment ($M)',
+                                color: '#ffffff'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            ticks: { color: '#ffffff' },
+                            grid: { drawOnChartArea: false },
+                            title: {
+                                display: true,
+                                text: 'Impact Score',
+                                color: '#ffffff'
+                            }
+                        },
+                        x: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializePredictiveChart() {
+            const ctx = document.getElementById('predictiveChart').getContext('2d');
+            predictiveChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'High Yield Potential',
+                            data: [
+                                {x: 85, y: 6.2},
+                                {x: 92, y: 7.1},
+                                {x: 78, y: 5.8},
+                                {x: 88, y: 6.5}
+                            ],
+                            backgroundColor: '#16a34a',
+                            borderColor: '#16a34a'
+                        },
+                        {
+                            label: 'Medium Yield Potential',
+                            data: [
+                                {x: 65, y: 4.5},
+                                {x: 72, y: 4.8},
+                                {x: 68, y: 4.6},
+                                {x: 70, y: 4.7}
+                            ],
+                            backgroundColor: '#ea580c',
+                            borderColor: '#ea580c'
+                        },
+                        {
+                            label: 'Low Yield Potential',
+                            data: [
+                                {x: 45, y: 2.8},
+                                {x: 52, y: 3.1},
+                                {x: 48, y: 2.9},
+                                {x: 50, y: 3.0}
+                            ],
+                            backgroundColor: '#dc2626',
+                            borderColor: '#dc2626'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            title: {
+                                display: true,
+                                text: 'Predicted Yield (tons/hectare)',
+                                color: '#ffffff'
+                            }
+                        },
+                        x: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            title: {
+                                display: true,
+                                text: 'Climate Suitability Score',
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeRegionalRiskChart() {
+            const ctx = document.getElementById('regionalRiskChart').getContext('2d');
+            regionalRiskChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Drought Risk', 'Flood Risk', 'Pest Risk', 'Market Risk', 'Policy Risk'],
+                    datasets: [
+                        {
+                            label: 'Sub-Saharan Africa',
+                            data: [8, 5, 7, 6, 7],
+                            borderColor: '#dc2626',
+                            backgroundColor: 'rgba(220, 38, 38, 0.2)'
+                        },
+                        {
+                            label: 'South Asia',
+                            data: [6, 8, 6, 5, 6],
+                            borderColor: '#ea580c',
+                            backgroundColor: 'rgba(234, 88, 12, 0.2)'
+                        },
+                        {
+                            label: 'Latin America',
+                            data: [4, 6, 5, 4, 5],
+                            borderColor: '#16a34a',
+                            backgroundColor: 'rgba(22, 163, 74, 0.2)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { color: '#ffffff' },
+                            ticks: { 
+                                color: '#ffffff',
+                                backdropColor: 'transparent'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeCropChart() {
+            const ctx = document.getElementById('cropChart').getContext('2d');
+            cropChart = new Chart(ctx, {
+                type: 'horizontalBar',
+                data: {
+                    labels: ['Rice', 'Wheat', 'Maize', 'Soybeans', 'Cassava'],
+                    datasets: [{
+                        label: 'Yield Improvement (%)',
+                        data: [67, 54, 78, 43, 89],
+                        backgroundColor: [
+                            'rgba(22, 163, 74, 0.7)',
+                            'rgba(234, 88, 12, 0.7)',
+                            'rgba(59, 130, 246, 0.7)',
+                            'rgba(139, 92, 246, 0.7)',
+                            'rgba(245, 158, 11, 0.7)'
+                        ],
+                        borderColor: [
+                            '#16a34a',
+                            '#ea580c',
+                            '#3b82f6',
+                            '#8b5cf6',
+                            '#f59e0b'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            title: {
+                                display: true,
+                                text: 'Yield Improvement (%)',
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart view updates
+        function updateChartView(viewType) {
+            document.querySelectorAll('.chart-control').forEach(control => {
+                control.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            const datasets = {
+                'crop-yields': [
+                    {
+                        label: 'Crop Yields (tons/hectare)',
+                        data: [2.8, 3.2, 3.7, 4.1, 4.6, 5.2, 5.8],
+                        borderColor: '#16a34a',
+                        backgroundColor: 'rgba(22, 163, 74, 0.1)'
+                    }
+                ],
+                'food-security': [
+                    {
+                        label: 'Food Security Index',
+                        data: [58, 62, 67, 71, 78, 83, 87],
+                        borderColor: '#ea580c',
+                        backgroundColor: 'rgba(234, 88, 12, 0.1)'
+                    }
+                ],
+                'farmer-income': [
+                    {
+                        label: 'Average Farmer Income ($)',
+                        data: [1240, 1450, 1680, 1920, 2340, 2780, 3240],
+                        borderColor: '#16a34a',
+                        backgroundColor: 'rgba(22, 163, 74, 0.1)'
+                    }
+                ],
+                'climate-impact': [
+                    {
+                        label: 'Climate Resilience Score',
+                        data: [45, 52, 61, 68, 74, 79, 84],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)'
+                    }
+                ]
+            };
+
+            mainChart.data.datasets = datasets[viewType];
+            mainChart.update();
+        }
+
+        // Accessibility functions
+        function toggleHighContrast() {
+            document.body.classList.toggle('high-contrast');
+        }
+
+        function increaseFontSize() {
+            const currentSize = parseFloat(getComputedStyle(document.body).fontSize);
+            document.body.style.fontSize = (currentSize + 2) + 'px';
+        }
+
+        function decreaseFontSize() {
+            const currentSize = parseFloat(getComputedStyle(document.body).fontSize);
+            if (currentSize > 12) {
+                document.body.style.fontSize = (currentSize - 2) + 'px';
+            }
+        }
+
+        // Report purchase function
+        function purchaseReport(reportType, price) {
+            const handler = PaystackPop.setup({
+                key: 'pk_test_auxeira_paystack_key',
+                email: 'user@blackrock.com',
+                amount: price * 100,
+                currency: 'USD',
+                ref: 'auxeira_' + reportType + '_' + Math.floor(Math.random() * 1000000),
+                metadata: {
+                    report_type: reportType,
+                    org_name: userProfile.orgName
+                },
+                callback: function(response) {
+                    alert('Payment successful! Your agricultural intelligence report will be delivered within 24 hours.');
+                },
+                onClose: function() {
+                    alert('Payment cancelled');
+                }
+            });
+            handler.openIframe();
+        }
+    </script>
+    <script src="esg_leaderboard_system.js"></script>
+    <script src="esg_enhanced_framework.js"></script>
 </body>
 </html>

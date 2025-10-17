@@ -3,169 +3,767 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SDG 15: Life on Land Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>SDG 5: Gender Equality - Auxeira ESG Intelligence Platform</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Paystack -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    
+    <style>
+        :root {
+            --terminal-bg: #0a0a0a;
+            --terminal-dark: #1a1a1a;
+            --terminal-green: #00ff41;
+            --terminal-blue: #00d4ff;
+            --terminal-purple: #b300ff;
+            --terminal-yellow: #ffff00;
+            --terminal-red: #ff0040;
+            --terminal-cyan: #00ffff;
+            --terminal-white: #ffffff;
+            --terminal-gray: #808080;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, var(--terminal-bg) 0%, #2a0845 50%, #1a1a2e 100%);
+            color: var(--terminal-white);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--terminal-green);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.2);
+        }
+
+        .terminal-header {
+            background: var(--terminal-dark);
+            border-bottom: 2px solid var(--terminal-green);
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            color: var(--terminal-green) !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--terminal-white) !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--terminal-green) !important;
+        }
+
+        .main-content {
+            margin-top: 80px;
+            padding: 20px 0;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(255, 20, 147, 0.2) 0%, rgba(138, 43, 226, 0.2) 100%);
+            border: 2px solid var(--terminal-purple);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            color: var(--terminal-purple);
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 20, 147, 0.5);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--terminal-white);
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--terminal-purple);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: var(--terminal-green);
+            background: rgba(255, 20, 147, 0.1);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--terminal-purple);
+            display: block;
+        }
+
+        .metric-label {
+            color: var(--terminal-white);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .tab-content {
+            background: var(--glass-bg);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        .nav-tabs .nav-link {
+            background: transparent;
+            border: 1px solid var(--terminal-purple);
+            color: var(--terminal-white);
+            margin-right: 10px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: var(--terminal-purple);
+            border-color: var(--terminal-purple);
+            color: var(--terminal-dark);
+        }
+
+        .story-card {
+            background: linear-gradient(135deg, rgba(255, 20, 147, 0.1) 0%, rgba(138, 43, 226, 0.1) 100%);
+            border: 1px solid var(--terminal-purple);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .story-title {
+            color: var(--terminal-purple);
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .impact-badge {
+            background: var(--terminal-purple);
+            color: var(--terminal-white);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--terminal-purple) 0%, #ff1493 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 20, 147, 0.3);
+        }
+
+        .compliance-badge {
+            background: var(--terminal-green);
+            color: var(--terminal-dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 10px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .accessibility-controls {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .accessibility-btn {
+            background: var(--terminal-dark);
+            border: 1px solid var(--terminal-purple);
+            color: var(--terminal-white);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .accessibility-btn:hover {
+            background: var(--terminal-purple);
+            color: var(--terminal-dark);
+        }
+
+        .high-contrast {
+            --glass-bg: rgba(0, 0, 0, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.8);
+        }
+
+        .chart-container { 
+            margin: 20px 0; 
+            padding: 20px; 
+            background: rgba(255,255,255,0.05); 
+            border-radius: 12px; 
+        }
+        
+        .chart-title { 
+            color: var(--terminal-green); 
+            margin-bottom: 15px; 
+        }
+        
+        .premium-report-card { 
+            position: relative; 
+            padding: 20px; 
+            margin-bottom: 15px; 
+        }
+        
+        .price-tag { 
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+            background: var(--terminal-green); 
+            color: var(--terminal-dark); 
+            padding: 4px 8px; 
+            border-radius: 12px; 
+            font-weight: bold; 
+        }
+        
+        .update-indicator { 
+            animation: fadeIn 0.5s ease-in; 
+        }
+        
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+        
+        .locked-content { 
+            border: 2px dashed var(--terminal-yellow); 
+        }
+        
+        .generate-report-btn:disabled { 
+            opacity: 0.6; 
+            cursor: not-allowed; 
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .accessibility-controls {
+                position: relative;
+                top: auto;
+                right: auto;
+                flex-direction: row;
+                justify-content: center;
+                margin: 20px 0;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="leaderboard_styles.css">
 </head>
 <body>
-    <header class="navbar">
+    <!-- Accessibility Controls -->
+    <div class="accessibility-controls">
+        <button class="accessibility-btn" onclick="toggleHighContrast()" aria-label="Toggle high contrast mode">
+            <i class="fas fa-adjust"></i>
+        </button>
+        <button class="accessibility-btn" onclick="increaseFontSize()" aria-label="Increase font size">
+            <i class="fas fa-search-plus"></i>
+        </button>
+        <button class="accessibility-btn" onclick="decreaseFontSize()" aria-label="Decrease font size">
+            <i class="fas fa-search-minus"></i>
+        </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg terminal-header">
         <div class="container">
-            <div class="logo">SDG 15</div>
-            <nav>
-                <ul>
-                    <li><a href="#hero">Home</a></li>
-                    <li><a href="#success-stories">Success Stories</a></li>
-                    <li><a href="#portfolio">Living Portfolio</a></li>
-                    <li><a href="#opportunities">Opportunities</a></li>
-                    <li><a href="#metrics">Impact Metrics</a></li>
-                    <li><a href="#insights">AI Insights</a></li>
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-venus me-2"></i>Auxeira | SDG 5: Gender Equality
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#overview">Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#analytics">Analytics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#portfolio">Portfolio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reports">Reports</a>
+                    </li>
                 </ul>
-            </nav>
+            </div>
         </div>
-    </header>
+    </nav>
 
-    <section id="hero" class="hero-section">
-        <div class="container">
-            <h1>SDG 15: Life on Land</h1>
-            <p class="tagline">Protecting and Restoring Our Terrestrial Ecosystems</p>
-            <div class="impact-numbers">
-                <div class="impact-number-item">
-                    <h3>31.2%</h3>
-                    <p>Global Forest Cover (2020)</p>
+    <!-- Main Content -->
+    <div class="container main-content">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1 class="hero-title">Gender Equality Intelligence</h1>
+            <p class="hero-subtitle">
+                Empowering women and girls through data-driven investment strategies and impact measurement
+            </p>
+            
+            <!-- Compliance Badges -->
+            <div class="compliance-badges mb-4">
+                <span class="compliance-badge">SFDR Article 9</span>
+                <span class="compliance-badge">CSRD Compliant</span>
+                <span class="compliance-badge">TCFD Aligned</span>
+                <span class="compliance-badge">UN Women Standards</span>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="row mt-4">
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="metric-card">
+                        <span class="metric-value">2.8M</span>
+                        <div class="metric-label">Women Empowered</div>
+                    </div>
                 </div>
-                <div class="impact-number-item">
-                    <h3>44%</h3>
-                    <p>Protected Biodiversity Areas (2024)</p>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="metric-card">
+                        <span class="metric-value">45%</span>
+                        <div class="metric-label">Leadership Increase</div>
+                    </div>
                 </div>
-                <div class="impact-number-item">
-                    <h3>>12%</h3>
-                    <p>Species Extinction Risk Increase (1993-2024)</p>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="metric-card">
+                        <span class="metric-value">$850M</span>
+                        <div class="metric-label">Economic Impact</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="metric-card">
+                        <span class="metric-value">92%</span>
+                        <div class="metric-label">Success Rate</div>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
 
-    <section id="success-stories" class="section-padding">
-        <div class="container">
-            <h2>Compelling Success Stories</h2>
-            <div class="story-grid">
-                <div class="story-card">
-                    <h3>The Nature Conservancy's Forest Program</h3>
-                    <p>Focuses on protecting forests and promoting sustainable forest management. Their work in the Amazon has protected millions of acres of rainforest, contributing significantly to climate change mitigation and biodiversity preservation.</p>
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                    <i class="fas fa-chart-line me-2"></i>Overview
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab">
+                    <i class="fas fa-brain me-2"></i>Analytics
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="portfolio-tab" data-bs-toggle="tab" data-bs-target="#portfolio" type="button" role="tab">
+                    <i class="fas fa-briefcase me-2"></i>Portfolio
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab">
+                    <i class="fas fa-file-alt me-2"></i>Reports
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="mainTabContent">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <h3 class="text-purple mb-4">
+                    <i class="fas fa-venus me-2"></i>Gender Equality Impact Overview
+                </h3>
+
+                <!-- Success Stories -->
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="story-card">
+                            <h4 class="story-title org-placeholder">BlackRock Empowers Fatima's Entrepreneurship Revolution in Sub-Saharan Africa</h4>
+                            <p class="mb-3">
+                                Through our women's entrepreneurship program, Fatima transformed from a subsistence farmer 
+                                to leading a cooperative of 200+ women, generating $2.3M in annual revenue and creating 
+                                450 jobs in rural <span class="geography-placeholder">Nigeria</span>.
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="impact-badge">450 Jobs Created</span>
+                                <small class="text-muted">Impact Score: 94%</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6 mb-4">
+                        <div class="story-card">
+                            <h4 class="story-title">Digital Skills Training Transforms Lives</h4>
+                            <p class="mb-3">
+                                Our digital literacy initiative reached 15,000 women across 8 countries, with 78% 
+                                securing employment in tech sectors and earning 340% higher wages within 18 months.
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="impact-badge">340% Wage Increase</span>
+                                <small class="text-muted">Impact Score: 89%</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="story-card">
-                    <h3>WWF's Forest Initiatives</h3>
-                    <p>Addresses threats to forests globally, aiming to conserve the world's forests by 2030. Their efforts in Southeast Asia have led to the recovery of endangered species populations and critical habitat restoration.</p>
+
+                <!-- Impact Visualization Area -->
+                <div class="hero-impact mt-4">
+                    <!-- Charts will be added here by the enhanced framework -->
                 </div>
-                <div class="story-card">
-                    <h3>Boeing's Pollinator Prairie</h3>
-                    <p>A project dedicated to restoring native habitats and supporting pollinator populations. This initiative has successfully increased pollinator species diversity and educated the public on ecological importance.</p>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div class="tab-pane fade" id="analytics" role="tabpanel">
+                <h3 class="text-purple mb-4">
+                    <i class="fas fa-brain me-2"></i>AI-Powered Gender Equality Analytics
+                </h3>
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="glass-card">
+                            <h5 class="text-success mb-3">Predictive Impact Modeling</h5>
+                            <p class="mb-3">
+                                Our AI models predict that increasing women's leadership positions by 25% could 
+                                generate an additional $340M in economic value across our portfolio companies.
+                            </p>
+                            
+                            <!-- What-If Analysis -->
+                            <div class="what-if-analysis">
+                                <h6 class="text-warning">What-If Scenario Analysis</h6>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Investment Amount ($M)</label>
+                                        <input type="range" class="form-range" min="10" max="500" value="100" id="investmentSlider">
+                                        <span id="investmentValue">$100M</span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Focus Area</label>
+                                        <select class="form-select" id="focusArea">
+                                            <option>Leadership Training</option>
+                                            <option>Entrepreneurship</option>
+                                            <option>STEM Education</option>
+                                            <option>Financial Inclusion</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Projected Impact</label>
+                                        <div class="impact-projection">
+                                            <span id="projectedWomen" class="text-success">25,000 Women</span>
+                                            <small class="d-block text-muted">Expected Beneficiaries</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="glass-card">
+                            <h5 class="text-success mb-3">Key Insights</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-up text-success me-2"></i>
+                                    Women-led startups show 35% higher ROI
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-chart-line text-warning me-2"></i>
+                                    Gender-diverse teams outperform by 21%
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-globe text-info me-2"></i>
+                                    Sub-Saharan Africa shows highest potential
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-lightbulb text-purple me-2"></i>
+                                    STEM education gaps present opportunities
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics content will be enhanced by the framework -->
+                <div id="analytics-content" class="mt-4">
+                    <!-- ROI trends chart will be added here -->
+                </div>
+            </div>
+
+            <!-- Portfolio Tab -->
+            <div class="tab-pane fade" id="portfolio" role="tabpanel">
+                <h3 class="text-purple mb-4">
+                    <i class="fas fa-briefcase me-2"></i>Living Gender Equality Portfolio
+                </h3>
+
+                <div class="row">
+                    <div class="col-lg-4 mb-4">
+                        <div class="glass-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Women's Leadership Fund</h5>
+                                <span class="badge bg-success">Performing</span>
+                            </div>
+                            <p class="text-muted mb-3">Investing in women-led enterprises across emerging markets</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <strong class="text-success">$125M</strong>
+                                    <small class="d-block text-muted">AUM</small>
+                                </div>
+                                <div class="col-6">
+                                    <strong class="text-warning">28%</strong>
+                                    <small class="d-block text-muted">IRR</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 mb-4">
+                        <div class="glass-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">STEM Education Initiative</h5>
+                                <span class="badge bg-warning">Growing</span>
+                            </div>
+                            <p class="text-muted mb-3">Closing the gender gap in science and technology</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <strong class="text-success">$85M</strong>
+                                    <small class="d-block text-muted">AUM</small>
+                                </div>
+                                <div class="col-6">
+                                    <strong class="text-warning">32%</strong>
+                                    <small class="d-block text-muted">IRR</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 mb-4">
+                        <div class="glass-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Financial Inclusion Program</h5>
+                                <span class="badge bg-info">Expanding</span>
+                            </div>
+                            <p class="text-muted mb-3">Providing financial services to underserved women</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <strong class="text-success">$95M</strong>
+                                    <small class="d-block text-muted">AUM</small>
+                                </div>
+                                <div class="col-6">
+                                    <strong class="text-warning">25%</strong>
+                                    <small class="d-block text-muted">IRR</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Performance Chart -->
+                <div class="glass-card mt-4">
+                    <h5 class="text-success mb-3">Portfolio Performance Trends</h5>
+                    <canvas id="portfolioChart" height="100"></canvas>
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div class="tab-pane fade" id="reports" role="tabpanel">
+                <h3 class="text-purple mb-4">
+                    <i class="fas fa-file-alt me-2"></i>Gender Equality Intelligence Reports
+                </h3>
+
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="glass-card">
+                            <h5 class="text-success">Women's Economic Empowerment Report</h5>
+                            <p class="text-muted mb-3">
+                                Comprehensive analysis of women's economic participation and barriers to entry
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-success">Free Access</span>
+                                <button class="btn btn-outline-success btn-sm">Download</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 mb-4">
+                        <div class="glass-card">
+                            <h5 class="text-warning">Gender Lens Investing Trends</h5>
+                            <p class="text-muted mb-3">
+                                Market analysis and investment opportunities in gender-focused funds
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-warning">Premium - $149</span>
+                                <button class="btn btn-primary btn-sm report-btn premium" data-price="$149">
+                                    <span class="report-title" style="display: none;">Gender Lens Investing Trends</span>
+                                    <span class="report-description" style="display: none;">Market analysis and investment opportunities</span>
+                                    Preview
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI-Generated Reports Section will be added by enhanced framework -->
+                <div id="reports-content">
+                    <!-- New premium reports will be added here -->
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <section id="portfolio" class="section-padding bg-light">
-        <div class="container">
-            <h2>Living Portfolio: Investments in Action</h2>
-            <div class="portfolio-grid">
-                <div class="portfolio-card">
-                    <h3>The Nature Conservancy</h3>
-                    <p>A global non-profit focused on land and water conservation, climate change, and biodiversity protection across over 70 countries.</p>
-                </div>
-                <div class="portfolio-card">
-                    <h3>Google</h3>
-                    <p>Supports environmental monitoring and research for biodiversity through initiatives like the Google Green Program and Google Earth Engine.</p>
-                </div>
-                <div class="portfolio-card">
-                    <h3>Unilever</h3>
-                    <p>Committed to sustainable sourcing, aiming for 100% agricultural raw materials sustainably sourced by 2025, with strong supply chain transparency.</p>
-                </div>
-                <div class="portfolio-card">
-                    <h3>Danone</h3>
-                    <p>Focuses on regenerative agriculture and sustainable sourcing, utilizing a biodiversity scorecard to assess and improve its impact across the value chain.</p>
-                </div>
-                <div class="portfolio-card">
-                    <h3>GSK</h3>
-                    <p>Aims for positive biodiversity at its owned sites by 2030, implementing biodiversity action plans and investing in habitat improvement.</p>
-                </div>
-                <div class="portfolio-card">
-                    <h3>IKEA</h3>
-                    <p>Committed to its Forest Positive Plan, aiming to plant 1 billion trees by 2030, alongside water stewardship and sustainable materials programs.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Accessibility Functions -->
+    <script>
+        let fontSize = 16;
+        
+        function toggleHighContrast() {
+            document.body.classList.toggle('high-contrast');
+        }
+        
+        function increaseFontSize() {
+            fontSize += 2;
+            document.body.style.fontSize = fontSize + 'px';
+        }
+        
+        function decreaseFontSize() {
+            if (fontSize > 12) {
+                fontSize -= 2;
+                document.body.style.fontSize = fontSize + 'px';
+            }
+        }
 
-    <section id="opportunities" class="section-padding">
-        <div class="container">
-            <h2>New Investment Opportunities</h2>
-            <div class="opportunity-grid">
-                <div class="opportunity-card">
-                    <h3>Sustainable Forestry Funds</h3>
-                    <p>Investments in sustainably managed timberlands and reforestation projects that generate carbon credits and conserve biodiversity.</p>
-                </div>
-                <div class="opportunity-card">
-                    <h3>Biodiversity Offset Projects</h3>
-                    <p>Funding for projects that create or restore habitats to compensate for biodiversity loss elsewhere, often linked to development projects.</p>
-                </div>
-                <div class="opportunity-card">
-                    <h3>Eco-tourism and Conservation Ventures</h3>
-                    <p>Investments in businesses that combine sustainable tourism with direct conservation efforts, supporting local communities and wildlife protection.</p>
-                </div>
-                <div class="opportunity-card">
-                    <h3>Restoration Technology Startups</h3>
-                    <p>Companies developing innovative technologies for ecosystem restoration, such as drone-based reforestation, AI for species monitoring, or advanced soil remediation.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+        // What-if analysis interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            const investmentSlider = document.getElementById('investmentSlider');
+            const investmentValue = document.getElementById('investmentValue');
+            const projectedWomen = document.getElementById('projectedWomen');
+            
+            if (investmentSlider) {
+                investmentSlider.addEventListener('input', function() {
+                    const value = this.value;
+                    investmentValue.textContent = `$${value}M`;
+                    
+                    // Calculate projected impact
+                    const womenImpacted = Math.round(value * 250);
+                    projectedWomen.textContent = `${womenImpacted.toLocaleString()} Women`;
+                });
+            }
 
-    <section id="metrics" class="section-padding bg-light">
-        <div class="container">
-            <h2>Comprehensive Impact Metrics</h2>
-            <div class="chart-container">
-                <img src="https://via.placeholder.com/800x400/8FBC8F/FFFFFF?text=Forest+Cover+Change+Chart" alt="Forest Cover Change Chart">
-                <p>Global forest cover continues to decline, albeit at a slower rate. Sustainable forest management practices are crucial to reverse this trend.</p>
-                <img src="https://via.placeholder.com/800x400/8FBC8F/FFFFFF?text=Protected+Area+Growth+Chart" alt="Protected Area Growth Chart">
-                <p>While protected areas have increased, progress has stagnated since 2015, highlighting the need for renewed conservation efforts.</p>
-                <img src="https://via.placeholder.com/800x400/8FBC8F/FFFFFF?text=Species+Extinction+Risk+Chart" alt="Species Extinction Risk Chart">
-                <p>The Red List Index shows a significant deterioration in species extinction risk, emphasizing the urgency of biodiversity protection.</p>
-            </div>
-        </div>
-    </section>
+            // Initialize portfolio chart
+            initializePortfolioChart();
+        });
 
-    <section id="insights" class="section-padding">
-        <div class="container">
-            <h2>AI-Powered Insights & Recommendations</h2>
-            <div class="insights-content">
-                <div class="insights-item">
-                    <h3>Predictive Modeling for Deforestation Hotspots</h3>
-                    <p>AI identifies areas at high risk of deforestation, enabling proactive conservation efforts and targeted interventions to protect vulnerable ecosystems.</p>
-                </div>
-                <div class="insights-item">
-                    <h3>Satellite Imagery Analysis for Ecosystem Health</h3>
-                    <p>AI-driven monitoring of ecosystem health, biodiversity changes, and land use patterns provides real-time data for informed decision-making and rapid response.</p>
-                </div>
-                <div class="insights-item">
-                    <h3>Optimized Restoration Strategies</h3>
-                    <p>AI recommends the most effective restoration techniques for specific degraded ecosystems based on comprehensive environmental data, maximizing impact and resource efficiency.</p>
-                </div>
-                <div class="insights-item">
-                    <h3>Biodiversity Impact Assessment Tools</h3>
-                    <p>AI-powered tools enable companies to accurately assess and mitigate their biodiversity footprint across complex supply chains, fostering sustainable business practices.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+        function initializePortfolioChart() {
+            const ctx = document.getElementById('portfolioChart');
+            if (!ctx) return;
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 SDG 15 Dashboard. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <script src="script.js"></script>
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                    datasets: [{
+                        label: 'Women Empowered (Thousands)',
+                        data: [45, 52, 48, 61, 55, 67, 73, 78, 82, 89],
+                        borderColor: 'var(--terminal-purple)',
+                        backgroundColor: 'rgba(255, 20, 147, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Economic Impact ($M)',
+                        data: [125, 145, 135, 168, 152, 189, 205, 218, 235, 248],
+                        borderColor: 'var(--terminal-green)',
+                        backgroundColor: 'rgba(0, 255, 65, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Gender Equality Impact Trends',
+                            color: 'var(--terminal-white)',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            labels: { color: 'var(--terminal-white)' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: 'var(--terminal-white)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: 'var(--terminal-white)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+    
+    <!-- AI Dashboard Administrator -->
+    <script src="ai_dashboard_administrator.js"></script>
+    <script src="esg_leaderboard_system.js"></script>
+    <script src="esg_enhanced_framework.js"></script>
 </body>
-</html>
 </html>
