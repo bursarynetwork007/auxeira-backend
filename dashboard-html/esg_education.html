@@ -471,6 +471,62 @@
             box-shadow: 0 10px 20px rgba(0, 255, 136, 0.2);
         }
 
+        /* Report Card Styles */
+        .report-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            height: 100%;
+        }
+        
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 212, 255, 0.1);
+        }
+        
+        .report-card.free-report {
+            border-color: var(--terminal-green);
+        }
+        
+        .report-card.premium {
+            border-color: var(--terminal-gold);
+        }
+        
+        .report-card.specialist {
+            border-color: var(--terminal-purple);
+        }
+        
+        .report-title {
+            color: var(--terminal-white);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .report-description {
+            color: var(--terminal-gray);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+        
+        .report-features {
+            color: var(--terminal-blue);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        
+        .premium-badge {
+            background: linear-gradient(135deg, var(--terminal-gold), var(--terminal-purple));
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
         /* Collaboration Zone Styles */
         .collaboration-hub {
             display: grid;
@@ -1672,85 +1728,277 @@
 
             <!-- Reports Tab -->
             <div id="reports" class="tab-content">
-                <h2 style="color: var(--terminal-blue);" class="mb-4">
-                    <i class="fas fa-file-alt"></i> AI-Powered Education Impact Reports
-                </h2>
-
-                <div class="row">
-                    <!-- Free Report -->
-                    <div class="col-lg-6 mb-4">
-                        <div class="report-card">
-                            <div class="d-flex justify-content-between align-items-start mb-4">
-                                <div style="font-size: 2.5rem;">📚</div>
-                                <span class="badge bg-success">Free</span>
-                            </div>
-                            <h3 class="report-title">Global Education Outlook</h3>
-                            <p class="report-description">Comprehensive analysis of education trends, policy impacts, and investment opportunities across emerging markets</p>
-                            <div class="mb-3">
-                                <span class="tag tag-unesco">UNESCO</span>
-                                <span class="tag tag-gri">GRI</span>
-                            </div>
-                            <button class="btn btn-primary" onclick="downloadFreeReport()">Download Report</button>
-                        </div>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 style="color: var(--terminal-blue);">
+                        <i class="fas fa-file-alt"></i> AI-Powered Education Impact Reports
+                    </h2>
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-success">11 Report Types</span>
+                        <span class="badge bg-info">AI-Generated</span>
+                        <span class="badge bg-warning">Institutional Grade</span>
                     </div>
+                </div>
 
-                    <!-- AI-Generated Premium Reports -->
-                    <div class="col-lg-6 mb-4">
-                        <div class="report-card ai-powered" onclick="generateAIReport('scalability')">
-                            <div class="d-flex justify-content-between align-items-start mb-4">
-                                <div style="font-size: 2.5rem;">🚀</div>
-                                <span class="premium-badge">$399</span>
-                            </div>
-                            <h3 class="report-title">Scalability & Impact Expansion Report</h3>
-                            <p class="report-description">AI-powered analysis forecasting scalability of education initiatives with predictive growth models</p>
-                            <div class="mb-3">
-                                <span class="tag tag-sfdr">SFDR</span>
-                                <span class="tag tag-tcfd">TCFD</span>
+                <!-- Free Reports Section -->
+                <div class="glass-card mb-4">
+                    <h4 style="color: var(--terminal-green); mb-3">
+                        <i class="fas fa-gift"></i> Free Reports
+                    </h4>
+                    <div class="row">
+                        <div class="col-lg-6 mb-3">
+                            <div class="report-card free-report">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div style="font-size: 2rem;">📚</div>
+                                    <span class="badge bg-success">Free</span>
+                                </div>
+                                <h5 class="report-title">Global Education Outlook</h5>
+                                <p class="report-description">Comprehensive analysis of education trends, policy impacts, and investment opportunities across emerging markets.</p>
+                                <div class="mb-3">
+                                    <span class="tag tag-unesco">UNESCO</span>
+                                    <span class="tag tag-gri">GRI</span>
+                                </div>
+                                <button class="btn btn-primary btn-sm" onclick="downloadFreeReport('outlook')">Download Report</button>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="col-lg-6 mb-4">
-                        <div class="report-card ai-powered" onclick="generateAIReport('stakeholder')">
-                            <div class="d-flex justify-content-between align-items-start mb-4">
-                                <div style="font-size: 2.5rem;">🤝</div>
-                                <span class="premium-badge">$349</span>
-                            </div>
-                            <h3 class="report-title">Stakeholder Engagement Report</h3>
-                            <p class="report-description">Community and government buy-in analysis with actionable engagement strategies</p>
-                            <div class="mb-3">
-                                <span class="tag tag-gri">GRI</span>
-                                <span class="tag tag-unesco">UNESCO</span>
+                        <div class="col-lg-6 mb-3">
+                            <div class="report-card free-report">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div style="font-size: 2rem;">📈</div>
+                                    <span class="badge bg-success">Free</span>
+                                </div>
+                                <h5 class="report-title">Impact Summary Report</h5>
+                                <p class="report-description">3-section impact overview with key metrics, success stories, and trendline analysis for your organization.</p>
+                                <div class="mb-3">
+                                    <span class="tag tag-sfdr">SFDR</span>
+                                    <span class="tag tag-gri">GRI</span>
+                                </div>
+                                <button class="btn btn-primary btn-sm" onclick="downloadFreeReport('impact')">Generate Report</button>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="col-lg-6 mb-4">
-                        <div class="report-card ai-powered" onclick="generateAIReport('risk-roi')">
-                            <div class="d-flex justify-content-between align-items-start mb-4">
-                                <div style="font-size: 2.5rem;">📊</div>
-                                <span class="premium-badge">$499</span>
+                <!-- Premium Reports Section -->
+                <div class="glass-card mb-4">
+                    <h4 style="color: var(--terminal-gold); mb-3">
+                        <i class="fas fa-crown"></i> Premium AI Reports
+                    </h4>
+                    <div class="row">
+                        <!-- Scalability & Impact Expansion Report -->
+                        <div class="col-lg-4 mb-4">
+                            <div class="report-card ai-powered premium" onclick="generateAIReport('scalability')">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div style="font-size: 2rem;">🚀</div>
+                                    <span class="premium-badge">$399</span>
+                                </div>
+                                <h5 class="report-title">Scalability & Impact Expansion</h5>
+                                <p class="report-description">AI-powered forecasting of education initiative scalability with predictive growth models and 3-year impact projections.</p>
+                                <div class="mb-3">
+                                    <span class="tag tag-sfdr">GRI</span>
+                                    <span class="tag tag-tcfd">IRIS+</span>
+                                </div>
+                                <div class="report-features">
+                                    <small>✓ Growth Matrix Analysis</small><br>
+                                    <small>✓ Cost Reduction Strategies</small><br>
+                                    <small>✓ Risk Mitigation Plans</small>
+                                </div>
                             </div>
-                            <h3 class="report-title">Risk-Adjusted ROI Report</h3>
-                            <p class="report-description">TCFD/SASB compliant risk analysis with sophisticated ROI calculations</p>
-                            <div class="mb-3">
-                                <span class="tag tag-tcfd">TCFD</span>
-                                <span class="tag tag-csrd">CSRD</span>
+                        </div>
+
+                        <!-- Stakeholder Engagement Report -->
+                        <div class="col-lg-4 mb-4">
+                            <div class="report-card ai-powered premium" onclick="generateAIReport('stakeholder')">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div style="font-size: 2rem;">🤝</div>
+                                    <span class="premium-badge">$349</span>
+                                </div>
+                                <h5 class="report-title">Stakeholder Engagement</h5>
+                                <p class="report-description">Community and government buy-in analysis with actionable engagement strategies and influence mapping.</p>
+                                <div class="mb-3">
+                                    <span class="tag tag-gri">IRIS+</span>
+                                    <span class="tag tag-unesco">SDG</span>
+                                </div>
+                                <div class="report-features">
+                                    <small>✓ Stakeholder Mapping</small><br>
+                                    <small>✓ Engagement Scores</small><br>
+                                    <small>✓ Action Plans</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Risk-Adjusted ROI Report -->
+                        <div class="col-lg-4 mb-4">
+                            <div class="report-card ai-powered premium" onclick="generateAIReport('risk-roi')">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div style="font-size: 2rem;">📊</div>
+                                    <span class="premium-badge">$499</span>
+                                </div>
+                                <h5 class="report-title">Risk-Adjusted ROI</h5>
+                                <p class="report-description">TCFD/SASB compliant risk analysis with sophisticated ROI calculations and 5-year scenario modeling.</p>
+                                <div class="mb-3">
+                                    <span class="tag tag-tcfd">TCFD</span>
+                                    <span class="tag tag-csrd">SASB</span>
+                                </div>
+                                <div class="report-features">
+                                    <small>✓ Risk Heatmaps</small><br>
+                                    <small>✓ ROI Scenarios</small><br>
+                                    <small>✓ Mitigation Plans</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cross-Sector Collaboration Report -->
+                        <div class="col-lg-4 mb-4">
+                            <div class="report-card ai-powered premium" onclick="generateAIReport('collaboration')">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div style="font-size: 2rem;">🌐</div>
+                                    <span class="premium-badge">$449</span>
+                                </div>
+                                <h5 class="report-title">Cross-Sector Collaboration</h5>
+                                <p class="report-description">Strategic partnership opportunities with impact forecasting and synergy analysis for amplified reach.</p>
+                                <div class="mb-3">
+                                    <span class="tag tag-sfdr">SDG 17</span>
+                                    <span class="tag tag-gri">GRI</span>
+                                </div>
+                                <div class="report-features">
+                                    <small>✓ Partner Matrix</small><br>
+                                    <small>✓ Synergy Scoring</small><br>
+                                    <small>✓ Impact Forecast</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Policy Alignment Report -->
+                        <div class="col-lg-4 mb-4">
+                            <div class="report-card ai-powered premium" onclick="generateAIReport('policy')">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div style="font-size: 2rem;">🏛️</div>
+                                    <span class="premium-badge">$399</span>
+                                </div>
+                                <h5 class="report-title">Policy Alignment</h5>
+                                <p class="report-description">Regulatory insights mapping investments to compliant, scalable policies with risk/opportunity analysis.</p>
+                                <div class="mb-3">
+                                    <span class="tag tag-unesco">UNESCO</span>
+                                    <span class="tag tag-tcfd">Policy</span>
+                                </div>
+                                <div class="report-features">
+                                    <small>✓ Compliance Scoring</small><br>
+                                    <small>✓ Policy Forecasts</small><br>
+                                    <small>✓ Advocacy Opportunities</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ROI & Metrics Dashboard Report -->
+                        <div class="col-lg-4 mb-4">
+                            <div class="report-card ai-powered premium" onclick="generateAIReport('roi-metrics')">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div style="font-size: 2rem;">💰</div>
+                                    <span class="premium-badge">$449</span>
+                                </div>
+                                <h5 class="report-title">ROI & Metrics Dashboard</h5>
+                                <p class="report-description">Quantifiable returns analysis blending financial metrics (IRR, MOIC) with social KPIs and causal analysis.</p>
+                                <div class="mb-3">
+                                    <span class="tag tag-sfdr">SFDR</span>
+                                    <span class="tag tag-gri">IRIS+</span>
+                                </div>
+                                <div class="report-features">
+                                    <small>✓ Financial + Social ROI</small><br>
+                                    <small>✓ Benchmark Analysis</small><br>
+                                    <small>✓ Causal Stories</small>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="col-lg-6 mb-4">
-                        <div class="report-card ai-powered" onclick="generateAIReport('collaboration')">
-                            <div class="d-flex justify-content-between align-items-start mb-4">
-                                <div style="font-size: 2.5rem;">🌐</div>
-                                <span class="premium-badge">$449</span>
+                <!-- Specialized Reports Section -->
+                <div class="glass-card mb-4">
+                    <h4 style="color: var(--terminal-purple); mb-3">
+                        <i class="fas fa-microscope"></i> Specialized Analysis Reports
+                    </h4>
+                    <div class="row">
+                        <!-- Cross-Impact Opportunity Report -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="report-card ai-powered specialist" onclick="generateAIReport('cross-impact')">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div style="font-size: 2rem;">🔗</div>
+                                    <span class="premium-badge">$399</span>
+                                </div>
+                                <h5 class="report-title">Cross-Impact Opportunity</h5>
+                                <p class="report-description">Uncover hidden connections between Education and other SDGs with synergy mapping and collaboration opportunities.</p>
+                                <div class="mb-3">
+                                    <span class="tag tag-sfdr">Multi-SDG</span>
+                                    <span class="tag tag-gri">Synergy</span>
+                                </div>
+                                <div class="report-features">
+                                    <small>✓ SDG Intersection Analysis</small><br>
+                                    <small>✓ Opportunity Matrix</small><br>
+                                    <small>✓ Amplified Reach Projections</small>
+                                </div>
                             </div>
-                            <h3 class="report-title">Cross-Sector Collaboration Report</h3>
-                            <p class="report-description">Strategic partnership opportunities with impact forecasting and synergy analysis</p>
-                            <div class="mb-3">
-                                <span class="tag tag-sfdr">SDG 17</span>
-                                <span class="tag tag-gri">GRI</span>
+                        </div>
+
+                        <!-- Comparative Benchmark Report -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="report-card ai-powered specialist" onclick="generateAIReport('benchmark')">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div style="font-size: 2rem;">📏</div>
+                                    <span class="premium-badge">$349</span>
+                                </div>
+                                <h5 class="report-title">Comparative Benchmark</h5>
+                                <p class="report-description">Compare your impact metrics to peer organizations with efficiency ratios, policy alignment, and ROI optimization.</p>
+                                <div class="mb-3">
+                                    <span class="tag tag-gri">Benchmark</span>
+                                    <span class="tag tag-unesco">Peer</span>
+                                </div>
+                                <div class="report-features">
+                                    <small>✓ Efficiency Ratios</small><br>
+                                    <small>✓ Peer Comparison</small><br>
+                                    <small>✓ ROI Recommendations</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Policy Influence & Risk Watch -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="report-card ai-powered specialist" onclick="generateAIReport('policy-risk')">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div style="font-size: 2rem;">⚠️</div>
+                                    <span class="premium-badge">$299</span>
+                                </div>
+                                <h5 class="report-title">Policy Influence & Risk Watch</h5>
+                                <p class="report-description">Monitor policy shifts affecting education investments with risk heatmaps and advocacy opportunity identification.</p>
+                                <div class="mb-3">
+                                    <span class="tag tag-tcfd">Risk</span>
+                                    <span class="tag tag-unesco">Policy</span>
+                                </div>
+                                <div class="report-features">
+                                    <small>✓ Policy Shift Analysis</small><br>
+                                    <small>✓ Risk Heatmaps</small><br>
+                                    <small>✓ Advocacy Strategies</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ESG Scorecard Report -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="report-card ai-powered specialist" onclick="generateAIReport('esg-scorecard')">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div style="font-size: 2rem;">🏆</div>
+                                    <span class="premium-badge">$399</span>
+                                </div>
+                                <h5 class="report-title">ESG Scorecard</h5>
+                                <p class="report-description">Comprehensive ESG assessment with Environmental, Social, and Governance metrics benchmarked against regional peers.</p>
+                                <div class="mb-3">
+                                    <span class="tag tag-sfdr">ESG</span>
+                                    <span class="tag tag-csrd">CSRD</span>
+                                </div>
+                                <div class="report-features">
+                                    <small>✓ E-S-G Breakdown</small><br>
+                                    <small>✓ Radar Chart Analysis</small><br>
+                                    <small>✓ Regional Benchmarks</small>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1764,6 +2012,29 @@
                     </div>
                     <div id="reportSteps">
                         <p><i class="fas fa-spinner fa-spin text-primary"></i> Analyzing your organization profile...</p>
+                        <p><i class="fas fa-clock text-secondary"></i> Crawling website data via Thunderbit...</p>
+                        <p><i class="fas fa-brain text-info"></i> Generating AI insights with Claude/Manus/NanoGPT-5...</p>
+                        <p><i class="fas fa-chart-bar text-success"></i> Creating visualizations and charts...</p>
+                        <p><i class="fas fa-file-pdf text-warning"></i> Formatting final report...</p>
+                    </div>
+                </div>
+
+                <!-- Report Preview Modal -->
+                <div class="modal fade" id="reportPreviewModal" tabindex="-1">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="reportPreviewTitle">Report Preview</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body" id="reportPreviewContent">
+                                <!-- Report preview content will be loaded here -->
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close Preview</button>
+                                <button type="button" class="btn btn-primary" id="purchaseReportBtn">Purchase Full Report</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2473,6 +2744,71 @@
         // Upload Project Modal
         function showUploadProjectModal() {
             alert('Upload Project feature coming soon! Foundations can upload projects for crowdfunding and specialist recruitment.');
+        }
+
+        // AI Report Generation Functions
+        function generateAIReport(reportType) {
+            // Show premium modal for paid reports
+            if (reportType !== 'impact' && reportType !== 'outlook') {
+                showPremiumModal(reportType);
+                return;
+            }
+            
+            // Show generation progress
+            document.getElementById('reportGenerationStatus').style.display = 'block';
+            
+            // Simulate AI report generation
+            let progress = 0;
+            const progressBar = document.getElementById('reportProgress');
+            const steps = document.querySelectorAll('#reportSteps p');
+            
+            const interval = setInterval(() => {
+                progress += 20;
+                progressBar.style.width = progress + '%';
+                
+                // Update step indicators
+                const currentStep = Math.floor(progress / 20) - 1;
+                if (currentStep >= 0 && currentStep < steps.length) {
+                    steps[currentStep].innerHTML = steps[currentStep].innerHTML.replace('fa-spinner fa-spin', 'fa-check text-success');
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('reportGenerationStatus').style.display = 'none';
+                        alert(`${reportType.toUpperCase()} Report generated successfully! Download link sent to your email.`);
+                        // Reset progress
+                        progressBar.style.width = '0%';
+                        steps.forEach(step => {
+                            step.innerHTML = step.innerHTML.replace('fa-check text-success', 'fa-spinner fa-spin');
+                        });
+                    }, 1000);
+                }
+            }, 800);
+        }
+        
+        function downloadFreeReport(reportType) {
+            generateAIReport(reportType);
+        }
+        
+        function showPremiumModal(reportType) {
+            // Update modal content based on report type
+            const modal = document.getElementById('premiumModal');
+            const reportTitles = {
+                'scalability': 'Scalability & Impact Expansion Report - $399',
+                'stakeholder': 'Stakeholder Engagement Report - $349',
+                'risk-roi': 'Risk-Adjusted ROI Report - $499',
+                'collaboration': 'Cross-Sector Collaboration Report - $449',
+                'policy': 'Policy Alignment Report - $399',
+                'roi-metrics': 'ROI & Metrics Dashboard Report - $449',
+                'cross-impact': 'Cross-Impact Opportunity Report - $399',
+                'benchmark': 'Comparative Benchmark Report - $349',
+                'policy-risk': 'Policy Influence & Risk Watch - $299',
+                'esg-scorecard': 'ESG Scorecard Report - $399'
+            };
+            
+            modal.querySelector('h3').textContent = reportTitles[reportType] || 'Premium AI Report';
+            modal.style.display = 'flex';
         }
 
         // Pledge Amount Function
