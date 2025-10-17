@@ -493,6 +493,141 @@
             box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
         }
 
+        /* Event Card Styles */
+        .event-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .event-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--terminal-blue);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Crowdfunding Card Styles */
+        .crowdfunding-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .crowdfunding-card.featured {
+            border: 2px solid var(--terminal-gold);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.1);
+        }
+
+        .crowdfunding-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 212, 255, 0.1);
+        }
+
+        .alignment-badge {
+            background: linear-gradient(135deg, var(--terminal-green), var(--terminal-blue));
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .role-badge {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--terminal-white);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+            display: inline-block;
+        }
+
+        .role-badge.available {
+            border-color: var(--terminal-green);
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .role-badge.filled {
+            border-color: var(--terminal-blue);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .pledge-btn {
+            margin: 0.2rem;
+        }
+
+        .pledge-btn:hover {
+            background: var(--terminal-blue);
+            border-color: var(--terminal-blue);
+        }
+
+        .pledge-section {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        /* Expert Card Styles */
+        .expert-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .expert-card:hover {
+            border-color: var(--terminal-blue);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.1);
+        }
+
+        .expert-avatar {
+            font-size: 2.5rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--terminal-dark);
+            border-radius: 50%;
+            border: 2px solid var(--glass-border);
+        }
+
+        .expert-name {
+            color: var(--terminal-white);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .expert-title {
+            color: var(--terminal-gray);
+            font-size: 0.9rem;
+        }
+
+        .expert-location {
+            color: var(--terminal-blue);
+            font-size: 0.8rem;
+        }
+
+        .skill-tag {
+            background: var(--terminal-purple);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin: 0.1rem;
+            display: inline-block;
+        }
+
         .partner-logo {
             width: 80px;
             height: 80px;
@@ -1178,30 +1313,39 @@
                 </div>
             </div>
 
-            <!-- Collaboration Zone Tab - ENHANCED -->
+            <!-- Collaboration Zone Tab - CHAMPION COLLABORATION -->
             <div id="collaboration" class="tab-content">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 style="color: var(--terminal-blue);">
-                        <i class="fas fa-users"></i> Collaboration Zone
+                        <i class="fas fa-users"></i> Collaboration Zone - Champion Collaboration
                     </h2>
-                    <button class="btn btn-primary" onclick="showCreateCollabModal()">
-                        <i class="fas fa-plus"></i> Create New Collaboration
-                    </button>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-success" onclick="showUploadProjectModal()">
+                            <i class="fas fa-upload"></i> Upload Project
+                        </button>
+                        <button class="btn btn-primary" onclick="showCreateCollabModal()">
+                            <i class="fas fa-plus"></i> Create Collaboration
+                        </button>
+                    </div>
                 </div>
 
-                <!-- AI-Powered Events Section -->
+                <!-- AI-Scraped Upcoming Events Section -->
                 <div class="glass-card mb-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="fas fa-calendar me-3" style="color: var(--terminal-blue); font-size: 1.5rem;"></i>
-                        <h4 style="color: var(--terminal-blue); margin: 0;">AI-Recommended Events</h4>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-calendar-alt me-3" style="color: var(--terminal-blue); font-size: 1.5rem;"></i>
+                            <h4 style="color: var(--terminal-blue); margin: 0;">AI-Scraped Upcoming Aligned Events</h4>
+                        </div>
+                        <span class="badge bg-primary">Live Updates <i class="fas fa-sync-alt fa-spin"></i></span>
                     </div>
                    
                     <div id="ai-events-container">
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <div class="story-card">
-                                    <div class="story-title">🌍 Global Education Summit 2024</div>
-                                    <div class="story-content">UNESCO's flagship event bringing together 500+ education leaders. Perfect alignment with your SDG 4 focus.</div>
+                            <div class="col-md-4 mb-3">
+                                <div class="story-card event-card">
+                                    <div class="event-badge">🌍 UNESCO</div>
+                                    <div class="story-title">Global Education Summit 2024</div>
+                                    <div class="story-content">500+ education leaders discussing AI in education, digital literacy, and SDG 4 implementation strategies.</div>
                                     <div class="story-metrics">
                                         <div class="metric-item">
                                             <div class="metric-value">Dec 15-17</div>
@@ -1209,15 +1353,17 @@
                                         </div>
                                         <div class="metric-item">
                                             <div class="metric-value">96%</div>
-                                            <div class="metric-label">Match Score</div>
+                                            <div class="metric-label">Alignment</div>
                                         </div>
                                     </div>
+                                    <button class="btn btn-sm btn-primary mt-2">Register Interest</button>
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="story-card">
-                                    <div class="story-title">💻 EdTech Africa Conference</div>
-                                    <div class="story-content">Leading digital education conference with focus on AI-powered learning solutions and teacher training.</div>
+                            <div class="col-md-4 mb-3">
+                                <div class="story-card event-card">
+                                    <div class="event-badge">💻 EdTech</div>
+                                    <div class="story-title">EdTech Africa Conference</div>
+                                    <div class="story-content">Leading digital education conference with focus on AI-powered learning solutions and teacher training programs.</div>
                                     <div class="story-metrics">
                                         <div class="metric-item">
                                             <div class="metric-value">Jan 20-22</div>
@@ -1225,9 +1371,248 @@
                                         </div>
                                         <div class="metric-item">
                                             <div class="metric-value">89%</div>
-                                            <div class="metric-label">Match Score</div>
+                                            <div class="metric-label">Alignment</div>
                                         </div>
                                     </div>
+                                    <button class="btn btn-sm btn-primary mt-2">Register Interest</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="story-card event-card">
+                                    <div class="event-badge">🏛️ Policy</div>
+                                    <div class="story-title">African Education Policy Forum</div>
+                                    <div class="story-content">Policy makers and education ministers discussing curriculum reform and digital transformation initiatives.</div>
+                                    <div class="story-metrics">
+                                        <div class="metric-item">
+                                            <div class="metric-value">Feb 8-10</div>
+                                            <div class="metric-label">Accra, Ghana</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-value">91%</div>
+                                            <div class="metric-label">Alignment</div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-sm btn-primary mt-2">Register Interest</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Crowdfunding Projects Section -->
+                <div class="glass-card mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-hands-helping me-3" style="color: var(--terminal-green); font-size: 1.5rem;"></i>
+                            <h4 style="color: var(--terminal-green); margin: 0;">Crowdfunding Projects</h4>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-success">$12.8M Raised This Month</span>
+                            <span class="badge bg-info">47 Active Projects</span>
+                        </div>
+                    </div>
+
+                    <!-- Featured Crowdfunding Project -->
+                    <div class="crowdfunding-card featured mb-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h4 style="color: var(--terminal-blue);">🎓 AI-Powered Teacher Training Platform - Kenya</h4>
+                                <p style="color: var(--terminal-gray);">By <strong>Acumen Academy Fund</strong> • Featured Project</p>
+                            </div>
+                            <span class="premium-badge">94% SDG Aligned</span>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <p style="color: var(--terminal-white);">Revolutionary AI-powered platform to train 10,000+ teachers across Kenya in digital literacy and modern pedagogy. Proven 89% improvement in student outcomes.</p>
+                                
+                                <div class="funding-details mb-3">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="metric-item">
+                                                <div class="metric-value" style="color: var(--terminal-green);">$1.8M</div>
+                                                <div class="metric-label">Raised</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="metric-item">
+                                                <div class="metric-value" style="color: var(--terminal-blue);">$2.5M</div>
+                                                <div class="metric-label">Target</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="metric-item">
+                                                <div class="metric-value" style="color: var(--terminal-purple);">247</div>
+                                                <div class="metric-label">Backers</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="metric-item">
+                                                <div class="metric-value" style="color: var(--terminal-gold);">23 days</div>
+                                                <div class="metric-label">Remaining</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="progress mb-3" style="height: 10px; background: var(--terminal-dark);">
+                                    <div class="progress-bar" style="width: 72%; background: linear-gradient(90deg, var(--terminal-green), var(--terminal-blue));"></div>
+                                </div>
+                                
+                                <div class="roles-needed mb-3">
+                                    <h6 style="color: var(--terminal-purple);">🎯 Specialized Roles Needed:</h6>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="role-badge available">Head Researcher - $120K</span>
+                                        <span class="role-badge filled">Tech Lead - Filled ✓</span>
+                                        <span class="role-badge available">Policy Advisor - $80K</span>
+                                        <span class="role-badge available">Field Coordinator - $60K</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="pledge-section">
+                                    <h6 style="color: var(--terminal-blue);">💰 Make a Pledge</h6>
+                                    <div class="pledge-amounts mb-3">
+                                        <button class="btn btn-outline-primary btn-sm pledge-btn" data-amount="1000">$1,000</button>
+                                        <button class="btn btn-outline-primary btn-sm pledge-btn" data-amount="5000">$5,000</button>
+                                        <button class="btn btn-outline-primary btn-sm pledge-btn" data-amount="10000">$10,000</button>
+                                        <button class="btn btn-outline-primary btn-sm pledge-btn" data-amount="25000">$25,000</button>
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="customAmount" placeholder="Custom amount" style="background: var(--terminal-dark); border-color: var(--glass-border); color: var(--terminal-white);">
+                                    </div>
+                                    <button class="btn btn-success w-100 mb-2" onclick="pledgeAmount()">Pledge Now</button>
+                                    <button class="btn btn-outline-info w-100 mb-2" onclick="applyForRole()">Apply for Role</button>
+                                    <button class="btn btn-outline-primary w-100" onclick="viewProspectus()">View Prospectus</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Other Crowdfunding Projects -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="crowdfunding-card">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 style="color: var(--terminal-purple);">📚 Rural Library Network - Ghana</h5>
+                                    <span class="alignment-badge">88% Aligned</span>
+                                </div>
+                                <p style="color: var(--terminal-gray); font-size: 0.9rem;">By <strong>Ghana Education Foundation</strong></p>
+                                <p style="color: var(--terminal-white); font-size: 0.9rem;">Building 50 solar-powered libraries with digital learning centers in rural communities.</p>
+                                
+                                <div class="progress mb-2" style="height: 6px; background: var(--terminal-dark);">
+                                    <div class="progress-bar" style="width: 45%; background: var(--terminal-purple);"></div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mb-2">
+                                    <small style="color: var(--terminal-gray);">$450K / $1M raised</small>
+                                    <small style="color: var(--terminal-gold);">35 days left</small>
+                                </div>
+                                
+                                <div class="d-flex gap-1">
+                                    <button class="btn btn-sm btn-outline-success flex-fill">Pledge</button>
+                                    <button class="btn btn-sm btn-outline-primary flex-fill">View Details</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="crowdfunding-card">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 style="color: var(--terminal-blue);">💻 Coding Bootcamp for Girls - Nigeria</h5>
+                                    <span class="alignment-badge">92% Aligned</span>
+                                </div>
+                                <p style="color: var(--terminal-gray); font-size: 0.9rem;">By <strong>TechHer Foundation</strong></p>
+                                <p style="color: var(--terminal-white); font-size: 0.9rem;">Training 1,000 girls in coding and digital skills across 10 Nigerian states.</p>
+                                
+                                <div class="progress mb-2" style="height: 6px; background: var(--terminal-dark);">
+                                    <div class="progress-bar" style="width: 67%; background: var(--terminal-blue);"></div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mb-2">
+                                    <small style="color: var(--terminal-gray);">$335K / $500K raised</small>
+                                    <small style="color: var(--terminal-gold);">12 days left</small>
+                                </div>
+                                
+                                <div class="d-flex gap-1">
+                                    <button class="btn btn-sm btn-outline-success flex-fill">Pledge</button>
+                                    <button class="btn btn-sm btn-outline-primary flex-fill">View Details</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expert Directory & Role Matching -->
+                <div class="glass-card mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-user-tie me-3" style="color: var(--terminal-gold); font-size: 1.5rem;"></i>
+                        <h4 style="color: var(--terminal-gold); margin: 0;">Expert Directory & Role Matching</h4>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Search for experts by skill, location, or expertise" style="background: var(--terminal-dark); border-color: var(--glass-border); color: var(--terminal-white);">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" style="background: var(--terminal-dark); border-color: var(--glass-border); color: var(--terminal-white);">
+                                <option>All Roles</option>
+                                <option>Head Researcher</option>
+                                <option>Policy Advisor</option>
+                                <option>Tech Lead</option>
+                                <option>Field Coordinator</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="expert-card">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="expert-avatar">👨‍💼</div>
+                                    <div class="ms-3">
+                                        <div class="expert-name">Dr. Amina Jalloh</div>
+                                        <div class="expert-title">Education Policy & Curriculum Development</div>
+                                        <div class="expert-location">Sierra Leone • Available for Consultancy</div>
+                                    </div>
+                                </div>
+                                <div class="expert-skills mb-2">
+                                    <span class="skill-tag">Policy Research</span>
+                                    <span class="skill-tag">Curriculum Design</span>
+                                    <span class="skill-tag">SDG 4</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-primary">View Profile</button>
+                                    <button class="btn btn-sm btn-outline-success">Invite to Project</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="expert-card">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="expert-avatar">👩‍💻</div>
+                                    <div class="ms-3">
+                                        <div class="expert-name">Prof. Kwame Osei</div>
+                                        <div class="expert-title">EdTech & Digital Learning Solutions</div>
+                                        <div class="expert-location">Ghana • Seeking Research Partners</div>
+                                    </div>
+                                </div>
+                                <div class="expert-skills mb-2">
+                                    <span class="skill-tag">AI in Education</span>
+                                    <span class="skill-tag">Digital Literacy</span>
+                                    <span class="skill-tag">Teacher Training</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-primary">View Profile</button>
+                                    <button class="btn btn-sm btn-outline-success">Invite to Project</button>
                                 </div>
                             </div>
                         </div>
@@ -1238,176 +1623,49 @@
                 <div class="glass-card mb-4">
                     <div class="d-flex align-items-center mb-3">
                         <i class="fas fa-chart-network me-3" style="color: var(--terminal-green); font-size: 1.5rem;"></i>
-                        <h4 style="color: var(--terminal-green); margin: 0;">Network Insights</h4>
+                        <h4 style="color: var(--terminal-green); margin: 0;">Collaboration Network Insights</h4>
                     </div>
+                    
                     <div class="row mb-4">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="metric-item text-center">
                                 <div class="metric-value" style="color: var(--terminal-green);">87%</div>
                                 <div class="metric-label">Connection Strength</div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="metric-item text-center">
                                 <div class="metric-value" style="color: var(--terminal-blue);">+12</div>
-                                <div class="metric-label">New Connections This Month</div>
+                                <div class="metric-label">New Connections</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="metric-item text-center">
+                                <div class="metric-value" style="color: var(--terminal-purple);">$12.8M</div>
+                                <div class="metric-label">Funds Raised</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="metric-item text-center">
+                                <div class="metric-value" style="color: var(--terminal-gold);">47</div>
+                                <div class="metric-label">Active Projects</div>
                             </div>
                         </div>
                     </div>
+                    
                     <div class="mt-3">
-                        <h5 style="color: var(--terminal-purple);">Top Collaboration Opportunities</h5>
+                        <h6 style="color: var(--terminal-purple);">🎯 Top Collaboration Opportunities</h6>
                         <ul style="color: var(--terminal-white); line-height: 1.8;">
-                            <li><strong>Gates Foundation</strong> - Digital Literacy Initiative (95% alignment)</li>
-                            <li><strong>Mastercard Foundation</strong> - Youth Employment Program (92% alignment)</li>
-                            <li><strong>UNESCO</strong> - Policy Development Working Group (88% alignment)</li>
+                            <li><strong>Gates Foundation</strong> - Digital Literacy Initiative (95% alignment) - $2.3M available</li>
+                            <li><strong>Mastercard Foundation</strong> - Youth Employment Program (92% alignment) - Seeking tech partners</li>
+                            <li><strong>UNESCO</strong> - Policy Development Working Group (88% alignment) - Research roles open</li>
                         </ul>
-                    </div>
-                </div>
-
-                <!-- Expert Directory -->
-                <div class="glass-card mb-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="fas fa-user-tie me-3" style="color: var(--terminal-gold); font-size: 1.5rem;"></i>
-                        <h4 style="color: var(--terminal-gold); margin: 0;">Expert Directory</h4>
-                    </div>
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="Search for experts by skill, location, or expertise" style="background: var(--terminal-dark); border-color: var(--glass-border); color: var(--terminal-white);">
-                        <button class="btn btn-primary" type="button">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="story-card">
-                                <div class="d-flex align-items-center mb-2">
-                                    <div style="font-size: 2rem; margin-right: 1rem;">👨‍💼</div>
-                                    <div>
-                                        <div class="story-title" style="margin-bottom: 0.5rem;">Dr. Amina Jalloh</div>
-                                        <div style="color: var(--terminal-gray);">Education Policy & Curriculum Development</div>
-                                        <div style="color: var(--terminal-blue); font-size: 0.9rem;">Sierra Leone • Available for Consultancy</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="story-card">
-                                <div class="d-flex align-items-center mb-2">
-                                    <div style="font-size: 2rem; margin-right: 1rem;">👩‍💻</div>
-                                    <div>
-                                        <div class="story-title" style="margin-bottom: 0.5rem;">Prof. Kwame Osei</div>
-                                        <div style="color: var(--terminal-gray);">EdTech & Digital Learning Solutions</div>
-                                        <div style="color: var(--terminal-blue); font-size: 0.9rem;">Ghana • Seeking Research Partners</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Active Collaborations -->
-                <div class="glass-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 style="color: var(--terminal-blue);">EduTech Kenya Series A - Co-Investment</h4>
-                        <span class="premium-badge">94% Aligned</span>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-8">
-                            <p style="color: var(--terminal-white);">Seeking co-Impact Donors for $2.5M Series A in Kenya's leading digital literacy platform. Strong ESG alignment with SDG 4 focus and proven 89% improvement in math scores.</p>
-                            <div class="mb-2" style="color: var(--terminal-gray);">
-                                <strong>Lead Impact Donor:</strong> Acumen Academy Fund<br>
-                                <strong>Target:</strong> $2.5M • <strong>Committed:</strong> $1.8M (72%)
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center">
-                                <div class="progress mb-2" style="background: var(--terminal-dark);">
-                                    <div class="progress-bar" style="width: 72%; background: var(--terminal-green);"></div>
-                                </div>
-                                <div class="metric-value" style="color: var(--terminal-green);">$700K</div>
-                                <div class="metric-label">Remaining</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <button class="btn btn-primary">View Prospectus</button>
-                        <button class="btn btn-outline-success">Pledge Investment</button>
-                        <button class="btn btn-outline-primary">Join Due Diligence</button>
-                    </div>
-                </div>
-
-                <div class="glass-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 style="color: var(--terminal-purple);">Teacher Training Nigeria - Seeking Entrepreneurs</h4>
-                        <span class="premium-badge">88% Aligned</span>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-8">
-                            <p style="color: var(--terminal-white);">Fully funded $1.2M initiative seeking experienced entrepreneurs and researchers to scale AI-powered teacher training across Nigeria. Focus on female teacher empowerment.</p>
-                            <div class="mb-2" style="color: var(--terminal-gray);">
-                                <strong>Funding Status:</strong> Fully Funded<br>
-                                <strong>Seeking:</strong> 2 Entrepreneurs, 1 Research Partner
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center">
-                                <div class="metric-value" style="color: var(--terminal-blue);">3/5</div>
-                                <div class="metric-label">Positions Filled</div>
-                                <div class="mt-2">
-                                    <span class="badge bg-success">2 Entrepreneurs</span>
-                                    <span class="badge bg-warning">1 Researcher Needed</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <button class="btn btn-primary">View Details</button>
-                        <button class="btn btn-outline-primary">Recommend Partner</button>
-                        <button class="btn btn-outline-info">Join Advisory</button>
-                    </div>
-                </div>
-
-                <!-- Active Strategic Partnerships -->
-                <div class="glass-card mb-4">
-                    <h4 style="color: var(--terminal-green);">Active Strategic Partnerships</h4>
-                    <div class="collaboration-hub">
-                        <div class="partner-card">
-                            <div class="partner-logo" style="background: var(--terminal-blue);">
-                                <i class="fas fa-university"></i>
-                            </div>
-                            <h5>UNESCO</h5>
-                            <p>Global education standards alignment and policy advocacy</p>
-                            <div class="mt-3">
-                                <span class="tag tag-unesco">Policy Partner</span>
-                            </div>
-                        </div>
-
-                        <div class="partner-card">
-                            <div class="partner-logo" style="background: var(--terminal-green);">
-                                <i class="fas fa-globe"></i>
-                            </div>
-                            <h5>Local NGOs</h5>
-                            <p>Community-based implementation and cultural adaptation</p>
-                            <div class="mt-3">
-                                <span class="tag tag-gri">Implementation</span>
-                            </div>
-                        </div>
-
-                        <div class="partner-card">
-                            <div class="partner-logo" style="background: var(--terminal-purple);">
-                                <i class="fas fa-laptop-code"></i>
-                            </div>
-                            <h5>Tech Partners</h5>
-                            <p>Digital infrastructure and educational technology solutions</p>
-                            <div class="mt-3">
-                                <span class="tag tag-sfdr">Innovation</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
                 <!-- Partnership Impact Visualization -->
                 <div class="chart-container">
-                    <div class="chart-title">Partnership Impact Network</div>
+                    <div class="chart-title">Collaboration Impact Network</div>
                     <canvas id="partnershipChart" aria-label="Partnership impact network visualization" role="img"></canvas>
                 </div>
             </div>
@@ -2134,20 +2392,20 @@
                 });
             }
 
-            // Partnership Chart
+            // Partnership Chart - Enhanced for Collaboration Network
             const partnershipCtx = document.getElementById('partnershipChart');
             if (partnershipCtx) {
                 charts.partnershipChart = new Chart(partnershipCtx, {
                     type: 'doughnut',
                     data: {
-                        labels: ['UNESCO', 'Local NGOs', 'Tech Partners', 'Government', 'Private Sector'],
+                        labels: ['Crowdfunding Projects', 'Expert Network', 'Foundation Partners', 'Tech Collaborations', 'Policy Partnerships'],
                         datasets: [{
-                            data: [25, 30, 20, 15, 10],
+                            data: [35, 25, 20, 12, 8],
                             backgroundColor: [
+                                '#00ff88',
+                                '#ffd700', 
                                 '#00d4ff',
                                 '#8b5cf6',
-                                '#00ff88',
-                                '#ffd700',
                                 '#ff6b35'
                             ],
                             borderWidth: 2,
@@ -2162,6 +2420,15 @@
                                 labels: {
                                     color: '#ffffff',
                                     padding: 20
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed || 0;
+                                        return `${label}: ${value}% of collaboration activity`;
+                                    }
                                 }
                             }
                         }
@@ -2202,6 +2469,42 @@
         function showCreateCollabModal() {
             alert('Create New Collaboration feature coming soon! This will allow you to initiate partnerships and co-investment opportunities.');
         }
+
+        // Upload Project Modal
+        function showUploadProjectModal() {
+            alert('Upload Project feature coming soon! Foundations can upload projects for crowdfunding and specialist recruitment.');
+        }
+
+        // Pledge Amount Function
+        function pledgeAmount() {
+            const customAmount = document.getElementById('customAmount').value;
+            const amount = customAmount || '1000';
+            alert(`Thank you for pledging $${amount}! You will be redirected to secure payment processing.`);
+        }
+
+        // Apply for Role Function
+        function applyForRole() {
+            alert('Apply for Role feature coming soon! You can apply for specialized positions like Head Researcher, Policy Advisor, etc.');
+        }
+
+        // View Prospectus Function
+        function viewProspectus() {
+            alert('Prospectus viewer coming soon! This will show detailed project information, financial projections, and impact metrics.');
+        }
+
+        // Pledge Button Click Handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click handlers for pledge buttons
+            document.querySelectorAll('.pledge-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const amount = this.dataset.amount;
+                    document.getElementById('customAmount').value = amount;
+                    // Highlight selected amount
+                    document.querySelectorAll('.pledge-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
 
         // Window resize handler for charts
         window.addEventListener('resize', function() {
