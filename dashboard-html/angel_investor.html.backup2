@@ -728,30 +728,6 @@
                 <button class="nav-link" id="market-tab" data-bs-toggle="tab" data-bs-target="#market" type="button" role="tab"><i class="fas fa-lightbulb me-2"></i>Market Intelligence
                 </button>
             </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="deal-wizard-tab" data-bs-toggle="tab" data-bs-target="#deal-wizard" type="button" role="tab">
-                    <i class="fas fa-magic me-2"></i>Deal Sourcing
-                    <span class="badge bg-primary ms-2">Manus AI</span>
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="sentiment-tab" data-bs-toggle="tab" data-bs-target="#sentiment" type="button" role="tab">
-                    <i class="fas fa-chart-line me-2"></i>Founder Signals
-                    <span class="badge bg-info ms-2">Live</span>
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="vetting-tab" data-bs-toggle="tab" data-bs-target="#vetting" type="button" role="tab">
-                    <i class="fas fa-shield-alt me-2"></i>Founder Vetting
-                    <span class="badge bg-success ms-2">Blockchain</span>
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="risk-radar-tab" data-bs-toggle="tab" data-bs-target="#risk-radar" type="button" role="tab">
-                    <i class="fas fa-radar me-2"></i>Risk Radar
-                    <span class="badge bg-danger ms-2">Live</span>
-                </button>
-            </li>
         </ul>
 
         <!-- Tab Content -->
@@ -767,30 +743,6 @@
                             <button class="add-startup-btn" onclick="openAddStartupModal()">
                                 <i class="fas fa-plus me-2"></i>Add Startup
                             </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Portfolio Journey Narrative (NEW - Storytelling) -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="glass-card p-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-book-open me-2 text-primary"></i>
-                                    Your Angel Investment Journey
-                                    <span class="badge bg-primary ms-2">Strategic Intelligence</span>
-                                </h5>
-                                <button class="btn btn-sm btn-outline-primary" onclick="refreshAngelPortfolioStory()">
-                                    <i class="fas fa-sync me-1"></i>Refresh Story
-                                </button>
-                            </div>
-                            <div id="angelPortfolioJourneyNarrative">
-                                <div class="text-center py-4">
-                                    <i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i>
-                                    <p class="text-muted">Crafting your investment narrative...</p>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -2117,26 +2069,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Deal Sourcing Wizard Tab -->
-            <div class="tab-pane fade" id="deal-wizard" role="tabpanel" aria-labelledby="deal-wizard-tab">
-                <div id="dealSourcingWizardContainer"></div>
-            </div>
-
-            <!-- Founder Sentiment Analyzer Tab -->
-            <div class="tab-pane fade" id="sentiment" role="tabpanel" aria-labelledby="sentiment-tab">
-                <div id="founderSentimentContainer"></div>
-            </div>
-
-            <!-- Blockchain Founder Vetting Tab -->
-            <div class="tab-pane fade" id="vetting" role="tabpanel" aria-labelledby="vetting-tab">
-                <div id="blockchainVettingContainer"></div>
-            </div>
-
-            <!-- Dynamic Risk Radar Tab -->
-            <div class="tab-pane fade" id="risk-radar" role="tabpanel" aria-labelledby="risk-radar-tab">
-                <div id="riskRadarContainer"></div>
             </div>
         </div>
     </div>
@@ -3589,85 +3521,6 @@
             console.log(`Explaining match for ${dealName} (${matchScore}%)`);
             // This could trigger a more detailed AI explanation
             alert(`AI Match Explanation for ${dealName} coming soon!`);
-        }
-    </script>
-
-    <!-- Angel-Specific Features -->
-    <script src="deal-sourcing-wizard.js"></script>
-    <script src="founder-sentiment-analyzer.js"></script>
-    <script src="blockchain-founder-vetting.js"></script>
-    <script src="dynamic-risk-radar.js"></script>
-    
-    <!-- VC Features (for adaptation) -->
-    <script src="innovation-thesis-builder.js"></script>
-    <script src="portfolio-value-playbook.js"></script>
-    <script src="predictive-exit-simulator.js"></script>
-    <script src="esg-impact-tracker.js"></script>
-    <script src="coinvestment-network-matcher.js"></script>
-    <script src="advanced-report-generator.js"></script>
-    
-    <!-- Angel Feature Adapters -->
-    <script src="angel-feature-adapters.js"></script>
-    
-    <!-- Strategic Storytelling Engine -->
-    <script src="strategic-storytelling-engine.js"></script>
-
-    <!-- Initialize Angel Features -->
-    <script>
-        // Lazy load angel features when tabs are clicked
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
-            
-            tabButtons.forEach(button => {
-                button.addEventListener('shown.bs.tab', function(e) {
-                    const targetId = e.target.getAttribute('data-bs-target');
-                    
-                    // Initialize features on first tab click
-                    if (targetId === '#deal-wizard' && !window.dealWizardInitialized) {
-                        dealSourcingWizard.initialize('dealSourcingWizardContainer');
-                        window.dealWizardInitialized = true;
-                    } else if (targetId === '#sentiment' && !window.sentimentInitialized) {
-                        sentimentAnalyzer.initialize('founderSentimentContainer');
-                        window.sentimentInitialized = true;
-                    } else if (targetId === '#vetting' && !window.vettingInitialized) {
-                        blockchainVetting.initialize('blockchainVettingContainer');
-                        window.vettingInitialized = true;
-                    } else if (targetId === '#risk-radar' && !window.riskRadarInitialized) {
-                        riskRadar.initialize('riskRadarContainer');
-                        window.riskRadarInitialized = true;
-                    }
-                });
-            });
-            
-            // Initialize storytelling narratives
-            loadAngelPortfolioJourneyNarrative();
-        });
-        
-        // Load Angel Portfolio Journey Narrative
-        async function loadAngelPortfolioJourneyNarrative() {
-            const container = document.getElementById('angelPortfolioJourneyNarrative');
-            if (!container) return;
-            
-            try {
-                const portfolioData = {
-                    totalInvested: 2500000, // $2.5M (typical angel portfolio)
-                    currentValue: 6500000, // $6.5M
-                    companies: 15,
-                    timeframe: '4 years'
-                };
-                
-                const narrative = await storytellingEngine.generatePortfolioJourney(portfolioData);
-                container.innerHTML = narrative.html;
-            } catch (error) {
-                console.error('Error loading angel portfolio narrative:', error);
-                container.innerHTML = '<p class="text-muted">Unable to load narrative at this time.</p>';
-            }
-        }
-        
-        // Refresh angel portfolio story
-        async function refreshAngelPortfolioStory() {
-            storytellingEngine.clearCache();
-            await loadAngelPortfolioJourneyNarrative();
         }
     </script>
 
