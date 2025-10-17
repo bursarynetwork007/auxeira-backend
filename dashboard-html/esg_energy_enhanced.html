@@ -189,6 +189,17 @@
             color: var(--text-primary);
         }
     </style>
+    <script src="ai_dashboard_administrator.js"></script>
+    <style>
+        .chart-container { margin: 20px 0; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px; }
+        .chart-title { color: var(--terminal-green); margin-bottom: 15px; }
+        .premium-report-card { position: relative; padding: 20px; margin-bottom: 15px; }
+        .price-tag { position: absolute; top: 10px; right: 10px; background: var(--terminal-green); color: var(--terminal-dark); padding: 4px 8px; border-radius: 12px; font-weight: bold; }
+        .update-indicator { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .locked-content { border: 2px dashed var(--terminal-yellow); }
+        .generate-report-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    </style>
 </head>
 <body>
     <div class="accessibility-controls">
@@ -464,5 +475,6 @@
             document.getElementById('timestamp').textContent = new Date().toISOString().replace('T', ' ').substr(0, 19) + ' UTC';
         }, 30000);
     </script>
+    <script src="esg_enhanced_framework.js"></script>
 </body>
 </html>
