@@ -1,0 +1,3130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira ESG Education Impact Donor Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <style>
+        :root {
+            --terminal-dark: #0a0a0a;
+            --terminal-darker: #050505;
+            --terminal-blue: #00d4ff;
+            --terminal-purple: #8b5cf6;
+            --terminal-green: #00ff88;
+            --terminal-gold: #ffd700;
+            --terminal-white: #ffffff;
+            --terminal-gray: #666666;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --high-contrast-bg: rgba(255, 255, 255, 0.15);
+            --high-contrast-border: rgba(255, 255, 255, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--terminal-dark) 0%, var(--terminal-darker) 100%);
+            color: var(--terminal-white);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* High Contrast Mode */
+        body.high-contrast {
+            --glass-bg: var(--high-contrast-bg);
+            --glass-border: var(--high-contrast-border);
+        }
+
+        .terminal-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--terminal-blue), var(--terminal-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .profile-completion {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-completion:hover {
+            background: var(--terminal-blue);
+            color: var(--terminal-dark);
+        }
+
+        .data-refresh {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            color: var(--terminal-green);
+        }
+
+        .last-updated {
+            font-size: 0.8rem;
+            color: var(--terminal-green);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .live-update-badge {
+            background: var(--terminal-green);
+            color: var(--terminal-dark);
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .accessibility-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .accessibility-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--terminal-white);
+            padding: 0.3rem 0.6rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .accessibility-btn:hover {
+            background: var(--terminal-purple);
+        }
+
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            padding: 2rem 0;
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-item:hover {
+            background: var(--glass-bg);
+            border-left-color: var(--terminal-blue);
+        }
+
+        .nav-item.active {
+            background: var(--glass-bg);
+            border-left-color: var(--terminal-blue);
+            color: var(--terminal-blue);
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .terminal-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .terminal-card:hover {
+            border-color: var(--terminal-blue);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .card-header h3 {
+            color: var(--terminal-blue);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--terminal-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .story-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .story-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .story-badge.leaf { color: var(--terminal-green); }
+        .story-badge.rocket { color: var(--terminal-gold); }
+        .story-badge.handshake { color: var(--terminal-purple); }
+
+        .story-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--terminal-blue);
+            margin-bottom: 1rem;
+        }
+
+        .story-content {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .story-metrics {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .story-metric {
+            text-align: center;
+        }
+
+        .story-metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--terminal-green);
+        }
+
+        .story-metric-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--terminal-blue), var(--terminal-purple));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-premium {
+            background: linear-gradient(45deg, var(--terminal-gold), #ff6b35);
+            color: white;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .report-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .report-card:hover {
+            border-color: var(--terminal-blue);
+            transform: translateY(-5px);
+        }
+
+        .report-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--terminal-blue);
+            margin-bottom: 1rem;
+        }
+
+        .report-description {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .report-price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--terminal-green);
+            margin-bottom: 1rem;
+        }
+
+        .report-preview {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .preview-title {
+            font-weight: bold;
+            color: var(--terminal-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Upload Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: var(--terminal-dark);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            margin: 5% auto;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--terminal-blue);
+        }
+
+        .close {
+            color: var(--terminal-white);
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .close:hover {
+            color: var(--terminal-blue);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--terminal-blue);
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--terminal-white);
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--terminal-blue);
+            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .file-upload {
+            border: 2px dashed var(--glass-border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: var(--terminal-blue);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .file-upload.dragover {
+            border-color: var(--terminal-green);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        /* Analytics Engine Styles */
+        .analytics-module {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .analytics-module h4 {
+            color: var(--terminal-blue);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .prediction-chart, .attribution-chart {
+            margin: 1rem 0;
+            height: 200px;
+        }
+
+        .prediction-summary, .attribution-summary {
+            margin-top: 1rem;
+        }
+
+        .prediction-item, .attribution-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 5px;
+        }
+
+        .prediction-value, .attribution-value {
+            color: var(--terminal-green);
+            font-weight: bold;
+        }
+
+        .risk-matrix {
+            margin: 1rem 0;
+        }
+
+        .risk-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+
+        .risk-cell {
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .risk-cell.low {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid var(--terminal-green);
+        }
+
+        .risk-cell.medium {
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid var(--terminal-gold);
+        }
+
+        .risk-cell.high {
+            background: rgba(255, 107, 53, 0.2);
+            border: 1px solid #ff6b35;
+        }
+
+        .risk-label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-count {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .risk-factors {
+            margin-top: 1rem;
+        }
+
+        .risk-factor {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 5px;
+        }
+
+        .factor-score {
+            color: var(--terminal-green);
+            font-weight: bold;
+        }
+
+        /* Collaboration Features */
+        .expert-match, .knowledge-items, .investment-opportunities, .mentorship-programs {
+            margin-top: 1rem;
+        }
+
+        .match-item, .knowledge-item, .opportunity-item, .program-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .match-item:hover, .knowledge-item:hover, .opportunity-item:hover, .program-item:hover {
+            border-color: var(--terminal-blue);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .match-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--terminal-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .match-details {
+            flex: 1;
+        }
+
+        .match-name, .knowledge-title, .opportunity-title, .program-title {
+            font-weight: bold;
+            color: var(--terminal-blue);
+            margin-bottom: 0.3rem;
+        }
+
+        .match-expertise, .knowledge-meta, .opportunity-details, .program-details {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .match-score {
+            color: var(--terminal-green);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .opportunity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        .opportunity-amount {
+            color: var(--terminal-green);
+            font-weight: bold;
+        }
+
+        .opportunity-progress {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(45deg, var(--terminal-blue), var(--terminal-green));
+            transition: width 0.3s ease;
+        }
+
+        .opportunity-investors {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .program-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .program-status.active {
+            background: var(--terminal-green);
+            color: var(--terminal-dark);
+        }
+
+        .program-status.recruiting {
+            background: var(--terminal-gold);
+            color: var(--terminal-dark);
+        }
+
+        /* Event Calendar Styles */
+        .event-list {
+            margin-top: 1rem;
+        }
+
+        .event-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .event-item:hover {
+            border-color: var(--terminal-blue);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .event-date {
+            background: var(--terminal-blue);
+            color: var(--terminal-dark);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-right: 1rem;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .event-details {
+            flex: 1;
+        }
+
+        .event-title {
+            font-weight: bold;
+            color: var(--terminal-blue);
+            margin-bottom: 0.3rem;
+        }
+
+        .event-location {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                order: 2;
+            }
+
+            .content {
+                order: 1;
+                padding: 1rem;
+            }
+
+            .terminal-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .metric-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .report-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-item {
+                padding: 0.75rem 1rem;
+            }
+
+            .modal-content {
+                margin: 2% auto;
+                width: 95%;
+                padding: 1rem;
+            }
+        }
+
+        /* Accessibility Improvements */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Focus indicators */
+        .nav-item:focus,
+        .btn:focus,
+        .form-control:focus,
+        .modal .close:focus {
+            outline: 2px solid var(--terminal-blue);
+            outline-offset: 2px;
+        }
+
+        /* High contrast mode adjustments */
+        body.high-contrast .terminal-card,
+        body.high-contrast .modal-content,
+        body.high-contrast .analytics-module {
+            background: var(--high-contrast-bg);
+            border-color: var(--high-contrast-border);
+        }
+
+        /* Chart container styles */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 1rem 0;
+        }
+
+        .chart-container canvas {
+            max-height: 100%;
+        }
+
+        /* Loading states */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--terminal-blue);
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--terminal-blue);
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* AI Status Indicator */
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+        }
+
+        .ai-status.processing {
+            color: var(--terminal-gold);
+            border-color: var(--terminal-gold);
+        }
+
+        .ai-status.ready {
+            color: var(--terminal-green);
+            border-color: var(--terminal-green);
+        }
+
+        .ai-status.error {
+            color: #ff6b35;
+            border-color: #ff6b35;
+        }
+
+        .ai-status-icon {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .ai-status.processing .ai-status-icon {
+            animation: pulse 1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Terminal Header -->
+    <div class="terminal-header">
+        <div class="logo">AUXEIRA</div>
+        <div class="user-info">
+            <div class="profile-completion" onclick="openProfileModal()" 
+                 aria-label="Complete your profile - 65% done" 
+                 role="button" tabindex="0">
+                Profile: 65% Complete
+            </div>
+            <div class="last-updated" aria-live="polite">
+                <i class="fas fa-sync-alt"></i>
+                <span id="lastUpdated">Last updated: 2 min ago</span>
+                <div class="live-update-badge">LIVE</div>
+            </div>
+            <div class="ai-status ready" id="aiStatus" aria-live="polite">
+                <div class="ai-status-icon"></div>
+                <span>AI Ready</span>
+            </div>
+            <div class="accessibility-controls">
+                <button class="accessibility-btn" onclick="toggleHighContrast()" 
+                        aria-label="Toggle high contrast mode">
+                    <i class="fas fa-adjust"></i>
+                </button>
+                <button class="accessibility-btn" onclick="toggleFontSize()" 
+                        aria-label="Increase font size">
+                    <i class="fas fa-text-height"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar" role="navigation" aria-label="Main navigation">
+            <div class="nav-item active" onclick="showTab('overview')" 
+                 role="button" tabindex="0" aria-label="Overview dashboard">
+                <i class="fas fa-tachometer-alt nav-icon"></i>
+                <span>Overview</span>
+            </div>
+            <div class="nav-item" onclick="showTab('opportunity-ripple')" 
+                 role="button" tabindex="0" aria-label="Opportunity ripple">
+                <i class="fas fa-water nav-icon"></i>
+                <span>Opportunity Ripple</span>
+            </div>
+            <div class="nav-item" onclick="showTab('portfolio')" 
+                 role="button" tabindex="0" aria-label="Portfolio management">
+                <i class="fas fa-briefcase nav-icon"></i>
+                <span>Portfolio</span>
+            </div>
+            <div class="nav-item" onclick="showTab('leaderboard')" 
+                 role="button" tabindex="0" aria-label="Leaderboard rankings">
+                <i class="fas fa-trophy nav-icon"></i>
+                <span>Leaderboard</span>
+            </div>
+            <div class="nav-item" onclick="showTab('collaboration')" 
+                 role="button" tabindex="0" aria-label="Collaboration zone">
+                <i class="fas fa-users nav-icon"></i>
+                <span>Collaboration Zone</span>
+            </div>
+            <div class="nav-item" onclick="showTab('reports')" 
+                 role="button" tabindex="0" aria-label="Reports and analytics">
+                <i class="fas fa-file-alt nav-icon"></i>
+                <span>Reports</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content" role="main">
+            <!-- Overview Tab -->
+            <div id="overview" class="tab-content active">
+                <h2 class="mb-4" style="color: var(--terminal-blue);">
+                    <i class="fas fa-tachometer-alt"></i> 
+                    Welcome, <span data-bind="user_name">Dr. Amara Okafor</span>
+                </h2>
+
+                <!-- Hero Impact Story -->
+                <div class="terminal-card">
+                    <div class="story-badge leaf" aria-label="Environmental impact">🌱</div>
+                    <div class="story-title" data-bind="hero_story_title">
+                        Your R<span data-bind="total_investment | currency">2.4M</span> Transformed 
+                        <span data-bind="students_reached | number">285,000</span> Lives
+                    </div>
+                    <div class="story-content" data-bind="hero_story_content">
+                        In the heart of rural KwaZulu-Natal, your investment sparked a digital revolution. 
+                        Nomsa Mthembu, once teaching with chalk and outdated textbooks, now guides 
+                        her students through interactive STEM lessons on tablets. The ripple effect? 
+                        A 340% increase in mathematics proficiency and 89% of her students now 
+                        pursuing higher education—breaking generational cycles of poverty.
+                    </div>
+                    <div class="story-metrics">
+                        <div class="story-metric">
+                            <div class="story-metric-value" data-bind="lives_per_grant | number">118</div>
+                            <div class="story-metric-label">Lives-per-Grant</div>
+                        </div>
+                        <div class="story-metric">
+                            <div class="story-metric-value" data-bind="literacy_improvement | percentage">94.2%</div>
+                            <div class="story-metric-label">Literacy Improvement</div>
+                        </div>
+                        <div class="story-metric">
+                            <div class="story-metric-value" data-bind="teacher_retention | percentage">87.5%</div>
+                            <div class="story-metric-label">Teacher Retention</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Metrics Grid -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="terminal-card">
+                            <div class="metric-item">
+                                <div class="metric-value" data-bind="total_students | number">285,000</div>
+                                <div class="metric-label">Students Reached</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="terminal-card">
+                            <div class="metric-item">
+                                <div class="metric-value" data-bind="education_roi | number">5.8x</div>
+                                <div class="metric-label">Education ROI</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="terminal-card">
+                            <div class="metric-item">
+                                <div class="metric-value" data-bind="esg_score | number">87</div>
+                                <div class="metric-label">ESG Score</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="terminal-card">
+                            <div class="metric-item">
+                                <div class="metric-value" data-bind="active_projects | number">23</div>
+                                <div class="metric-label">Active Projects</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Impact Visualization -->
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-chart-line"></i> Impact Trends</h3>
+                                <button class="btn btn-primary btn-sm" onclick="toggleTimeframe()" 
+                                        id="timeframeToggle" aria-label="Toggle between 1-year and 5-year view">
+                                    Show 5-Year History
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="impactChart" aria-label="Impact trends over time"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-globe-africa"></i> Regional Impact</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="regionalChart" aria-label="Regional impact distribution"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Reports for Overview Tab -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-file-alt"></i> Scalability & Impact Expansion Report</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="report-preview">
+                                    <div class="preview-title">Executive Summary Preview:</div>
+                                    <p>Your education portfolio demonstrates exceptional scalability potential with 
+                                    a projected 3x impact expansion possible through strategic partnerships. 
+                                    Current cost-per-beneficiary of R84 can be reduced to R67 through...</p>
+                                </div>
+                                <div class="report-price">$199</div>
+                                <button class="btn btn-premium" onclick="generateAIReport('scalability-report')">
+                                    Generate Full Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-leaf"></i> ESG Scorecard</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="report-preview">
+                                    <div class="preview-title">Scorecard Preview:</div>
+                                    <p>Environmental: 82/100 | Social: 94/100 | Governance: 85/100
+                                    Your portfolio exceeds industry benchmarks in social impact while 
+                                    maintaining strong governance standards. Key improvement areas...</p>
+                                </div>
+                                <div class="report-price">$149</div>
+                                <button class="btn btn-premium" onclick="generateAIReport('esg-scorecard')">
+                                    Generate Full Scorecard
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opportunity Ripple Tab -->
+            <div id="opportunity-ripple" class="tab-content">
+                <h2 class="mb-4" style="color: var(--terminal-blue);">
+                    <i class="fas fa-water"></i> Opportunity Ripple
+                </h2>
+
+                <!-- Opportunity Cards -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="story-card">
+                            <div class="story-badge rocket" aria-label="Growth opportunity">🚀</div>
+                            <div class="story-title" data-bind="opportunity_1_title">
+                                EdTech Startup - Series A Funding
+                            </div>
+                            <div class="story-content" data-bind="opportunity_1_description">
+                                Revolutionary AI-powered learning platform targeting rural African schools. 
+                                Proven 85% improvement in learning outcomes with 50,000+ students already benefiting.
+                            </div>
+                            <div class="story-metrics">
+                                <div class="story-metric">
+                                    <div class="story-metric-value" data-bind="opp_1_funding_target | currency">$2.5M</div>
+                                    <div class="story-metric-label">Funding Target</div>
+                                </div>
+                                <div class="story-metric">
+                                    <div class="story-metric-value" data-bind="opp_1_match_score | percentage">94%</div>
+                                    <div class="story-metric-label">Match Score</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary mt-3" onclick="viewOpportunityDetails(1)">
+                                Explore Opportunity
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="story-card">
+                            <div class="story-badge handshake" aria-label="Partnership opportunity">🤝</div>
+                            <div class="story-title" data-bind="opportunity_2_title">
+                                Rural School Network Expansion
+                            </div>
+                            <div class="story-content" data-bind="opportunity_2_description">
+                                Partnership opportunity to expand digital infrastructure to 150 rural schools 
+                                across Nigeria, Ghana, and Kenya. Projected to reach 75,000 new students.
+                            </div>
+                            <div class="story-metrics">
+                                <div class="story-metric">
+                                    <div class="story-metric-value" data-bind="opp_2_funding_target | currency">$1.8M</div>
+                                    <div class="story-metric-label">Investment Needed</div>
+                                </div>
+                                <div class="story-metric">
+                                    <div class="story-metric-value" data-bind="opp_2_match_score | percentage">89%</div>
+                                    <div class="story-metric-label">Match Score</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary mt-3" onclick="viewOpportunityDetails(2)">
+                                Explore Partnership
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Report for Opportunity Ripple Tab -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-search"></i> Fund Benchmarking & Screening Report</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="report-preview">
+                                    <div class="preview-title">Benchmarking Preview:</div>
+                                    <p>Your opportunity screening process ranks in the top 15% globally among 
+                                    education-focused impact funds. Average due diligence time: 23 days vs 
+                                    industry average of 45 days. Key screening criteria effectiveness...</p>
+                                </div>
+                                <div class="report-price">$299</div>
+                                <button class="btn btn-premium" onclick="generateAIReport('fund-benchmarking')">
+                                    Generate Benchmarking Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Tab -->
+            <div id="portfolio" class="tab-content">
+                <h2 class="mb-4" style="color: var(--terminal-blue);">
+                    <i class="fas fa-briefcase"></i> Portfolio Management
+                </h2>
+
+                <!-- Portfolio Performance -->
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-chart-area"></i> Portfolio Performance</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="portfolioChart" aria-label="Portfolio performance over time"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-pie-chart"></i> Asset Allocation</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="allocationChart" aria-label="Asset allocation breakdown"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Report for Portfolio Tab -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-calculator"></i> Lives-per-Grant & Metrics Dashboard Report</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="report-preview">
+                                    <div class="preview-title">Metrics Preview:</div>
+                                    <p>Current portfolio average: 118 Lives-per-Grant (LPG) vs industry benchmark 
+                                    of 87 LPG. Top performing investment: Digital Literacy Initiative with 
+                                    245 LPG. Optimization opportunities identified in teacher training...</p>
+                                </div>
+                                <div class="report-price">$249</div>
+                                <button class="btn btn-premium" onclick="generateAIReport('lpg-metrics-dashboard')">
+                                    Generate Metrics Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaderboard Tab -->
+            <div id="leaderboard" class="tab-content">
+                <h2 class="mb-4" style="color: var(--terminal-blue);">
+                    <i class="fas fa-trophy"></i> Impact Donor Leaderboard
+                </h2>
+
+                <!-- Leaderboard Table -->
+                <div class="terminal-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-ranking-star"></i> Top Performers</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-dark">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Impact Donor</th>
+                                        <th>Lives-per-Grant</th>
+                                        <th>ESG Score</th>
+                                        <th>Students Reached</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="table-success">
+                                        <td>1</td>
+                                        <td>You (Dr. Amara Okafor)</td>
+                                        <td>118</td>
+                                        <td>87</td>
+                                        <td>285,000</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Education Forward Fund</td>
+                                        <td>112</td>
+                                        <td>84</td>
+                                        <td>320,000</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>Global Learning Initiative</td>
+                                        <td>105</td>
+                                        <td>89</td>
+                                        <td>195,000</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Report for Leaderboard Tab -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-search"></i> Fund Benchmarking & Screening Report</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="report-preview">
+                                    <div class="preview-title">Competitive Analysis Preview:</div>
+                                    <p>Your fund ranks #1 in Lives-per-Grant efficiency among 47 education-focused 
+                                    impact funds globally. Key differentiators: 23% lower cost-per-beneficiary, 
+                                    15% higher teacher retention rates, and superior rural reach...</p>
+                                </div>
+                                <div class="report-price">$299</div>
+                                <button class="btn btn-premium" onclick="generateAIReport('fund-benchmarking')">
+                                    Generate Competitive Analysis
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collaboration Zone Tab -->
+            <div id="collaboration" class="tab-content">
+                <h2 class="mb-4" style="color: var(--terminal-blue);">
+                    <i class="fas fa-users"></i> Collaboration Zone
+                </h2>
+
+                <!-- Network Insights and Events -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-users"></i> Network Insights</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="metric-grid">
+                                    <div class="metric-item">
+                                        <div class="metric-value" data-bind="network_connections | number">156</div>
+                                        <div class="metric-label">Active Connections</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-value" data-bind="collaboration_score | percentage">87%</div>
+                                        <div class="metric-label">Collaboration Score</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-value" data-bind="partnership_opportunities | number">23</div>
+                                        <div class="metric-label">Partnership Opportunities</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-value" data-bind="knowledge_shared | number">45</div>
+                                        <div class="metric-label">Knowledge Shared</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-calendar-alt"></i> Upcoming Events</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="event-list">
+                                    <div class="event-item">
+                                        <div class="event-date">Dec 15</div>
+                                        <div class="event-details">
+                                            <div class="event-title">ESG Education Summit</div>
+                                            <div class="event-location">Virtual</div>
+                                        </div>
+                                    </div>
+                                    <div class="event-item">
+                                        <div class="event-date">Dec 20</div>
+                                        <div class="event-details">
+                                            <div class="event-title">Impact Measurement Workshop</div>
+                                            <div class="event-location">Cape Town</div>
+                                        </div>
+                                    </div>
+                                    <div class="event-item">
+                                        <div class="event-date">Jan 10</div>
+                                        <div class="event-details">
+                                            <div class="event-title">Donor Networking Event</div>
+                                            <div class="event-location">Lagos</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Collaboration & Networking Features -->
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-handshake"></i> Expert Matching</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="expert-match">
+                                    <div class="match-item">
+                                        <div class="match-avatar">
+                                            <i class="fas fa-user-graduate"></i>
+                                        </div>
+                                        <div class="match-details">
+                                            <div class="match-name">Dr. Sarah Okafor</div>
+                                            <div class="match-expertise">Education Policy Expert</div>
+                                            <div class="match-score">95% Match</div>
+                                        </div>
+                                    </div>
+                                    <div class="match-item">
+                                        <div class="match-avatar">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <div class="match-details">
+                                            <div class="match-name">Prof. Michael Chen</div>
+                                            <div class="match-expertise">Impact Measurement</div>
+                                            <div class="match-score">92% Match</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-share-alt"></i> Knowledge Sharing</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="knowledge-items">
+                                    <div class="knowledge-item">
+                                        <div class="knowledge-title">Best Practices: Rural Education</div>
+                                        <div class="knowledge-meta">45 downloads • 4.8★</div>
+                                    </div>
+                                    <div class="knowledge-item">
+                                        <div class="knowledge-title">Teacher Training Frameworks</div>
+                                        <div class="knowledge-meta">32 downloads • 4.9★</div>
+                                    </div>
+                                    <div class="knowledge-item">
+                                        <div class="knowledge-title">Digital Literacy Programs</div>
+                                        <div class="knowledge-meta">28 downloads • 4.7★</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-plus-circle"></i> Upload Opportunity</h3>
+                            </div>
+                            <div class="card-body text-center">
+                                <button class="btn btn-primary btn-lg" onclick="openUploadModal()" 
+                                        aria-label="Upload new collaboration opportunity">
+                                    <i class="fas fa-upload"></i> Share Opportunity
+                                </button>
+                                <p class="mt-2 text-muted">Share partnership opportunities with the community</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Co-investment & Partnerships -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-coins"></i> Co-investment Opportunities</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="investment-opportunities">
+                                    <div class="opportunity-item">
+                                        <div class="opportunity-header">
+                                            <div class="opportunity-title">EdTech Startup - Series A</div>
+                                            <div class="opportunity-amount">$2.5M Target</div>
+                                        </div>
+                                        <div class="opportunity-details">
+                                            <div class="opportunity-progress">
+                                                <div class="progress">
+                                                    <div class="progress-bar" style="width: 65%"></div>
+                                                </div>
+                                                <span>65% Funded</span>
+                                            </div>
+                                            <div class="opportunity-investors">12 co-investors</div>
+                                        </div>
+                                    </div>
+                                    <div class="opportunity-item">
+                                        <div class="opportunity-header">
+                                            <div class="opportunity-title">Rural School Network</div>
+                                            <div class="opportunity-amount">$1.8M Target</div>
+                                        </div>
+                                        <div class="opportunity-details">
+                                            <div class="opportunity-progress">
+                                                <div class="progress">
+                                                    <div class="progress-bar" style="width: 40%"></div>
+                                                </div>
+                                                <span>40% Funded</span>
+                                            </div>
+                                            <div class="opportunity-investors">8 co-investors</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-graduation-cap"></i> Mentorship Programs</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="mentorship-programs">
+                                    <div class="program-item">
+                                        <div class="program-title">Emerging Impact Donors</div>
+                                        <div class="program-details">
+                                            <span class="program-duration">6 months</span>
+                                            <span class="program-participants">24 participants</span>
+                                        </div>
+                                        <div class="program-status active">Active</div>
+                                    </div>
+                                    <div class="program-item">
+                                        <div class="program-title">ESG Measurement Mastery</div>
+                                        <div class="program-details">
+                                            <span class="program-duration">3 months</span>
+                                            <span class="program-participants">18 participants</span>
+                                        </div>
+                                        <div class="program-status recruiting">Recruiting</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Analytics Engine -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-brain"></i> Advanced Analytics Engine</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="analytics-module">
+                                            <h4><i class="fas fa-chart-line"></i> Predictive Modelling</h4>
+                                            <div class="prediction-chart">
+                                                <canvas id="predictionChart" width="300" height="200" 
+                                                        aria-label="5-year education outcome predictions"></canvas>
+                                            </div>
+                                            <div class="prediction-summary">
+                                                <div class="prediction-item">
+                                                    <span class="prediction-label">5-Year Literacy Rate:</span>
+                                                    <span class="prediction-value" data-bind="literacy_prediction | percentage">94.2%</span>
+                                                </div>
+                                                <div class="prediction-item">
+                                                    <span class="prediction-label">Teacher Retention:</span>
+                                                    <span class="prediction-value" data-bind="teacher_retention_prediction | percentage">87.5%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="analytics-module">
+                                            <h4><i class="fas fa-shield-alt"></i> Risk Assessment Matrix</h4>
+                                            <div class="risk-matrix">
+                                                <div class="risk-grid">
+                                                    <div class="risk-cell low" data-risk="low" 
+                                                         onclick="showRiskDetails('low')" 
+                                                         role="button" tabindex="0" 
+                                                         aria-label="Low risk investments: 12 projects">
+                                                        <span class="risk-label">Low Risk</span>
+                                                        <span class="risk-count">12</span>
+                                                    </div>
+                                                    <div class="risk-cell medium" data-risk="medium" 
+                                                         onclick="showRiskDetails('medium')" 
+                                                         role="button" tabindex="0" 
+                                                         aria-label="Medium risk investments: 8 projects">
+                                                        <span class="risk-label">Medium Risk</span>
+                                                        <span class="risk-count">8</span>
+                                                    </div>
+                                                    <div class="risk-cell high" data-risk="high" 
+                                                         onclick="showRiskDetails('high')" 
+                                                         role="button" tabindex="0" 
+                                                         aria-label="High risk investments: 3 projects">
+                                                        <span class="risk-label">High Risk</span>
+                                                        <span class="risk-count">3</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="risk-factors">
+                                                <div class="risk-factor">
+                                                    <span class="factor-name">Political Stability</span>
+                                                    <span class="factor-score">8.2/10</span>
+                                                </div>
+                                                <div class="risk-factor">
+                                                    <span class="factor-name">Economic Conditions</span>
+                                                    <span class="factor-score">7.5/10</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="analytics-module">
+                                            <h4><i class="fas fa-bullseye"></i> Impact Attribution</h4>
+                                            <div class="attribution-chart">
+                                                <canvas id="attributionChart" width="300" height="200" 
+                                                        aria-label="Impact attribution analysis"></canvas>
+                                            </div>
+                                            <div class="attribution-summary">
+                                                <div class="attribution-item">
+                                                    <span class="attribution-label">Direct Impact:</span>
+                                                    <span class="attribution-value">68%</span>
+                                                </div>
+                                                <div class="attribution-item">
+                                                    <span class="attribution-label">Indirect Impact:</span>
+                                                    <span class="attribution-value">32%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Reports for Collaboration Zone Tab -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-users"></i> Stakeholder Engagement Report</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="report-preview">
+                                    <div class="preview-title">Engagement Preview:</div>
+                                    <p>Your stakeholder engagement score of 87% exceeds industry average by 23%. 
+                                    Key strengths: transparent communication (94%), regular updates (89%), 
+                                    collaborative decision-making (82%). Areas for improvement...</p>
+                                </div>
+                                <div class="report-price">$199</div>
+                                <button class="btn btn-premium" onclick="generateAIReport('stakeholder-engagement')">
+                                    Generate Engagement Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="terminal-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-handshake"></i> Cross-Sector Collaboration Report</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="report-preview">
+                                    <div class="preview-title">Collaboration Preview:</div>
+                                    <p>Analysis identifies 15 high-potential cross-sector partnerships that could 
+                                    amplify your impact by 2.3x. Top opportunities: tech sector partnerships 
+                                    for digital infrastructure, healthcare collaborations for...</p>
+                                </div>
+                                <div class="report-price">$249</div>
+                                <button class="btn btn-premium" onclick="generateAIReport('cross-sector-collaboration')">
+                                    Generate Collaboration Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div id="reports" class="tab-content">
+                <h2 class="mb-4" style="color: var(--terminal-blue);">
+                    <i class="fas fa-file-alt"></i> Impact Reports
+                </h2>
+
+                <!-- Reports Grid -->
+                <div class="report-grid">
+                    <div class="report-card">
+                        <div class="report-title">Executive Summary</div>
+                        <div class="report-description">
+                            Comprehensive overview of your education impact portfolio with key metrics and strategic insights.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">Summary Preview:</div>
+                            <p>Your R2.4M investment has transformed 285,000 lives with a 5.8x education ROI. 
+                            Key achievements include 94.2% literacy improvement and 87.5% teacher retention...</p>
+                        </div>
+                        <div class="report-price">Free</div>
+                        <button class="btn btn-primary" onclick="generateAIReport('executive-summary')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">Scalability & Impact Expansion Report</div>
+                        <div class="report-description">
+                            Analysis of scaling opportunities and impact multiplication strategies for your education initiatives.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">Scalability Preview:</div>
+                            <p>3x impact expansion possible through strategic partnerships. Cost-per-beneficiary 
+                            reduction from R84 to R67 achievable via technology integration and...</p>
+                        </div>
+                        <div class="report-price">$199</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('scalability-report')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">ESG Scorecard</div>
+                        <div class="report-description">
+                            Detailed environmental, social, and governance performance metrics with industry benchmarks.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">ESG Preview:</div>
+                            <p>Environmental: 82/100 | Social: 94/100 | Governance: 85/100. Exceeds benchmarks 
+                            in social impact while maintaining strong governance standards...</p>
+                        </div>
+                        <div class="report-price">$149</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('esg-scorecard')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">Learning Outcomes Analysis</div>
+                        <div class="report-description">
+                            Deep dive into learning outcomes data with predictive analytics and improvement recommendations.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">Outcomes Preview:</div>
+                            <p>Mathematics proficiency increased 340%, reading comprehension up 280%. 
+                            Predictive models show continued improvement trajectory with 94.2% literacy rate...</p>
+                        </div>
+                        <div class="report-price">$249</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('learning-outcomes')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">Teacher Training Impact</div>
+                        <div class="report-description">
+                            Comprehensive assessment of teacher training programs and their impact on student outcomes.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">Training Preview:</div>
+                            <p>87.5% teacher retention rate vs 65% industry average. Training programs show 
+                            direct correlation with student performance improvements of 45% on average...</p>
+                        </div>
+                        <div class="report-price">$199</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('teacher-training')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">Gender Equity & Diversity Report</div>
+                        <div class="report-description">
+                            Analysis of gender equity initiatives and diversity outcomes in your education portfolio.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">Equity Preview:</div>
+                            <p>Female student enrollment increased 67%, STEM participation up 89%. 
+                            Gender parity achieved in 78% of supported schools with continued improvement...</p>
+                        </div>
+                        <div class="report-price">$179</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('gender-equity')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">Compliance Report</div>
+                        <div class="report-description">
+                            Regulatory compliance assessment with UNESCO, local education ministry requirements.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">Compliance Preview:</div>
+                            <p>100% compliance with UNESCO Education 2030 Framework. All projects meet 
+                            local ministry standards with 94% exceeding minimum requirements...</p>
+                        </div>
+                        <div class="report-price">$299</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('compliance-report')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">Digital Divide Analysis</div>
+                        <div class="report-description">
+                            Assessment of digital access gaps and strategies to bridge the digital divide in education.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">Digital Access Preview:</div>
+                            <p>Digital access improved from 23% to 78% in target communities. Infrastructure 
+                            investments show 4.2x multiplier effect on learning outcomes...</p>
+                        </div>
+                        <div class="report-price">$229</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('digital-divide')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">Cost Effectiveness Study</div>
+                        <div class="report-description">
+                            Detailed cost-benefit analysis of education interventions with Lives-per-Grant optimization.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">Cost Analysis Preview:</div>
+                            <p>Current cost-per-beneficiary: R84 vs industry average R127. Optimization 
+                            strategies identified to reduce costs by 20% while maintaining impact quality...</p>
+                        </div>
+                        <div class="report-price">$349</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('cost-effectiveness')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">Policy Influence Report</div>
+                        <div class="report-description">
+                            Analysis of policy landscape and recommendations for advocacy and influence strategies.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">Policy Preview:</div>
+                            <p>Your initiatives influenced 3 major policy changes affecting 1.2M students. 
+                            Advocacy effectiveness score: 89% with recommendations for expanded influence...</p>
+                        </div>
+                        <div class="report-price">$399</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('policy-influence')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">Sustainability Assessment</div>
+                        <div class="report-description">
+                            Long-term sustainability analysis of education programs with environmental impact assessment.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">Sustainability Preview:</div>
+                            <p>Programs show 95% sustainability probability beyond funding period. 
+                            Environmental footprint reduced 34% through green infrastructure initiatives...</p>
+                        </div>
+                        <div class="report-price">$279</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('sustainability-assessment')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">Carbon & Decarbonization Report</div>
+                        <div class="report-description">
+                            Carbon footprint analysis of education infrastructure with decarbonization strategies.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">Carbon Preview:</div>
+                            <p>Education infrastructure carbon footprint: 2,340 tons CO2/year. Decarbonization 
+                            roadmap shows 67% reduction potential through renewable energy adoption...</p>
+                        </div>
+                        <div class="report-price">$199</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('carbon-report')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">Materiality Assessment Report</div>
+                        <div class="report-description">
+                            ESG materiality assessment identifying key sustainability issues and stakeholder priorities.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">Materiality Preview:</div>
+                            <p>Top material issues: Quality education (98% importance), Gender equality (94%), 
+                            Digital access (89%). Stakeholder priority alignment score: 92%...</p>
+                        </div>
+                        <div class="report-price">$329</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('materiality-assessment')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">Lives-per-Grant & Metrics Dashboard Report</div>
+                        <div class="report-description">
+                            Comprehensive Lives-per-Grant analysis with detailed metrics and performance benchmarks.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">LPG Preview:</div>
+                            <p>Current LPG: 118 vs industry benchmark 87. Top performer: Digital Literacy 
+                            Initiative (245 LPG). Optimization opportunities in teacher training programs...</p>
+                        </div>
+                        <div class="report-price">$249</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('lpg-metrics')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">Fund Benchmarking & Screening Report</div>
+                        <div class="report-description">
+                            Comparative analysis against global education funds with screening and due diligence insights.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">Benchmarking Preview:</div>
+                            <p>Ranks top 15% globally among education impact funds. Due diligence time: 
+                            23 days vs industry average 45 days. Screening effectiveness: 94%...</p>
+                        </div>
+                        <div class="report-price">$299</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('fund-benchmarking')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">Stakeholder Engagement Report</div>
+                        <div class="report-description">
+                            Analysis of stakeholder relationships and engagement effectiveness with improvement strategies.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">Engagement Preview:</div>
+                            <p>Stakeholder engagement score: 87% (23% above average). Strengths: transparent 
+                            communication (94%), regular updates (89%), collaborative decisions (82%)...</p>
+                        </div>
+                        <div class="report-price">$199</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('stakeholder-engagement')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">Cross-Sector Collaboration Report</div>
+                        <div class="report-description">
+                            Identification and analysis of cross-sector partnership opportunities for amplified impact.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">Collaboration Preview:</div>
+                            <p>15 high-potential partnerships identified for 2.3x impact amplification. 
+                            Top opportunities: tech partnerships, healthcare collaborations, private sector...</p>
+                        </div>
+                        <div class="report-price">$249</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('cross-sector-collaboration')">Generate Report</button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-title">Risk-Adjusted Lives-per-Grant Report</div>
+                        <div class="report-description">
+                            Advanced risk-adjusted analysis of Lives-per-Grant metrics with portfolio optimization recommendations.
+                        </div>
+                        <div class="report-preview">
+                            <div class="preview-title">Risk-Adjusted Preview:</div>
+                            <p>Risk-adjusted LPG: 98 (vs raw LPG of 118). Portfolio optimization could 
+                            improve risk-adjusted returns by 23% through strategic reallocation...</p>
+                        </div>
+                        <div class="report-price">$399</div>
+                        <button class="btn btn-premium" onclick="generateAIReport('risk-adjusted-lpg')">Generate Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Opportunity Modal -->
+    <div id="uploadModal" class="modal" role="dialog" aria-labelledby="uploadModalTitle" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="uploadModalTitle" class="modal-title">Share Collaboration Opportunity</h2>
+                <button class="close" onclick="closeUploadModal()" aria-label="Close modal">&times;</button>
+            </div>
+            <form id="opportunityForm" onsubmit="submitOpportunity(event)">
+                <div class="form-group">
+                    <label for="opportunityTitle" class="form-label">Opportunity Title *</label>
+                    <input type="text" id="opportunityTitle" class="form-control" required 
+                           aria-describedby="titleHelp">
+                    <small id="titleHelp" class="form-text text-muted">
+                        Provide a clear, descriptive title for your opportunity
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="opportunityType" class="form-label">Opportunity Type *</label>
+                    <select id="opportunityType" class="form-control" required>
+                        <option value="">Select type...</option>
+                        <option value="partnership">Strategic Partnership</option>
+                        <option value="co-investment">Co-investment</option>
+                        <option value="knowledge-sharing">Knowledge Sharing</option>
+                        <option value="mentorship">Mentorship</option>
+                        <option value="collaboration">Research Collaboration</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="opportunityDescription" class="form-label">Description *</label>
+                    <textarea id="opportunityDescription" class="form-control" rows="4" required 
+                              aria-describedby="descHelp"></textarea>
+                    <small id="descHelp" class="form-text text-muted">
+                        Describe the opportunity, expected outcomes, and collaboration details
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="targetAmount" class="form-label">Target Amount (if applicable)</label>
+                    <input type="text" id="targetAmount" class="form-control" 
+                           placeholder="e.g., $500K, R2M">
+                </div>
+                
+                <div class="form-group">
+                    <label for="timeline" class="form-label">Timeline</label>
+                    <input type="text" id="timeline" class="form-control" 
+                           placeholder="e.g., 6 months, Q2 2024">
+                </div>
+                
+                <div class="form-group">
+                    <label for="focusAreas" class="form-label">Focus Areas</label>
+                    <input type="text" id="focusAreas" class="form-control" 
+                           placeholder="e.g., Digital Literacy, Teacher Training, Rural Education">
+                </div>
+                
+                <div class="form-group">
+                    <label for="regions" class="form-label">Target Regions</label>
+                    <input type="text" id="regions" class="form-control" 
+                           placeholder="e.g., Sub-Saharan Africa, Nigeria, Kenya">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactInfo" class="form-label">Contact Information *</label>
+                    <input type="email" id="contactInfo" class="form-control" required 
+                           placeholder="your.email@organization.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="attachments" class="form-label">Attachments</label>
+                    <div class="file-upload" onclick="document.getElementById('fileInput').click()" 
+                         ondrop="handleFileDrop(event)" ondragover="handleDragOver(event)" 
+                         ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--terminal-blue);"></i>
+                        <p>Click to upload or drag and drop files here</p>
+                        <p class="text-muted">PDF, DOC, PPT files up to 10MB</p>
+                    </div>
+                    <input type="file" id="fileInput" style="display: none;" multiple 
+                           accept=".pdf,.doc,.docx,.ppt,.pptx" onchange="handleFileSelect(event)">
+                    <div id="fileList" class="mt-2"></div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="form-check">
+                        <input type="checkbox" id="agreeTerms" class="form-check-input" required>
+                        <label for="agreeTerms" class="form-check-label">
+                            I agree to share this opportunity with the Auxeira community and 
+                            understand it will be visible to other impact donors *
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary" onclick="closeUploadModal()">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-share"></i> Share Opportunity
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Profile Completion Modal -->
+    <div id="profileModal" class="modal" role="dialog" aria-labelledby="profileModalTitle" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="profileModalTitle" class="modal-title">Complete Your Profile</h2>
+                <button class="close" onclick="closeProfileModal()" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="profile-completion-progress">
+                <div class="progress mb-3">
+                    <div class="progress-bar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">
+                        65% Complete
+                    </div>
+                </div>
+                <p class="text-muted">Complete your profile to get personalized insights and better opportunity matching</p>
+            </div>
+            <form id="profileForm" onsubmit="updateProfile(event)">
+                <div class="form-group">
+                    <label for="orgName" class="form-label">Organization Name</label>
+                    <input type="text" id="orgName" class="form-control" value="Dr. Amara Okafor Foundation">
+                </div>
+                
+                <div class="form-group">
+                    <label for="sectorType" class="form-label">Sector Type</label>
+                    <select id="sectorType" class="form-control">
+                        <option value="impact-fund" selected>Impact Fund</option>
+                        <option value="ngo">NGO</option>
+                        <option value="foundation">Foundation</option>
+                        <option value="government">Government Agency</option>
+                        <option value="corporate">Corporate Foundation</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="focusAreas" class="form-label">Focus Areas</label>
+                    <input type="text" id="focusAreasProfile" class="form-control" 
+                           value="digital literacy, teacher training, rural education">
+                </div>
+                
+                <div class="form-group">
+                    <label for="targetRegions" class="form-label">Target Regions</label>
+                    <input type="text" id="targetRegions" class="form-control" 
+                           value="Sub-Saharan Africa, Nigeria, Kenya, Ghana">
+                </div>
+                
+                <div class="form-group">
+                    <label for="annualSpend" class="form-label">Annual Education Spend</label>
+                    <input type="text" id="annualSpend" class="form-control" value="$2.4M">
+                </div>
+                
+                <div class="form-group">
+                    <label for="sdgAlignment" class="form-label">Primary SDG Alignment</label>
+                    <select id="sdgAlignment" class="form-control">
+                        <option value="SDG4" selected>SDG 4: Quality Education</option>
+                        <option value="SDG5">SDG 5: Gender Equality</option>
+                        <option value="SDG1">SDG 1: No Poverty</option>
+                        <option value="SDG10">SDG 10: Reduced Inequalities</option>
+                        <option value="SDG8">SDG 8: Decent Work and Economic Growth</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="impactGoals" class="form-label">Primary Impact Goals</label>
+                    <textarea id="impactGoals" class="form-control" rows="3">
+Maximize literacy outcomes in rural communities, improve teacher retention rates, and bridge the digital divide in education across Sub-Saharan Africa.
+                    </textarea>
+                </div>
+                
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary" onclick="closeProfileModal()">
+                        Later
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            API_BASE_URL: 'https://api.auxeira.com',
+            NANO_GPT5_ENDPOINT: '/ai/nano-gpt-5',
+            THUNDERBIT_ENDPOINT: '/crawler/thunderbit',
+            PAYSTACK_PUBLIC_KEY: 'pk_test_your_paystack_public_key_here'
+        };
+
+        // Global variables
+        let profileData = {};
+        let currentTimeframe = '365'; // Default to 365 days
+        let charts = {};
+        let isHighContrast = false;
+        let fontSize = 'normal';
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+            loadProfileData();
+            initializeCharts();
+            setupAccessibility();
+            startDataRefresh();
+        });
+
+        async function initializeDashboard() {
+            try {
+                updateAIStatus('processing', 'Initializing dashboard...');
+                
+                // Load initial data
+                await loadDashboardData();
+                
+                // Bind data to elements
+                bindDataToElements();
+                
+                updateAIStatus('ready', 'Dashboard ready');
+                updateLastRefresh();
+            } catch (error) {
+                console.error('Dashboard initialization error:', error);
+                updateAIStatus('error', 'Initialization failed');
+            }
+        }
+
+        async function loadDashboardData() {
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/dashboard/data?days=${currentTimeframe}`, {
+                    headers: {
+                        'Authorization': `Bearer ${getAuthToken()}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return data;
+                } else {
+                    // Use mock data for development
+                    return getMockData();
+                }
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                return getMockData();
+            }
+        }
+
+        function getMockData() {
+            return {
+                user_name: 'Dr. Amara Okafor',
+                total_investment: '2.4M',
+                students_reached: '285,000',
+                lives_per_grant: '118',
+                literacy_improvement: '94.2',
+                teacher_retention: '87.5',
+                total_students: '285,000',
+                education_roi: '5.8',
+                esg_score: '87',
+                active_projects: '23',
+                network_connections: '156',
+                collaboration_score: '87',
+                partnership_opportunities: '23',
+                knowledge_shared: '45',
+                literacy_prediction: '94.2',
+                teacher_retention_prediction: '87.5'
+            };
+        }
+
+        function bindDataToElements() {
+            const data = getMockData(); // In production, use loaded data
+            
+            document.querySelectorAll('[data-bind]').forEach(element => {
+                const bindingInfo = element.getAttribute('data-bind').split('|');
+                const key = bindingInfo[0].trim();
+                const format = bindingInfo[1] ? bindingInfo[1].trim() : null;
+                
+                if (data[key] !== undefined) {
+                    element.textContent = formatValue(data[key], format);
+                }
+            });
+        }
+
+        function formatValue(value, format) {
+            if (!format) return value;
+            
+            switch (format) {
+                case 'number':
+                    return parseInt(value).toLocaleString();
+                case 'currency':
+                    return new Intl.NumberFormat('en-ZA', {
+                        style: 'currency',
+                        currency: 'ZAR'
+                    }).format(value);
+                case 'percentage':
+                    return `${value}%`;
+                default:
+                    return value;
+            }
+        }
+
+        // Navigation
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked nav item
+            event.target.closest('.nav-item').classList.add('active');
+            
+            // Update charts if needed
+            if (tabName === 'overview') {
+                updateCharts();
+            }
+        }
+
+        // Chart initialization
+        function initializeCharts() {
+            initializeImpactChart();
+            initializeRegionalChart();
+            initializePortfolioChart();
+            initializeAllocationChart();
+            initializePredictionChart();
+            initializeAttributionChart();
+        }
+
+        function initializeImpactChart() {
+            const ctx = document.getElementById('impactChart');
+            if (!ctx) return;
+            
+            charts.impact = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Students Reached',
+                        data: [45000, 52000, 61000, 78000, 95000, 125000, 156000, 189000, 215000, 245000, 268000, 285000],
+                        borderColor: 'var(--terminal-blue)',
+                        backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Lives-per-Grant',
+                        data: [67, 72, 78, 85, 92, 98, 104, 108, 112, 115, 117, 118],
+                        borderColor: 'var(--terminal-green)',
+                        backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'var(--terminal-white)'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: 'var(--terminal-white)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            ticks: { color: 'var(--terminal-white)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            ticks: { color: 'var(--terminal-white)' },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeRegionalChart() {
+            const ctx = document.getElementById('regionalChart');
+            if (!ctx) return;
+            
+            charts.regional = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Nigeria', 'Kenya', 'Ghana', 'South Africa', 'Other'],
+                    datasets: [{
+                        data: [35, 28, 18, 12, 7],
+                        backgroundColor: [
+                            'var(--terminal-blue)',
+                            'var(--terminal-green)',
+                            'var(--terminal-purple)',
+                            'var(--terminal-gold)',
+                            'var(--terminal-gray)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'var(--terminal-white)',
+                                padding: 15
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializePortfolioChart() {
+            const ctx = document.getElementById('portfolioChart');
+            if (!ctx) return;
+            
+            charts.portfolio = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Q1 2023', 'Q2 2023', 'Q3 2023', 'Q4 2023', 'Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024'],
+                    datasets: [{
+                        label: 'Portfolio Value',
+                        data: [1.8, 2.1, 2.3, 2.5, 2.8, 3.2, 3.6, 4.1],
+                        borderColor: 'var(--terminal-blue)',
+                        backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'var(--terminal-white)'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: 'var(--terminal-white)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            ticks: { 
+                                color: 'var(--terminal-white)',
+                                callback: function(value) {
+                                    return '$' + value + 'M';
+                                }
+                            },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeAllocationChart() {
+            const ctx = document.getElementById('allocationChart');
+            if (!ctx) return;
+            
+            charts.allocation = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Digital Infrastructure', 'Teacher Training', 'Curriculum Development', 'Student Support', 'Technology'],
+                    datasets: [{
+                        data: [30, 25, 20, 15, 10],
+                        backgroundColor: [
+                            'var(--terminal-blue)',
+                            'var(--terminal-green)',
+                            'var(--terminal-purple)',
+                            'var(--terminal-gold)',
+                            'var(--terminal-gray)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'var(--terminal-white)',
+                                padding: 10
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializePredictionChart() {
+            const ctx = document.getElementById('predictionChart');
+            if (!ctx) return;
+            
+            charts.prediction = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2024', '2025', '2026', '2027', '2028'],
+                    datasets: [{
+                        label: 'Literacy Rate Prediction',
+                        data: [87.5, 90.2, 92.1, 93.5, 94.2],
+                        borderColor: 'var(--terminal-green)',
+                        backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Teacher Retention Prediction',
+                        data: [82.1, 84.3, 85.8, 86.9, 87.5],
+                        borderColor: 'var(--terminal-blue)',
+                        backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'var(--terminal-white)',
+                                font: { size: 10 }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: 'var(--terminal-white)', font: { size: 10 } },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            ticks: { 
+                                color: 'var(--terminal-white)',
+                                font: { size: 10 },
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeAttributionChart() {
+            const ctx = document.getElementById('attributionChart');
+            if (!ctx) return;
+            
+            charts.attribution = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Direct Impact', 'Indirect Impact'],
+                    datasets: [{
+                        data: [68, 32],
+                        backgroundColor: [
+                            'var(--terminal-green)',
+                            'var(--terminal-blue)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'var(--terminal-white)',
+                                font: { size: 10 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCharts() {
+            Object.values(charts).forEach(chart => {
+                if (chart && chart.update) {
+                    chart.update();
+                }
+            });
+        }
+
+        // Timeframe toggle
+        function toggleTimeframe() {
+            const button = document.getElementById('timeframeToggle');
+            if (currentTimeframe === '365') {
+                currentTimeframe = '1825'; // 5 years
+                button.textContent = 'Show 1-Year View';
+                button.setAttribute('aria-label', 'Toggle to 1-year view');
+            } else {
+                currentTimeframe = '365';
+                button.textContent = 'Show 5-Year History';
+                button.setAttribute('aria-label', 'Toggle to 5-year view');
+            }
+            
+            // Reload data with new timeframe
+            loadDashboardData().then(data => {
+                bindDataToElements();
+                updateCharts();
+            });
+        }
+
+        // AI Integration Functions
+        async function generateAIReport(reportType) {
+            try {
+                updateAIStatus('processing', 'Generating AI report...');
+                
+                // Get user profile data for personalization
+                const profileContext = await getProfileContext();
+                
+                // Get Thunderbit crawled data
+                const crawledData = await getCrawledData();
+                
+                // Generate report using nano-GPT-5
+                const reportData = await callNanoGPT5(reportType, profileContext, crawledData);
+                
+                // Process payment if premium report
+                if (isPremiumReport(reportType)) {
+                    await processReportPayment(reportType, reportData);
+                } else {
+                    displayReport(reportData);
+                }
+                
+                updateAIStatus('ready', 'Report generated');
+            } catch (error) {
+                console.error('Error generating AI report:', error);
+                updateAIStatus('error', 'Report generation failed');
+            }
+        }
+
+        async function callNanoGPT5(reportType, profileContext, crawledData) {
+            const prompts = {
+                'scalability-report': generateScalabilityPrompt(profileContext, crawledData),
+                'esg-scorecard': generateESGPrompt(profileContext, crawledData),
+                'executive-summary': generateExecutiveSummaryPrompt(profileContext, crawledData),
+                'fund-benchmarking': generateBenchmarkingPrompt(profileContext, crawledData),
+                'lpg-metrics': generateLPGPrompt(profileContext, crawledData),
+                'stakeholder-engagement': generateStakeholderPrompt(profileContext, crawledData),
+                'cross-sector-collaboration': generateCollaborationPrompt(profileContext, crawledData),
+                // Add more prompts as needed
+            };
+            
+            const prompt = prompts[reportType] || generateGenericPrompt(reportType, profileContext, crawledData);
+            
+            const response = await fetch(`${CONFIG.API_BASE_URL}${CONFIG.NANO_GPT5_ENDPOINT}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${getAuthToken()}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    prompt: prompt,
+                    model: 'nano-gpt-5',
+                    max_tokens: 4000,
+                    temperature: 0.7,
+                    response_format: 'json'
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to generate AI report');
+            }
+            
+            return await response.json();
+        }
+
+        async function getCrawledData() {
+            try {
+                const website = profileData.website || 'auxeira.com';
+                const response = await fetch(`${CONFIG.API_BASE_URL}${CONFIG.THUNDERBIT_ENDPOINT}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${getAuthToken()}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        url: website,
+                        focus_areas: profileData.focus_areas || 'education',
+                        depth: 2,
+                        include_related: true
+                    })
+                });
+                
+                if (response.ok) {
+                    return await response.json();
+                } else {
+                    return { summary: 'No recent data available', content: [] };
+                }
+            } catch (error) {
+                console.error('Error crawling data:', error);
+                return { summary: 'Crawling failed', content: [] };
+            }
+        }
+
+        // Prompt Generation Functions
+        function generateScalabilityPrompt(profileContext, crawledData) {
+            return `System: You are Auxeira's Scalability Strategist AI. Generate a report forecasting scalability of education initiatives, aligned with GRI and IRIS+ standards. JSON output: {title, scalability_summary (200 words), growth_matrix (array of {strategy, scale_potential (1-10), cost_estimate, timeline}), expansion_narrative (700 words), risk_factors (array of {risk, mitigation}), visuals (Chart.js configs)}.
+
+User: For ${profileContext.org_name} (${profileContext.sector_type}), forecast scalability of ${profileContext.focus_areas} in ${profileContext.region}. Goals: ${profileContext.impact_goals}. Use crawled data: ${JSON.stringify(crawledData.summary)}. Align with SDG ${profileContext.sdg_alignment}. Narrative: How ${profileContext.org_name} can scale from current reach to 3x impact, cutting costs by 20% via partnerships. Include 3 growth strategies and risks. Project 3-year impact.`;
+        }
+
+        function generateESGPrompt(profileContext, crawledData) {
+            return `System: You are Auxeira's ESG Analyst AI. Generate comprehensive ESG scorecard for education investments, aligned with SASB and GRI standards. JSON output: {title, esg_summary (150 words), environmental_score (0-100), social_score (0-100), governance_score (0-100), detailed_metrics (array), benchmark_comparison, improvement_recommendations (array), visuals (Chart.js configs)}.
+
+User: Create ESG scorecard for ${profileContext.org_name} (${profileContext.sector_type}) focused on ${profileContext.focus_areas} in ${profileContext.region}. Annual spend: ${profileContext.annual_spend}. Use crawled insights: ${JSON.stringify(crawledData.summary)}. Compare against education fund benchmarks. Include environmental impact of digital infrastructure, social outcomes for beneficiaries, and governance transparency. Provide actionable improvement recommendations.`;
+        }
+
+        function generateExecutiveSummaryPrompt(profileContext, crawledData) {
+            return `System: You are Auxeira's Executive Summary AI. Create concise, impactful executive summaries for education impact portfolios. JSON output: {title, executive_summary (300 words), key_achievements (array of 5), financial_highlights (array), impact_metrics (array), next_steps (array of 3)}.
+
+User: Generate executive summary for ${profileContext.org_name}'s education portfolio. Focus areas: ${profileContext.focus_areas}. Region: ${profileContext.region}. Annual spend: ${profileContext.annual_spend}. Key metrics: 285K students reached, 5.8x education ROI, 87 ESG score. Include policy influence, teacher retention, and digital divide progress.`;
+        }
+
+        // Payment Processing
+        async function processReportPayment(reportType, reportData) {
+            const reportPrices = {
+                'scalability-report': 19900, // $199 in cents
+                'esg-scorecard': 14900,
+                'learning-outcomes': 24900,
+                'teacher-training': 19900,
+                'gender-equity': 17900,
+                'compliance-report': 29900,
+                'digital-divide': 22900,
+                'cost-effectiveness': 34900,
+                'policy-influence': 39900,
+                'sustainability-assessment': 27900,
+                'carbon-report': 19900,
+                'materiality-assessment': 32900,
+                'lpg-metrics': 24900,
+                'fund-benchmarking': 29900,
+                'stakeholder-engagement': 19900,
+                'cross-sector-collaboration': 24900,
+                'risk-adjusted-lpg': 39900
+            };
+            
+            const amount = reportPrices[reportType] || 19900;
+            
+            const handler = PaystackPop.setup({
+                key: CONFIG.PAYSTACK_PUBLIC_KEY,
+                email: profileData.email || 'user@example.com',
+                amount: amount,
+                currency: 'USD',
+                ref: `report_${reportType}_${Date.now()}`,
+                metadata: {
+                    report_type: reportType,
+                    org_name: profileData.org_name,
+                    user_id: getUserId()
+                },
+                callback: function(response) {
+                    // Payment successful
+                    console.log('Payment successful:', response);
+                    displayReport(reportData);
+                    trackReportPurchase(reportType, amount);
+                },
+                onClose: function() {
+                    console.log('Payment cancelled');
+                    updateAIStatus('ready', 'Payment cancelled');
+                }
+            });
+            
+            handler.openIframe();
+        }
+
+        function isPremiumReport(reportType) {
+            const freeReports = ['executive-summary'];
+            return !freeReports.includes(reportType);
+        }
+
+        function displayReport(reportData) {
+            // Create a new window or modal to display the report
+            const reportWindow = window.open('', '_blank', 'width=800,height=600');
+            reportWindow.document.write(`
+                <html>
+                <head>
+                    <title>${reportData.title}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        h1 { color: #00d4ff; }
+                        .section { margin-bottom: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>${reportData.title}</h1>
+                    <div class="section">
+                        <h2>Executive Summary</h2>
+                        <p>${reportData.summary || reportData.executive_summary}</p>
+                    </div>
+                    <div class="section">
+                        <h2>Key Findings</h2>
+                        <ul>
+                            ${(reportData.key_findings || reportData.key_achievements || []).map(finding => `<li>${finding}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <h2>Recommendations</h2>
+                        <ul>
+                            ${(reportData.recommendations || reportData.next_steps || []).map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    </div>
+                </body>
+                </html>
+            `);
+        }
+
+        // Profile Management
+        async function loadProfileData() {
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${getAuthToken()}`
+                    }
+                });
+                
+                if (response.ok) {
+                    profileData = await response.json();
+                    updateProfileUI();
+                } else {
+                    // Use default profile data
+                    profileData = {
+                        org_name: 'Dr. Amara Okafor Foundation',
+                        profile_completion: 65,
+                        sector_type: 'impact-fund',
+                        region: 'Sub-Saharan Africa',
+                        focus_areas: 'digital literacy, teacher training, rural education',
+                        sdg_alignment: 'SDG4, SDG5',
+                        annual_spend: '$2.4M',
+                        impact_goals: 'Maximize literacy outcomes in rural communities, improve teacher retention rates, and bridge the digital divide in education across Sub-Saharan Africa.',
+                        email: 'amara@okafor-foundation.org'
+                    };
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                profileData = {
+                    org_name: 'Your Organization',
+                    profile_completion: 65
+                };
+            }
+        }
+
+        function updateProfileUI() {
+            const completionElement = document.querySelector('.profile-completion');
+            if (completionElement) {
+                completionElement.textContent = `Profile: ${profileData.profile_completion}% Complete`;
+            }
+        }
+
+        async function getProfileContext() {
+            return {
+                org_name: profileData.org_name || 'Your Organization',
+                sector_type: profileData.sector_type || 'impact-fund',
+                region: profileData.region || 'Global',
+                focus_areas: profileData.focus_areas || 'education',
+                sdg_alignment: profileData.sdg_alignment || 'SDG4',
+                annual_spend: profileData.annual_spend || '$1M',
+                impact_goals: profileData.impact_goals || 'Improve education outcomes'
+            };
+        }
+
+        // Modal Functions
+        function openUploadModal() {
+            document.getElementById('uploadModal').style.display = 'block';
+            document.getElementById('uploadModal').setAttribute('aria-hidden', 'false');
+            document.getElementById('opportunityTitle').focus();
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').style.display = 'none';
+            document.getElementById('uploadModal').setAttribute('aria-hidden', 'true');
+            document.getElementById('opportunityForm').reset();
+            document.getElementById('fileList').innerHTML = '';
+        }
+
+        function openProfileModal() {
+            document.getElementById('profileModal').style.display = 'block';
+            document.getElementById('profileModal').setAttribute('aria-hidden', 'false');
+            document.getElementById('orgName').focus();
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').style.display = 'none';
+            document.getElementById('profileModal').setAttribute('aria-hidden', 'true');
+        }
+
+        // Form Handlers
+        async function submitOpportunity(event) {
+            event.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('title', document.getElementById('opportunityTitle').value);
+            formData.append('type', document.getElementById('opportunityType').value);
+            formData.append('description', document.getElementById('opportunityDescription').value);
+            formData.append('target_amount', document.getElementById('targetAmount').value);
+            formData.append('timeline', document.getElementById('timeline').value);
+            formData.append('focus_areas', document.getElementById('focusAreas').value);
+            formData.append('regions', document.getElementById('regions').value);
+            formData.append('contact_info', document.getElementById('contactInfo').value);
+            
+            // Add files
+            const fileInput = document.getElementById('fileInput');
+            for (let i = 0; i < fileInput.files.length; i++) {
+                formData.append('attachments', fileInput.files[i]);
+            }
+            
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/opportunities`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${getAuthToken()}`
+                    },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    alert('Opportunity shared successfully!');
+                    closeUploadModal();
+                } else {
+                    alert('Error sharing opportunity. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error submitting opportunity:', error);
+                alert('Error sharing opportunity. Please try again.');
+            }
+        }
+
+        async function updateProfile(event) {
+            event.preventDefault();
+            
+            const profileUpdate = {
+                org_name: document.getElementById('orgName').value,
+                sector_type: document.getElementById('sectorType').value,
+                focus_areas: document.getElementById('focusAreasProfile').value,
+                target_regions: document.getElementById('targetRegions').value,
+                annual_spend: document.getElementById('annualSpend').value,
+                sdg_alignment: document.getElementById('sdgAlignment').value,
+                impact_goals: document.getElementById('impactGoals').value
+            };
+            
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/profile`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${getAuthToken()}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(profileUpdate)
+                });
+                
+                if (response.ok) {
+                    profileData = { ...profileData, ...profileUpdate, profile_completion: 85 };
+                    updateProfileUI();
+                    alert('Profile updated successfully!');
+                    closeProfileModal();
+                    
+                    // Refresh dashboard with new profile data
+                    bindDataToElements();
+                } else {
+                    alert('Error updating profile. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                alert('Error updating profile. Please try again.');
+            }
+        }
+
+        // File Upload Handlers
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            displayFileList(files);
+        }
+
+        function handleFileDrop(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const fileUpload = event.target.closest('.file-upload');
+            fileUpload.classList.remove('dragover');
+            
+            const files = event.dataTransfer.files;
+            document.getElementById('fileInput').files = files;
+            displayFileList(files);
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        function handleDragEnter(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.target.closest('.file-upload').classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.target.closest('.file-upload').classList.remove('dragover');
+        }
+
+        function displayFileList(files) {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item d-flex justify-content-between align-items-center p-2 mt-2 bg-dark rounded';
+                fileItem.innerHTML = `
+                    <span><i class="fas fa-file"></i> ${file.name} (${formatFileSize(file.size)})</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFile(${i})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                fileList.appendChild(fileItem);
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function removeFile(index) {
+            const fileInput = document.getElementById('fileInput');
+            const dt = new DataTransfer();
+            
+            for (let i = 0; i < fileInput.files.length; i++) {
+                if (i !== index) {
+                    dt.items.add(fileInput.files[i]);
+                }
+            }
+            
+            fileInput.files = dt.files;
+            displayFileList(fileInput.files);
+        }
+
+        // Accessibility Functions
+        function setupAccessibility() {
+            // Keyboard navigation for nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        this.click();
+                    }
+                });
+            });
+            
+            // Keyboard navigation for risk cells
+            document.querySelectorAll('.risk-cell').forEach(cell => {
+                cell.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        this.click();
+                    }
+                });
+            });
+            
+            // Close modals with Escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    const modals = document.querySelectorAll('.modal');
+                    modals.forEach(modal => {
+                        if (modal.style.display === 'block') {
+                            if (modal.id === 'uploadModal') {
+                                closeUploadModal();
+                            } else if (modal.id === 'profileModal') {
+                                closeProfileModal();
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function toggleHighContrast() {
+            isHighContrast = !isHighContrast;
+            document.body.classList.toggle('high-contrast', isHighContrast);
+            
+            // Update charts for high contrast
+            if (isHighContrast) {
+                Object.values(charts).forEach(chart => {
+                    if (chart && chart.options) {
+                        chart.options.plugins.legend.labels.color = '#ffffff';
+                        chart.options.scales.x.ticks.color = '#ffffff';
+                        chart.options.scales.y.ticks.color = '#ffffff';
+                        chart.update();
+                    }
+                });
+            }
+        }
+
+        function toggleFontSize() {
+            fontSize = fontSize === 'normal' ? 'large' : 'normal';
+            document.body.style.fontSize = fontSize === 'large' ? '1.1em' : '1em';
+        }
+
+        // Utility Functions
+        function updateAIStatus(status, message) {
+            const aiStatus = document.getElementById('aiStatus');
+            const statusIcon = aiStatus.querySelector('.ai-status-icon');
+            const statusText = aiStatus.querySelector('span');
+            
+            aiStatus.className = `ai-status ${status}`;
+            statusText.textContent = message;
+        }
+
+        function updateLastRefresh() {
+            const lastUpdated = document.getElementById('lastUpdated');
+            const now = new Date();
+            lastUpdated.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+        }
+
+        function startDataRefresh() {
+            // Update every 2 minutes
+            setInterval(() => {
+                loadDashboardData().then(data => {
+                    bindDataToElements();
+                    updateLastRefresh();
+                });
+            }, 120000);
+        }
+
+        function getAuthToken() {
+            // In production, get from secure storage
+            return localStorage.getItem('auth_token') || 'demo_token';
+        }
+
+        function getUserId() {
+            // In production, get from secure storage
+            return localStorage.getItem('user_id') || 'demo_user';
+        }
+
+        function trackReportPurchase(reportType, amount) {
+            // Analytics tracking
+            console.log(`Report purchased: ${reportType}, Amount: ${amount}`);
+        }
+
+        // Risk Analysis Functions
+        function showRiskDetails(riskLevel) {
+            const riskData = {
+                low: {
+                    title: 'Low Risk Investments (12 projects)',
+                    description: 'Stable, established programs with proven track records',
+                    projects: ['Digital Literacy Program - Nigeria', 'Teacher Training Initiative - Kenya', 'Rural School Network - Ghana']
+                },
+                medium: {
+                    title: 'Medium Risk Investments (8 projects)',
+                    description: 'Growing programs with good potential but some uncertainties',
+                    projects: ['EdTech Startup - Series A', 'Mobile Learning Platform', 'STEM Education Initiative']
+                },
+                high: {
+
