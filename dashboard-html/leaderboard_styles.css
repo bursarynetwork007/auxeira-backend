@@ -1,0 +1,416 @@
+/* ESG Leaderboard System Styles */
+
+/* Position Summary Styles */
+.position-summary {
+    background: linear-gradient(135deg, rgba(0, 255, 65, 0.1) 0%, rgba(0, 212, 255, 0.1) 100%);
+    border: 2px solid var(--terminal-green);
+    padding: 30px;
+}
+
+.rank-display {
+    text-align: center;
+}
+
+.rank-number {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--terminal-green);
+    text-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+    line-height: 1;
+}
+
+.rank-label {
+    color: var(--terminal-white);
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.percentile-display {
+    text-align: center;
+}
+
+.percentile-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--terminal-blue);
+    text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+    line-height: 1;
+}
+
+.percentile-label {
+    color: var(--terminal-white);
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.org-name {
+    color: var(--terminal-white);
+    margin-bottom: 15px;
+}
+
+.performance-badges .badge {
+    margin-right: 10px;
+    margin-bottom: 5px;
+    font-size: 0.8rem;
+}
+
+.improvement-insights {
+    padding: 10px;
+    background: rgba(255, 255, 0, 0.1);
+    border-radius: 8px;
+    border-left: 3px solid var(--terminal-yellow);
+}
+
+/* Filter Controls */
+.filter-controls {
+    padding: 20px;
+}
+
+.filter-controls .form-label {
+    color: var(--terminal-white);
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.filter-controls .form-select {
+    background: var(--terminal-dark);
+    border: 1px solid var(--terminal-green);
+    color: var(--terminal-white);
+}
+
+.filter-controls .form-select:focus {
+    border-color: var(--terminal-blue);
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+/* Leaderboard Table Styles */
+.leaderboard-table {
+    background: transparent;
+}
+
+.leaderboard-table th {
+    background: var(--terminal-dark);
+    border-color: var(--terminal-green);
+    color: var(--terminal-green);
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    padding: 15px 10px;
+}
+
+.leaderboard-table td {
+    border-color: rgba(255, 255, 255, 0.1);
+    padding: 15px 10px;
+    vertical-align: middle;
+}
+
+.leaderboard-table tr:hover {
+    background: rgba(0, 255, 65, 0.05);
+}
+
+.user-row {
+    background: rgba(0, 255, 65, 0.1) !important;
+    border: 2px solid var(--terminal-green);
+}
+
+.user-row:hover {
+    background: rgba(0, 255, 65, 0.15) !important;
+}
+
+/* Rank Badge Styles */
+.rank-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.rank-gold {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #000;
+}
+
+.rank-silver {
+    background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+    color: #000;
+}
+
+.rank-bronze {
+    background: linear-gradient(135deg, #CD7F32, #B8860B);
+    color: #fff;
+}
+
+.rank-default {
+    background: var(--terminal-dark);
+    color: var(--terminal-white);
+    border: 1px solid var(--terminal-green);
+}
+
+/* Organization Info */
+.org-info strong {
+    color: var(--terminal-white);
+    font-size: 0.95rem;
+}
+
+/* Type Badge */
+.type-badge {
+    background: var(--terminal-blue);
+    color: var(--terminal-dark);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* Score Display */
+.score-display {
+    position: relative;
+    width: 80px;
+}
+
+.score-value {
+    color: var(--terminal-green);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.score-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    margin-top: 4px;
+    overflow: hidden;
+}
+
+.score-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--terminal-green), var(--terminal-blue));
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+/* ESG Rating Styles */
+.esg-rating {
+    padding: 6px 10px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.esg-excellent {
+    background: var(--terminal-green);
+    color: var(--terminal-dark);
+}
+
+.esg-good {
+    background: var(--terminal-yellow);
+    color: var(--terminal-dark);
+}
+
+.esg-average {
+    background: var(--terminal-gray);
+    color: var(--terminal-white);
+}
+
+/* Benchmarking Insights */
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.insight-card {
+    display: flex;
+    align-items: flex-start;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border-left: 4px solid var(--terminal-green);
+    transition: all 0.3s ease;
+}
+
+.insight-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.insight-icon {
+    margin-right: 15px;
+    font-size: 1.5rem;
+    margin-top: 5px;
+}
+
+.insight-content {
+    flex: 1;
+}
+
+.insight-title {
+    color: var(--terminal-white);
+    margin-bottom: 8px;
+    font-size: 1rem;
+}
+
+.insight-description {
+    color: var(--terminal-gray);
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+/* Chart Container Enhancements */
+#peer-comparison-chart,
+#performance-trends-chart {
+    position: relative;
+    height: 300px;
+}
+
+/* View Toggle Buttons */
+.btn-group .btn {
+    border-color: var(--terminal-green);
+    color: var(--terminal-white);
+}
+
+.btn-group .btn.active {
+    background: var(--terminal-green);
+    color: var(--terminal-dark);
+}
+
+.btn-group .btn:hover {
+    background: rgba(0, 255, 65, 0.2);
+    border-color: var(--terminal-green);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .rank-number {
+        font-size: 2rem;
+    }
+    
+    .percentile-number {
+        font-size: 1.8rem;
+    }
+    
+    .position-summary {
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .performance-badges {
+        text-align: center;
+        margin: 15px 0;
+    }
+    
+    .insights-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .leaderboard-table {
+        font-size: 0.8rem;
+    }
+    
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 8px 5px;
+    }
+    
+    .score-display {
+        width: 60px;
+    }
+}
+
+@media (max-width: 576px) {
+    .filter-controls .row {
+        gap: 15px;
+    }
+    
+    .filter-controls .col-md-3 {
+        margin-bottom: 15px;
+    }
+    
+    .rank-display,
+    .percentile-display {
+        margin-bottom: 20px;
+    }
+}
+
+/* Animation Enhancements */
+.leaderboard-table tbody tr {
+    animation: fadeInUp 0.5s ease forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.leaderboard-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+.leaderboard-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
+.leaderboard-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
+.leaderboard-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+.leaderboard-table tbody tr:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Pulse animation for user row */
+.user-row {
+    animation: userRowPulse 2s infinite;
+}
+
+@keyframes userRowPulse {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(0, 255, 65, 0.6);
+    }
+}
+
+/* Loading states */
+.loading-placeholder {
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Tooltip styles */
+.tooltip-inner {
+    background: var(--terminal-dark);
+    border: 1px solid var(--terminal-green);
+    color: var(--terminal-white);
+}
+
+.tooltip .arrow::before {
+    border-top-color: var(--terminal-green);
+}
+
+/* High contrast mode adjustments */
+.high-contrast .insight-card {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(255, 255, 255, 0.8);
+}
+
+.high-contrast .leaderboard-table th {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.high-contrast .score-bar {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.high-contrast .score-fill {
+    background: #ffffff;
+}

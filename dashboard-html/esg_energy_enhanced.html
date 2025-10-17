@@ -200,6 +200,7 @@
         .locked-content { border: 2px dashed var(--terminal-yellow); }
         .generate-report-btn:disabled { opacity: 0.6; cursor: not-allowed; }
     </style>
+    <link rel="stylesheet" href="leaderboard_styles.css">
 </head>
 <body>
     <div class="accessibility-controls">
@@ -475,6 +476,7 @@
             document.getElementById('timestamp').textContent = new Date().toISOString().replace('T', ' ').substr(0, 19) + ' UTC';
         }, 30000);
     </script>
+    <script src="esg_leaderboard_system.js"></script>
     <script src="esg_enhanced_framework.js"></script>
 </body>
 </html>

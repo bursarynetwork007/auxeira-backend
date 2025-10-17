@@ -915,6 +915,7 @@
         .locked-content { border: 2px dashed var(--terminal-yellow); }
         .generate-report-btn:disabled { opacity: 0.6; cursor: not-allowed; }
     </style>
+    <link rel="stylesheet" href="leaderboard_styles.css">
 </head>
 <body>
     <!-- Terminal Header -->
@@ -2774,6 +2775,7 @@ User: Generate executive summary for ${profileContext.org_name}'s education port
         .locked-content { border: 2px dashed var(--terminal-yellow); }
         .generate-report-btn:disabled { opacity: 0.6; cursor: not-allowed; }
     </style>
+    <link rel="stylesheet" href="leaderboard_styles.css">
 </head>
                 <body>
                     <h1>${reportData.title}</h1>
@@ -2793,7 +2795,8 @@ User: Generate executive summary for ${profileContext.org_name}'s education port
                             ${(reportData.recommendations || reportData.next_steps || []).map(rec => `<li>${rec}</li>`).join('')}
                         </ul>
                     </div>
-                    <script src="esg_enhanced_framework.js"></script>
+                    <script src="esg_leaderboard_system.js"></script>
+    <script src="esg_enhanced_framework.js"></script>
 </body>
                 </html>
             `);
