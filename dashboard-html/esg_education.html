@@ -1178,13 +1178,195 @@
                 </div>
             </div>
 
-            <!-- Collaboration Zone Tab -->
+            <!-- Collaboration Zone Tab - ENHANCED -->
             <div id="collaboration" class="tab-content">
-                <h2 style="color: var(--terminal-blue);" class="mb-4">
-                    <i class="fas fa-users"></i> Collaboration Zone
-                </h2>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 style="color: var(--terminal-blue);">
+                        <i class="fas fa-users"></i> Collaboration Zone
+                    </h2>
+                    <button class="btn btn-primary" onclick="showCreateCollabModal()">
+                        <i class="fas fa-plus"></i> Create New Collaboration
+                    </button>
+                </div>
 
-                <!-- Active Partnerships -->
+                <!-- AI-Powered Events Section -->
+                <div class="glass-card mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-calendar me-3" style="color: var(--terminal-blue); font-size: 1.5rem;"></i>
+                        <h4 style="color: var(--terminal-blue); margin: 0;">AI-Recommended Events</h4>
+                    </div>
+                   
+                    <div id="ai-events-container">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="story-card">
+                                    <div class="story-title">🌍 Global Education Summit 2024</div>
+                                    <div class="story-content">UNESCO's flagship event bringing together 500+ education leaders. Perfect alignment with your SDG 4 focus.</div>
+                                    <div class="story-metrics">
+                                        <div class="metric-item">
+                                            <div class="metric-value">Dec 15-17</div>
+                                            <div class="metric-label">Dubai, UAE</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-value">96%</div>
+                                            <div class="metric-label">Match Score</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="story-card">
+                                    <div class="story-title">💻 EdTech Africa Conference</div>
+                                    <div class="story-content">Leading digital education conference with focus on AI-powered learning solutions and teacher training.</div>
+                                    <div class="story-metrics">
+                                        <div class="metric-item">
+                                            <div class="metric-value">Jan 20-22</div>
+                                            <div class="metric-label">Lagos, Nigeria</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-value">89%</div>
+                                            <div class="metric-label">Match Score</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Network Insights -->
+                <div class="glass-card mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-chart-network me-3" style="color: var(--terminal-green); font-size: 1.5rem;"></i>
+                        <h4 style="color: var(--terminal-green); margin: 0;">Network Insights</h4>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="metric-item text-center">
+                                <div class="metric-value" style="color: var(--terminal-green);">87%</div>
+                                <div class="metric-label">Connection Strength</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="metric-item text-center">
+                                <div class="metric-value" style="color: var(--terminal-blue);">+12</div>
+                                <div class="metric-label">New Connections This Month</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h5 style="color: var(--terminal-purple);">Top Collaboration Opportunities</h5>
+                        <ul style="color: var(--terminal-white); line-height: 1.8;">
+                            <li><strong>Gates Foundation</strong> - Digital Literacy Initiative (95% alignment)</li>
+                            <li><strong>Mastercard Foundation</strong> - Youth Employment Program (92% alignment)</li>
+                            <li><strong>UNESCO</strong> - Policy Development Working Group (88% alignment)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Expert Directory -->
+                <div class="glass-card mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-user-tie me-3" style="color: var(--terminal-gold); font-size: 1.5rem;"></i>
+                        <h4 style="color: var(--terminal-gold); margin: 0;">Expert Directory</h4>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Search for experts by skill, location, or expertise" style="background: var(--terminal-dark); border-color: var(--glass-border); color: var(--terminal-white);">
+                        <button class="btn btn-primary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="story-card">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div style="font-size: 2rem; margin-right: 1rem;">👨‍💼</div>
+                                    <div>
+                                        <div class="story-title" style="margin-bottom: 0.5rem;">Dr. Amina Jalloh</div>
+                                        <div style="color: var(--terminal-gray);">Education Policy & Curriculum Development</div>
+                                        <div style="color: var(--terminal-blue); font-size: 0.9rem;">Sierra Leone • Available for Consultancy</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="story-card">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div style="font-size: 2rem; margin-right: 1rem;">👩‍💻</div>
+                                    <div>
+                                        <div class="story-title" style="margin-bottom: 0.5rem;">Prof. Kwame Osei</div>
+                                        <div style="color: var(--terminal-gray);">EdTech & Digital Learning Solutions</div>
+                                        <div style="color: var(--terminal-blue); font-size: 0.9rem;">Ghana • Seeking Research Partners</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Collaborations -->
+                <div class="glass-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 style="color: var(--terminal-blue);">EduTech Kenya Series A - Co-Investment</h4>
+                        <span class="premium-badge">94% Aligned</span>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <p style="color: var(--terminal-white);">Seeking co-Impact Donors for $2.5M Series A in Kenya's leading digital literacy platform. Strong ESG alignment with SDG 4 focus and proven 89% improvement in math scores.</p>
+                            <div class="mb-2" style="color: var(--terminal-gray);">
+                                <strong>Lead Impact Donor:</strong> Acumen Academy Fund<br>
+                                <strong>Target:</strong> $2.5M • <strong>Committed:</strong> $1.8M (72%)
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="progress mb-2" style="background: var(--terminal-dark);">
+                                    <div class="progress-bar" style="width: 72%; background: var(--terminal-green);"></div>
+                                </div>
+                                <div class="metric-value" style="color: var(--terminal-green);">$700K</div>
+                                <div class="metric-label">Remaining</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-primary">View Prospectus</button>
+                        <button class="btn btn-outline-success">Pledge Investment</button>
+                        <button class="btn btn-outline-primary">Join Due Diligence</button>
+                    </div>
+                </div>
+
+                <div class="glass-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 style="color: var(--terminal-purple);">Teacher Training Nigeria - Seeking Entrepreneurs</h4>
+                        <span class="premium-badge">88% Aligned</span>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <p style="color: var(--terminal-white);">Fully funded $1.2M initiative seeking experienced entrepreneurs and researchers to scale AI-powered teacher training across Nigeria. Focus on female teacher empowerment.</p>
+                            <div class="mb-2" style="color: var(--terminal-gray);">
+                                <strong>Funding Status:</strong> Fully Funded<br>
+                                <strong>Seeking:</strong> 2 Entrepreneurs, 1 Research Partner
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="metric-value" style="color: var(--terminal-blue);">3/5</div>
+                                <div class="metric-label">Positions Filled</div>
+                                <div class="mt-2">
+                                    <span class="badge bg-success">2 Entrepreneurs</span>
+                                    <span class="badge bg-warning">1 Researcher Needed</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-primary">View Details</button>
+                        <button class="btn btn-outline-primary">Recommend Partner</button>
+                        <button class="btn btn-outline-info">Join Advisory</button>
+                    </div>
+                </div>
+
+                <!-- Active Strategic Partnerships -->
                 <div class="glass-card mb-4">
                     <h4 style="color: var(--terminal-green);">Active Strategic Partnerships</h4>
                     <div class="collaboration-hub">
@@ -1219,24 +1401,6 @@
                             <div class="mt-3">
                                 <span class="tag tag-sfdr">Innovation</span>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Collaboration Opportunities -->
-                <div class="glass-card ai-powered">
-                    <h4 style="color: var(--terminal-gold);">AI-Identified Collaboration Opportunities <span class="ai-loading" id="collabLoader"></span></h4>
-                    <div id="collabOpportunities">
-                        <div class="opportunity-card">
-                            <h5 style="color: var(--terminal-blue);">🤝 Gates Foundation Partnership</h5>
-                            <p><strong>Synergy Score: 94%</strong> - Aligned mission and complementary resources</p>
-                            <p>Potential co-investment in teacher training programs across Sub-Saharan Africa. Combined reach: 500K+ students.</p>
-                        </div>
-
-                        <div class="opportunity-card">
-                            <h5 style="color: var(--terminal-green);">🌐 Google for Education Alliance</h5>
-                            <p><strong>Synergy Score: 87%</strong> - Technology infrastructure alignment</p>
-                            <p>Leverage Google Workspace for Education to enhance digital literacy programs. Cost reduction: 35%.</p>
                         </div>
                     </div>
                 </div>
@@ -2033,6 +2197,11 @@
                 document.body.style.fontSize = fontSize + 'px';
             }
         });
+
+        // Create Collaboration Modal
+        function showCreateCollabModal() {
+            alert('Create New Collaboration feature coming soon! This will allow you to initiate partnerships and co-investment opportunities.');
+        }
 
         // Window resize handler for charts
         window.addEventListener('resize', function() {
