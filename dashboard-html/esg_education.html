@@ -2147,6 +2147,14 @@
 
         // Tab Navigation
         function showTab(tabName) {
+            // Check profile completion for premium tabs
+            const premiumTabs = ['analytics', 'portfolio', 'collaboration', 'reports'];
+            if (premiumTabs.includes(tabName)) {
+                if (!forceProfileCompletion(`access ${tabName} features`)) {
+                    return;
+                }
+            }
+            
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
