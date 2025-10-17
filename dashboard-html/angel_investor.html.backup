@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auxeira VC Dashboard - AI-Powered Value Creation Platform</title>
+    <title>Auxeira Angel Investor Dashboard - AI-Powered Angel Investment Intelligence Platform</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -526,7 +526,7 @@
             }
         }
     
-        /* Innovation Thesis Builder Styles */
+        /* Angel Investment Thesis Builder Styles */
         .thesis-canvas {
             min-height: 300px;
             border: 2px dashed var(--border-color);
@@ -657,7 +657,7 @@
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h1 class="h2 mb-1">Auxeira Value Creation Platform</h1>
+                        <h1 class="h3 mb-0">Auxeira Angel Investor Dashboard</h1>
                         <p class="text-muted mb-0">
                             <span id="fundName">Alpha Ventures</span> • <span id="fundNumber">Fund III</span> • 
                             <span class="badge bg-primary ms-2">SSE Enabled</span>
@@ -706,8 +706,7 @@
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="deals-tab" data-bs-toggle="tab" data-bs-target="#deals" type="button" role="tab">
-                    <i class="fas fa-handshake me-2"></i>Deals & Co-Investment
+                <button class="nav-link" id="deals-tab" data-bs-toggle="tab" data-bs-target="#deals" type="button" role="tab"><i class="fas fa-handshake me-2"></i>Deal Flow & Syndication
                 </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -722,13 +721,11 @@
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="leaderboard-tab" data-bs-toggle="tab" data-bs-target="#leaderboard" type="button" role="tab">
-                    <i class="fas fa-trophy me-2"></i>Leaderboard
+                <button class="nav-link" id="leaderboard-tab" data-bs-toggle="tab" data-bs-target="#leaderboard" type="button" role="tab"><i class="fas fa-users me-2"></i>Angel Network
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="market-tab" data-bs-toggle="tab" data-bs-target="#market" type="button" role="tab">
-                    <i class="fas fa-globe me-2"></i>Market Intelligence
+                <button class="nav-link" id="market-tab" data-bs-toggle="tab" data-bs-target="#market" type="button" role="tab"><i class="fas fa-lightbulb me-2"></i>Market Intelligence
                 </button>
             </li>
         </ul>
@@ -754,8 +751,8 @@
                 <div class="row mb-4">
                     <div class="col-md-3">
                         <div class="metric-card">
-                            <div class="metric-value text-success" id="currentIRR">28.4%</div>
-                            <div class="metric-label">Current IRR</div>
+                            <div class="metric-value text-success" id="currentROI">28.4%</div>
+                            <div class="metric-label">Current ROI</div>
                             <div class="small text-muted">Target: 25%</div>
                             <div class="small text-success">+2.1%</div>
                         </div>
@@ -770,8 +767,8 @@
                     </div>
                     <div class="col-md-3">
                         <div class="metric-card">
-                            <div class="metric-value text-warning" id="currentDPI">0.9x</div>
-                            <div class="metric-label">Current DPI</div>
+                            <div class="metric-value text-warning" id="currentRealized Returns">0.9x</div>
+                            <div class="metric-label">Current Realized Returns</div>
                             <div class="small text-muted">Target: 1.2x</div>
                             <div class="small text-warning">+0.1x</div>
                         </div>
@@ -779,7 +776,7 @@
                     <div class="col-md-3">
                         <div class="metric-card">
                             <div class="metric-value text-info" id="portfolioValue">$450M</div>
-                            <div class="metric-label">Portfolio Value</div>
+                            <div class="metric-label">Total Investment Value</div>
                             <div class="small text-muted">Target: $625M</div>
                             <div class="small text-info">+$45M</div>
                         </div>
@@ -802,26 +799,26 @@
                     </div>
                 </div>
 
-                <!-- Portfolio Companies Grid -->
+                <!-- Portfolio Startups Grid -->
                 <div class="row">
                     <div class="col-12">
                         <div class="glass-card p-4">
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h5 class="mb-0">
-                                    <i class="fas fa-building me-2"></i>Portfolio Companies
+                                    <i class="fas fa-building me-2"></i>Portfolio Startups
                                     <span class="badge bg-secondary ms-2" id="portfolioCount">6</span>
                                 </h5>
                                 <div class="d-flex gap-2">
                                     <select class="form-select form-select-sm" id="sortBy" onchange="sortPortfolio()">
-                                        <option value="irr">Sort by IRR</option>
+                                        <option value="irr">Sort by ROI</option>
                                         <option value="moic">Sort by MOIC</option>
                                         <option value="value">Sort by Value</option>
                                         <option value="risk">Sort by Risk</option>
-                                        <option value="sse">Sort by SSE Score</option>
+                                        <option value="sse">Sort by AIS Score</option>
                                     </select>
                                     <select class="form-select form-select-sm" id="filterBy" onchange="filterPortfolio()">
                                         <option value="all">All Companies</option>
-                                        <option value="high_performers">High Performers (IRR >30%)</option>
+                                        <option value="high_performers">High Performers (ROI >30%)</option>
                                         <option value="at_risk">At Risk (Runway <18mo)</option>
                                         <option value="strong_signals">Strong Buy Signals</option>
                                         <option value="unicorn_potential">Unicorn Potential (>$10M)</option>
@@ -843,7 +840,7 @@
                         <div class="glass-card p-4 feature-highlight">
                             <div class="feature-tag">AI-POWERED</div>
                             <h5 class="mb-3">
-                                <i class="fas fa-robot me-2"></i>Gina Value Creation Copilot
+                                <i class="fas fa-robot me-2"></i>Gina Startup Support Copilot
                                 <span class="badge bg-success ms-2">Live Analysis</span>
                             </h5>
                             <div class="row mb-4">
@@ -855,7 +852,7 @@
                                         <div class="fw-bold fs-5">50% Reduction in Failures</div>
                                         <div class="small text-muted">Based on 10K+ simulations</div>
                                         <div class="mt-2">
-                                            <span class="badge bg-success">+20% IRR Boost</span>
+                                            <span class="badge bg-success">+20% ROI Boost</span>
                                             <span class="badge bg-primary ms-1">+25% Faster Milestones</span>
                                         </div>
                                     </div>
@@ -865,7 +862,7 @@
                                         <h6 class="text-danger">
                                             <i class="fas fa-arrow-down me-2"></i>Without SSE
                                         </h6>
-                                        <div class="fw-bold fs-5">35% Lower Value Creation</div>
+                                        <div class="fw-bold fs-5">35% Lower Startup Support</div>
                                         <div class="small text-muted">Counterfactual analysis</div>
                                         <div class="mt-2">
                                             <span class="badge bg-danger">Higher Failure Risk</span>
@@ -940,7 +937,7 @@
                             <div class="causal-impact">
                                 <h6 class="text-success mb-3">Recent AI Insights</h6>
                                 <div class="small">
-                                    <p><strong>HealthTech Optimization:</strong> Implementing milestone-based rewards could extend runway by 6 months. Similar portfolio companies achieved 25% cost reduction with this approach.</p>
+                                    <p><strong>HealthTech Optimization:</strong> Implementing milestone-based rewards could extend runway by 6 months. Similar portfolio startups achieved 25% cost reduction with this approach.</p>
                                     <div class="peer-comparison">
                                         <small>
                                             <strong>Peer Success:</strong> Sequoia-backed HealthTech reduced burn by 30% using SSE rewards
@@ -968,12 +965,12 @@
                                 <div class="col-md-8">
                                     <div class="causal-impact p-3">
                                         <h6 class="text-success mb-3">
-                                            <i class="fas fa-chart-line me-2"></i>Joint SSE Value Creation
+                                            <i class="fas fa-chart-line me-2"></i>Joint SSE Startup Support
                                         </h6>
                                         <div class="row text-center">
                                             <div class="col-4">
                                                 <div class="fw-bold fs-4 text-success">25%</div>
-                                                <div class="text-muted">Higher IRR</div>
+                                                <div class="text-muted">Higher ROI</div>
                                             </div>
                                             <div class="col-4">
                                                 <div class="fw-bold fs-4 text-primary">18%</div>
@@ -1022,7 +1019,7 @@
                                         <p class="small text-muted mb-2">Quantum computing for AI acceleration, 3.2x revenue growth</p>
                                         <div class="peer-comparison">
                                             <small>
-                                                <strong>SSE Synergy:</strong> Joint rewards yield 25% higher IRR
+                                                <strong>SSE Synergy:</strong> Joint rewards yield 25% higher ROI
                                             </small>
                                         </div>
                                         <div class="mt-3">
@@ -1173,7 +1170,7 @@
                                         </div>
                                         <div class="mb-3">
                                             <div class="d-flex justify-content-between mb-2">
-                                                <span class="text-muted">Fund IRR</span>
+                                                <span class="text-muted">Fund ROI</span>
                                                 <span class="fw-bold text-primary">28.4%</span>
                                             </div>
                                             <div class="progress">
@@ -1213,7 +1210,7 @@
                                                 <div class="progress-bar" style="width: 92%"></div>
                                             </div>
                                         </div>
-                                        <p class="small text-muted mb-3">Comprehensive analysis of portfolio companies</p>
+                                        <p class="small text-muted mb-3">Comprehensive analysis of portfolio startups</p>
                                         <div class="d-flex justify-content-between">
                                             <button class="btn btn-outline-warning btn-sm">
                                                 <i class="fas fa-download me-1"></i>Download
@@ -1501,7 +1498,7 @@
                                 <div class="row mt-4">
                                     <div class="col-lg-6">
                                         <div class="chart-container">
-                                            <h6 class="mb-3">Portfolio Value Projection</h6>
+                                            <h6 class="mb-3">Total Investment Value Projection</h6>
                                             <canvas id="scenarioChart" height="300"></canvas>
                                         </div>
                                     </div>
@@ -1556,9 +1553,9 @@
                                             <th>Rank</th>
                                             <th>VC Firm</th>
                                             <th>Fund</th>
-                                            <th>IRR</th>
+                                            <th>ROI</th>
                                             <th>MOIC</th>
-                                            <th>DPI</th>
+                                            <th>Realized Returns</th>
                                             <th>Alpha Score</th>
                                             <th>Trend</th>
                                         </tr>
@@ -1575,7 +1572,7 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="chart-container">
-                            <h6 class="mb-3">Top Performers by IRR</h6>
+                            <h6 class="mb-3">Top Performers by ROI</h6>
                             <canvas id="irrLeaderboardChart" height="300"></canvas>
                         </div>
                     </div>
@@ -1655,14 +1652,14 @@
                         </div>
                     
 
-                <!-- Innovation Thesis Builder -->
+                <!-- Angel Investment Thesis Builder -->
                 <div class="row mt-4">
                     <div class="col-12">
                         <div class="glass-card p-4">
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h5 class="mb-0">
                                     <i class="fas fa-lightbulb me-2" style="color: var(--accent-gold);"></i>
-                                    Innovation Thesis Builder
+                                    Angel Investment Thesis Builder
                                 </h5>
                                 <button class="btn btn-sm btn-primary" onclick="uploadStartupOpportunity()">
                                     <i class="fas fa-upload me-2"></i>Upload Startup Opportunity
@@ -1725,7 +1722,7 @@
                                 </div>
                             </div>
 
-                            <!-- Risk & IRR Analysis -->
+                            <!-- Risk & ROI Analysis -->
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="glass-card p-3 mb-3">
@@ -1749,7 +1746,7 @@
 
                                 <div class="col-md-6">
                                     <div class="glass-card p-3 mb-3">
-                                        <h6 class="mb-3">Projected IRR</h6>
+                                        <h6 class="mb-3">Projected ROI</h6>
                                         <div id="irrProjection" class="text-center">
                                             <span class="fs-3 fw-bold text-success">-</span>
                                             <p class="text-muted small mb-0">Based on sector growth & risk profiles</p>
@@ -2025,7 +2022,7 @@
             <div class="modal-content bg-dark">
                 <div class="modal-header border-secondary">
                     <h5 class="modal-title">
-                        <i class="fas fa-robot text-primary me-2"></i>Auxeira Gina Value Creation Copilot
+                        <i class="fas fa-robot text-primary me-2"></i>Auxeira Gina Startup Support Copilot
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -2048,7 +2045,7 @@
                                         <i class="fas fa-lightbulb text-warning me-2"></i>
                                         <strong>AI Insight: HealthTech Runway Optimization</strong>
                                     </div>
-                                    <p>Based on SSE analysis, implementing milestone-based rewards could extend runway by 6 months. Similar portfolio companies achieved 25% cost reduction with this approach.</p>
+                                    <p>Based on SSE analysis, implementing milestone-based rewards could extend runway by 6 months. Similar portfolio startups achieved 25% cost reduction with this approach.</p>
                                     <div class="peer-comparison">
                                         <small>
                                             <strong>Peer Success:</strong> Sequoia-backed HealthTech reduced burn by 30% using SSE rewards
@@ -2061,7 +2058,7 @@
                             <div class="glass p-3">
                                 <h6 class="mb-3">Gina Capabilities</h6>
                                 <ul class="list-unstyled">
-                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Predictive Value Creation</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Predictive Startup Support</li>
                                     <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Liquidity Forecasting</li>
                                     <li class="mb-2"><i class="fas fa-check text-success me-2"></i>SSE Impact Analysis</li>
                                     <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Peer Benchmarking</li>
@@ -2277,7 +2274,7 @@
                     <div class="row text-center mb-3">
                         <div class="col-4">
                             <div class="h5 text-success mb-0">${company.irr.toFixed(1)}%</div>
-                            <small class="text-muted">IRR</small>
+                            <small class="text-muted">ROI</small>
                         </div>
                         <div class="col-4">
                             <div class="h5 text-primary mb-0">${company.moic.toFixed(1)}x</div>
@@ -2362,7 +2359,7 @@
                 data: {
                     labels: ['Q1 2023', 'Q2 2023', 'Q3 2023', 'Q4 2023', 'Q1 2024', 'Q2 2024', 'Q3 2024'],
                     datasets: [{
-                        label: 'IRR %',
+                        label: 'ROI %',
                         data: [18.5, 21.2, 24.8, 26.1, 27.3, 28.0, 28.4],
                         borderColor: '#10B981',
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -2500,7 +2497,7 @@
                 }
             });
 
-            // IRR Leaderboard Chart
+            // ROI Leaderboard Chart
             const irrCtx = document.getElementById('irrLeaderboardChart').getContext('2d');
             const topFirms = leaderboardData.slice(0, 5);
             
@@ -2509,7 +2506,7 @@
                 data: {
                     labels: topFirms.map(firm => firm.name),
                     datasets: [{
-                        label: 'IRR %',
+                        label: 'ROI %',
                         data: topFirms.map(firm => firm.irr),
                         backgroundColor: [
                             '#FFD700',
@@ -2672,7 +2669,7 @@
             
             // Interest rate analysis
             if (interestRate > 1) {
-                description += `<p><strong>Interest Rates:</strong> Rising interest rates (+${interestRate}%) increase the cost of capital and may pressure valuations, particularly for companies with longer paths to profitability. Debt-heavy portfolio companies may face refinancing challenges.</p>`;
+                description += `<p><strong>Interest Rates:</strong> Rising interest rates (+${interestRate}%) increase the cost of capital and may pressure valuations, particularly for companies with longer paths to profitability. Debt-heavy portfolio startups may face refinancing challenges.</p>`;
             } else if (interestRate < 0) {
                 description += `<p><strong>Interest Rates:</strong> Declining interest rates (${interestRate}%) create favorable financing conditions and typically support higher valuation multiples across all stages.</p>`;
             } else {
@@ -2701,15 +2698,15 @@
             const concentrationImpact = (sectorConcentration - 65) / 100;
             
             // Base projections
-            const baseIRR = 28.4;
+            const baseROI = 28.4;
             const baseMOIC = 2.8;
             const baseValue = 450;
-            const baseDPI = 0.9;
+            const baseRealized Returns = 0.9;
             
             // Calculate adjusted projections
-            const year1IRR = baseIRR + growthImpact * 5 - volatilityImpact * 2 + interestImpact * 3 - concentrationImpact * 1;
-            const year3IRR = baseIRR + growthImpact * 8 - volatilityImpact * 3 + interestImpact * 5 - concentrationImpact * 2;
-            const year5IRR = baseIRR + growthImpact * 12 - volatilityImpact * 4 + interestImpact * 7 - concentrationImpact * 3;
+            const year1ROI = baseROI + growthImpact * 5 - volatilityImpact * 2 + interestImpact * 3 - concentrationImpact * 1;
+            const year3ROI = baseROI + growthImpact * 8 - volatilityImpact * 3 + interestImpact * 5 - concentrationImpact * 2;
+            const year5ROI = baseROI + growthImpact * 12 - volatilityImpact * 4 + interestImpact * 7 - concentrationImpact * 3;
             
             const year1MOIC = baseMOIC + growthImpact * 0.3 - volatilityImpact * 0.1 + interestImpact * 0.2 - concentrationImpact * 0.05;
             const year3MOIC = baseMOIC + growthImpact * 0.5 - volatilityImpact * 0.2 + interestImpact * 0.3 - concentrationImpact * 0.1;
@@ -2719,15 +2716,15 @@
             const year3Value = baseValue * (1 + growthImpact * 0.2 - volatilityImpact * 0.1 + interestImpact * 0.15 - concentrationImpact * 0.05);
             const year5Value = baseValue * (1 + growthImpact * 0.3 - volatilityImpact * 0.15 + interestImpact * 0.22 - concentrationImpact * 0.08);
             
-            const year1DPI = baseDPI + growthImpact * 0.1 - volatilityImpact * 0.05 + interestImpact * 0.08 - concentrationImpact * 0.02;
-            const year3DPI = baseDPI + growthImpact * 0.2 - volatilityImpact * 0.1 + interestImpact * 0.15 - concentrationImpact * 0.05;
-            const year5DPI = baseDPI + growthImpact * 0.3 - volatilityImpact * 0.15 + interestImpact * 0.22 - concentrationImpact * 0.08;
+            const year1Realized Returns = baseRealized Returns + growthImpact * 0.1 - volatilityImpact * 0.05 + interestImpact * 0.08 - concentrationImpact * 0.02;
+            const year3Realized Returns = baseRealized Returns + growthImpact * 0.2 - volatilityImpact * 0.1 + interestImpact * 0.15 - concentrationImpact * 0.05;
+            const year5Realized Returns = baseRealized Returns + growthImpact * 0.3 - volatilityImpact * 0.15 + interestImpact * 0.22 - concentrationImpact * 0.08;
             
             const rows = [
-                { metric: 'IRR (%)', current: baseIRR, y1: year1IRR, y3: year3IRR, y5: year5IRR },
+                { metric: 'ROI (%)', current: baseROI, y1: year1ROI, y3: year3ROI, y5: year5ROI },
                 { metric: 'MOIC (x)', current: baseMOIC, y1: year1MOIC, y3: year3MOIC, y5: year5MOIC },
-                { metric: 'Portfolio Value ($M)', current: baseValue, y1: year1Value, y3: year3Value, y5: year5Value },
-                { metric: 'DPI (x)', current: baseDPI, y1: year1DPI, y3: year3DPI, y5: year5DPI }
+                { metric: 'Total Investment Value ($M)', current: baseValue, y1: year1Value, y3: year3Value, y5: year5Value },
+                { metric: 'Realized Returns (x)', current: baseRealized Returns, y1: year1Realized Returns, y3: year3Realized Returns, y5: year5Realized Returns }
             ];
             
             let tableHTML = '';
@@ -3056,8 +3053,8 @@
             // Update canvas
             updateThesisCanvas();
 
-            // Calculate risk and IRR
-            calculateRiskAndIRR();
+            // Calculate risk and ROI
+            calculateRiskAndROI();
 
             // Generate AI suggestions
             generateAISuggestions();
@@ -3101,7 +3098,7 @@
         function removeSector(index) {
             selectedSectors.splice(index, 1);
             updateThesisCanvas();
-            calculateRiskAndIRR();
+            calculateRiskAndROI();
             
             if (selectedSectors.length === 0) {
                 document.getElementById('aiSuggestions').style.display = 'none';
@@ -3110,7 +3107,7 @@
             }
         }
 
-        function calculateRiskAndIRR() {
+        function calculateRiskAndROI() {
             if (selectedSectors.length === 0) {
                 document.getElementById('riskScore').innerHTML = `
                     <span class="fs-3 fw-bold">-</span>
@@ -3140,21 +3137,21 @@
             `;
             document.getElementById('riskLevel').style.width = `${riskScore}%`;
 
-            // Calculate IRR based on growth rates and risk
+            // Calculate ROI based on growth rates and risk
             const avgGrowth = selectedSectors.reduce((sum, s) => sum + s.growth, 0) / selectedSectors.length;
-            const riskAdjustment = avgRisk * 2; // Risk reduces IRR
+            const riskAdjustment = avgRisk * 2; // Risk reduces ROI
             
-            const conservativeIRR = Math.max(0, avgGrowth * 0.6 - riskAdjustment);
-            const baseIRR = Math.max(0, avgGrowth * 0.8 - riskAdjustment * 0.7);
-            const optimisticIRR = avgGrowth * 1.2 - riskAdjustment * 0.5;
+            const conservativeROI = Math.max(0, avgGrowth * 0.6 - riskAdjustment);
+            const baseROI = Math.max(0, avgGrowth * 0.8 - riskAdjustment * 0.7);
+            const optimisticROI = avgGrowth * 1.2 - riskAdjustment * 0.5;
 
             document.getElementById('irrProjection').innerHTML = `
-                <span class="fs-3 fw-bold text-success">${baseIRR.toFixed(1)}%</span>
-                <p class="text-muted small mb-0">Projected Base Case IRR</p>
+                <span class="fs-3 fw-bold text-success">${baseROI.toFixed(1)}%</span>
+                <p class="text-muted small mb-0">Projected Base Case ROI</p>
             `;
-            document.getElementById('irrConservative').textContent = `${conservativeIRR.toFixed(1)}%`;
-            document.getElementById('irrBase').textContent = `${baseIRR.toFixed(1)}%`;
-            document.getElementById('irrOptimistic').textContent = `${optimisticIRR.toFixed(1)}%`;
+            document.getElementById('irrConservative').textContent = `${conservativeROI.toFixed(1)}%`;
+            document.getElementById('irrBase').textContent = `${baseROI.toFixed(1)}%`;
+            document.getElementById('irrOptimistic').textContent = `${optimisticROI.toFixed(1)}%`;
         }
 
         function generateAISuggestions() {
@@ -3223,7 +3220,7 @@
             if (confirm('Are you sure you want to clear your thesis?')) {
                 selectedSectors = [];
                 updateThesisCanvas();
-                calculateRiskAndIRR();
+                calculateRiskAndROI();
                 document.getElementById('aiSuggestions').style.display = 'none';
             }
         }
@@ -3238,7 +3235,7 @@
                 sectors: selectedSectors,
                 timestamp: new Date().toISOString(),
                 riskScore: document.getElementById('riskScore').textContent,
-                baseIRR: document.getElementById('irrBase').textContent
+                baseROI: document.getElementById('irrBase').textContent
             };
 
             console.log('Thesis saved:', thesisData);
@@ -3273,220 +3270,6 @@
 
             bootstrap.Modal.getInstance(document.getElementById('startupUploadModal')).hide();
             form.reset();
-        }
-    </script>
-
-    <!-- Auxeira AI Client Library -->
-    <script src="auxeira-ai-client.js"></script>
-    <script>
-        // AI-Powered Dashboard Enhancement
-        // Initialize AI features on page load
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('Initializing AI-powered features...');
-            
-            // Wait for AI client to initialize
-            await auxeiraAI.init();
-            
-            // Load AI-powered overview section
-            loadAIOverview();
-            
-            // Setup tab change listeners for lazy loading
-            document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
-                tab.addEventListener('shown.bs.tab', function(event) {
-                    const targetId = event.target.getAttribute('data-bs-target');
-                    handleTabChange(targetId);
-                });
-            });
-        });
-
-        // Load AI-powered overview content
-        async function loadAIOverview() {
-            const data = {
-                portfolioValue: '$125M',
-                irr: 28.5,
-                moic: 3.2,
-                activeCompanies: 12,
-                exits: 3,
-                sseImpact: {
-                    valueCreated: 45000000,
-                    jobsCreated: 450,
-                    survivalRate: 0.92
-                }
-            };
-            
-            // Check if AI overview section exists, if not create it
-            let overviewSection = document.getElementById('ai-overview-section');
-            if (!overviewSection) {
-                // Find the portfolio metrics section and add AI overview before it
-                const portfolioTab = document.getElementById('portfolio');
-                if (portfolioTab) {
-                    overviewSection = document.createElement('div');
-                    overviewSection.id = 'ai-overview-section';
-                    overviewSection.className = 'row mb-4';
-                    portfolioTab.insertBefore(overviewSection, portfolioTab.firstChild);
-                }
-            }
-            
-            if (overviewSection) {
-                await auxeiraAI.loadSection('VC', 'overview', 'ai-overview-section', data);
-            }
-        }
-
-        // Handle tab changes and load AI content
-        async function handleTabChange(targetId) {
-            console.log('Tab changed to:', targetId);
-            
-            switch(targetId) {
-                case '#copilot':
-                    await loadAICopilot();
-                    break;
-                case '#deals':
-                    await loadAIDealFlow();
-                    break;
-                case '#reports':
-                    await loadAIReports();
-                    break;
-                case '#liquidity':
-                    await loadAIAnalytics();
-                    break;
-            }
-        }
-
-        // Load AI Copilot insights
-        async function loadAICopilot() {
-            const copilotSection = document.getElementById('ai-copilot-insights');
-            if (!copilotSection) {
-                const copilotTab = document.getElementById('copilot');
-                if (copilotTab) {
-                    const newSection = document.createElement('div');
-                    newSection.id = 'ai-copilot-insights';
-                    newSection.className = 'row mb-4';
-                    copilotTab.insertBefore(newSection, copilotTab.firstChild);
-                    
-                    const data = {
-                        portfolioHealth: 85,
-                        topRecommendations: 3,
-                        urgentActions: 1
-                    };
-                    
-                    await auxeiraAI.loadSection('VC', 'copilot', 'ai-copilot-insights', data);
-                }
-            }
-        }
-
-        // Load AI Deal Flow
-        async function loadAIDealFlow() {
-            const dealSection = document.getElementById('ai-deal-flow');
-            if (!dealSection) {
-                const dealsTab = document.getElementById('deals');
-                if (dealsTab) {
-                    const newSection = document.createElement('div');
-                    newSection.id = 'ai-deal-flow';
-                    newSection.className = 'row mb-4';
-                    dealsTab.insertBefore(newSection, dealsTab.firstChild);
-                    
-                    const data = {
-                        deals: [
-                            { name: 'CloudSecure AI', sector: 'Cybersecurity', match: 94, sse_score: 88 },
-                            { name: 'QuantumEdge', sector: 'Quantum Computing', match: 89, sse_score: 92 },
-                            { name: 'BioSynth Labs', sector: 'Biotech', match: 87, sse_score: 85 }
-                        ]
-                    };
-                    
-                    await auxeiraAI.loadSection('VC', 'dealflow', 'ai-deal-flow', data);
-                }
-            }
-        }
-
-        // Load AI Reports
-        async function loadAIReports() {
-            const reportsSection = document.getElementById('ai-reports-hub');
-            if (!reportsSection) {
-                const reportsTab = document.getElementById('reports');
-                if (reportsTab) {
-                    const newSection = document.createElement('div');
-                    newSection.id = 'ai-reports-hub';
-                    newSection.className = 'row mb-4';
-                    reportsTab.insertBefore(newSection, reportsTab.firstChild);
-                    
-                    const data = {
-                        reportType: 'quarterly',
-                        sector_funding: 11100000000,
-                        topSector: 'Defense Tech'
-                    };
-                    
-                    await auxeiraAI.loadSection('VC', 'reports', 'ai-reports-hub', data);
-                }
-            }
-        }
-
-        // Load AI Analytics (IRR Simulator)
-        async function loadAIAnalytics() {
-            const analyticsSection = document.getElementById('ai-analytics-simulator');
-            if (!analyticsSection) {
-                const liquidityTab = document.getElementById('liquidity');
-                if (liquidityTab) {
-                    const newSection = document.createElement('div');
-                    newSection.id = 'ai-analytics-simulator';
-                    newSection.className = 'row mb-4';
-                    liquidityTab.insertBefore(newSection, liquidityTab.firstChild);
-                    
-                    const data = {
-                        base_irr: 28,
-                        variables: { market_shift: 5 },
-                        scenarios: ['optimistic', 'base', 'pessimistic']
-                    };
-                    
-                    await auxeiraAI.loadSection('VC', 'analytics', 'ai-analytics-simulator', data);
-                }
-            }
-        }
-
-        // Enhanced refresh function with AI
-        async function refreshData() {
-            console.log('Refreshing AI insights...');
-            auxeiraAI.clearCache();
-            
-            // Show loading indicator
-            const refreshBtn = document.querySelector('[onclick="refreshData()"]');
-            if (refreshBtn) {
-                const originalHTML = refreshBtn.innerHTML;
-                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Refreshing...';
-                refreshBtn.disabled = true;
-                
-                // Reload current tab content
-                await loadAIOverview();
-                
-                setTimeout(() => {
-                    refreshBtn.innerHTML = originalHTML;
-                    refreshBtn.disabled = false;
-                }, 2000);
-            }
-        }
-
-        // Generate causal narrative for a company
-        async function showCausalImpact(companyName) {
-            const baselineMetrics = {
-                jobs: 25,
-                revenue: 2000000,
-                survival_probability: 0.65
-            };
-            
-            const sseMetrics = {
-                jobs: 34,
-                revenue: 2700000,
-                survival_probability: 0.85
-            };
-            
-            const narrative = await auxeiraAI.generateCausalNarrative(companyName, baselineMetrics, sseMetrics);
-            
-            // Display in modal or dedicated section
-            const modalBody = document.querySelector('#causalImpactModal .modal-body');
-            if (modalBody) {
-                modalBody.innerHTML = narrative;
-                const modal = new bootstrap.Modal(document.getElementById('causalImpactModal'));
-                modal.show();
-            }
         }
     </script>
 
