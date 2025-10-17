@@ -731,6 +731,33 @@
                     <i class="fas fa-globe me-2"></i>Market Intelligence
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="thesis-builder-tab" data-bs-toggle="tab" data-bs-target="#thesis-builder" type="button" role="tab">
+                    <i class="fas fa-lightbulb me-2"></i>Innovation Thesis
+                    <span class="badge bg-warning ms-2">AI</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="value-playbook-tab" data-bs-toggle="tab" data-bs-target="#value-playbook" type="button" role="tab">
+                    <i class="fas fa-tasks me-2"></i>Value Playbook
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="esg-tracker-tab" data-bs-toggle="tab" data-bs-target="#esg-tracker" type="button" role="tab">
+                    <i class="fas fa-leaf me-2"></i>ESG & Impact
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="network-matcher-tab" data-bs-toggle="tab" data-bs-target="#network-matcher" type="button" role="tab">
+                    <i class="fas fa-network-wired me-2"></i>Co-Investment Network
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="report-generator-tab" data-bs-toggle="tab" data-bs-target="#report-generator" type="button" role="tab">
+                    <i class="fas fa-file-alt me-2"></i>LP Reports
+                    <span class="badge bg-success ms-2">7 Types</span>
+                </button>
+            </li>
         </ul>
 
         <!-- Tab Content -->
@@ -2076,6 +2103,34 @@
         </div>
     </div>
 
+            <!-- Innovation Thesis Builder Tab -->
+            <div class="tab-pane fade" id="thesis-builder" role="tabpanel" aria-labelledby="thesis-builder-tab">
+                <div id="thesisBuilderContainer"></div>
+            </div>
+
+            <!-- Value Creation Playbook Tab -->
+            <div class="tab-pane fade" id="value-playbook" role="tabpanel" aria-labelledby="value-playbook-tab">
+                <div id="valuePlaybookContainer"></div>
+            </div>
+
+            <!-- ESG & Impact Tracker Tab -->
+            <div class="tab-pane fade" id="esg-tracker" role="tabpanel" aria-labelledby="esg-tracker-tab">
+                <div id="esgTrackerContainer"></div>
+            </div>
+
+            <!-- Co-Investment Network Matcher Tab -->
+            <div class="tab-pane fade" id="network-matcher" role="tabpanel" aria-labelledby="network-matcher-tab">
+                <div id="networkMatcherContainer"></div>
+            </div>
+
+            <!-- Advanced Report Generator Tab -->
+            <div class="tab-pane fade" id="report-generator" role="tabpanel" aria-labelledby="report-generator-tab">
+                <div id="reportGeneratorContainer"></div>
+            </div>
+
+        </div>
+    </div>
+
     <!-- Profile Completion Modal -->
     <div class="modal fade" id="profileModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -3278,6 +3333,14 @@
 
     <!-- Auxeira AI Client Library -->
     <script src="auxeira-ai-client.js"></script>
+    
+    <!-- Deep Innovation Features -->
+    <script src="innovation-thesis-builder.js"></script>
+    <script src="portfolio-value-playbook.js"></script>
+    <script src="predictive-exit-simulator.js"></script>
+    <script src="esg-impact-tracker.js"></script>
+    <script src="coinvestment-network-matcher.js"></script>
+    <script src="advanced-report-generator.js"></script>
     <script>
         // AI-Powered Dashboard Enhancement
         // Initialize AI features on page load
@@ -3297,6 +3360,9 @@
                     handleTabChange(targetId);
                 });
             });
+            
+            // Initialize deep innovation features on first tab view
+            console.log('Deep innovation features loaded and ready');
         });
 
         // Load AI-powered overview content
@@ -3335,6 +3401,24 @@
         // Handle tab changes and load AI content
         async function handleTabChange(targetId) {
             console.log('Tab changed to:', targetId);
+            
+            // Initialize deep innovation features on demand
+            if (targetId === '#thesis-builder' && !window.thesisBuilderInitialized) {
+                thesisBuilder.initialize('thesisBuilderContainer');
+                window.thesisBuilderInitialized = true;
+            } else if (targetId === '#value-playbook' && !window.valuePlaybookInitialized) {
+                valuePlaybook.initialize('valuePlaybookContainer');
+                window.valuePlaybookInitialized = true;
+            } else if (targetId === '#esg-tracker' && !window.esgTrackerInitialized) {
+                esgTracker.initialize('esgTrackerContainer');
+                window.esgTrackerInitialized = true;
+            } else if (targetId === '#network-matcher' && !window.networkMatcherInitialized) {
+                coinvestmentMatcher.initialize('networkMatcherContainer');
+                window.networkMatcherInitialized = true;
+            } else if (targetId === '#report-generator' && !window.reportGeneratorInitialized) {
+                reportGenerator.initialize('reportGeneratorContainer');
+                window.reportGeneratorInitialized = true;
+            }
             
             switch(targetId) {
                 case '#copilot':
