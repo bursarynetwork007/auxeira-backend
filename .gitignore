@@ -22,3 +22,5 @@ backend/.serverless/
 backend/test-payload.json
 backend/response.json
 backend/.serverless/
+*.git/
+auxeira-backend-mirror-*/
