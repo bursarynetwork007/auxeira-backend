@@ -1,5 +1,5 @@
 service: auxeira-backend
-frameworkVersion: ^4.0.0
+frameworkVersion: ^3.0.0
 
 package:
   patterns:

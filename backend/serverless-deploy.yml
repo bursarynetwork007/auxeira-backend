@@ -1,0 +1,26 @@
+service: auxeira-backend
+frameworkVersion: ^3.0.0
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: prod
+  memorySize: 2048
+  timeout: 90
+
+functions:
+  api:
+    handler: lambda-enhanced.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
+      - http:
+          path: /
+          method: ANY
+          cors: true
+
+plugins:
+  - serverless-offline
