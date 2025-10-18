@@ -3,27 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auxeira SDG 1: No Poverty - Institutional ESG Dashboard</title>
+    <title>Auxeira SDG 1: No Poverty - Policy Intelligence Platform</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
-            --primary-blue: #1e40af;
-            --secondary-purple: #7c3aed;
-            --accent-green: #10b981;
-            --warning-orange: #f59e0b;
-            --danger-red: #ef4444;
-            --dark-bg: #0a0a0a;
-            --darker-bg: #050505;
+            --terminal-dark: #0a0a0a;
+            --terminal-darker: #050505;
+            --terminal-blue: #00d4ff;
+            --terminal-purple: #8b5cf6;
+            --terminal-green: #00ff88;
+            --terminal-gold: #ffd700;
+            --terminal-white: #ffffff;
+            --terminal-gray: #666666;
+            --poverty-red: #e53e3e;
+            --prosperity-green: #38a169;
             --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --text-primary: #ffffff;
-            --text-secondary: #94a3b8;
-            --poverty-red: #dc2626;
-            --prosperity-green: #059669;
+            --premium-gold: linear-gradient(45deg, #ffd700, #ff6b35);
+            --warning-amber: #f59e0b;
         }
 
         * {
@@ -33,942 +35,1233 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
-            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--terminal-dark) 0%, var(--terminal-darker) 100%);
+            color: var(--terminal-white);
             min-height: 100vh;
             overflow-x: hidden;
         }
 
-        /* Accessibility Enhancements */
-        .high-contrast {
-            --glass-bg: rgba(255, 255, 255, 0.15);
-            --glass-border: rgba(255, 255, 255, 0.3);
-        }
-
-        .accessibility-controls {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 1001;
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .accessibility-btn {
+        .terminal-header {
             background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-primary);
-            padding: 0.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .accessibility-btn:hover, .accessibility-btn:focus {
-            background: var(--primary-blue);
-            outline: 2px solid var(--accent-green);
-        }
-
-        /* Live Update Indicator */
-        .live-update-bar {
-            background: linear-gradient(90deg, var(--accent-green), var(--primary-blue));
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
             position: sticky;
             top: 0;
             z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .update-indicator {
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--poverty-red), var(--prosperity-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-info {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 1rem;
         }
 
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--accent-green);
-            border-radius: 50%;
+        .profile-completion {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .profile-completion:hover {
+            background: var(--terminal-blue);
+            color: var(--terminal-dark);
+        }
+
+        .profile-completion::after {
+            content: '🎯';
+            position: absolute;
+            right: -10px;
+            top: -5px;
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
         }
 
-        .last-updated {
+        .data-refresh {
             font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.8);
+            opacity: 0.7;
+            color: var(--terminal-green);
         }
 
-        /* Header */
-        .dashboard-header {
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 300px;
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
+            border-right: 1px solid var(--glass-border);
             padding: 2rem 0;
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--glass-bg);
+            border-left-color: var(--poverty-red);
+            color: var(--poverty-red);
+        }
+
+        .nav-item.premium::after {
+            content: '👑';
+            position: absolute;
+            right: 1rem;
+            color: var(--terminal-gold);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(229, 62, 62, 0.1);
+        }
+
+        .story-narrative {
+            background: linear-gradient(135deg, var(--poverty-red), var(--prosperity-green));
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 3rem;
             position: relative;
             overflow: hidden;
         }
 
-        .dashboard-header::before {
+        .story-narrative::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
         }
 
-        .header-content {
+        .narrative-content {
             position: relative;
             z-index: 2;
         }
 
-        .sdg-badge {
-            background: linear-gradient(135deg, var(--poverty-red), var(--danger-red));
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            font-size: 0.9rem;
+        .narrative-title {
+            font-size: 2.5rem;
             font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
             margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
 
-        .compliance-badges {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
+        .narrative-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
         }
 
-        .compliance-badge {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        .narrative-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
         }
 
-        .compliance-badge.sfdr {
-            border-color: var(--accent-green);
-            color: var(--accent-green);
-        }
-
-        .compliance-badge.csrd {
-            border-color: var(--primary-blue);
-            color: var(--primary-blue);
-        }
-
-        .compliance-badge.tcfd {
-            border-color: var(--warning-orange);
-            color: var(--warning-orange);
-        }
-
-        /* Navigation */
-        .nav-tabs {
-            background: var(--glass-bg);
+        .stat-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
             border-radius: 12px;
-            padding: 0.5rem;
-            margin: 2rem 0;
-            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
         }
 
-        .nav-tabs .nav-link {
-            color: var(--text-secondary);
-            border: none;
-            border-radius: 8px;
-            padding: 0.75rem 1.5rem;
-            margin: 0 0.25rem;
-            transition: all 0.3s ease;
-            background: transparent;
-            position: relative;
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--terminal-white);
         }
 
-        .nav-tabs .nav-link.active {
-            background: linear-gradient(135deg, var(--poverty-red), var(--danger-red));
-            color: var(--text-primary);
-            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
         }
 
-        .nav-tabs .nav-link:hover:not(.active) {
+        .deal-flow-card {
             background: var(--glass-bg);
-            color: var(--text-primary);
-        }
-
-        /* Glass Cards */
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
             padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .deal-flow-card:hover {
+            transform: translateX(10px);
+            border-color: var(--poverty-red);
+            box-shadow: 0 10px 30px rgba(229, 62, 62, 0.2);
+        }
+
+        .deal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .deal-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--poverty-red);
+        }
+
+        .ai-match-score {
+            background: var(--prosperity-green);
+            color: var(--terminal-dark);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .ai-match-score::before {
+            content: '🤖';
+            margin-right: 0.5rem;
+        }
+
+        .deal-explanation {
+            background: rgba(56, 161, 105, 0.1);
+            border-left: 3px solid var(--prosperity-green);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .health-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .health-excellent { background: var(--prosperity-green); }
+        .health-good { background: var(--terminal-blue); }
+        .health-warning { background: var(--warning-amber); }
+        .health-danger { background: var(--poverty-red); }
+
+        .portfolio-health-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .health-metric {
+            background: var(--glass-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+        }
+
+        .health-metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .report-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
             margin-bottom: 1.5rem;
             transition: all 0.3s ease;
             position: relative;
         }
 
-        .glass-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border-color: var(--poverty-red);
+        .report-card.premium {
+            border: 2px solid transparent;
+            background: linear-gradient(var(--glass-bg), var(--glass-bg)) padding-box,
+                        var(--premium-gold) border-box;
         }
 
-        .glass-card.ai-powered::before {
-            content: '🤖 AI-Generated';
-            position: absolute;
-            top: -10px;
-            right: 15px;
-            background: linear-gradient(45deg, var(--primary-blue), var(--secondary-purple));
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: bold;
-        }
-
-        /* Metrics */
-        .metric-card {
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .metric-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--poverty-red), var(--prosperity-green));
-            border-radius: 3px 3px 0 0;
-        }
-
-        .metric-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            background: linear-gradient(135deg, var(--poverty-red), var(--prosperity-green));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 0.5rem;
-        }
-
-        .metric-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .metric-change {
-            font-size: 0.8rem;
-            margin-top: 0.5rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            display: inline-block;
-        }
-
-        .metric-change.positive {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--accent-green);
-        }
-
-        .metric-change.negative {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--danger-red);
-        }
-
-        /* Charts */
-        .chart-container {
-            height: 400px;
-            margin: 1rem 0;
-            position: relative;
-        }
-
-        .chart-controls {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .chart-control {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .chart-control:hover, .chart-control.active {
-            background: var(--poverty-red);
-            border-color: var(--poverty-red);
-        }
-
-        /* Story Cards */
-        .story-card {
-            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(239, 68, 68, 0.1));
-            border: 1px solid var(--poverty-red);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            position: relative;
-        }
-
-        .story-header {
+        .report-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
             margin-bottom: 1rem;
-        }
-
-        .story-title {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: var(--text-primary);
-        }
-
-        .impact-score {
-            background: linear-gradient(135deg, var(--prosperity-green), var(--accent-green));
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            font-weight: bold;
-        }
-
-        .story-metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-
-        .story-metric {
-            text-align: center;
-        }
-
-        .story-metric-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--prosperity-green);
-        }
-
-        .story-metric-label {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-        }
-
-        /* Reports Section */
-        .report-preview {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .report-preview.locked::after {
-            content: '🔒';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 1.2rem;
         }
 
         .report-title {
-            font-size: 1.1rem;
+            font-size: 1.4rem;
             font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        .report-preview-text {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.5;
-            margin-bottom: 1rem;
-        }
-
-        .report-preview.locked .report-preview-text {
-            background: linear-gradient(to right, var(--text-secondary) 0%, transparent 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            position: relative;
-        }
-
-        .report-preview.locked .report-preview-text::after {
-            content: '... [Premium Content - Unlock to read more]';
-            color: var(--warning-orange);
-            font-weight: bold;
+            color: var(--poverty-red);
         }
 
         .report-price {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .price-tag {
-            background: linear-gradient(135deg, var(--warning-orange), var(--danger-red));
-            color: white;
+            background: var(--premium-gold);
+            color: var(--terminal-dark);
             padding: 0.5rem 1rem;
             border-radius: 20px;
             font-weight: bold;
         }
 
-        .btn-unlock {
-            background: linear-gradient(135deg, var(--prosperity-green), var(--accent-green));
-            border: none;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 25px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            cursor: pointer;
+        .report-teaser {
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
         }
 
-        .btn-unlock:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        .report-locked {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem;
+            border-radius: 0 0 16px 16px;
+            text-align: center;
         }
 
-        /* Profile Integration */
-        .personalized-content {
-            border-left: 3px solid var(--prosperity-green);
-            padding-left: 1rem;
-            margin: 1rem 0;
-            background: rgba(16, 185, 129, 0.1);
-            border-radius: 0 8px 8px 0;
-        }
-
-        .profile-indicator {
+        .filter-bar {
             background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
-            margin-bottom: 1rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
             display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
             align-items: center;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
             gap: 0.5rem;
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .chart-controls {
-                flex-direction: column;
-            }
-            
-            .story-metrics {
-                grid-template-columns: 1fr;
-            }
-            
-            .compliance-badges {
-                flex-direction: column;
-            }
+        .filter-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
 
-        /* Focus and Keyboard Navigation */
-        .nav-link:focus,
-        .chart-control:focus,
-        .btn-unlock:focus,
-        .accessibility-btn:focus {
-            outline: 2px solid var(--accent-green);
-            outline-offset: 2px;
+        .filter-select {
+            background: var(--terminal-darker);
+            border: 1px solid var(--glass-border);
+            color: var(--terminal-white);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            min-width: 150px;
         }
 
-        /* Screen Reader Only */
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
+        .what-if-container {
+            background: var(--glass-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .scenario-builder {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .scenario-input {
+            background: var(--terminal-darker);
+            border: 1px solid var(--glass-border);
+            color: var(--terminal-white);
+            padding: 0.8rem;
+            border-radius: 8px;
+            width: 100%;
+        }
+
+        .scenario-results {
+            background: rgba(56, 161, 105, 0.1);
+            border: 1px solid var(--prosperity-green);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .sentiment-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .sentiment-positive {
+            background: rgba(56, 161, 105, 0.2);
+            color: var(--prosperity-green);
+        }
+
+        .sentiment-neutral {
+            background: rgba(255, 215, 0, 0.2);
+            color: var(--terminal-gold);
+        }
+
+        .sentiment-negative {
+            background: rgba(229, 62, 62, 0.2);
+            color: var(--poverty-red);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--poverty-red), var(--prosperity-green));
+            border: none;
+            border-radius: 25px;
+            padding: 0.8rem 2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(229, 62, 62, 0.3);
+        }
+
+        .btn-premium {
+            background: var(--premium-gold);
+            border: none;
+            border-radius: 25px;
+            padding: 0.8rem 2rem;
+            font-weight: bold;
+            color: var(--terminal-dark);
+            transition: all 0.3s ease;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .profile-nudge {
+            background: linear-gradient(45deg, var(--terminal-blue), var(--terminal-purple));
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
             overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
+        }
+
+        .profile-nudge::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .chart-container {
+            background: var(--glass-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .chart-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: var(--poverty-red);
+            text-align: center;
         }
     </style>
-    <script src="ai_dashboard_administrator.js"></script>
-    <style>
-        .chart-container { margin: 20px 0; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px; }
-        .chart-title { color: var(--terminal-green); margin-bottom: 15px; }
-        .premium-report-card { position: relative; padding: 20px; margin-bottom: 15px; }
-        .price-tag { position: absolute; top: 10px; right: 10px; background: var(--terminal-green); color: var(--terminal-dark); padding: 4px 8px; border-radius: 12px; font-weight: bold; }
-        .update-indicator { animation: fadeIn 0.5s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .locked-content { border: 2px dashed var(--terminal-yellow); }
-        .generate-report-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    </style>
-    <link rel="stylesheet" href="leaderboard_styles.css">
 </head>
 <body>
-    <!-- Accessibility Controls -->
-    <div class="accessibility-controls">
-        <button class="accessibility-btn" onclick="toggleHighContrast()" aria-label="Toggle high contrast mode">
-            <i class="fas fa-adjust"></i>
-        </button>
-        <button class="accessibility-btn" onclick="increaseFontSize()" aria-label="Increase font size">
-            <i class="fas fa-plus"></i>
-        </button>
-        <button class="accessibility-btn" onclick="decreaseFontSize()" aria-label="Decrease font size">
-            <i class="fas fa-minus"></i>
-        </button>
-    </div>
-
-    <!-- Live Update Bar -->
-    <div class="live-update-bar">
-        <div class="update-indicator">
-            <div class="pulse-dot"></div>
-            <span>Live Data Feed Active</span>
-        </div>
-        <div class="last-updated" id="lastUpdated">
-            Last updated: <span id="updateTimestamp">2024-10-16 14:23:45 UTC</span>
-        </div>
-    </div>
-
     <!-- Header -->
-    <header class="dashboard-header">
-        <div class="container">
-            <div class="header-content">
-                <div class="sdg-badge">
-                    <i class="fas fa-heart"></i>
-                    SDG 1: No Poverty
-                </div>
-                <h1 class="mb-3">
-                    <span id="orgName">BlackRock</span> Poverty Alleviation Impact Dashboard
-                </h1>
-                <p class="lead mb-4">
-                    Institutional-grade analytics for poverty reduction investments with real-time impact tracking and AI-powered insights
-                </p>
-                <div class="compliance-badges">
-                    <div class="compliance-badge sfdr">
-                        <i class="fas fa-check-circle"></i>
-                        SFDR Article 9 Compliant
-                    </div>
-                    <div class="compliance-badge csrd">
-                        <i class="fas fa-shield-alt"></i>
-                        CSRD Reporting Ready
-                    </div>
-                    <div class="compliance-badge tcfd">
-                        <i class="fas fa-leaf"></i>
-                        TCFD Aligned
-                    </div>
-                </div>
+    <header class="terminal-header">
+        <div class="logo">
+            <i class="fas fa-hand-holding-heart me-2"></i>Auxeira SDG 1: Policy Intelligence Platform
+        </div>
+        <div class="user-info">
+            <div class="profile-completion" onclick="showProfileModal()">
+                Impact Profile: 65% Complete
             </div>
+            <div class="data-refresh">Last updated: 2 min ago</div>
         </div>
     </header>
 
-    <div class="container">
-        <!-- Profile Indicator -->
-        <div class="profile-indicator">
-            <i class="fas fa-user-circle"></i>
-            <span>Personalized for: <strong id="userProfile">ESG Fund Manager - Global Poverty Focus</strong></span>
-        </div>
+    <div class="main-container">
+        <!-- Enhanced Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="nav-item active" onclick="showTab('narrative')">
+                <i class="fas fa-book-open"></i>
+                <span>Policy Narrative</span>
+            </div>
+            <div class="nav-item" onclick="showTab('analytics')">
+                <i class="fas fa-chart-line"></i>
+                <span>What-If Analytics</span>
+            </div>
+            <div class="nav-item" onclick="showTab('dealflow')">
+                <i class="fas fa-handshake"></i>
+                <span>Enhanced Deal Flow</span>
+            </div>
+            <div class="nav-item" onclick="showTab('portfolio')">
+                <i class="fas fa-briefcase"></i>
+                <span>Portfolio Health</span>
+            </div>
+            <div class="nav-item premium" onclick="showTab('reports')">
+                <i class="fas fa-file-alt"></i>
+                <span>AI Reports</span>
+            </div>
+            <div class="nav-item" onclick="showTab('sentiment')">
+                <i class="fas fa-brain"></i>
+                <span>Sentiment Analysis</span>
+            </div>
+            <div class="nav-item" onclick="showTab('insights')">
+                <i class="fas fa-lightbulb"></i>
+                <span>AI Insights</span>
+            </div>
+        </nav>
 
-        <!-- Navigation Tabs -->
-        <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
-                    <i class="fas fa-chart-line me-2"></i>Impact Overview
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="stories-tab" data-bs-toggle="tab" data-bs-target="#stories" type="button" role="tab" aria-controls="stories" aria-selected="false">
-                    <i class="fas fa-book-open me-2"></i>Success Stories
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="portfolio-tab" data-bs-toggle="tab" data-bs-target="#portfolio" type="button" role="tab" aria-controls="portfolio" aria-selected="false">
-                    <i class="fas fa-briefcase me-2"></i>Living Portfolio
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
-                    <i class="fas fa-brain me-2"></i>AI Analytics
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab" aria-controls="reports" aria-selected="false">
-                    <i class="fas fa-file-alt me-2"></i>Premium Reports
-                </button>
-            </li>
-        </ul>
-
-        <!-- Tab Content -->
-        <div class="tab-content" id="dashboardTabContent">
-            <!-- Impact Overview Tab -->
-            <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="glass-card metric-card">
-                            <div class="metric-number" id="peopleLifted">2.4M</div>
-                            <div class="metric-label">People Lifted from Poverty</div>
-                            <div class="metric-change positive">+340K this quarter</div>
-                            <div class="sr-only">2.4 million people lifted from poverty, increased by 340 thousand this quarter</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="glass-card metric-card">
-                            <div class="metric-number" id="avgIncome">$1,847</div>
-                            <div class="metric-label">Average Income Increase</div>
-                            <div class="metric-change positive">+23% YoY</div>
-                            <div class="sr-only">Average income increase of $1,847, up 23% year over year</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="glass-card metric-card">
-                            <div class="metric-number" id="roiMetric">284%</div>
-                            <div class="metric-label">Social ROI</div>
-                            <div class="metric-change positive">+45% vs benchmark</div>
-                            <div class="sr-only">Social return on investment of 284%, 45% above benchmark</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="glass-card metric-card">
-                            <div class="metric-number" id="sustainabilityScore">92</div>
-                            <div class="metric-label">Sustainability Score</div>
-                            <div class="metric-change positive">+8 points</div>
-                            <div class="sr-only">Sustainability score of 92, increased by 8 points</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="glass-card ai-powered">
-                            <h4 class="mb-3">Poverty Reduction Trends & AI Projections</h4>
-                            <div class="chart-controls">
-                                <div class="chart-control active" onclick="updateChartView('poverty-rate')" role="button" tabindex="0" aria-label="Show poverty rate chart">Poverty Rate</div>
-                                <div class="chart-control" onclick="updateChartView('income-growth')" role="button" tabindex="0" aria-label="Show income growth chart">Income Growth</div>
-                                <div class="chart-control" onclick="updateChartView('regional-impact')" role="button" tabindex="0" aria-label="Show regional impact chart">Regional Impact</div>
-                                <div class="chart-control" onclick="updateChartView('roi-trends')" role="button" tabindex="0" aria-label="Show ROI trends chart">ROI Trends</div>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="mainChart" aria-label="Main poverty reduction analytics chart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="glass-card ai-powered">
-                            <h4 class="mb-3">AI Risk Assessment</h4>
-                            <div class="chart-container" style="height: 300px;">
-                                <canvas id="riskChart" aria-label="Risk assessment heatmap"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Main Content -->
+        <main class="content-area">
+            <!-- Profile Completion Nudge -->
+            <div class="profile-nudge">
+                <h4>🎯 Complete Your Impact Profile for Personalized Insights</h4>
+                <p>Get tailored policy recommendations and deal matching by completing your organization profile</p>
+                <button class="btn btn-primary mt-2" onclick="showProfileModal()">Complete Profile (65%)</button>
             </div>
 
-            <!-- Success Stories Tab -->
-            <div class="tab-pane fade" id="stories" role="tabpanel" aria-labelledby="stories-tab">
-                <div class="personalized-content">
-                    <h5><i class="fas fa-user-tie me-2"></i>Curated for <span id="orgNameStories">BlackRock</span> Investment Focus</h5>
-                    <p>These success stories align with your portfolio's poverty alleviation mandate and impact measurement frameworks.</p>
-                </div>
-
-                <div class="story-card">
-                    <div class="story-header">
-                        <div>
-                            <div class="story-title">Microfinance Revolution in Rural Bangladesh</div>
-                            <div class="text-muted">Grameen Bank Partnership • 2022-2024</div>
+            <!-- Policy Narrative Tab -->
+            <div id="narrative" class="tab-content active">
+                <div class="story-narrative">
+                    <div class="narrative-content">
+                        <div class="narrative-title">Breaking the Poverty Cycle</div>
+                        <div class="narrative-subtitle">
+                            How strategic investments in microfinance, education, and healthcare are creating sustainable pathways out of poverty for 2.4 million people across 67 countries.
                         </div>
-                        <div class="impact-score">98% Impact Score</div>
-                    </div>
-                    <p class="mb-3">
-                        Through strategic partnership with Grameen Bank, our microfinance initiative has transformed 450,000 rural households in Bangladesh. 
-                        The program combines traditional microcredit with digital financial literacy training, resulting in sustainable income generation 
-                        and poverty reduction that exceeds UN SDG targets by 34%.
-                    </p>
-                    <div class="story-metrics">
-                        <div class="story-metric">
-                            <div class="story-metric-value">450K</div>
-                            <div class="story-metric-label">Households Reached</div>
-                        </div>
-                        <div class="story-metric">
-                            <div class="story-metric-value">$1,240</div>
-                            <div class="story-metric-label">Avg Income Increase</div>
-                        </div>
-                        <div class="story-metric">
-                            <div class="story-metric-value">89%</div>
-                            <div class="story-metric-label">Loan Repayment Rate</div>
-                        </div>
-                        <div class="story-metric">
-                            <div class="story-metric-value">67%</div>
-                            <div class="story-metric-label">Women Participation</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="story-card">
-                    <div class="story-header">
-                        <div>
-                            <div class="story-title">Urban Slum Transformation in Lagos</div>
-                            <div class="text-muted">Lagos State Government Partnership • 2023-2024</div>
-                        </div>
-                        <div class="impact-score">94% Impact Score</div>
-                    </div>
-                    <p class="mb-3">
-                        Comprehensive urban renewal program targeting Lagos's largest informal settlements. The initiative combines affordable housing, 
-                        skills training, and small business development, creating sustainable pathways out of poverty for 280,000 residents while 
-                        maintaining community cohesion and cultural identity.
-                    </p>
-                    <div class="story-metrics">
-                        <div class="story-metric">
-                            <div class="story-metric-value">280K</div>
-                            <div class="story-metric-label">Residents Impacted</div>
-                        </div>
-                        <div class="story-metric">
-                            <div class="story-metric-value">15,400</div>
-                            <div class="story-metric-label">Housing Units</div>
-                        </div>
-                        <div class="story-metric">
-                            <div class="story-metric-value">78%</div>
-                            <div class="story-metric-label">Employment Rate</div>
-                        </div>
-                        <div class="story-metric">
-                            <div class="story-metric-value">$890M</div>
-                            <div class="story-metric-label">Economic Value Created</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="story-card">
-                    <div class="story-header">
-                        <div>
-                            <div class="story-title">Agricultural Productivity Program in Kenya</div>
-                            <div class="text-muted">Kenya Agricultural Research Institute • 2022-2024</div>
-                        </div>
-                        <div class="impact-score">91% Impact Score</div>
-                    </div>
-                    <p class="mb-3">
-                        Climate-smart agriculture initiative targeting smallholder farmers in arid regions. Through drought-resistant seeds, 
-                        precision irrigation, and digital market access, the program has increased farm productivity by 156% while building 
-                        resilience against climate change impacts.
-                    </p>
-                    <div class="story-metrics">
-                        <div class="story-metric">
-                            <div class="story-metric-value">125K</div>
-                            <div class="story-metric-label">Farmers Trained</div>
-                        </div>
-                        <div class="story-metric">
-                            <div class="story-metric-value">156%</div>
-                            <div class="story-metric-label">Productivity Increase</div>
-                        </div>
-                        <div class="story-metric">
-                            <div class="story-metric-value">$2,340</div>
-                            <div class="story-metric-label">Avg Income Boost</div>
-                        </div>
-                        <div class="story-metric">
-                            <div class="story-metric-value">43%</div>
-                            <div class="story-metric-label">Food Security Gain</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Living Portfolio Tab -->
-            <div class="tab-pane fade" id="portfolio" role="tabpanel" aria-labelledby="portfolio-tab">
-                <div class="glass-card ai-powered">
-                    <h4 class="mb-3">Active Poverty Alleviation Investments</h4>
-                    <div class="chart-container">
-                        <canvas id="portfolioChart" aria-label="Portfolio performance and allocation chart"></canvas>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="glass-card">
-                            <h5 class="mb-3">Grameen Digital</h5>
-                            <p class="text-muted mb-3">Microfinance Technology Platform</p>
-                            <div class="row text-center">
-                                <div class="col-6">
-                                    <div class="h4 text-success">$45M</div>
-                                    <div class="small">Investment</div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="h4 text-info">890K</div>
-                                    <div class="small">Beneficiaries</div>
-                                </div>
+                        <p class="lead">
+                            In the slums of Kibera, Kenya, Maria's story began like millions of others - trapped in a cycle of poverty with limited access to capital, education, or healthcare. Today, through our integrated approach combining digital microfinance, skills training, and community health programs, Maria employs 23 people in her textile business and has lifted her entire extended family out of extreme poverty.
+                        </p>
+                        <div class="narrative-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">2.4M</div>
+                                <div class="stat-label">Lives Transformed</div>
                             </div>
-                            <div class="mt-3">
-                                <div class="d-flex justify-content-between">
-                                    <span>Impact Score</span>
-                                    <span class="text-success">94/100</span>
-                                </div>
-                                <div class="progress mt-1">
-                                    <div class="progress-bar bg-success" style="width: 94%"></div>
-                                </div>
+                            <div class="stat-item">
+                                <div class="stat-number">$847M</div>
+                                <div class="stat-label">Capital Deployed</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">67</div>
+                                <div class="stat-label">Countries Reached</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">89%</div>
+                                <div class="stat-label">Success Rate</div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="glass-card">
-                            <h5 class="mb-3">Kiva Microfunds</h5>
-                            <p class="text-muted mb-3">Global Crowdfunded Microloans</p>
-                            <div class="row text-center">
-                                <div class="col-6">
-                                    <div class="h4 text-success">$32M</div>
-                                    <div class="small">Investment</div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="h4 text-info">1.2M</div>
-                                    <div class="small">Beneficiaries</div>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <div class="d-flex justify-content-between">
-                                    <span>Impact Score</span>
-                                    <span class="text-success">89/100</span>
-                                </div>
-                                <div class="progress mt-1">
-                                    <div class="progress-bar bg-success" style="width: 89%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="glass-card">
-                            <h5 class="mb-3">BRAC Ultra Poor</h5>
-                            <p class="text-muted mb-3">Graduation Program</p>
-                            <div class="row text-center">
-                                <div class="col-6">
-                                    <div class="h4 text-success">$67M</div>
-                                    <div class="small">Investment</div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="h4 text-info">340K</div>
-                                    <div class="small">Beneficiaries</div>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <div class="d-flex justify-content-between">
-                                    <span>Impact Score</span>
-                                    <span class="text-success">97/100</span>
-                                </div>
-                                <div class="progress mt-1">
-                                    <div class="progress-bar bg-success" style="width: 97%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- AI Analytics Tab -->
-            <div class="tab-pane fade" id="analytics" role="tabpanel" aria-labelledby="analytics-tab">
-                <div class="glass-card ai-powered">
-                    <h4 class="mb-3">Predictive Impact Modeling</h4>
-                    <div class="chart-container">
-                        <canvas id="predictiveChart" aria-label="AI-powered predictive impact analysis"></canvas>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="glass-card">
-                            <h5 class="mb-3">Regional Risk Heatmap</h5>
-                            <div class="chart-container" style="height: 300px;">
-                                <canvas id="regionalRiskChart" aria-label="Regional risk assessment heatmap"></canvas>
-                            </div>
+                        <div class="chart-container">
+                            <div class="chart-title">Poverty Reduction Impact Timeline</div>
+                            <canvas id="impactTimelineChart" height="150"></canvas>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="glass-card">
-                            <h5 class="mb-3">Intervention Effectiveness</h5>
-                            <div class="chart-container" style="height: 300px;">
-                                <canvas id="interventionChart" aria-label="Intervention effectiveness comparison"></canvas>
+                        <div class="chart-container">
+                            <div class="chart-title">Policy Intervention Effectiveness</div>
+                            <canvas id="policyEffectivenessChart" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <h4 class="mb-3">📖 The Transformation Story</h4>
+                    <p class="lead">
+                        Our poverty alleviation strategy operates on three interconnected pillars: <strong>Economic Empowerment</strong>, <strong>Human Capital Development</strong>, and <strong>Systemic Change</strong>. Each investment is designed not just to provide immediate relief, but to create lasting structural changes that prevent the return to poverty.
+                    </p>
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <h5 class="text-danger">💰 Economic Empowerment</h5>
+                            <p>Through digital microfinance platforms and entrepreneurship programs, we've enabled 450,000 individuals to start or expand businesses, creating sustainable income streams that lift entire families out of poverty.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="text-success">🎓 Human Capital Development</h5>
+                            <p>Our education and skills training programs have reached 890,000 people, providing them with the knowledge and capabilities needed to participate in the modern economy.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="text-info">🏛️ Systemic Change</h5>
+                            <p>By working with governments and institutions, we've influenced policy changes that benefit 12.4 million people through improved social safety nets and economic opportunities.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- What-If Analytics Tab -->
+            <div id="analytics" class="tab-content">
+                <h2 class="mb-4">What-If Analytics: Policy Impact Modeling</h2>
+                
+                <div class="what-if-container">
+                    <h4 class="mb-3">🔮 Scenario Builder</h4>
+                    <p class="mb-4">Model the potential impact of different investment strategies and policy interventions on poverty reduction outcomes.</p>
+                    
+                    <div class="scenario-builder">
+                        <div>
+                            <label class="filter-label">Investment Amount ($M)</label>
+                            <input type="range" class="form-range" min="10" max="1000" value="100" id="investmentAmount" oninput="updateScenario()">
+                            <span id="investmentValue">$100M</span>
+                        </div>
+                        <div>
+                            <label class="filter-label">Geographic Focus</label>
+                            <select class="filter-select" id="geoFocus" onchange="updateScenario()">
+                                <option value="sub-saharan-africa">Sub-Saharan Africa</option>
+                                <option value="south-asia">South Asia</option>
+                                <option value="southeast-asia">Southeast Asia</option>
+                                <option value="latin-america">Latin America</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="filter-label">Primary Intervention</label>
+                            <select class="filter-select" id="intervention" onchange="updateScenario()">
+                                <option value="microfinance">Microfinance</option>
+                                <option value="education">Education & Skills</option>
+                                <option value="healthcare">Healthcare Access</option>
+                                <option value="infrastructure">Infrastructure</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="filter-label">Time Horizon (Years)</label>
+                            <input type="range" class="form-range" min="1" max="10" value="5" id="timeHorizon" oninput="updateScenario()">
+                            <span id="timeValue">5 years</span>
+                        </div>
+                    </div>
+
+                    <div class="scenario-results">
+                        <h5 class="mb-3">📊 Projected Impact</h5>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="h3 text-success" id="projectedLives">234,000</div>
+                                    <div class="small">Lives Impacted</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="h3 text-info" id="projectedROI">4.2x</div>
+                                    <div class="small">Social ROI</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="h3 text-warning" id="projectedJobs">45,600</div>
+                                    <div class="small">Jobs Created</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="h3 text-danger" id="projectedReduction">67%</div>
+                                    <div class="small">Poverty Reduction</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <div class="chart-title">Impact Projection Over Time</div>
+                            <canvas id="projectionChart" height="150"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <div class="chart-title">Risk-Return Analysis</div>
+                            <canvas id="riskReturnChart" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Deal Flow Tab -->
+            <div id="dealflow" class="tab-content">
+                <h2 class="mb-4">Enhanced Deal Flow with AI Matching</h2>
+                
+                <div class="filter-bar">
+                    <div class="filter-item">
+                        <label class="filter-label">Stage</label>
+                        <select class="filter-select">
+                            <option value="all">All Stages</option>
+                            <option value="seed">Seed</option>
+                            <option value="series-a">Series A</option>
+                            <option value="series-b">Series B</option>
+                            <option value="growth">Growth</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">Geography</label>
+                        <select class="filter-select">
+                            <option value="all">All Regions</option>
+                            <option value="africa">Africa</option>
+                            <option value="asia">Asia</option>
+                            <option value="latam">Latin America</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">Impact Focus</label>
+                        <select class="filter-select">
+                            <option value="all">All Focus Areas</option>
+                            <option value="microfinance">Microfinance</option>
+                            <option value="education">Education</option>
+                            <option value="healthcare">Healthcare</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">AI Match Score</label>
+                        <select class="filter-select">
+                            <option value="all">All Scores</option>
+                            <option value="high">90%+ Match</option>
+                            <option value="medium">70-89% Match</option>
+                            <option value="low">Below 70%</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="deal-flow-card">
+                    <div class="deal-header">
+                        <div class="deal-title">FinTech for All - Series B</div>
+                        <div class="ai-match-score">94% Match</div>
+                    </div>
+                    <div class="deal-explanation">
+                        <strong>AI Matching Explanation:</strong> High compatibility based on your focus on microfinance (95% match), Sub-Saharan Africa geography (90% match), and Series B stage preference (98% match). The company's 450K user base and 97% repayment rate align with your portfolio performance criteria.
+                    </div>
+                    <p>Revolutionary mobile banking platform serving unbanked populations in Kenya, Uganda, and Tanzania. Seeking $35M to expand to 5 new countries.</p>
+                    <div class="row mt-3">
+                        <div class="col-md-3">
+                            <strong>Stage:</strong> Series B
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Seeking:</strong> $35M
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Users:</strong> 450K active
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Impact:</strong> 2.3M potential
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="sentiment-indicator sentiment-positive">
+                            <i class="fas fa-thumbs-up"></i> Positive Market Sentiment
+                        </span>
+                        <button class="btn btn-primary btn-sm float-end">View Full Details</button>
+                    </div>
+                </div>
+
+                <div class="deal-flow-card">
+                    <div class="deal-header">
+                        <div class="deal-title">EduTech Solutions - Series A</div>
+                        <div class="ai-match-score">91% Match</div>
+                    </div>
+                    <div class="deal-explanation">
+                        <strong>AI Matching Explanation:</strong> Strong alignment with your education investment thesis (92% match) and emerging markets focus (89% match). The company's AI-powered personalized learning approach matches your technology adoption criteria.
+                    </div>
+                    <p>AI-powered education platform providing personalized learning for underserved communities. Proven impact across 12 countries with 890K students.</p>
+                    <div class="row mt-3">
+                        <div class="col-md-3">
+                            <strong>Stage:</strong> Series A
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Seeking:</strong> $28M
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Students:</strong> 890K
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Countries:</strong> 12
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="sentiment-indicator sentiment-positive">
+                            <i class="fas fa-chart-line"></i> Growing Market Interest
+                        </span>
+                        <button class="btn btn-primary btn-sm float-end">View Full Details</button>
+                    </div>
+                </div>
+
+                <div class="deal-flow-card">
+                    <div class="deal-header">
+                        <div class="deal-title">HealthAccess Network - Growth</div>
+                        <div class="ai-match-score">88% Match</div>
+                    </div>
+                    <div class="deal-explanation">
+                        <strong>AI Matching Explanation:</strong> Good fit for your healthcare portfolio expansion (85% match) and growth-stage investment criteria (90% match). The telemedicine model aligns with your digital health investment strategy.
+                    </div>
+                    <p>Telemedicine platform connecting rural patients with healthcare professionals. Serving 2.1M patients across 34 countries with 94% patient satisfaction.</p>
+                    <div class="row mt-3">
+                        <div class="col-md-3">
+                            <strong>Stage:</strong> Growth
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Seeking:</strong> $67M
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Patients:</strong> 2.1M
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Satisfaction:</strong> 94%
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="sentiment-indicator sentiment-neutral">
+                            <i class="fas fa-balance-scale"></i> Neutral Market Sentiment
+                        </span>
+                        <button class="btn btn-primary btn-sm float-end">View Full Details</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Health Tab -->
+            <div id="portfolio" class="tab-content">
+                <h2 class="mb-4">Portfolio Health Dashboard</h2>
+                
+                <div class="portfolio-health-summary">
+                    <div class="health-metric">
+                        <div class="health-metric-value text-success">
+                            <span class="health-indicator health-excellent"></span>23
+                        </div>
+                        <div>Excellent Health</div>
+                    </div>
+                    <div class="health-metric">
+                        <div class="health-metric-value text-info">
+                            <span class="health-indicator health-good"></span>12
+                        </div>
+                        <div>Good Health</div>
+                    </div>
+                    <div class="health-metric">
+                        <div class="health-metric-value text-warning">
+                            <span class="health-indicator health-warning"></span>4
+                        </div>
+                        <div>Needs Attention</div>
+                    </div>
+                    <div class="health-metric">
+                        <div class="health-metric-value text-danger">
+                            <span class="health-indicator health-danger"></span>1
+                        </div>
+                        <div>Critical Issues</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <div class="chart-title">Portfolio Health Trends</div>
+                            <canvas id="healthTrendsChart" height="150"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <div class="chart-title">Risk Distribution</div>
+                            <canvas id="riskDistributionChart" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <h4 class="mb-3">🏥 Portfolio Companies Health Status</h4>
+                    <div class="table-responsive">
+                        <table class="table table-dark">
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Health Status</th>
+                                    <th>Impact Score</th>
+                                    <th>Financial Health</th>
+                                    <th>Risk Level</th>
+                                    <th>Action Required</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>GrameenTech</td>
+                                    <td><span class="health-indicator health-excellent"></span> Excellent</td>
+                                    <td>94/100</td>
+                                    <td>Strong</td>
+                                    <td>Low</td>
+                                    <td><span class="text-success">Monitor</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Kibera Innovations</td>
+                                    <td><span class="health-indicator health-good"></span> Good</td>
+                                    <td>87/100</td>
+                                    <td>Stable</td>
+                                    <td>Medium</td>
+                                    <td><span class="text-info">Review Q4</span></td>
+                                </tr>
+                                <tr>
+                                    <td>FarmTech Solutions</td>
+                                    <td><span class="health-indicator health-excellent"></span> Excellent</td>
+                                    <td>96/100</td>
+                                    <td>Strong</td>
+                                    <td>Low</td>
+                                    <td><span class="text-success">Scale Support</span></td>
+                                </tr>
+                                <tr>
+                                    <td>SkillBridge Africa</td>
+                                    <td><span class="health-indicator health-warning"></span> Warning</td>
+                                    <td>72/100</td>
+                                    <td>Concerning</td>
+                                    <td>High</td>
+                                    <td><span class="text-warning">Immediate Review</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Reports Tab -->
+            <div id="reports" class="tab-content">
+                <h2 class="mb-4">AI-Generated Industry Reports</h2>
+                
+                <div class="report-card">
+                    <div class="report-header">
+                        <div class="report-title">Global Microfinance Market Analysis 2024</div>
+                        <div class="badge bg-success">FREE</div>
+                    </div>
+                    <div class="report-teaser">
+                        <p>Comprehensive analysis of the global microfinance sector, including market size, growth trends, regulatory changes, and impact measurement frameworks. This report covers 67 countries and analyzes $234B in microfinance assets.</p>
+                        <p><strong>Key Insights:</strong> Digital transformation driving 34% growth in mobile-first platforms, regulatory harmonization creating new opportunities in Southeast Asia, and impact measurement becoming critical for institutional investors.</p>
+                    </div>
+                    <button class="btn btn-primary">Download Full Report (FREE)</button>
+                </div>
+
+                <div class="report-card premium">
+                    <div class="report-header">
+                        <div class="report-title">Poverty Alleviation Technology Trends</div>
+                        <div class="report-price">$49</div>
+                    </div>
+                    <div class="report-teaser">
+                        <p>Deep dive into emerging technologies transforming poverty alleviation efforts, including AI-powered credit scoring, blockchain-based identity systems, and IoT applications in rural development.</p>
+                        <p><strong>Preview:</strong> AI credit scoring has improved loan approval rates by 67% while reducing default rates by 23%. Blockchain identity systems are enabling financial inclusion for 2.3M previously unbanked individuals...</p>
+                    </div>
+                    <div class="report-locked">
+                        <i class="fas fa-lock fa-2x mb-2"></i>
+                        <p>Unlock the full 45-page report with detailed case studies, market projections, and investment recommendations.</p>
+                        <button class="btn btn-premium">Purchase Report - $49</button>
+                    </div>
+                </div>
+
+                <div class="report-card premium">
+                    <div class="report-header">
+                        <div class="report-title">Impact Investment Policy Framework 2024</div>
+                        <div class="report-price">$99</div>
+                    </div>
+                    <div class="report-teaser">
+                        <p>Comprehensive policy analysis covering regulatory changes, tax incentives, and government initiatives across 45 countries. Essential reading for institutional investors and policy makers.</p>
+                        <p><strong>Preview:</strong> New EU taxonomy regulations will affect $890B in impact investments, while emerging market governments are introducing tax incentives worth $12B annually...</p>
+                    </div>
+                    <div class="report-locked">
+                        <i class="fas fa-lock fa-2x mb-2"></i>
+                        <p>Access detailed policy recommendations, regulatory timeline, and compliance frameworks.</p>
+                        <button class="btn btn-premium">Purchase Report - $99</button>
+                    </div>
+                </div>
+
+                <div class="report-card premium">
+                    <div class="report-header">
+                        <div class="report-title">SDG 1 Investment Opportunities 2024-2030</div>
+                        <div class="report-price">$199</div>
+                    </div>
+                    <div class="report-teaser">
+                        <p>Exclusive analysis of high-potential investment opportunities in poverty alleviation, including due diligence frameworks, risk assessments, and projected returns for 156 companies across emerging markets.</p>
+                        <p><strong>Preview:</strong> We've identified $2.3B in investment opportunities with projected 4.2x social returns and 2.8x financial returns over 5-year horizons...</p>
+                    </div>
+                    <div class="report-locked">
+                        <i class="fas fa-lock fa-2x mb-2"></i>
+                        <p>Get exclusive access to our proprietary deal pipeline, investment thesis, and detailed company profiles.</p>
+                        <button class="btn btn-premium">Purchase Report - $199</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sentiment Analysis Tab -->
+            <div id="sentiment" class="tab-content">
+                <h2 class="mb-4">Market Sentiment Analysis (Free Tier)</h2>
+                
+                <div class="glass-card">
+                    <h4 class="mb-3">📊 Current Market Sentiment</h4>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="h2 text-success">78%</div>
+                                <div>Positive Sentiment</div>
+                                <div class="small text-muted">Microfinance Sector</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="h2 text-warning">65%</div>
+                                <div>Neutral Sentiment</div>
+                                <div class="small text-muted">Education Technology</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="h2 text-info">82%</div>
+                                <div>Positive Sentiment</div>
+                                <div class="small text-muted">Healthcare Access</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <div class="chart-title">Sentiment Trends (30 Days)</div>
+                            <canvas id="sentimentTrendsChart" height="150"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <div class="chart-title">News Volume & Sentiment</div>
+                            <canvas id="newsVolumeChart" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <h4 class="mb-3">📰 Recent Sentiment Drivers</h4>
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item bg-transparent border-secondary">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">World Bank announces $2B microfinance initiative</h6>
+                                    <p class="mb-1 small">Positive impact on sector outlook and investor confidence</p>
+                                </div>
+                                <span class="sentiment-indicator sentiment-positive">
+                                    <i class="fas fa-arrow-up"></i> +15%
+                                </span>
+                            </div>
+                        </div>
+                        <div class="list-group-item bg-transparent border-secondary">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Regulatory changes in India affect fintech lending</h6>
+                                    <p class="mb-1 small">Market uncertainty around compliance requirements</p>
+                                </div>
+                                <span class="sentiment-indicator sentiment-neutral">
+                                    <i class="fas fa-minus"></i> -3%
+                                </span>
+                            </div>
+                        </div>
+                        <div class="list-group-item bg-transparent border-secondary">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Major success story: 1M people lifted out of poverty</h6>
+                                    <p class="mb-1 small">Grameen Foundation reports breakthrough results</p>
+                                </div>
+                                <span class="sentiment-indicator sentiment-positive">
+                                    <i class="fas fa-arrow-up"></i> +22%
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Premium Reports Tab -->
-            <div class="tab-pane fade" id="reports" role="tabpanel" aria-labelledby="reports-tab">
-                <div class="personalized-content">
-                    <h5><i class="fas fa-file-alt me-2"></i>Institutional Reports for <span id="orgNameReports">BlackRock</span></h5>
-                    <p>AI-generated reports tailored to your ESG mandate and regulatory requirements.</p>
+            <!-- AI Insights Tab -->
+            <div id="insights" class="tab-content">
+                <h2 class="mb-4">AI-Powered Strategic Insights</h2>
+                
+                <div class="glass-card">
+                    <h4 style="color: #e53e3e;" class="mb-3">🎯 Strategic Recommendations</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <strong>Increase Microfinance Allocation:</strong> Our AI models predict 34% higher impact by increasing microfinance investments in Southeast Asia by $120M over the next 18 months. Current market sentiment (78% positive) and regulatory environment support this expansion.
+                        </li>
+                        <li class="mb-3">
+                            <strong>Focus on Women-Led Enterprises:</strong> Portfolio analysis shows women-led businesses in your portfolio achieve 2.3x higher poverty reduction rates with 15% lower default rates. Consider setting a 60% allocation target for women-led investments.
+                        </li>
+                        <li class="mb-3">
+                            <strong>Technology Integration Priority:</strong> Companies combining mobile technology with traditional services show 67% better sustainability metrics and 45% faster scale. Prioritize deals with strong digital components.
+                        </li>
+                    </ul>
                 </div>
 
-                <!-- Free Report -->
-                <div class="report-preview">
-                    <div class="report-title">SDG 1 Quarterly Impact Summary</div>
-                    <div class="report-preview-text">
-                        This comprehensive quarterly report analyzes poverty alleviation impact across your investment portfolio. 
-                        Key findings include a 23% increase in beneficiary income levels, 94% loan repayment rates in microfinance 
-                        programs, and strong correlation between digital literacy training and sustainable income generation. 
-                        The report includes detailed SFDR Article 9 compliance metrics and CSRD-ready impact disclosures.
-                    </div>
-                    <div class="report-price">
-                        <span class="text-success font-weight-bold">FREE REPORT</span>
-                        <button class="btn btn-success">Download PDF</button>
-                    </div>
+                <div class="glass-card">
+                    <h4 class="text-warning mb-3">⚠️ Risk Alerts & Mitigation</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <strong>SkillBridge Africa - Critical Alert:</strong> Job placement rates declining due to market saturation. Recommend immediate strategic review and potential pivot to emerging tech skills training. Budget $2.3M for transformation program.
+                        </li>
+                        <li class="mb-3">
+                            <strong>Regional Risk - Political Instability:</strong> Political instability in 2 key markets may impact 23% of portfolio ($89M at risk). Consider hedging strategies and diversification into stable markets like Rwanda and Ghana.
+                        </li>
+                        <li class="mb-3">
+                            <strong>Currency Risk:</strong> USD strengthening poses 12% downside risk to emerging market investments. Consider local currency hedging for investments >$10M.
+                        </li>
+                    </ul>
                 </div>
 
-                <!-- Premium Report 1 -->
-                <div class="report-preview locked">
-                    <div class="report-title">Advanced Poverty Prediction Analytics</div>
-                    <div class="report-preview-text">
-                        Leveraging machine learning algorithms and satellite data, this report provides predictive insights into 
-                        poverty trends across 47 countries. The analysis includes climate risk correlations, economic shock 
-                        vulnerability assessments, and optimal intervention timing recommendations. Features advanced MSCI-style 
-                        risk heatmaps and scenario modeling for portfolio optimization.
-                    </div>
-                    <div class="report-price">
-                        <div class="price-tag">$49</div>
-                        <button class="btn-unlock" onclick="purchaseReport('poverty-prediction', 49)">Unlock Report</button>
+                <div class="glass-card">
+                    <h4 style="color: #38a169;" class="mb-3">🚀 Emerging Opportunities</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <strong>Climate-Poverty Nexus:</strong> Emerging opportunities in climate-resilient agriculture could impact 4.2M additional people with $200M investment. AI models show 89% probability of 4.5x social returns.
+                        </li>
+                        <li class="mb-3">
+                            <strong>Digital Financial Inclusion:</strong> Blockchain-based identity solutions could unlock financial services for 12M unbanked individuals. Market timing optimal with regulatory clarity emerging in 5 key markets.
+                        </li>
+                        <li class="mb-3">
+                            <strong>AI-Powered Credit Scoring:</strong> Next-generation credit scoring using alternative data shows 67% improvement in reaching underserved populations. Consider strategic partnership with 3 identified leaders.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Profile Completion Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark">
+                <div class="modal-header">
+                    <h5 class="modal-title">Complete Your Impact Profile</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Organization Name</label>
+                                <input type="text" class="form-control bg-dark text-white" placeholder="Enter organization name">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Organization Website</label>
+                                <input type="url" class="form-control bg-dark text-white" placeholder="https://example.com">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Primary Country</label>
+                                <select class="form-select bg-dark text-white">
+                                    <option>Select country</option>
+                                    <option>United States</option>
+                                    <option>United Kingdom</option>
+                                    <option>Germany</option>
+                                    <option>Singapore</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Focus Areas (Select multiple)</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="microfinance">
+                                    <label class="form-check-label" for="microfinance">Microfinance</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="education">
+                                    <label class="form-check-label" for="education">Education</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="healthcare">
+                                    <label class="form-check-label" for="healthcare">Healthcare</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="agriculture">
+                                    <label class="form-check-label" for="agriculture">Agriculture</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Investment Range</label>
+                                <select class="form-select bg-dark text-white">
+                                    <option>Select range</option>
+                                    <option>$1M - $10M</option>
+                                    <option>$10M - $50M</option>
+                                    <option>$50M - $100M</option>
+                                    <option>$100M+</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Premium Report 2 -->
-                <div class="report-preview locked">
-                    <div class="report-title">Microfinance Market Intelligence Report</div>
-                    <div class="report-preview-text">
-                        Deep-dive analysis of global microfinance markets with proprietary data from 200+ institutions. 
-                        Includes competitive landscape mapping, regulatory environment analysis, and emerging technology 
-                        adoption trends. Features detailed ROI benchmarking against peer institutions and identification 
-                        of high-potential investment opportunities in underserved markets.
-                    </div>
-                    <div class="report-price">
-                        <div class="price-tag">$99</div>
-                        <button class="btn-unlock" onclick="purchaseReport('microfinance-intelligence', 99)">Unlock Report</button>
-                    </div>
-                </div>
-
-                <!-- Premium Report 3 -->
-                <div class="report-preview locked">
-                    <div class="report-title">ESG Impact Optimization Strategy</div>
-                    <div class="report-preview-text">
-                        Comprehensive strategy report combining AI-powered impact prediction with portfolio optimization 
-                        recommendations. Includes custom allocation models for maximizing SDG 1 impact while maintaining 
-                        target returns. Features proprietary impact scoring methodology, regulatory compliance roadmaps, 
-                        and stakeholder engagement frameworks aligned with institutional best practices.
-                    </div>
-                    <div class="report-price">
-                        <div class="price-tag">$199</div>
-                        <button class="btn-unlock" onclick="purchaseReport('esg-optimization', 199)">Unlock Report</button>
-                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Later</button>
+                    <button type="button" class="btn btn-primary">Save Profile</button>
                 </div>
             </div>
         </div>
@@ -976,491 +1269,305 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Global variables
-        let mainChart, riskChart, portfolioChart, predictiveChart, regionalRiskChart, interventionChart;
-        let userProfile = {
-            orgName: 'BlackRock',
-            profileType: 'ESG Fund Manager',
-            focusArea: 'Global Poverty Focus',
-            preferences: ['impact-measurement', 'regulatory-compliance', 'risk-assessment']
-        };
-
-        // Initialize dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeCharts();
-            personalizeContent();
-            startRealTimeUpdates();
-        });
-
-        // Personalization
-        function personalizeContent() {
-            document.getElementById('orgName').textContent = userProfile.orgName;
-            document.getElementById('orgNameStories').textContent = userProfile.orgName;
-            document.getElementById('orgNameReports').textContent = userProfile.orgName;
-            document.getElementById('userProfile').textContent = `${userProfile.profileType} - ${userProfile.focusArea}`;
-        }
-
-        // Real-time updates
-        function startRealTimeUpdates() {
-            setInterval(updateTimestamp, 30000); // Update every 30 seconds
-            setInterval(updateMetrics, 60000); // Update metrics every minute
-        }
-
-        function updateTimestamp() {
-            const now = new Date();
-            document.getElementById('updateTimestamp').textContent = now.toISOString().replace('T', ' ').substr(0, 19) + ' UTC';
-        }
-
-        function updateMetrics() {
-            // Simulate real-time metric updates
-            const metrics = ['peopleLifted', 'avgIncome', 'roiMetric', 'sustainabilityScore'];
-            metrics.forEach(metric => {
-                const element = document.getElementById(metric);
-                if (element) {
-                    // Add small random variation to simulate live data
-                    const currentValue = element.textContent;
-                    // This would be replaced with actual API calls in production
-                }
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
             });
-        }
-
-        // Chart initialization
-        function initializeCharts() {
-            initializeMainChart();
-            initializeRiskChart();
-            initializePortfolioChart();
-            initializePredictiveChart();
-            initializeRegionalRiskChart();
-            initializeInterventionChart();
-        }
-
-        function initializeMainChart() {
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            mainChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['2020', '2021', '2022', '2023', '2024', '2025 (Proj)', '2026 (Proj)'],
-                    datasets: [
-                        {
-                            label: 'Poverty Rate (%)',
-                            data: [24.3, 22.1, 19.8, 17.2, 14.6, 12.1, 9.8],
-                            borderColor: '#dc2626',
-                            backgroundColor: 'rgba(220, 38, 38, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        },
-                        {
-                            label: 'AI Projection',
-                            data: [null, null, null, null, 14.6, 12.1, 9.8],
-                            borderColor: '#f59e0b',
-                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                            borderDash: [5, 5],
-                            tension: 0.4,
-                            fill: false
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#ffffff' }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            ticks: { color: '#ffffff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            title: {
-                                display: true,
-                                text: 'Poverty Rate (%)',
-                                color: '#ffffff'
-                            }
-                        },
-                        x: {
-                            ticks: { color: '#ffffff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        }
-                    }
-                }
+            
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
             });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked nav item
+            event.target.closest('.nav-item').classList.add('active');
         }
 
-        function initializeRiskChart() {
-            const ctx = document.getElementById('riskChart').getContext('2d');
-            riskChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Low Risk', 'Medium Risk', 'High Risk'],
-                    datasets: [{
-                        data: [65, 25, 10],
-                        backgroundColor: ['#10b981', '#f59e0b', '#dc2626'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#ffffff' }
-                        }
-                    }
-                }
-            });
+        function showProfileModal() {
+            const modal = new bootstrap.Modal(document.getElementById('profileModal'));
+            modal.show();
         }
 
-        function initializePortfolioChart() {
-            const ctx = document.getElementById('portfolioChart').getContext('2d');
-            portfolioChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Microfinance', 'Education', 'Healthcare', 'Agriculture', 'Housing'],
-                    datasets: [
-                        {
-                            label: 'Investment ($M)',
-                            data: [144, 89, 67, 78, 92],
-                            backgroundColor: 'rgba(16, 185, 129, 0.7)',
-                            borderColor: '#10b981',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Impact Score',
-                            data: [94, 87, 91, 89, 85],
-                            backgroundColor: 'rgba(220, 38, 38, 0.7)',
-                            borderColor: '#dc2626',
-                            borderWidth: 1,
-                            yAxisID: 'y1'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#ffffff' }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            ticks: { color: '#ffffff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            title: {
-                                display: true,
-                                text: 'Investment ($M)',
-                                color: '#ffffff'
-                            }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            ticks: { color: '#ffffff' },
-                            grid: { drawOnChartArea: false },
-                            title: {
-                                display: true,
-                                text: 'Impact Score',
-                                color: '#ffffff'
-                            }
-                        },
-                        x: {
-                            ticks: { color: '#ffffff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        }
-                    }
-                }
-            });
-        }
+        function updateScenario() {
+            const investment = document.getElementById('investmentAmount').value;
+            const timeHorizon = document.getElementById('timeHorizon').value;
+            const geoFocus = document.getElementById('geoFocus').value;
+            const intervention = document.getElementById('intervention').value;
 
-        function initializePredictiveChart() {
-            const ctx = document.getElementById('predictiveChart').getContext('2d');
-            predictiveChart = new Chart(ctx, {
-                type: 'scatter',
-                data: {
-                    datasets: [
-                        {
-                            label: 'High Impact Potential',
-                            data: [
-                                {x: 85, y: 12.5},
-                                {x: 92, y: 15.2},
-                                {x: 78, y: 11.8},
-                                {x: 88, y: 14.1}
-                            ],
-                            backgroundColor: '#10b981',
-                            borderColor: '#10b981'
-                        },
-                        {
-                            label: 'Medium Impact Potential',
-                            data: [
-                                {x: 65, y: 8.5},
-                                {x: 72, y: 9.2},
-                                {x: 68, y: 8.8},
-                                {x: 70, y: 9.1}
-                            ],
-                            backgroundColor: '#f59e0b',
-                            borderColor: '#f59e0b'
-                        },
-                        {
-                            label: 'Low Impact Potential',
-                            data: [
-                                {x: 45, y: 5.5},
-                                {x: 52, y: 6.2},
-                                {x: 48, y: 5.8},
-                                {x: 50, y: 6.1}
-                            ],
-                            backgroundColor: '#dc2626',
-                            borderColor: '#dc2626'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#ffffff' }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            ticks: { color: '#ffffff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            title: {
-                                display: true,
-                                text: 'Projected ROI (%)',
-                                color: '#ffffff'
-                            }
-                        },
-                        x: {
-                            ticks: { color: '#ffffff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            title: {
-                                display: true,
-                                text: 'Impact Score',
-                                color: '#ffffff'
-                            }
-                        }
-                    }
-                }
-            });
-        }
+            // Update display values
+            document.getElementById('investmentValue').textContent = `$${investment}M`;
+            document.getElementById('timeValue').textContent = `${timeHorizon} years`;
 
-        function initializeRegionalRiskChart() {
-            const ctx = document.getElementById('regionalRiskChart').getContext('2d');
-            regionalRiskChart = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['Political Risk', 'Economic Risk', 'Climate Risk', 'Social Risk', 'Operational Risk'],
-                    datasets: [
-                        {
-                            label: 'Sub-Saharan Africa',
-                            data: [7, 6, 8, 5, 6],
-                            borderColor: '#dc2626',
-                            backgroundColor: 'rgba(220, 38, 38, 0.2)'
-                        },
-                        {
-                            label: 'South Asia',
-                            data: [5, 4, 7, 4, 5],
-                            borderColor: '#f59e0b',
-                            backgroundColor: 'rgba(245, 158, 11, 0.2)'
-                        },
-                        {
-                            label: 'Latin America',
-                            data: [4, 3, 6, 3, 4],
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.2)'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#ffffff' }
-                        }
-                    },
-                    scales: {
-                        r: {
-                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            pointLabels: { color: '#ffffff' },
-                            ticks: { 
-                                color: '#ffffff',
-                                backdropColor: 'transparent'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function initializeInterventionChart() {
-            const ctx = document.getElementById('interventionChart').getContext('2d');
-            interventionChart = new Chart(ctx, {
-                type: 'horizontalBar',
-                data: {
-                    labels: ['Microfinance', 'Cash Transfers', 'Skills Training', 'Healthcare Access', 'Education'],
-                    datasets: [{
-                        label: 'Effectiveness Score',
-                        data: [94, 87, 91, 89, 85],
-                        backgroundColor: [
-                            'rgba(16, 185, 129, 0.7)',
-                            'rgba(245, 158, 11, 0.7)',
-                            'rgba(59, 130, 246, 0.7)',
-                            'rgba(139, 92, 246, 0.7)',
-                            'rgba(220, 38, 38, 0.7)'
-                        ],
-                        borderColor: [
-                            '#10b981',
-                            '#f59e0b',
-                            '#3b82f6',
-                            '#8b5cf6',
-                            '#dc2626'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    indexAxis: 'y',
-                    plugins: {
-                        legend: {
-                            labels: { color: '#ffffff' }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            ticks: { color: '#ffffff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        },
-                        x: {
-                            ticks: { color: '#ffffff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            title: {
-                                display: true,
-                                text: 'Effectiveness Score',
-                                color: '#ffffff'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Chart view updates
-        function updateChartView(viewType) {
-            // Update active control
-            document.querySelectorAll('.chart-control').forEach(control => {
-                control.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
-            // Update chart data based on view type
-            const datasets = {
-                'poverty-rate': [
-                    {
-                        label: 'Poverty Rate (%)',
-                        data: [24.3, 22.1, 19.8, 17.2, 14.6, 12.1, 9.8],
-                        borderColor: '#dc2626',
-                        backgroundColor: 'rgba(220, 38, 38, 0.1)'
-                    }
-                ],
-                'income-growth': [
-                    {
-                        label: 'Average Income ($)',
-                        data: [890, 1050, 1240, 1480, 1720, 2010, 2340],
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)'
-                    }
-                ],
-                'regional-impact': [
-                    {
-                        label: 'Sub-Saharan Africa',
-                        data: [18.5, 16.2, 14.1, 12.3, 10.8, 9.2, 7.8],
-                        borderColor: '#dc2626',
-                        backgroundColor: 'rgba(220, 38, 38, 0.1)'
-                    },
-                    {
-                        label: 'South Asia',
-                        data: [21.2, 19.1, 16.8, 14.9, 13.2, 11.5, 9.9],
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)'
-                    }
-                ],
-                'roi-trends': [
-                    {
-                        label: 'Social ROI (%)',
-                        data: [180, 210, 245, 268, 284, 305, 328],
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)'
-                    }
-                ]
+            // Calculate projections based on inputs
+            const baseImpact = investment * 2.34;
+            const geoMultiplier = {
+                'sub-saharan-africa': 1.2,
+                'south-asia': 1.1,
+                'southeast-asia': 1.0,
+                'latin-america': 0.9
+            };
+            const interventionMultiplier = {
+                'microfinance': 1.3,
+                'education': 1.1,
+                'healthcare': 1.0,
+                'infrastructure': 0.8
             };
 
-            mainChart.data.datasets = datasets[viewType];
-            mainChart.update();
+            const projectedLives = Math.round(baseImpact * geoMultiplier[geoFocus] * interventionMultiplier[intervention]);
+            const projectedROI = (3.2 + (timeHorizon * 0.2)).toFixed(1);
+            const projectedJobs = Math.round(projectedLives * 0.195);
+            const projectedReduction = Math.min(95, Math.round(45 + (investment * 0.2))).toString();
+
+            document.getElementById('projectedLives').textContent = projectedLives.toLocaleString();
+            document.getElementById('projectedROI').textContent = projectedROI + 'x';
+            document.getElementById('projectedJobs').textContent = projectedJobs.toLocaleString();
+            document.getElementById('projectedReduction').textContent = projectedReduction + '%';
         }
 
-        // Accessibility functions
-        function toggleHighContrast() {
-            document.body.classList.toggle('high-contrast');
-        }
-
-        function increaseFontSize() {
-            const currentSize = parseFloat(getComputedStyle(document.body).fontSize);
-            document.body.style.fontSize = (currentSize + 2) + 'px';
-        }
-
-        function decreaseFontSize() {
-            const currentSize = parseFloat(getComputedStyle(document.body).fontSize);
-            if (currentSize > 12) {
-                document.body.style.fontSize = (currentSize - 2) + 'px';
-            }
-        }
-
-        // Report purchase function
-        function purchaseReport(reportType, price) {
-            const handler = PaystackPop.setup({
-                key: 'pk_test_auxeira_paystack_key', // Replace with actual key
-                email: 'user@blackrock.com',
-                amount: price * 100, // Convert to kobo
-                currency: 'USD',
-                ref: 'auxeira_' + reportType + '_' + Math.floor(Math.random() * 1000000),
-                metadata: {
-                    report_type: reportType,
-                    org_name: userProfile.orgName
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Impact Timeline Chart
+            const timelineCtx = document.getElementById('impactTimelineChart').getContext('2d');
+            new Chart(timelineCtx, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024'],
+                    datasets: [{
+                        label: 'People Lifted Out of Poverty',
+                        data: [0, 340000, 890000, 1650000, 2400000],
+                        borderColor: '#e53e3e',
+                        backgroundColor: 'rgba(229, 62, 62, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
                 },
-                callback: function(response) {
-                    alert('Payment successful! Your report will be delivered within 24 hours.');
-                    // In production, this would trigger report generation and delivery
-                },
-                onClose: function() {
-                    alert('Payment cancelled');
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { labels: { color: '#ffffff' } }
+                    },
+                    scales: {
+                        y: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        x: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+                    }
                 }
             });
-            handler.openIframe();
-        }
 
-        // Keyboard navigation support
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Tab') {
-                // Ensure tab navigation works properly
-                const focusableElements = document.querySelectorAll(
-                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-                );
-                // Handle tab navigation logic here if needed
-            }
+            // Policy Effectiveness Chart
+            const policyCtx = document.getElementById('policyEffectivenessChart').getContext('2d');
+            new Chart(policyCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Microfinance', 'Education', 'Healthcare', 'Infrastructure', 'Skills Training', 'Policy Reform'],
+                    datasets: [{
+                        label: 'Effectiveness Score',
+                        data: [95, 87, 82, 76, 89, 73],
+                        borderColor: '#38a169',
+                        backgroundColor: 'rgba(56, 161, 105, 0.2)',
+                        pointBackgroundColor: '#38a169'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
+                    scales: {
+                        r: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { color: '#ffffff' }
+                        }
+                    }
+                }
+            });
+
+            // Projection Chart
+            const projectionCtx = document.getElementById('projectionChart').getContext('2d');
+            new Chart(projectionCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                    datasets: [{
+                        label: 'Projected Impact',
+                        data: [46800, 93600, 140400, 187200, 234000],
+                        borderColor: '#00d4ff',
+                        backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
+                    scales: {
+                        y: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        x: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+                    }
+                }
+            });
+
+            // Risk Return Chart
+            const riskReturnCtx = document.getElementById('riskReturnChart').getContext('2d');
+            new Chart(riskReturnCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Investment Opportunities',
+                        data: [
+                            {x: 15, y: 4.2}, {x: 25, y: 3.8}, {x: 35, y: 3.5},
+                            {x: 20, y: 4.5}, {x: 30, y: 3.2}, {x: 40, y: 2.9}
+                        ],
+                        backgroundColor: '#ffd700',
+                        borderColor: '#ffd700'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
+                    scales: {
+                        y: { 
+                            title: { display: true, text: 'Expected Return (x)', color: '#ffffff' },
+                            ticks: { color: '#ffffff' }, 
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' } 
+                        },
+                        x: { 
+                            title: { display: true, text: 'Risk Score', color: '#ffffff' },
+                            ticks: { color: '#ffffff' }, 
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' } 
+                        }
+                    }
+                }
+            });
+
+            // Health Trends Chart
+            const healthTrendsCtx = document.getElementById('healthTrendsChart').getContext('2d');
+            new Chart(healthTrendsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [
+                        {
+                            label: 'Excellent Health',
+                            data: [18, 20, 22, 21, 23, 23],
+                            borderColor: '#38a169',
+                            backgroundColor: 'rgba(56, 161, 105, 0.1)'
+                        },
+                        {
+                            label: 'Good Health',
+                            data: [15, 14, 13, 12, 12, 12],
+                            borderColor: '#00d4ff',
+                            backgroundColor: 'rgba(0, 212, 255, 0.1)'
+                        },
+                        {
+                            label: 'Warning',
+                            data: [5, 4, 3, 4, 4, 4],
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)'
+                        },
+                        {
+                            label: 'Critical',
+                            data: [2, 2, 2, 3, 1, 1],
+                            borderColor: '#e53e3e',
+                            backgroundColor: 'rgba(229, 62, 62, 0.1)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
+                    scales: {
+                        y: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        x: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+                    }
+                }
+            });
+
+            // Risk Distribution Chart
+            const riskDistCtx = document.getElementById('riskDistributionChart').getContext('2d');
+            new Chart(riskDistCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Low Risk', 'Medium Risk', 'High Risk', 'Critical Risk'],
+                    datasets: [{
+                        data: [23, 12, 4, 1],
+                        backgroundColor: ['#38a169', '#00d4ff', '#f59e0b', '#e53e3e']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { labels: { color: '#ffffff' } } }
+                }
+            });
+
+            // Sentiment Trends Chart
+            const sentimentCtx = document.getElementById('sentimentTrendsChart').getContext('2d');
+            new Chart(sentimentCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [
+                        {
+                            label: 'Microfinance',
+                            data: [72, 75, 76, 78],
+                            borderColor: '#38a169',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Education Tech',
+                            data: [68, 66, 64, 65],
+                            borderColor: '#f59e0b',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Healthcare',
+                            data: [79, 80, 81, 82],
+                            borderColor: '#00d4ff',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
+                    scales: {
+                        y: { 
+                            min: 60, max: 85,
+                            ticks: { color: '#ffffff' }, 
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' } 
+                        },
+                        x: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+                    }
+                }
+            });
+
+            // News Volume Chart
+            const newsVolumeCtx = document.getElementById('newsVolumeChart').getContext('2d');
+            new Chart(newsVolumeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [{
+                        label: 'News Articles',
+                        data: [234, 189, 267, 298],
+                        backgroundColor: '#8b5cf6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
+                    scales: {
+                        y: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        x: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+                    }
+                }
+            });
+
+            // Initialize scenario with default values
+            updateScenario();
         });
     </script>
-    <script src="esg_leaderboard_system.js"></script>
-    <script src="esg_enhanced_framework.js"></script>
 </body>
 </html>

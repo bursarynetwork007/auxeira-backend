@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira VC Dashboard - Portfolio Intelligence & Deal Flow Discovery</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    
+    <style>
+        :root {
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #1a1a1a;
+            --accent-bg: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #666666;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-yellow: #f59e0b;
+            --border-color: #333333;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, #1a1a2e 50%, var(--primary-bg) 100%);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Glass Morphism Effects */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+        }
+
+        .glass-card {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Critical Action Banner */
+        .critical-banner {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3); }
+            50% { box-shadow: 0 4px 30px rgba(59, 130, 246, 0.5); }
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            border-bottom: 2px solid var(--border-color);
+            background: var(--secondary-bg);
+            border-radius: 12px 12px 0 0;
+            padding: 0.5rem;
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 8px;
+            margin: 0 0.25rem;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border: none;
+        }
+
+        .nav-tabs .nav-link.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Alpha Score Gauge */
+        .alpha-gauge {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        .alpha-score {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .alpha-score-value {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Portfolio Cards */
+        .portfolio-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portfolio-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue), var(--accent-purple));
+        }
+
+        .portfolio-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 25px 50px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Metrics Cards */
+        .metric-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .metric-card:hover::before {
+            opacity: 1;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Signal Badges */
+        .signal-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .signal-strong-buy { background: var(--accent-green); color: white; }
+        .signal-buy { background: var(--accent-blue); color: white; }
+        .signal-hold { background: var(--accent-yellow); color: black; }
+        .signal-sell { background: var(--accent-red); color: white; }
+
+        /* Risk Level Indicators */
+        .risk-low { color: var(--accent-green); }
+        .risk-medium { color: var(--accent-yellow); }
+        .risk-high { color: var(--accent-red); }
+
+        /* Tier Access Overlays */
+        .tier-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(5px);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tier-locked .tier-overlay {
+            opacity: 1;
+        }
+
+        .upgrade-cta {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .upgrade-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Deal Flow Cards */
+        .deal-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .deal-card:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
+        }
+
+        .sse-score {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Charts Container */
+        .chart-container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Behavioral Nudges */
+        .nudge-card {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(245, 158, 11, 0.1));
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            animation: gentle-pulse 3s infinite;
+        }
+
+        @keyframes gentle-pulse {
+            0%, 100% { border-color: rgba(239, 68, 68, 0.3); }
+            50% { border-color: rgba(239, 68, 68, 0.6); }
+        }
+
+        .loss-aversion {
+            color: var(--accent-red);
+            font-weight: bold;
+        }
+
+        .peer-comparison {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container-fluid {
+                padding: 0.5rem;
+            }
+            
+            .metric-value {
+                font-size: 2rem;
+            }
+            
+            .alpha-score-value {
+                font-size: 2.5rem;
+            }
+            
+            .portfolio-card, .deal-card {
+                padding: 1rem;
+            }
+        }
+
+        /* Loading States */
+        .loading-shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        /* Premium Features Highlight */
+        .premium-feature {
+            position: relative;
+        }
+
+        .premium-feature::after {
+            content: '✨ PREMIUM';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #000;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        /* Success States */
+        .success-glow {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            border-color: var(--accent-green) !important;
+        }
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Focus States */
+        .nav-link:focus,
+        .btn:focus,
+        .form-control:focus {
+            outline: 2px solid var(--accent-blue);
+            outline-offset: 2px;
+        }
+    </style>
+    <script src="./behavioral-enhancements.js" defer></script>
+    <script src="./subscription-system.js" defer></script>
+    <script src="./analytics-monitoring.js" defer></script>
+</head>
+<body>
+    <!-- Critical Action Banner -->
+    <div class="critical-banner" id="criticalBanner">
+        <div class="container-fluid">
+            <div class="d-flex align-items-center justify-content-between flex-wrap">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-brain me-2 fa-pulse"></i>
+                    <div>
+                        <strong>ALPHA INTELLIGENCE:</strong>
+                        <span class="ms-2">Portfolio Alpha Score: <span id="portfolioAlphaScore">76</span> • <span id="criticalAlertsCount">2</span> critical alerts</span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-success">
+                        <i class="fas fa-circle fa-pulse me-1"></i>Live AI Analysis
+                    </span>
+                    <button class="btn btn-light btn-sm" onclick="openAlertsModal()">
+                        <i class="fas fa-eye me-1"></i>View Insights
+                    </button>
+                    <button class="btn btn-outline-light btn-sm" onclick="closeBanner()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Container -->
+    <div class="container-fluid py-4">
+        <!-- Dashboard Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h2 mb-1">Welcome back, <span id="vcName">Sarah Chen</span></h1>
+                        <p class="text-muted mb-0">
+                            <span id="fundName">Alpha Ventures</span> • <span id="fundNumber">Fund III</span> • 
+                            <span class="badge bg-primary ms-2" id="subscriptionTier">Premium</span>
+                        </p>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="text-end">
+                            <div class="small text-muted">Last Updated</div>
+                            <div class="fw-bold" id="lastUpdated">Just now</div>
+                        </div>
+                        <button class="btn btn-outline-primary" onclick="refreshData()">
+                            <i class="fas fa-sync-alt me-1"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="portfolio-tab" data-bs-toggle="tab" data-bs-target="#portfolio" type="button" role="tab" aria-controls="portfolio" aria-selected="true">
+                    <i class="fas fa-briefcase me-2"></i>Portfolio Dashboard
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="dealflow-tab" data-bs-toggle="tab" data-bs-target="#dealflow" type="button" role="tab" aria-controls="dealflow" aria-selected="false">
+                    <i class="fas fa-search-dollar me-2"></i>Deal Flow Discovery
+                    <span class="badge bg-warning ms-2">Premium</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
+                    <i class="fas fa-chart-line me-2"></i>Analytics & Reports
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="market-tab" data-bs-toggle="tab" data-bs-target="#market" type="button" role="tab" aria-controls="market" aria-selected="false">
+                    <i class="fas fa-globe me-2"></i>Market Intelligence
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="dashboardTabContent">
+            <!-- Portfolio Dashboard Tab -->
+            <div class="tab-pane fade show active" id="portfolio" role="tabpanel" aria-labelledby="portfolio-tab">
+                <!-- Alpha Score Display -->
+                <div class="row mb-4">
+                    <div class="col-lg-4">
+                        <div class="glass-card p-4 text-center">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-brain me-2"></i>Portfolio Alpha Intelligence
+                                <span class="badge bg-primary ms-2">Live AI</span>
+                            </h5>
+                            <div class="alpha-gauge mb-3">
+                                <canvas id="alphaGauge" width="200" height="200"></canvas>
+                                <div class="alpha-score">
+                                    <div class="alpha-score-value" id="alphaScoreValue">76</div>
+                                    <div class="small text-muted">Strong Alpha</div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-center mb-3">
+                                <i class="fas fa-trending-up text-success me-2"></i>
+                                <span class="text-success fw-bold">+4.2 points</span>
+                            </div>
+                            <div class="small text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                Last updated: <span id="alphaLastUpdate">30s ago</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <!-- Portfolio Metrics -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="metric-card">
+                                    <div class="metric-value text-success" id="currentIRR">28.4%</div>
+                                    <div class="metric-label">Current IRR</div>
+                                    <div class="small text-muted">Target: 25%</div>
+                                    <div class="small text-success">+2.1%</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card">
+                                    <div class="metric-value text-primary" id="currentMOIC">2.8x</div>
+                                    <div class="metric-label">Current MOIC</div>
+                                    <div class="small text-muted">Target: 3.5x</div>
+                                    <div class="small text-primary">+0.3x</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card">
+                                    <div class="metric-value text-warning" id="currentDPI">0.9x</div>
+                                    <div class="metric-label">Current DPI</div>
+                                    <div class="small text-muted">Target: 1.2x</div>
+                                    <div class="small text-warning">+0.1x</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="metric-card">
+                                    <div class="metric-value text-info" id="portfolioValue">$450M</div>
+                                    <div class="metric-label">Portfolio Value</div>
+                                    <div class="small text-muted">Target: $625M</div>
+                                    <div class="small text-info">+$45M</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Companies Grid -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="glass-card p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-building me-2"></i>Portfolio Companies
+                                    <span class="badge bg-secondary ms-2" id="portfolioCount">6</span>
+                                </h5>
+                                <div class="d-flex gap-2">
+                                    <select class="form-select form-select-sm" id="sortBy" onchange="sortPortfolio()">
+                                        <option value="irr">Sort by IRR</option>
+                                        <option value="moic">Sort by MOIC</option>
+                                        <option value="value">Sort by Value</option>
+                                        <option value="risk">Sort by Risk</option>
+                                        <option value="sse">Sort by SSE Score</option>
+                                    </select>
+                                    <select class="form-select form-select-sm" id="filterBy" onchange="filterPortfolio()">
+                                        <option value="all">All Companies</option>
+                                        <option value="high_performers">High Performers (IRR >30%)</option>
+                                        <option value="at_risk">At Risk (Runway <18mo)</option>
+                                        <option value="strong_signals">Strong Buy Signals</option>
+                                        <option value="unicorn_potential">Unicorn Potential (>$10M)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row" id="portfolioGrid">
+                                <!-- Portfolio companies will be dynamically loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Charts -->
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="chart-container">
+                            <h6 class="mb-3">Portfolio Performance Trend</h6>
+                            <canvas id="performanceChart" height="300"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="chart-container">
+                            <h6 class="mb-3">Sector Allocation</h6>
+                            <canvas id="sectorChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deal Flow Discovery Tab -->
+            <div class="tab-pane fade" id="dealflow" role="tabpanel" aria-labelledby="dealflow-tab">
+                <div class="position-relative">
+                    <!-- Premium Tier Gate -->
+                    <div class="tier-overlay" id="dealflowOverlay">
+                        <div class="text-center">
+                            <i class="fas fa-lock fa-3x text-primary mb-3"></i>
+                            <h4 class="text-white mb-3">Premium Deal Flow Discovery</h4>
+                            <p class="text-muted mb-4">Access high-performing startups seeking funding with SSE scores >70</p>
+                            <button class="upgrade-cta" onclick="upgradeToPremium()">
+                                <i class="fas fa-crown me-2"></i>Upgrade to Premium
+                            </button>
+                            <div class="mt-3">
+                                <small class="text-muted">Starting at $2,499/month</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deal Flow Content -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="glass-card p-4">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-search-dollar me-2"></i>High-Performing Startups
+                                        <span class="badge bg-success ms-2">SSE >70</span>
+                                    </h5>
+                                    <div class="d-flex gap-2">
+                                        <select class="form-select form-select-sm">
+                                            <option>All Stages</option>
+                                            <option>Seed</option>
+                                            <option>Series A</option>
+                                            <option>Series B</option>
+                                        </select>
+                                        <select class="form-select form-select-sm">
+                                            <option>All Sectors</option>
+                                            <option>AI/ML</option>
+                                            <option>Fintech</option>
+                                            <option>Healthcare</option>
+                                            <option>Cybersecurity</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row" id="dealflowGrid">
+                                    <!-- Deal flow opportunities will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics & Reports Tab -->
+            <div class="tab-pane fade" id="analytics" role="tabpanel" aria-labelledby="analytics-tab">
+                <div class="row mb-4">
+                    <div class="col-lg-8">
+                        <div class="chart-container">
+                            <h6 class="mb-3">IRR Projection Analysis</h6>
+                            <canvas id="irrProjectionChart" height="400"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="glass-card p-4">
+                            <h6 class="mb-3">LP Report Generator</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Report Period</label>
+                                <select class="form-select">
+                                    <option>Q3 2024</option>
+                                    <option>Q2 2024</option>
+                                    <option>Q1 2024</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Report Type</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked>
+                                    <label class="form-check-label">Portfolio Overview</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked>
+                                    <label class="form-check-label">Performance Metrics</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox">
+                                    <label class="form-check-label">Risk Analysis</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox">
+                                    <label class="form-check-label">Market Intelligence</label>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary w-100" onclick="generateLPReport()">
+                                <i class="fas fa-file-pdf me-2"></i>Generate Report ($49)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Intelligence Tab -->
+            <div class="tab-pane fade" id="market" role="tabpanel" aria-labelledby="market-tab">
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="metric-card text-center">
+                            <div class="fs-1 mb-2">📈</div>
+                            <div class="metric-label">Market Sentiment</div>
+                            <div class="fw-bold text-success">BULLISH</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card text-center">
+                            <div class="metric-value text-success">78</div>
+                            <div class="metric-label">Liquidity Score</div>
+                            <div class="small text-success">HIGH</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card text-center">
+                            <div class="metric-value text-warning">23.5</div>
+                            <div class="metric-label">Volatility Index</div>
+                            <div class="small text-warning">MODERATE</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card text-center">
+                            <div class="metric-value text-info">$15.2B</div>
+                            <div class="metric-label">Q4 Funding Forecast</div>
+                            <div class="small text-info">PROJECTED</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="chart-container">
+                            <h6 class="mb-3">Sector Performance & Trends</h6>
+                            <canvas id="sectorTrendsChart" height="400"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="glass-card p-4">
+                            <h6 class="mb-3">Emerging Opportunities</h6>
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item bg-transparent border-0 px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Quantum Computing</span>
+                                        <span class="badge bg-success">Hot</span>
+                                    </div>
+                                </div>
+                                <div class="list-group-item bg-transparent border-0 px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Climate Tech</span>
+                                        <span class="badge bg-primary">Growing</span>
+                                    </div>
+                                </div>
+                                <div class="list-group-item bg-transparent border-0 px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Web3 Infrastructure</span>
+                                        <span class="badge bg-warning">Watch</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Behavioral Nudges Modal -->
+    <div class="modal fade" id="alertsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">
+                        <i class="fas fa-brain text-primary me-2"></i>Alpha Intelligence Alerts
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="nudge-card">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                            <strong>Critical Alert: HealthTech</strong>
+                        </div>
+                        <p class="mb-2">Burn rate increased 25% - runway down to 14 months</p>
+                        <div class="loss-aversion">
+                            Potential loss: $5M investment at risk
+                        </div>
+                        <div class="peer-comparison mt-2">
+                            <small>
+                                <strong>Peer Comparison:</strong> Similar companies maintain 18+ month runway
+                            </small>
+                        </div>
+                        <button class="btn btn-warning btn-sm mt-2">
+                            <i class="fas fa-phone me-1"></i>Schedule Bridge Funding Discussion
+                        </button>
+                    </div>
+
+                    <div class="nudge-card">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-rocket text-success me-2"></i>
+                            <strong>Opportunity Alert: DataCorp</strong>
+                        </div>
+                        <p class="mb-2">Strong Q3 performance - consider follow-on investment</p>
+                        <div class="text-success">
+                            Potential upside: 2.5x additional returns based on trajectory
+                        </div>
+                        <div class="peer-comparison mt-2">
+                            <small>
+                                <strong>Market Signal:</strong> Top quartile performance in AI/ML sector
+                            </small>
+                        </div>
+                        <button class="btn btn-success btn-sm mt-2">
+                            <i class="fas fa-chart-line me-1"></i>Evaluate Series B Participation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // ============================================================================
+        // GLOBAL VARIABLES & DATA
+        // ============================================================================
+        
+        let vcProfile = {
+            name: 'Sarah Chen',
+            fund: 'Alpha Ventures',
+            fundNumber: 'Fund III',
+            tier: 'premium',
+            metrics: {
+                currentIRR: 28.4,
+                currentMOIC: 2.8,
+                currentDPI: 0.9,
+                portfolioValue: 450000000,
+                alphaScore: 76
+            }
+        };
+
+        let portfolioCompanies = [
+            {
+                id: 'company_1',
+                name: 'CloudSec',
+                sector: 'Cybersecurity',
+                stage: 'Series B',
+                investment: 8000000,
+                currentValue: 24000000,
+                moic: 3.0,
+                irr: 45.2,
+                sseScore: 92,
+                riskLevel: 'low',
+                alphaSignal: 'strong_buy',
+                runway: 18,
+                employees: 85,
+                mrr: 1200000,
+                churnRate: 2.1
+            },
+            {
+                id: 'company_2',
+                name: 'HealthTech',
+                sector: 'Healthcare',
+                stage: 'Series A',
+                investment: 5000000,
+                currentValue: 12000000,
+                moic: 2.4,
+                irr: 32.1,
+                sseScore: 78,
+                riskLevel: 'medium',
+                alphaSignal: 'hold',
+                runway: 14,
+                employees: 45,
+                mrr: 850000,
+                churnRate: 3.8
+            },
+            {
+                id: 'company_3',
+                name: 'FinanceApp',
+                sector: 'Fintech',
+                stage: 'Seed',
+                investment: 2000000,
+                currentValue: 8000000,
+                moic: 4.0,
+                irr: 78.5,
+                sseScore: 88,
+                riskLevel: 'high',
+                alphaSignal: 'strong_buy',
+                runway: 22,
+                employees: 25,
+                mrr: 320000,
+                churnRate: 1.5
+            },
+            {
+                id: 'company_4',
+                name: 'TechCo',
+                sector: 'Enterprise SaaS',
+                stage: 'Series C',
+                investment: 12000000,
+                currentValue: 36000000,
+                moic: 3.0,
+                irr: 28.9,
+                sseScore: 85,
+                riskLevel: 'low',
+                alphaSignal: 'buy',
+                runway: 24,
+                employees: 150,
+                mrr: 2800000,
+                churnRate: 1.8
+            },
+            {
+                id: 'company_5',
+                name: 'SaaSco',
+                sector: 'Marketing Tech',
+                stage: 'Series B',
+                investment: 6000000,
+                currentValue: 15000000,
+                moic: 2.5,
+                irr: 35.6,
+                sseScore: 81,
+                riskLevel: 'medium',
+                alphaSignal: 'buy',
+                runway: 20,
+                employees: 65,
+                mrr: 980000,
+                churnRate: 2.5
+            },
+            {
+                id: 'company_6',
+                name: 'DataCorp',
+                sector: 'AI/ML',
+                stage: 'Series A',
+                investment: 4000000,
+                currentValue: 16000000,
+                moic: 4.0,
+                irr: 65.2,
+                sseScore: 94,
+                riskLevel: 'medium',
+                alphaSignal: 'strong_buy',
+                runway: 16,
+                employees: 35,
+                mrr: 650000,
+                churnRate: 1.2
+            }
+        ];
+
+        let dealFlowOpportunities = [
+            {
+                id: 'deal_1',
+                name: 'AI Startup',
+                sector: 'AI/ML',
+                stage: 'Series A',
+                sseScore: 89,
+                seeking: 15000000,
+                valuation: 75000000,
+                compatibility: 94,
+                optedIn: true,
+                description: 'Revolutionary AI platform for enterprise automation'
+            },
+            {
+                id: 'deal_2',
+                name: 'FinTech Pro',
+                sector: 'Fintech',
+                stage: 'Seed',
+                sseScore: 82,
+                seeking: 5000000,
+                valuation: 25000000,
+                compatibility: 87,
+                optedIn: true,
+                description: 'Next-gen payment processing for SMBs'
+            },
+            {
+                id: 'deal_3',
+                name: 'HealthCare+',
+                sector: 'Healthcare',
+                stage: 'Series B',
+                sseScore: 76,
+                seeking: 25000000,
+                valuation: 150000000,
+                compatibility: 78,
+                optedIn: true,
+                description: 'Digital health platform with proven outcomes'
+            }
+        ];
+
+        // ============================================================================
+        // INITIALIZATION
+        // ============================================================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+            loadPortfolioData();
+            initializeCharts();
+            startRealTimeUpdates();
+            
+            // Check subscription tier and apply restrictions
+            if (vcProfile.tier !== 'premium') {
+                applyTierRestrictions();
+            }
+        });
+
+        function initializeDashboard() {
+            // Update profile information
+            document.getElementById('vcName').textContent = vcProfile.name;
+            document.getElementById('fundName').textContent = vcProfile.fund;
+            document.getElementById('fundNumber').textContent = vcProfile.fundNumber;
+            document.getElementById('subscriptionTier').textContent = vcProfile.tier.charAt(0).toUpperCase() + vcProfile.tier.slice(1);
+            
+            // Update metrics
+            document.getElementById('currentIRR').textContent = vcProfile.metrics.currentIRR + '%';
+            document.getElementById('currentMOIC').textContent = vcProfile.metrics.currentMOIC + 'x';
+            document.getElementById('currentDPI').textContent = vcProfile.metrics.currentDPI + 'x';
+            document.getElementById('portfolioValue').textContent = '$' + (vcProfile.metrics.portfolioValue / 1000000).toFixed(0) + 'M';
+            document.getElementById('alphaScoreValue').textContent = vcProfile.metrics.alphaScore;
+            document.getElementById('portfolioAlphaScore').textContent = vcProfile.metrics.alphaScore;
+            document.getElementById('portfolioCount').textContent = portfolioCompanies.length;
+            
+            updateLastUpdated();
+        }
+
+        function loadPortfolioData() {
+            const portfolioGrid = document.getElementById('portfolioGrid');
+            portfolioGrid.innerHTML = '';
+
+            portfolioCompanies.forEach(company => {
+                const companyCard = createPortfolioCard(company);
+                portfolioGrid.appendChild(companyCard);
+            });
+        }
+
+        function createPortfolioCard(company) {
+            const col = document.createElement('div');
+            col.className = 'col-lg-4 col-md-6 mb-4';
+            
+            const riskClass = company.riskLevel === 'low' ? 'risk-low' : 
+                             company.riskLevel === 'medium' ? 'risk-medium' : 'risk-high';
+            
+            const signalClass = `signal-${company.alphaSignal.replace('_', '-')}`;
+            
+            col.innerHTML = `
+                <div class="portfolio-card" onclick="openCompanyDetails('${company.id}')">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="mb-1">${company.name}</h6>
+                            <small class="text-muted">${company.sector} • ${company.stage}</small>
+                        </div>
+                        <span class="badge ${riskClass}">${company.riskLevel} risk</span>
+                    </div>
+                    
+                    <div class="row text-center mb-3">
+                        <div class="col-4">
+                            <div class="h5 text-success mb-0">${company.irr.toFixed(1)}%</div>
+                            <small class="text-muted">IRR</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="h5 text-primary mb-0">${company.moic.toFixed(1)}x</div>
+                            <small class="text-muted">MOIC</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="h5 text-info mb-0">${company.sseScore}</div>
+                            <small class="text-muted">SSE</small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="small">
+                            <span class="text-muted">Value:</span>
+                            <span class="text-white fw-bold">$${(company.currentValue / 1000000).toFixed(1)}M</span>
+                        </div>
+                        <div class="small">
+                            <span class="text-muted">MRR:</span>
+                            <span class="text-success fw-bold">$${(company.mrr / 1000).toFixed(0)}K</span>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="small text-muted">
+                            ${company.employees} employees • ${company.runway}mo runway
+                        </div>
+                        <div class="small text-muted">
+                            Churn: ${company.churnRate}%
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="signal-badge ${signalClass}">
+                            ${company.alphaSignal.replace('_', ' ')}
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-chart-line me-1"></i>Details
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return col;
+        }
+
+        function loadDealFlowData() {
+            const dealflowGrid = document.getElementById('dealflowGrid');
+            dealflowGrid.innerHTML = '';
+
+            dealFlowOpportunities.forEach(deal => {
+                const dealCard = createDealFlowCard(deal);
+                dealflowGrid.appendChild(dealCard);
+            });
+        }
+
+        function createDealFlowCard(deal) {
+            const col = document.createElement('div');
+            col.className = 'col-lg-4 col-md-6 mb-4';
+            
+            col.innerHTML = `
+                <div class="deal-card">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="mb-1">${deal.name}</h6>
+                            <small class="text-muted">${deal.sector} • ${deal.stage}</small>
+                        </div>
+                        <div class="sse-score">${deal.sseScore}</div>
+                    </div>
+                    
+                    <p class="small text-muted mb-3">${deal.description}</p>
+                    
+                    <div class="row text-center mb-3">
+                        <div class="col-6">
+                            <div class="h6 text-primary mb-0">$${(deal.seeking / 1000000).toFixed(0)}M</div>
+                            <small class="text-muted">Seeking</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="h6 text-info mb-0">$${(deal.valuation / 1000000).toFixed(0)}M</div>
+                            <small class="text-muted">Valuation</small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="small">
+                            <span class="text-muted">Compatibility:</span>
+                            <span class="text-success fw-bold">${deal.compatibility}%</span>
+                        </div>
+                        <span class="badge bg-success">
+                            <i class="fas fa-eye me-1"></i>Opted In
+                        </span>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary btn-sm flex-fill" onclick="requestIntroduction('${deal.id}')">
+                            <i class="fas fa-handshake me-1"></i>Request Intro
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="viewDealDetails('${deal.id}')">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return col;
+        }
+
+        // ============================================================================
+        // CHARTS INITIALIZATION
+        // ============================================================================
+        
+        function initializeCharts() {
+            initializeAlphaGauge();
+            initializePerformanceChart();
+            initializeSectorChart();
+            initializeIRRProjectionChart();
+            initializeSectorTrendsChart();
+        }
+
+        function initializeAlphaGauge() {
+            const ctx = document.getElementById('alphaGauge').getContext('2d');
+            const alphaScore = vcProfile.metrics.alphaScore;
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [alphaScore, 100 - alphaScore],
+                        backgroundColor: [
+                            alphaScore >= 80 ? '#10B981' : 
+                            alphaScore >= 60 ? '#3B82F6' : 
+                            alphaScore >= 40 ? '#F59E0B' : '#EF4444',
+                            '#374151'
+                        ],
+                        borderWidth: 0,
+                        cutout: '75%'
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+        }
+
+        function initializePerformanceChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Q1 2023', 'Q2 2023', 'Q3 2023', 'Q4 2023', 'Q1 2024', 'Q2 2024', 'Q3 2024'],
+                    datasets: [{
+                        label: 'IRR %',
+                        data: [18.5, 21.2, 24.8, 26.1, 27.3, 28.0, 28.4],
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'MOIC',
+                        data: [1.8, 2.1, 2.3, 2.5, 2.6, 2.7, 2.8],
+                        borderColor: '#3B82F6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#b3b3b3' },
+                            grid: { color: '#333333' }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            ticks: { color: '#b3b3b3' },
+                            grid: { color: '#333333' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            ticks: { color: '#b3b3b3' },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeSectorChart() {
+            const ctx = document.getElementById('sectorChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['AI/ML', 'Fintech', 'Healthcare', 'Cybersecurity', 'Enterprise SaaS', 'Marketing Tech'],
+                    datasets: [{
+                        data: [25, 20, 18, 15, 12, 10],
+                        backgroundColor: [
+                            '#8B5CF6',
+                            '#3B82F6',
+                            '#10B981',
+                            '#F59E0B',
+                            '#EF4444',
+                            '#6B7280'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#1a1a1a'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { color: '#ffffff' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeIRRProjectionChart() {
+            const ctx = document.getElementById('irrProjectionChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2024', '2025', '2026', '2027', '2028', '2029', '2030'],
+                    datasets: [{
+                        label: 'Conservative Projection',
+                        data: [28.4, 30.2, 32.1, 33.8, 35.2, 36.5, 37.8],
+                        borderColor: '#F59E0B',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        borderDash: [5, 5],
+                        tension: 0.4
+                    }, {
+                        label: 'Optimistic Projection',
+                        data: [28.4, 32.5, 36.8, 41.2, 45.8, 50.5, 55.3],
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Target IRR',
+                        data: [25, 25, 25, 25, 25, 25, 25],
+                        borderColor: '#EF4444',
+                        borderDash: [10, 5],
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#b3b3b3' },
+                            grid: { color: '#333333' }
+                        },
+                        y: {
+                            ticks: { color: '#b3b3b3' },
+                            grid: { color: '#333333' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeSectorTrendsChart() {
+            const ctx = document.getElementById('sectorTrendsChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['AI/ML', 'Cybersecurity', 'Fintech', 'Healthcare', 'Enterprise SaaS'],
+                    datasets: [{
+                        label: 'Growth Rate %',
+                        data: [45.2, 32.1, 23.8, 18.5, 15.7],
+                        backgroundColor: [
+                            '#8B5CF6',
+                            '#F59E0B',
+                            '#3B82F6',
+                            '#10B981',
+                            '#6B7280'
+                        ],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#b3b3b3' },
+                            grid: { color: '#333333' }
+                        },
+                        y: {
+                            ticks: { color: '#b3b3b3' },
+                            grid: { color: '#333333' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============================================================================
+        // TIER RESTRICTIONS & BEHAVIORAL NUDGES
+        // ============================================================================
+        
+        function applyTierRestrictions() {
+            if (vcProfile.tier !== 'premium') {
+                // Lock deal flow discovery
+                const dealflowOverlay = document.getElementById('dealflowOverlay');
+                if (dealflowOverlay) {
+                    dealflowOverlay.style.display = 'flex';
+                }
+                
+                // Add tier-locked class to restricted sections
+                const dealflowTab = document.getElementById('dealflow');
+                if (dealflowTab) {
+                    dealflowTab.classList.add('tier-locked');
+                }
+            }
+        }
+
+        function upgradeToPremium() {
+            // Paystack integration for subscription upgrade
+            const handler = PaystackPop.setup({
+                key: 'pk_live_your_paystack_public_key', // Replace with your public key
+                email: 'sarah.chen@alphaventures.com',
+                amount: 249900, // $2,499 in kobo
+                currency: 'USD',
+                plan: 'PLN_premium_vc_monthly',
+                callback: function(response) {
+                    // Handle successful payment
+                    console.log('Payment successful:', response);
+                    
+                    // Update user tier
+                    vcProfile.tier = 'premium';
+                    
+                    // Remove tier restrictions
+                    removeTierRestrictions();
+                    
+                    // Show success message
+                    showSuccessMessage('Welcome to Premium! All features are now unlocked.');
+                    
+                    // Load deal flow data
+                    loadDealFlowData();
+                },
+                onClose: function() {
+                    console.log('Payment popup closed');
+                }
+            });
+            
+            handler.openIframe();
+        }
+
+        function removeTierRestrictions() {
+            const dealflowOverlay = document.getElementById('dealflowOverlay');
+            if (dealflowOverlay) {
+                dealflowOverlay.style.display = 'none';
+            }
+            
+            const dealflowTab = document.getElementById('dealflow');
+            if (dealflowTab) {
+                dealflowTab.classList.remove('tier-locked');
+            }
+            
+            // Update subscription tier display
+            document.getElementById('subscriptionTier').textContent = 'Premium';
+            document.getElementById('subscriptionTier').className = 'badge bg-success ms-2';
+        }
+
+        // ============================================================================
+        // BEHAVIORAL NUDGES & PSYCHOLOGY
+        // ============================================================================
+        
+        function showBehavioralNudge(type, data) {
+            switch (type) {
+                case 'loss_aversion':
+                    showLossAversionNudge(data);
+                    break;
+                case 'peer_comparison':
+                    showPeerComparisonNudge(data);
+                    break;
+                case 'scarcity':
+                    showScarcityNudge(data);
+                    break;
+                case 'social_proof':
+                    showSocialProofNudge(data);
+                    break;
+            }
+        }
+
+        function showLossAversionNudge(data) {
+            const nudge = document.createElement('div');
+            nudge.className = 'nudge-card';
+            nudge.innerHTML = `
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                    <strong>Portfolio Risk Alert</strong>
+                </div>
+                <p class="mb-2">${data.message}</p>
+                <div class="loss-aversion">
+                    Potential loss: $${(data.potentialLoss / 1000000).toFixed(1)}M at risk
+                </div>
+                <button class="btn btn-warning btn-sm mt-2" onclick="takeAction('${data.action}')">
+                    <i class="fas fa-shield-alt me-1"></i>Take Protective Action
+                </button>
+            `;
+            
+            document.body.appendChild(nudge);
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                nudge.remove();
+            }, 10000);
+        }
+
+        function showPeerComparisonNudge(data) {
+            const nudge = document.createElement('div');
+            nudge.className = 'peer-comparison';
+            nudge.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Peer Benchmark:</strong> ${data.metric}
+                    </div>
+                    <div class="text-end">
+                        <div class="small text-muted">Your Performance</div>
+                        <div class="fw-bold ${data.performance > data.peerAverage ? 'text-success' : 'text-warning'}">
+                            ${data.performance}${data.unit}
+                        </div>
+                    </div>
+                </div>
+                <div class="progress mt-2" style="height: 6px;">
+                    <div class="progress-bar bg-success" style="width: ${(data.performance / data.topQuartile) * 100}%"></div>
+                </div>
+                <div class="d-flex justify-content-between small text-muted mt-1">
+                    <span>Avg: ${data.peerAverage}${data.unit}</span>
+                    <span>Top 25%: ${data.topQuartile}${data.unit}</span>
+                </div>
+            `;
+            
+            return nudge;
+        }
+
+        // ============================================================================
+        // REAL-TIME UPDATES & AI INTEGRATION
+        // ============================================================================
+        
+        function startRealTimeUpdates() {
+            // Simulate real-time alpha score updates
+            setInterval(() => {
+                updateAlphaScore();
+            }, 30000); // Update every 30 seconds
+            
+            // Update last updated timestamp
+            setInterval(() => {
+                updateLastUpdated();
+            }, 60000); // Update every minute
+        }
+
+        function updateAlphaScore() {
+            const change = (Math.random() - 0.5) * 2; // Random change between -1 and 1
+            const newScore = Math.max(0, Math.min(100, vcProfile.metrics.alphaScore + change));
+            
+            vcProfile.metrics.alphaScore = newScore;
+            document.getElementById('alphaScoreValue').textContent = Math.round(newScore);
+            document.getElementById('portfolioAlphaScore').textContent = Math.round(newScore);
+            
+            // Update alpha gauge chart
+            initializeAlphaGauge();
+        }
+
+        function updateLastUpdated() {
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent = now.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('alphaLastUpdate').textContent = 'Just now';
+        }
+
+        // ============================================================================
+        // USER INTERACTIONS
+        // ============================================================================
+        
+        function openAlertsModal() {
+            const modal = new bootstrap.Modal(document.getElementById('alertsModal'));
+            modal.show();
+        }
+
+        function closeBanner() {
+            document.getElementById('criticalBanner').style.display = 'none';
+        }
+
+        function refreshData() {
+            // Show loading state
+            const refreshBtn = document.querySelector('[onclick="refreshData()"]');
+            const originalText = refreshBtn.innerHTML;
+            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Refreshing...';
+            refreshBtn.disabled = true;
+            
+            // Simulate data refresh
+            setTimeout(() => {
+                updateAlphaScore();
+                updateLastUpdated();
+                
+                // Reset button
+                refreshBtn.innerHTML = originalText;
+                refreshBtn.disabled = false;
+                
+                showSuccessMessage('Data refreshed successfully');
+            }, 2000);
+        }
+
+        function sortPortfolio() {
+            const sortBy = document.getElementById('sortBy').value;
+            
+            portfolioCompanies.sort((a, b) => {
+                switch (sortBy) {
+                    case 'irr': return b.irr - a.irr;
+                    case 'moic': return b.moic - a.moic;
+                    case 'value': return b.currentValue - a.currentValue;
+                    case 'risk': 
+                        const riskOrder = { low: 1, medium: 2, high: 3 };
+                        return riskOrder[a.riskLevel] - riskOrder[b.riskLevel];
+                    case 'sse': return b.sseScore - a.sseScore;
+                    default: return 0;
+                }
+            });
+            
+            loadPortfolioData();
+        }
+
+        function filterPortfolio() {
+            const filterBy = document.getElementById('filterBy').value;
+            let filteredCompanies = [...portfolioCompanies];
+            
+            switch (filterBy) {
+                case 'high_performers':
+                    filteredCompanies = portfolioCompanies.filter(c => c.irr > 30);
+                    break;
+                case 'at_risk':
+                    filteredCompanies = portfolioCompanies.filter(c => c.runway < 18);
+                    break;
+                case 'strong_signals':
+                    filteredCompanies = portfolioCompanies.filter(c => c.alphaSignal === 'strong_buy');
+                    break;
+                case 'unicorn_potential':
+                    filteredCompanies = portfolioCompanies.filter(c => c.currentValue > 10000000);
+                    break;
+            }
+            
+            // Update portfolio grid with filtered companies
+            const portfolioGrid = document.getElementById('portfolioGrid');
+            portfolioGrid.innerHTML = '';
+            
+            filteredCompanies.forEach(company => {
+                const companyCard = createPortfolioCard(company);
+                portfolioGrid.appendChild(companyCard);
+            });
+        }
+
+        function openCompanyDetails(companyId) {
+            const company = portfolioCompanies.find(c => c.id === companyId);
+            if (company) {
+                // Open detailed company modal or navigate to company page
+                console.log('Opening details for:', company.name);
+                showSuccessMessage(`Opening detailed view for ${company.name}`);
+            }
+        }
+
+        function requestIntroduction(dealId) {
+            const deal = dealFlowOpportunities.find(d => d.id === dealId);
+            if (deal) {
+                showSuccessMessage(`Introduction request sent for ${deal.name}`);
+            }
+        }
+
+        function viewDealDetails(dealId) {
+            const deal = dealFlowOpportunities.find(d => d.id === dealId);
+            if (deal) {
+                console.log('Viewing deal details for:', deal.name);
+                showSuccessMessage(`Opening detailed view for ${deal.name}`);
+            }
+        }
+
+        function generateLPReport() {
+            // Paystack integration for report purchase
+            const handler = PaystackPop.setup({
+                key: 'pk_live_your_paystack_public_key', // Replace with your public key
+                email: 'sarah.chen@alphaventures.com',
+                amount: 4900, // $49 in kobo
+                currency: 'USD',
+                callback: function(response) {
+                    console.log('Report payment successful:', response);
+                    
+                    // Generate and download report
+                    setTimeout(() => {
+                        showSuccessMessage('LP Report generated successfully! Download will begin shortly.');
+                        
+                        // Simulate report download
+                        const link = document.createElement('a');
+                        link.href = '#'; // Replace with actual report URL
+                        link.download = 'Alpha_Ventures_Q3_2024_LP_Report.pdf';
+                        link.click();
+                    }, 2000);
+                },
+                onClose: function() {
+                    console.log('Report payment popup closed');
+                }
+            });
+            
+            handler.openIframe();
+        }
+
+        function takeAction(action) {
+            console.log('Taking action:', action);
+            showSuccessMessage(`Action initiated: ${action}`);
+        }
+
+        function showSuccessMessage(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast align-items-center text-white bg-success border-0 position-fixed';
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999;';
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-check-circle me-2"></i>${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            // Remove toast element after it's hidden
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        // ============================================================================
+        // ACCESSIBILITY & KEYBOARD NAVIGATION
+        // ============================================================================
+        
+        document.addEventListener('keydown', function(e) {
+            // Keyboard shortcuts
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case 'r':
+                        e.preventDefault();
+                        refreshData();
+                        break;
+                    case '1':
+                        e.preventDefault();
+                        document.getElementById('portfolio-tab').click();
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        document.getElementById('dealflow-tab').click();
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        document.getElementById('analytics-tab').click();
+                        break;
+                    case '4':
+                        e.preventDefault();
+                        document.getElementById('market-tab').click();
+                        break;
+                }
+            }
+        });
+
+        // Load deal flow data when tab is activated
+        document.getElementById('dealflow-tab').addEventListener('shown.bs.tab', function() {
+            if (vcProfile.tier === 'premium') {
+                loadDealFlowData();
+            }
+        });
+    </script>
+</body>
+</html>
