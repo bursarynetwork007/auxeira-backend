@@ -1,0 +1,33 @@
+{
+  "name": "auxeira-ai-backend",
+  "version": "1.0.0",
+  "description": "Ferrari-level AI-powered backend for Auxeira VC and Angel Investor Dashboards",
+  "main": "ai-backend-server.js",
+  "scripts": {
+    "start": "node ai-backend-server.js",
+    "dev": "nodemon ai-backend-server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "auxeira",
+    "sse",
+    "ai",
+    "dashboard",
+    "venture-capital",
+    "angel-investor"
+  ],
+  "author": "Auxeira Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "openai": "^4.20.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+

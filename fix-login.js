@@ -1,0 +1,122 @@
+// Fix for the login function - replace lines 5126-5175
+async function submitSigninForm(event) {
+    event.preventDefault();
+    const form = event.target;
+    const submitBtn = document.getElementById('signinSubmitBtn');
+    const loader = document.getElementById('signinLoader');
+    const btnText = document.getElementById('signinBtnText');
+
+    // Rate limiting
+    const identifier = 'signin_' + form.email.value;
+    if (!validationManager.checkRateLimit(identifier, 3, 900000)) {
+        showNotification('Too many login attempts. Please wait before trying again.', 'warning');
+        return;
+    }
+
+    // Validate CSRF token
+    if (!securityManager.validateCSRF(form.csrf_token.value)) {
+        showNotification('Security validation failed. Please refresh the page.', 'error');
+        return;
+    }
+
+    // Validate form
+    if (!validationManager.validateForm(form)) {
+        showNotification('Please fix the errors in the form.', 'error');
+        return;
+    }
+
+    // Show loading state
+    submitBtn.disabled = true;
+    loader.classList.add('show');
+    btnText.style.opacity = '0';
+
+    try {
+        // Get reCAPTCHA token
+        let recaptchaToken = null;
+        if (typeof grecaptcha !== 'undefined') {
+            try {
+                recaptchaToken = grecaptcha.getResponse();
+            } catch (e) {
+                console.warn('reCAPTCHA not ready:', e);
+            }
+        }
+
+        const loginData = {
+            email: form.email.value,
+            password: form.password.value
+        };
+
+        if (recaptchaToken) {
+            loginData.recaptchaToken = recaptchaToken;
+        }
+
+        console.log('Logging in user:', loginData.email);
+
+        const response = await fetch('https://6qfa3ssb10.execute-api.us-east-1.amazonaws.com/prod/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(loginData)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || data.error || 'Login failed');
+        }
+
+        // Store auth tokens
+        if (data.data?.access_token) {
+            localStorage.setItem('auxeira_auth_token', data.data.access_token);
+        }
+        if (data.data?.refresh_token) {
+            localStorage.setItem('auxeira_refresh_token', data.data.refresh_token);
+        }
+
+        // Store user data
+        const userData = {
+            id: data.data?.user?.id || data.userId,
+            email: data.data?.user?.email || loginData.email,
+            firstName: data.data?.user?.firstName || '',
+            lastName: data.data?.user?.lastName || '',
+            userType: data.data?.user?.userType || 'venture_capital'
+        };
+        
+        localStorage.setItem('auxeira_user', JSON.stringify(userData));
+
+        showNotification('Login successful! Redirecting...', 'success');
+
+        const modal = document.getElementById('authModal');
+        if (modal) {
+            setTimeout(() => modal.classList.remove('show'), 1000);
+        }
+
+        // Redirect to appropriate dashboard
+        setTimeout(() => {
+            const dashboardMap = {
+                'startup_founder': '/dashboard/startup_founder.html',
+                'corporate_partner': '/dashboard/corporate_partner.html',
+                'venture_capital': '/dashboard/venture_capital.html',
+                'angel_investor': '/dashboard/angel_investor.html',
+                'government': '/dashboard/government.html',
+                'esg_funder': '/dashboard/esg_funder.html',
+                'impact_investor': '/dashboard/impact_investor.html'
+            };
+            window.location.href = dashboardMap[userData.userType] || '/dashboard/venture_capital.html';
+        }, 1500);
+        
+    } catch (error) {
+        console.error('Login error:', error);
+        showNotification(error.message || 'Login failed. Please try again.', 'error');
+        
+        if (typeof grecaptcha !== 'undefined' && grecaptcha.reset) {
+            grecaptcha.reset();
+        }
+    } finally {
+        submitBtn.disabled = false;
+        loader.classList.remove('show');
+        btnText.style.opacity = '1';
+    }
+}

@@ -1,0 +1,18 @@
+
+Add this to the .mobile-menu CSS (around line 322):
+
+.mobile-menu {
+    display: none;
+    flex-direction: column;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;  /* ADD THIS LINE */
+    padding: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}

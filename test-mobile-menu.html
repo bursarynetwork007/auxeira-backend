@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Menu Test</title>
+    <style>
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            background: #1a1a1a;
+            padding: 1rem;
+            border: 2px solid red;
+        }
+        .mobile-menu.active {
+            display: flex;
+        }
+        .mobile-menu a {
+            color: white !important;
+            padding: 1rem;
+            background: blue;
+            margin: 5px;
+            display: block;
+        }
+    </style>
+</head>
+<body style="background: #333; color: white; padding: 20px;">
+    <h1>Mobile Menu Test</h1>
+    <button onclick="toggleMenu()" style="padding: 10px; font-size: 18px;">Toggle Menu</button>
+    
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#1">Link 1</a>
+        <a href="#2">Link 2</a>
+        <a href="#3">Link 3</a>
+    </div>
+    
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('active');
+            console.log('Menu toggled. Active:', menu.classList.contains('active'));
+        }
+    </script>
+</body>
+</html>

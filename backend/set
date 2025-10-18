@@ -1,0 +1,100 @@
+{
+    "FunctionName": "auxeira-backend-prod-api",
+    "FunctionArn": "arn:aws:lambda:us-east-1:615608124862:function:auxeira-backend-prod-api",
+    "Runtime": "nodejs18.x",
+    "Role": "arn:aws:iam::615608124862:role/auxeira-backend-prod-us-east-1-lambdaRole",
+    "Handler": "lambda-enhanced.handler",
+    "CodeSize": 18862055,
+    "Description": "",
+    "Timeout": 29,
+    "MemorySize": 2048,
+    "LastModified": "2025-09-29T12:20:00.000+0000",
+    "CodeSha256": "6uTR5RWZj9tfMyLe7wCPl2Qq6g6y8iYt5iW/T3yr/Vk=",
+    "Version": "$LATEST",
+    "Environment": {
+        "Variables": {
+            "JWT_REFRESH_SECRET": "kUP3tbtmpzsfPpJyDJ6b4HrnmqmXV0zrVzmIFhcptTvO18QJSIsCPB/kBaN2kDGKqmMdwl53jFqEC2jKXLZ/hA==",
+            "JWT_SECRET": "9qFtIdC0KhO+OWRmnzs9PBV9sss6dlzneBtMRddY40TaGAkAcJsO++mmwKvbgGURtbt6ULHtMw7I1zLk5oAUZQ==",
+            "RECAPTCHA_SECRET": "6LcEzq0rAAAAAI_P1oMqBYDkcYsda6x19JxkHf8W",
+            "USERS_TABLE": "auxeira-backend-users-prod",
+            "NODE_ENV": "production",
+            "SESSIONS_TABLE": "auxeira-backend-sessions-prod"
+        }
+    },
+    "TracingConfig": {
+        "Mode": "PassThrough"
+    },
+    "RevisionId": "ae4b2518-314f-41c0-aad9-ef529ae7eab0",
+    "State": "Active",
+    "LastUpdateStatus": "InProgress",
+    "LastUpdateStatusReason": "The function is being created.",
+    "LastUpdateStatusReasonCode": "Creating",
+    "PackageType": "Zip",
+    "Architectures": [
+        "x86_64"
+    ],
+    "EphemeralStorage": {
+        "Size": 512
+    },
+    "SnapStart": {
+        "ApplyOn": "None",
+        "OptimizationStatus": "Off"
+    },
+    "RuntimeVersionConfig": {
+        "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:0ac9d342573fe885f26e915fad6ab8a19b489d706ef8e43ccc6fbe80207e612d"
+    },
+    "LoggingConfig": {
+        "LogFormat": "Text",
+        "LogGroup": "/aws/lambda/auxeira-backend-prod-api"
+    }
+}
+{
+    "FunctionName": "auxeira-backend-prod-api",
+    "FunctionArn": "arn:aws:lambda:us-east-1:615608124862:function:auxeira-backend-prod-api",
+    "Runtime": "nodejs18.x",
+    "Role": "arn:aws:iam::615608124862:role/auxeira-backend-prod-us-east-1-lambdaRole",
+    "Handler": "lambda-enhanced.handler",
+    "CodeSize": 18862055,
+    "Description": "",
+    "Timeout": 29,
+    "MemorySize": 2048,
+    "LastModified": "2025-09-29T12:21:07.000+0000",
+    "CodeSha256": "6uTR5RWZj9tfMyLe7wCPl2Qq6g6y8iYt5iW/T3yr/Vk=",
+    "Version": "$LATEST",
+    "Environment": {
+        "Variables": {
+            "JWT_REFRESH_SECRET": "kUP3tbtmpzsfPpJyDJ6b4HrnmqmXV0zrVzmIFhcptTvO18QJSIsCPB/kBaN2kDGKqmMdwl53jFqEC2jKXLZ/hA==",
+            "JWT_SECRET": "9qFtIdC0KhO+OWRmnzs9PBV9sss6dlzneBtMRddY40TaGAkAcJsO++mmwKvbgGURtbt6ULHtMw7I1zLk5oAUZQ==",
+            "RECAPTCHA_SECRET": "6LcEzq0rAAAAAI_P1oMqBYDkcYsda6x19JxkHf8W",
+            "USERS_TABLE": "auxeira-backend-users-prod",
+            "NODE_ENV": "production",
+            "SESSIONS_TABLE": "auxeira-backend-sessions-prod"
+        }
+    },
+    "TracingConfig": {
+        "Mode": "PassThrough"
+    },
+    "RevisionId": "d2a81eb1-431e-4c27-b6a4-23a22caeae5a",
+    "State": "Active",
+    "LastUpdateStatus": "InProgress",
+    "LastUpdateStatusReason": "The function is being created.",
+    "LastUpdateStatusReasonCode": "Creating",
+    "PackageType": "Zip",
+    "Architectures": [
+        "x86_64"
+    ],
+    "EphemeralStorage": {
+        "Size": 512
+    },
+    "SnapStart": {
+        "ApplyOn": "None",
+        "OptimizationStatus": "Off"
+    },
+    "RuntimeVersionConfig": {
+        "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:0ac9d342573fe885f26e915fad6ab8a19b489d706ef8e43ccc6fbe80207e612d"
+    },
+    "LoggingConfig": {
+        "LogFormat": "Text",
+        "LogGroup": "/aws/lambda/auxeira-backend-prod-api"
+    }
+}

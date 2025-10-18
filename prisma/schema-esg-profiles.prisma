@@ -1,0 +1,132 @@
+// ESG Investor Profile Data Schema
+// These fields drive AI personalization
+
+model ESGInvestorProfile {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  
+  // Basic Info (nudge to complete)
+  investorName          String?
+  fundName              String?
+  investorType          String?  // Foundation, Impact Fund, Family Office, Corporate CSR
+  tier                  String   @default("free") // free, premium, enterprise
+  
+  // Investment Preferences (AI uses these)
+  focusAreas            String[] // Early Childhood, K-12, Higher Ed, Teacher Training, EdTech
+  geographicFocus       String[] // Sub-Saharan Africa, South Asia, Latin America, etc.
+  ticketSize            String?  // $50K-250K, $250K-1M, $1M-5M, $5M+
+  stagePreference       String[] // Pre-seed, Seed, Growth, Scale
+  
+  // Impact Priorities (drives narrative)
+  primarySDG            Int[]    // SDG 4 (Education), SDG 5 (Gender), SDG 8 (Jobs), SDG 10 (Inequality)
+  impactMetrics         String[] // Students Reached, Learning Gain, Teacher Quality, Affordability
+  theoryOfChange        String?  @db.Text // User's impact thesis
+  
+  // Reporting Preferences
+  reportingFrequency    String   @default("daily") // daily, weekly, monthly
+  preferredInsights     String[] // market_trends, portfolio_alerts, impact_stories, benchmarking
+  narrativeStyle        String   @default("data_driven") // data_driven, story_first, balanced
+  
+  // AI Personalization
+  aiPersonaType         String?  // visionary, pragmatist, skeptic, evangelist
+  readingLevel          String   @default("expert") // beginner, intermediate, expert
+  preferredLength       String   @default("concise") // brief, concise, detailed
+  
+  // Profile Completion
+  profileCompleteness   Int      @default(0) // 0-100%
+  lastNudge             DateTime?
+  nudgeCount            Int      @default(0)
+  
+  // AI Report Access
+  freeReportsUsed       Int      @default(0)
+  paidReportsGenerated  Int      @default(0)
+  lastReportDate        DateTime?
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  // Relations
+  aiReports             AIGeneratedReport[]
+  reportAccess          ReportAccessLog[]
+  
+  @@index([userId])
+  @@index([tier])
+  @@index([profileCompleteness])
+}
+
+// AI-Generated Reports
+model AIGeneratedReport {
+  id                    String   @id @default(cuid())
+  reportId              String   @unique
+  investorId            String
+  investor              ESGInvestorProfile @relation(fields: [investorId], references: [id], onDelete: Cascade)
+  
+  // Report Metadata
+  reportType            String   // daily_digest, portfolio_deep_dive, market_intelligence, impact_story, etc.
+  title                 String
+  subtitle              String?
+  generatedAt           DateTime @default(now())
+  
+  // Content (AI-generated)
+  executiveSummary      String   @db.Text
+  keyInsights           Json     // Array of insights with data
+  narrativeBody         String   @db.Text
+  dataVisualizations    Json     // Chart configs
+  recommendations       Json     // Action items
+  
+  // AI Metadata
+  promptUsed            String   @db.Text
+  modelVersion          String   @default("nanogpt-5")
+  tokensUsed            Int?
+  generationTime        Int?     // milliseconds
+  
+  // Access Control
+  isTeaser              Boolean  @default(false)
+  teaserContent         String?  @db.Text // First 20% of report
+  requiresPayment       Boolean  @default(false)
+  unlockPrice           Float?
+  
+  // Engagement
+  viewCount             Int      @default(0)
+  shareCount            Int      @default(0)
+  feedbackRating        Int?     // 1-5 stars
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@index([investorId])
+  @@index([reportType])
+  @@index([generatedAt])
+  @@index([isTeaser])
+}
+
+// Report Access Log
+model ReportAccessLog {
+  id                    String   @id @default(cuid())
+  investorId            String
+  investor              ESGInvestorProfile @relation(fields: [investorId], references: [id], onDelete: Cascade)
+  reportId              String
+  
+  action                String   // viewed_teaser, unlocked, shared, downloaded
+  timestamp             DateTime @default(now())
+  
+  @@index([investorId])
+  @@index([reportId])
+  @@index([timestamp])
+}
+
+// Profile Nudges
+model ProfileNudge {
+  id                    String   @id @default(cuid())
+  investorId            String
+  
+  nudgeType             String   // complete_profile, add_focus_areas, define_impact_thesis
+  message               String
+  priority              Int      // 1-5
+  dismissed             Boolean  @default(false)
+  
+  createdAt             DateTime @default(now())
+  
+  @@index([investorId])
+  @@index([dismissed])
+}

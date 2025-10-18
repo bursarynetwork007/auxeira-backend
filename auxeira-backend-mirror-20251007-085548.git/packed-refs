@@ -1,0 +1,8 @@
+# pack-refs with: peeled fully-peeled sorted 
+15544cd3fbf00eb5b24b6b39a96769ec5bf15a9b refs/heads/backup-before-fixes-20250919-112654
+4023779595e070f3fa5f4070e8f6ad3ff6e7429c refs/heads/backup-crypto-working-system
+b9d9d6d8439d5b0ba19aa3c0eefe1061cd2f7cc8 refs/heads/main
+e65666c3d3ad33c1ce57ceaf979642aa3995ebec refs/heads/setup-typescript-structure
+e65666c3d3ad33c1ce57ceaf979642aa3995ebec refs/pull/1/head
+6d6f812359c56e8df1e8980513d831ccc8d1bd45 refs/tags/v1.0-working
+^bd88e27846a583502233ec07f1b972e3116ab399

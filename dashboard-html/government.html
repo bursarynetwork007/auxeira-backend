@@ -1,0 +1,2855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira Government Agency Dashboard - Policy Intelligence & Economic Impact</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --terminal-dark: #0a0a0a;
+            --terminal-darker: #050505;
+            --terminal-blue: #00d4ff;
+            --terminal-purple: #8b5cf6;
+            --terminal-green: #00ff88;
+            --terminal-gold: #ffd700;
+            --terminal-white: #ffffff;
+            --terminal-gray: #666666;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --government-blue: #1e40af;
+            --government-purple: #7c3aed;
+            --economic-green: #10b981;
+            --policy-gold: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--terminal-dark) 0%, var(--terminal-darker) 100%);
+            color: var(--terminal-white);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .terminal-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .government-banner {
+            background: linear-gradient(135deg, var(--government-blue), var(--government-purple));
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--government-blue), var(--government-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .country-selector {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: var(--terminal-white);
+            margin-left: auto;
+        }
+
+        .nav-tabs {
+            background: var(--glass-bg);
+            border-radius: 12px;
+            padding: 0.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--glass-border);
+        }
+
+        .nav-tabs .nav-link {
+            color: #999999;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            margin: 0 0.25rem;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, var(--government-blue), var(--government-purple));
+            color: var(--terminal-white);
+            box-shadow: 0 4px 15px rgba(30, 64, 175, 0.3);
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: var(--glass-bg);
+            color: var(--terminal-white);
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-color: var(--government-blue);
+        }
+
+        .metric-card {
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--economic-green), var(--government-blue));
+            border-radius: 3px 3px 0 0;
+        }
+
+        .metric-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--economic-green), var(--government-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: #999999;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-change {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .metric-change.positive {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--economic-green);
+        }
+
+        .metric-change.negative {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin: 1rem 0;
+        }
+
+        .program-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .program-card:hover {
+            border-color: var(--government-blue);
+            transform: translateY(-2px);
+        }
+
+        .program-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .program-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--terminal-white);
+            margin-bottom: 0.5rem;
+        }
+
+        .program-sector {
+            color: var(--government-blue);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .program-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .program-metric {
+            text-align: center;
+        }
+
+        .program-metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--economic-green);
+        }
+
+        .program-metric-label {
+            font-size: 0.8rem;
+            color: #999999;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-badge.exceeding {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--economic-green);
+        }
+
+        .status-badge.strong {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--government-blue);
+        }
+
+        .status-badge.leader {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--policy-gold);
+        }
+
+        .status-badge.champion {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--terminal-purple);
+        }
+
+        .blockchain-badge {
+            background: linear-gradient(135deg, #00d4ff, #8b5cf6);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .policy-opportunity {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.1), rgba(124, 58, 237, 0.1));
+            border: 1px solid var(--government-blue);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .opportunity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .opportunity-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--terminal-white);
+        }
+
+        .match-score {
+            background: linear-gradient(135deg, var(--economic-green), var(--government-blue));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+
+        .opportunity-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .btn-government {
+            background: linear-gradient(135deg, var(--government-blue), var(--government-purple));
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-government:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(30, 64, 175, 0.4);
+            color: white;
+        }
+
+        .actuarial-toggle {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .toggle-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .toggle-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--glass-border);
+            background: transparent;
+            color: #999999;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background: var(--government-blue);
+            color: white;
+            border-color: var(--government-blue);
+        }
+
+        .goal-alignment {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .goal-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .goal-progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .goal-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--economic-green), var(--government-blue));
+            transition: width 0.3s ease;
+        }
+
+        .profile-completion {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1));
+            border: 1px solid var(--policy-gold);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .completion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .completion-progress {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .completion-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--policy-gold), var(--economic-green));
+            width: 78%;
+            transition: width 0.3s ease;
+        }
+
+        .missing-fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .missing-field {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .responsive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .responsive-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* New Enhancement Styles */
+        .milestone-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .milestone-card:hover {
+            background: linear-gradient(135deg, var(--economic-green), var(--government-blue));
+            color: var(--terminal-white);
+            transform: translateY(-2px);
+        }
+
+        .sentiment-gauge {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .sentiment-value {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
+        .sentiment-positive { color: var(--economic-green); }
+        .sentiment-neutral { color: var(--policy-gold); }
+        .sentiment-negative { color: #ef4444; }
+
+        .ecosystem-scorecard {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(30, 64, 175, 0.1));
+            border: 1px solid var(--economic-green);
+        }
+
+        .score-radar {
+            height: 250px;
+        }
+
+        .simulation-controls {
+            background: var(--glass-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .simulation-result {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.1), rgba(124, 58, 237, 0.1));
+            border: 1px solid var(--government-blue);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .benchmark-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .comparison-item {
+            text-align: center;
+            padding: 1rem;
+            background: var(--glass-bg);
+            border-radius: 8px;
+        }
+
+        .story-carousel img {
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .premium-feature {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-feature::after {
+            content: 'PREMIUM';
+            position: absolute;
+            top: 10px;
+            right: -30px;
+            background: var(--policy-gold);
+            color: black;
+            padding: 0.25rem 2rem;
+            transform: rotate(45deg);
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .responsive-grid,
+            .responsive-grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .country-selector {
+                margin-left: 0;
+                margin-top: 1rem;
+            }
+            
+            .metric-number {
+                font-size: 2rem;
+            }
+
+            .toggle-buttons {
+                flex-direction: column;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .last-updated {
+            color: #999999;
+            font-size: 0.8rem;
+            text-align: right;
+            margin-top: 1rem;
+        }
+
+        .data-freshness {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--economic-green);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+
+        .jumbotron {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.2), rgba(124, 58, 237, 0.2));
+            border: 1px solid var(--government-blue);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Terminal Header -->
+    <div class="terminal-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="h4 mb-0">
+                        <i class="fas fa-landmark me-2" style="color: var(--government-blue);"></i>
+                        Auxeira Government Agency Dashboard
+                    </h1>
+                </div>
+                <div class="col-md-6 text-end">
+                    <span class="data-freshness">
+                        <i class="fas fa-sync-alt me-1"></i>
+                        Live Data
+                    </span>
+                    <span class="ms-3 text-muted">
+                        <i class="fas fa-clock me-1"></i>
+                        Last Updated: <span id="lastUpdated">2024-03-15 14:30 UTC</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Government Profile Banner -->
+    <div class="container-fluid mt-4">
+        <div class="government-banner fade-in">
+            <div class="profile-section">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div>
+                    <h2 class="mb-1">Welcome, Dr. Adaora Okafor</h2>
+                    <p class="mb-1">Director of Innovation & Economic Development</p>
+                    <p class="mb-0 text-light">Federal Ministry of Industry, Trade & Investment • Abuja, Nigeria</p>
+                </div>
+                <select class="country-selector" id="countrySelector">
+                    <option value="NG">🇳🇬 Nigeria</option>
+                    <option value="GH">🇬🇭 Ghana</option>
+                    <option value="KE">🇰🇪 Kenya</option>
+                    <option value="ZA">🇿🇦 South Africa</option>
+                    <option value="EG">🇪🇬 Egypt</option>
+                    <option value="MA">🇲🇦 Morocco</option>
+                </select>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="h4 mb-0" data-bind="total_budget | currency">$2.5B</div>
+                        <small>Total Budget Allocated</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="h4 mb-0" data-bind="economic_impact | currency">$4.8B</div>
+                        <small>Economic Impact Generated</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="h4 mb-0" data-bind="jobs_created | number">45,680</div>
+                        <small>Jobs Created</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="h4 mb-0" data-bind="economic_roi">2.4x</div>
+                        <small>Economic ROI Multiplier</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Completion Nudge -->
+        <div class="profile-completion" id="profileCompletion">
+            <div class="completion-header">
+                <h5><i class="fas fa-chart-line me-2"></i>Optimize Your Government Intelligence</h5>
+                <span class="badge bg-warning">78% Complete</span>
+            </div>
+            <p>Complete your policy profile to unlock advanced economic modeling and personalized policy recommendations.</p>
+            <div class="completion-progress">
+                <div class="completion-progress-bar"></div>
+            </div>
+            <div class="missing-fields">
+                <div class="missing-field">
+                    <i class="fas fa-handshake mb-2"></i>
+                    <div><strong>Public-Private Partnership Goals</strong></div>
+                    <small>Define collaboration objectives for better deal matching</small>
+                </div>
+                <div class="missing-field">
+                    <i class="fas fa-coins mb-2"></i>
+                    <div><strong>Tax Revenue Targets</strong></div>
+                    <small>Set revenue optimization goals for ROI tracking</small>
+                </div>
+                <div class="missing-field">
+                    <i class="fas fa-globe mb-2"></i>
+                    <div><strong>Export Growth Objectives</strong></div>
+                    <small>Specify trade goals for international competitiveness</small>
+                </div>
+                <div class="missing-field">
+                    <i class="fas fa-balance-scale mb-2"></i>
+                    <div><strong>Regulatory Reform Priorities</strong></div>
+                    <small>Identify policy modernization focus areas</small>
+                </div>
+            </div>
+            <button class="btn btn-government mt-3" onclick="openProfileModal()">
+                <i class="fas fa-edit me-2"></i>Complete Profile
+            </button>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs" id="governmentTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                    <i class="fas fa-tachometer-alt me-2"></i>Overview
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="policy-tab" data-bs-toggle="tab" data-bs-target="#policy" type="button" role="tab">
+                    <i class="fas fa-clipboard-list me-2"></i>Policy Tracker
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="portfolio-tab" data-bs-toggle="tab" data-bs-target="#portfolio" type="button" role="tab">
+                    <i class="fas fa-briefcase me-2"></i>Portfolio
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="opportunities-tab" data-bs-toggle="tab" data-bs-target="#opportunities" type="button" role="tab">
+                    <i class="fas fa-lightbulb me-2"></i>Opportunities
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab">
+                    <i class="fas fa-chart-bar me-2"></i>Analytics
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="story-studio-tab" data-bs-toggle="tab" data-bs-target="#story-studio" type="button" role="tab">
+                    <i class="fas fa-video me-2"></i>Story Studio
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab">
+                    <i class="fas fa-file-alt me-2"></i>Reports
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="governmentTabContent">
+            <!-- Overview Tab - Enhanced with Storytelling -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <div class="row mt-4">
+                    <!-- Success Story Timeline -->
+                    <div class="col-12 mb-4">
+                        <div class="glass-card">
+                            <h5><i class="fas fa-history me-2"></i>Success Story Timeline</h5>
+                            <p class="text-muted mb-3">Key milestones in Nigeria's economic transformation journey</p>
+                            <div class="chart-container">
+                                <canvas id="successTimelineChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <!-- AI-Powered Strategic Narratives -->
+                    <div class="col-12 mb-4">
+                        <div class="glass-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5><i class="fas fa-brain me-2" style="color: var(--terminal-purple);"></i>AI-Powered Strategic Insights</h5>
+                                <button class="btn btn-sm btn-government" onclick="refreshAINarrative()">
+                                    <i class="fas fa-sync-alt me-1"></i>Refresh Insights
+                                </button>
+                            </div>
+                            <div id="aiNarrativeContainer">
+                                <div class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Generating insights...</span>
+                                    </div>
+                                    <p class="mt-2 text-muted">Analyzing government performance data...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Key Economic Metrics -->
+                    <div class="col-12 mb-4">
+                        <h5><i class="fas fa-chart-line me-2"></i>Key Economic Impact Metrics</h5>
+                        <div class="responsive-grid">
+                            <div class="glass-card metric-card">
+                                <div class="metric-number" data-bind="economic_roi">2.4x</div>
+                                <div class="metric-label">Economic ROI Multiplier</div>
+                                <div class="metric-change positive">
+                                    <i class="fas fa-arrow-up me-1"></i>+0.3x from last quarter
+                                </div>
+                            </div>
+                            <div class="glass-card metric-card">
+                                <div class="metric-number" data-bind="job_creation_rate">36.7</div>
+                                <div class="metric-label">Jobs per $1M Invested</div>
+                                <div class="metric-change positive">
+                                    <i class="fas fa-arrow-up me-1"></i>+4.2 from last quarter
+                                </div>
+                            </div>
+                            <div class="glass-card metric-card">
+                                <div class="metric-number" data-bind="tax_roi">36¢</div>
+                                <div class="metric-label">Tax Revenue per $1 Invested</div>
+                                <div class="metric-change positive">
+                                    <i class="fas fa-arrow-up me-1"></i>+3¢ from last quarter
+                                </div>
+                            </div>
+                            <div class="glass-card metric-card">
+                                <div class="metric-number" data-bind="compliance_score">94%</div>
+                                <div class="metric-label">Compliance Score</div>
+                                <div class="metric-change positive">
+                                    <i class="fas fa-arrow-up me-1"></i>+2% from last quarter
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Spend vs Outcome Chart -->
+                    <div class="col-md-8">
+                        <div class="glass-card">
+                            <h6><i class="fas fa-chart-area me-2"></i>Government Spend vs Economic Outcome</h6>
+                            <div class="chart-container">
+                                <canvas id="spendOutcomeChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Highlights -->
+                    <div class="col-md-4">
+                        <div class="glass-card">
+                            <h6><i class="fas fa-star me-2"></i>Project Highlights</h6>
+                            <div class="project-highlight mb-3 milestone-card" onclick="showStoryModal('nssi_story')">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong>Nigeria Startup Support Initiative</strong>
+                                    <span class="status-badge exceeding">Exceeding</span>
+                                </div>
+                                <div class="text-muted small">285 startups • 12,500 jobs • $180M tax revenue</div>
+                                <div class="goal-progress mt-2">
+                                    <div class="goal-progress-bar" style="width: 96%"></div>
+                                </div>
+                            </div>
+                            <div class="project-highlight mb-3 milestone-card" onclick="showStoryModal('agritech_story')">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong>AgriTech Innovation Hub</strong>
+                                    <span class="status-badge strong">Strong</span>
+                                </div>
+                                <div class="text-muted small">125 startups • 8,500 jobs • 45K farmers reached</div>
+                                <div class="goal-progress mt-2">
+                                    <div class="goal-progress-bar" style="width: 92%"></div>
+                                </div>
+                            </div>
+                            <div class="project-highlight mb-3 milestone-card" onclick="showStoryModal('fintech_story')">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong>FinTech Regulatory Sandbox</strong>
+                                    <span class="status-badge leader">Leader</span>
+                                </div>
+                                <div class="text-muted small">85 startups • 78% financial inclusion</div>
+                                <div class="goal-progress mt-2">
+                                    <div class="goal-progress-bar" style="width: 98%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Goal Alignment Meter -->
+                    <div class="col-12 mt-4">
+                        <div class="glass-card">
+                            <h6><i class="fas fa-bullseye me-2"></i>Policy Goal Alignment Meter</h6>
+                            <div class="goal-alignment">
+                                <div class="goal-item">
+                                    <i class="fas fa-users mb-2" style="color: var(--economic-green); font-size: 1.5rem;"></i>
+                                    <div><strong>Job Creation</strong></div>
+                                    <div class="goal-progress">
+                                        <div class="goal-progress-bar" style="width: 94%"></div>
+                                    </div>
+                                    <div class="text-muted small">94% of target achieved</div>
+                                </div>
+                                <div class="goal-item">
+                                    <i class="fas fa-globe mb-2" style="color: var(--government-blue); font-size: 1.5rem;"></i>
+                                    <div><strong>Export Growth</strong></div>
+                                    <div class="goal-progress">
+                                        <div class="goal-progress-bar" style="width: 87%"></div>
+                                    </div>
+                                    <div class="text-muted small">87% of target achieved</div>
+                                </div>
+                                <div class="goal-item">
+                                    <i class="fas fa-microscope mb-2" style="color: var(--terminal-purple); font-size: 1.5rem;"></i>
+                                    <div><strong>Technology Transfer</strong></div>
+                                    <div class="goal-progress">
+                                        <div class="goal-progress-bar" style="width: 89%"></div>
+                                    </div>
+                                    <div class="text-muted small">89% of target achieved</div>
+                                </div>
+                                <div class="goal-item">
+                                    <i class="fas fa-building mb-2" style="color: var(--policy-gold); font-size: 1.5rem;"></i>
+                                    <div><strong>SME Development</strong></div>
+                                    <div class="goal-progress">
+                                        <div class="goal-progress-bar" style="width: 91%"></div>
+                                    </div>
+                                    <div class="text-muted small">91% of target achieved</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Policy Tracker Tab - Enhanced with Storytelling and Sentiment Analysis -->
+            <div class="tab-pane fade" id="policy" role="tabpanel">
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h5><i class="fas fa-clipboard-list me-2"></i>Policy Implementation Tracker</h5>
+                        
+                        <!-- Real-Time Stakeholder Sentiment Tracker -->
+                        <div class="glass-card mb-4">
+                            <h6><i class="fas fa-heart me-2"></i>Public Sentiment Analysis</h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="sentiment-gauge">
+                                        <div class="sentiment-value sentiment-positive" id="sentimentValue">75%</div>
+                                        <div class="text-muted">Positive Sentiment</div>
+                                        <div class="small mt-2">Based on 15,234 social media posts</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="chart-container">
+                                        <canvas id="sentimentTrendChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Policy Journey Map -->
+                        <div class="glass-card mb-4">
+                            <h6><i class="fas fa-map me-2"></i>Policy Journey Map</h6>
+                            <div class="accordion" id="policyJourney">
+                                <!-- Dynamic content will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Policy Priority Areas -->
+                        <div class="glass-card mb-4">
+                            <h6>Policy Priority Areas</h6>
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <div class="policy-priority-card">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-users me-2" style="color: var(--economic-green);"></i>
+                                            <strong>Job Creation & Employment</strong>
+                                        </div>
+                                        <div class="small text-muted">Priority: High</div>
+                                        <div class="goal-progress mt-2">
+                                            <div class="goal-progress-bar" style="width: 94%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="policy-priority-card">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-globe me-2" style="color: var(--government-blue);"></i>
+                                            <strong>Export Growth & Trade</strong>
+                                        </div>
+                                        <div class="small text-muted">Priority: High</div>
+                                        <div class="goal-progress mt-2">
+                                            <div class="goal-progress-bar" style="width: 87%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="policy-priority-card">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-laptop me-2" style="color: var(--terminal-purple);"></i>
+                                            <strong>Digital Transformation</strong>
+                                        </div>
+                                        <div class="small text-muted">Priority: High</div>
+                                        <div class="goal-progress mt-2">
+                                            <div class="goal-progress-bar" style="width: 82%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="policy-priority-card">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-leaf me-2" style="color: var(--economic-green);"></i>
+                                            <strong>Sustainability & Climate</strong>
+                                        </div>
+                                        <div class="small text-muted">Priority: Medium</div>
+                                        <div class="goal-progress mt-2">
+                                            <div class="goal-progress-bar" style="width: 76%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Compliance Frameworks -->
+                        <div class="glass-card">
+                            <h6>International Compliance Framework Status</h6>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="compliance-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <strong>OECD Guidelines</strong>
+                                            <span class="status-badge exceeding">98%</span>
+                                        </div>
+                                        <div class="small text-muted">International economic cooperation standards</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="compliance-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <strong>AU Agenda 2063</strong>
+                                            <span class="status-badge strong">94%</span>
+                                        </div>
+                                        <div class="small text-muted">African Union development framework</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="compliance-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <strong>ECOWAS Protocols</strong>
+                                            <span class="status-badge strong">91%</span>
+                                        </div>
+                                        <div class="small text-muted">West African economic integration</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Tab - Enhanced with Blockchain and Human Stories -->
+            <div class="tab-pane fade" id="portfolio" role="tabpanel">
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h5><i class="fas fa-briefcase me-2"></i>Government Portfolio</h5>
+                        
+                        <!-- Startup Ecosystem Health Scorecard -->
+                        <div class="glass-card ecosystem-scorecard mb-4">
+                            <h6><i class="fas fa-chart-pie me-2"></i>Startup Ecosystem Health Scorecard</h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="text-center mb-3">
+                                        <div class="h1 text-success">82/100</div>
+                                        <div class="text-muted">Overall Ecosystem Score</div>
+                                    </div>
+                                    <div class="benchmark-comparison">
+                                        <div class="comparison-item">
+                                            <strong>FinTech</strong>
+                                            <div class="h5 text-success">85</div>
+                                        </div>
+                                        <div class="comparison-item">
+                                            <strong>AgriTech</strong>
+                                            <div class="h5 text-warning">72</div>
+                                        </div>
+                                        <div class="comparison-item">
+                                            <strong>HealthTech</strong>
+                                            <div class="h5 text-info">78</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="score-radar">
+                                        <canvas id="ecosystemRadarChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <strong>Recommendations:</strong> Increase angel tax credits, enhance mentorship programs, expand rural connectivity infrastructure.
+                            </div>
+                        </div>
+                        
+                        <!-- Portfolio Programs with Blockchain Verification -->
+                        <div class="program-card">
+                            <div class="program-header">
+                                <div>
+                                    <div class="program-title">Nigeria Startup Support Initiative (NSSI)</div>
+                                    <div class="program-sector">Multi-Sector Innovation</div>
+                                    <div class="mt-1">
+                                        <span class="status-badge exceeding">Exceeding Targets</span>
+                                        <span class="blockchain-badge ms-2">
+                                            <i class="fas fa-link me-1"></i>Blockchain Verified
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="h5 mb-0 text-success">2.4x ROI</div>
+                                    <div class="small text-muted">Economic Multiplier</div>
+                                </div>
+                            </div>
+                            <div class="program-metrics">
+                                <div class="program-metric">
+                                    <div class="program-metric-value">$500M</div>
+                                    <div class="program-metric-label">Budget Allocated</div>
+                                </div>
+                                <div class="program-metric">
+                                    <div class="program-metric-value">$1.2B</div>
+                                    <div class="program-metric-label">Economic Impact</div>
+                                </div>
+                                <div class="program-metric">
+                                    <div class="program-metric-value">285</div>
+                                    <div class="program-metric-label">Startups Supported</div>
+                                </div>
+                                <div class="program-metric">
+                                    <div class="program-metric-value">12,500</div>
+                                    <div class="program-metric-label">Jobs Created</div>
+                                </div>
+                                <div class="program-metric">
+                                    <div class="program-metric-value">$180M</div>
+                                    <div class="program-metric-label">Tax Revenue</div>
+                                </div>
+                                <div class="program-metric">
+                                    <div class="program-metric-value">96%</div>
+                                    <div class="program-metric-label">Compliance Score</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Faces of Impact Carousel -->
+                            <div class="mt-3">
+                                <h6><i class="fas fa-users me-2"></i>Faces of Impact</h6>
+                                <div id="nssiCarousel" class="carousel slide story-carousel" data-bs-ride="carousel">
+                                    <div class="carousel-inner">
+                                        <div class="carousel-item active">
+                                            <div class="glass-card">
+                                                <h6>Chidi Okonkwo, Tech Entrepreneur</h6>
+                                                <p>"NSSI funding helped scale my AI startup from 5 to 50 employees. We're now serving clients across West Africa."</p>
+                                                <div class="text-center">
+                                                    <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                                        <i class="fas fa-user fa-2x text-white"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="carousel-item">
+                                            <div class="glass-card">
+                                                <h6>Amina Bello, Software Developer</h6>
+                                                <p>"The training programs gave me skills that doubled my income. I now mentor other young women in tech."</p>
+                                                <div class="text-center">
+                                                    <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                                        <i class="fas fa-user fa-2x text-white"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#nssiCarousel" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon"></span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#nssiCarousel" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional program cards would follow similar structure -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opportunities Tab - Enhanced with Vision Narratives -->
+            <div class="tab-pane fade" id="opportunities" role="tabpanel">
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h5><i class="fas fa-lightbulb me-2"></i>High-Impact Opportunities</h5>
+                        
+                        <!-- Policy Opportunity 1 with Vision Narrative -->
+                        <div class="policy-opportunity">
+                            <div class="jumbotron">
+                                <h2 class="opportunity-title">Digital Nigeria 2030: A Connected Future</h2>
+                                <p class="lead">Imagine 200 million Nigerians with high-speed internet, driving $2.5B in economic growth and creating a thriving digital economy.</p>
+                                <button class="btn btn-government" onclick="showVisionModal('digital_nigeria')">
+                                    <i class="fas fa-play me-2"></i>Watch the Vision
+                                </button>
+                            </div>
+                            <div class="opportunity-header">
+                                <div>
+                                    <div class="opportunity-title">Digital Nigeria 2030</div>
+                                    <div class="text-muted">Digital Infrastructure & Innovation • Nationwide</div>
+                                </div>
+                                <div class="match-score">96% Match</div>
+                            </div>
+                            <p>Comprehensive digital transformation initiative to build innovation hubs, improve connectivity, and develop tech talent across Nigeria.</p>
+                            <div class="opportunity-metrics">
+                                <div class="metric-item">
+                                    <strong>$1.0B</strong>
+                                    <div class="small text-muted">Budget Request</div>
+                                </div>
+                                <div class="metric-item">
+                                    <strong>$2.5B</strong>
+                                    <div class="small text-muted">Economic Impact Projection</div>
+                                </div>
+                                <div class="metric-item">
+                                    <strong>25,000</strong>
+                                    <div class="small text-muted">Job Creation Target</div>
+                                </div>
+                                <div class="metric-item">
+                                    <strong>18 months</strong>
+                                    <div class="small text-muted">Implementation Timeline</div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="badge bg-primary me-2">SDG 8: Decent Work</span>
+                                <span class="badge bg-primary me-2">SDG 9: Innovation</span>
+                                <span class="badge bg-primary">SDG 4: Quality Education</span>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-government me-2">
+                                    <i class="fas fa-eye me-2"></i>Review Proposal
+                                </button>
+                                <button class="btn btn-outline-light">
+                                    <i class="fas fa-download me-2"></i>Download Brief
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Additional opportunities would follow -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab - Enhanced with AI Simulator and Counterfactual Analysis -->
+            <div class="tab-pane fade" id="analytics" role="tabpanel">
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h5><i class="fas fa-chart-bar me-2"></i>Advanced Analytics</h5>
+                        
+                        <!-- AI-Powered Policy Impact Simulator -->
+                        <div class="glass-card premium-feature mb-4">
+                            <h6><i class="fas fa-robot me-2"></i>AI-Powered Policy Impact Simulator</h6>
+                            <div class="simulation-controls">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Tax Incentives Increase (%)</label>
+                                        <input type="range" class="form-range" min="0" max="20" value="10" id="taxIncentivesSlider">
+                                        <div class="text-center" id="taxIncentivesValue">10%</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Budget Allocation ($M)</label>
+                                        <input type="range" class="form-range" min="100" max="1000" value="500" id="budgetSlider">
+                                        <div class="text-center" id="budgetValue">$500M</div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label">Target Sector</label>
+                                        <select class="form-select" id="sectorSelect">
+                                            <option value="fintech">FinTech</option>
+                                            <option value="agritech">AgriTech</option>
+                                            <option value="healthtech">HealthTech</option>
+                                            <option value="cleantech">CleanTech</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button class="btn btn-government mt-3" onclick="runPolicySimulation()">
+                                    <i class="fas fa-play me-2"></i>Run Simulation
+                                </button>
+                            </div>
+                            <div class="simulation-result mt-3" id="simulationResult" style="display: none;">
+                                <h6>Simulation Results</h6>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="text-center">
+                                            <div class="h4 text-success" id="predictedJobs">15,000</div>
+                                            <div class="text-muted">Predicted Jobs</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center">
+                                            <div class="h4 text-success" id="predictedROI">2.8x</div>
+                                            <div class="text-muted">Predicted ROI</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center">
+                                            <div class="h4 text-success" id="predictedRevenue">$220M</div>
+                                            <div class="text-muted">Tax Revenue</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="chart-container mt-3">
+                                    <canvas id="simulationChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Counterfactual Analysis -->
+                        <div class="glass-card premium-feature mb-4">
+                            <h6><i class="fas fa-chart-line me-2"></i>Counterfactual Impact Analysis</h6>
+                            <p>What if there was no Auxeira rewards system? Compare actual outcomes with hypothetical baseline.</p>
+                            <div class="chart-container">
+                                <canvas id="counterfactualChart"></canvas>
+                            </div>
+                            <div class="mt-3">
+                                <strong>Insight:</strong> Auxeira's rewards system drives 35% higher job creation and 20% better startup survival rates.
+                            </div>
+                        </div>
+
+                        <!-- Cross-Country Benchmarking Wizard -->
+                        <div class="glass-card premium-feature">
+                            <h6><i class="fas fa-globe-africa me-2"></i>Cross-Country Benchmarking Wizard</h6>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Compare Nigeria with:</label>
+                                    <select class="form-select" id="benchmarkCountry">
+                                        <option value="ghana">Ghana</option>
+                                        <option value="kenya">Kenya</option>
+                                        <option value="south_africa">South Africa</option>
+                                        <option value="egypt">Egypt</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Metric to Compare:</label>
+                                    <select class="form-select" id="benchmarkMetric">
+                                        <option value="roi">Economic ROI</option>
+                                        <option value="jobs">Job Creation Rate</option>
+                                        <option value="innovation">Innovation Index</option>
+                                        <option value="compliance">Compliance Score</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="btn btn-government mb-3" onclick="runBenchmarking()">
+                                <i class="fas fa-chart-bar me-2"></i>Generate Comparison
+                            </button>
+                            <div class="chart-container">
+                                <canvas id="benchmarkChart"></canvas>
+                            </div>
+                            <div class="mt-3" id="benchmarkInsights">
+                                <!-- AI insights will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Story Studio Tab -->
+            <div class="tab-pane fade" id="story-studio" role="tabpanel">
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="glass-card premium-feature">
+                            <h5><i class="fas fa-video me-2"></i>Policy Story Studio</h5>
+                            <p class="text-muted">Create compelling narrative reports and presentations for stakeholders</p>
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="glass-card h-100">
+                                        <h6><i class="fas fa-sliders-h me-2"></i>Story Elements</h6>
+                                        <div class="draggable-elements">
+                                            <div class="draggable-element mb-2 p-2 border rounded" draggable="true" data-type="metric">
+                                                <i class="fas fa-chart-line me-2"></i>Key Metric
+                                            </div>
+                                            <div class="draggable-element mb-2 p-2 border rounded" draggable="true" data-type="chart">
+                                                <i class="fas fa-chart-bar me-2"></i>Impact Chart
+                                            </div>
+                                            <div class="draggable-element mb-2 p-2 border rounded" draggable="true" data-type="testimonial">
+                                                <i class="fas fa-quote-left me-2"></i>Success Story
+                                            </div>
+                                            <div class="draggable-element mb-2 p-2 border rounded" draggable="true" data-type="recommendation">
+                                                <i class="fas fa-lightbulb me-2"></i>Policy Recommendation
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="glass-card">
+                                        <h6><i class="fas fa-edit me-2"></i>Story Canvas</h6>
+                                        <div id="storyCanvas" class="p-3 border rounded min-vh-50">
+                                            <div class="text-muted text-center py-5">Drag elements here to build your policy story</div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <button class="btn btn-government me-2" onclick="exportStory()">
+                                                <i class="fas fa-download me-2"></i>Export Story
+                                            </button>
+                                            <button class="btn btn-outline-light" onclick="clearCanvas()">
+                                                <i class="fas fa-trash me-2"></i>Clear Canvas
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Tab - Enhanced with Subscription Model -->
+            <div class="tab-pane fade" id="reports" role="tabpanel">
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h5><i class="fas fa-file-alt me-2"></i>Government Intelligence Reports</h5>
+                        
+                        <!-- Free Reports -->
+                        <div class="glass-card mb-4">
+                            <h6><i class="fas fa-gift me-2"></i>Free Reports</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="report-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>Executive Summary</strong>
+                                                <div class="small text-muted">High-level economic impact overview</div>
+                                            </div>
+                                            <button class="btn btn-sm btn-government">
+                                                <i class="fas fa-download me-1"></i>Download
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="report-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>Job Creation Analysis</strong>
+                                                <div class="small text-muted">Employment generation metrics</div>
+                                            </div>
+                                            <button class="btn btn-sm btn-government">
+                                                <i class="fas fa-download me-1"></i>Download
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Premium Subscription Reports -->
+                        <div class="glass-card">
+                            <h6><i class="fas fa-crown me-2"></i>Premium Narrative Reports</h6>
+                            <div class="row mb-4">
+                                <div class="col-md-4">
+                                    <div class="glass-card text-center">
+                                        <h5>Impact Story</h5>
+                                        <div class="h3 text-warning">$49<small class="text-muted">/month</small></div>
+                                        <ul class="list-unstyled mt-3">
+                                            <li><i class="fas fa-check text-success me-2"></i>5-page narrative PDF</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Stakeholder quotes</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Causal inference analysis</li>
+                                        </ul>
+                                        <button class="btn btn-government w-100" onclick="subscribeReport('impact_story', 4900)">
+                                            Subscribe Now
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="glass-card text-center">
+                                        <h5>Policy Vision</h5>
+                                        <div class="h3 text-warning">$99<small class="text-muted">/month</small></div>
+                                        <ul class="list-unstyled mt-3">
+                                            <li><i class="fas fa-check text-success me-2"></i>Video-narrated pitches</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Counterfactual analysis</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Stakeholder testimonials</li>
+                                        </ul>
+                                        <button class="btn btn-government w-100" onclick="subscribeReport('policy_vision', 9900)">
+                                            Subscribe Now
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="glass-card text-center">
+                                        <h5>Ecosystem Success</h5>
+                                        <div class="h3 text-warning">$199<small class="text-muted">/month</small></div>
+                                        <ul class="list-unstyled mt-3">
+                                            <li><i class="fas fa-check text-success me-2"></i>Comprehensive scorecards</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>AI-driven insights</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Export-ready presentations</li>
+                                        </ul>
+                                        <button class="btn btn-government w-100" onclick="subscribeReport('ecosystem_success', 19900)">
+                                            Subscribe Now
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Last Updated Footer -->
+        <div class="last-updated">
+            <i class="fas fa-sync-alt me-2"></i>
+            Last updated: <span id="lastUpdateTime"></span> | © 2025 Auxeira
+        </div>
+    </div>
+
+    <!-- Story Modal -->
+    <div class="modal fade" id="storyModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="background: var(--terminal-darker); border: 1px solid var(--glass-border);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--glass-border);">
+                    <h5 class="modal-title" id="storyModalTitle">Success Story</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="storyModalBody">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vision Modal -->
+    <div class="modal fade" id="visionModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content" style="background: var(--terminal-darker); border: 1px solid var(--glass-border);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--glass-border);">
+                    <h5 class="modal-title">Policy Vision</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="visionModalBody">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Completion Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="background: var(--terminal-darker); border: 1px solid var(--glass-border);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--glass-border);">
+                    <h5 class="modal-title">Complete Your Government Profile</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="profileForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Public-Private Partnership Goals</label>
+                                <select class="form-select" style="background: var(--glass-bg); border: 1px solid var(--glass-border); color: white;">
+                                    <option>Technology Transfer</option>
+                                    <option>Infrastructure Development</option>
+                                    <option>Innovation Hubs</option>
+                                    <option>Export Promotion</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tax Revenue Targets (Annual)</label>
+                                <input type="text" class="form-control" placeholder="e.g., $500M" style="background: var(--glass-bg); border: 1px solid var(--glass-border); color: white;">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Export Growth Objectives</label>
+                                <input type="text" class="form-control" placeholder="e.g., 25% increase" style="background: var(--glass-bg); border: 1px solid var(--glass-border); color: white;">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Regulatory Reform Priorities</label>
+                                <select class="form-select" style="background: var(--glass-bg); border: 1px solid var(--glass-border); color: white;">
+                                    <option>Digital Economy Laws</option>
+                                    <option>Financial Regulations</option>
+                                    <option>Trade Policies</option>
+                                    <option>Innovation Frameworks</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid var(--glass-border);">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-government" onclick="saveProfile()">Save Profile</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Government Dashboard Data with Enhanced Mock Data
+        const governmentData = {
+            economic_roi: 2.4,
+            job_creation_rate: 36.7,
+            tax_roi: 0.36,
+            compliance_score: 94,
+            total_budget: 2500000000,
+            economic_impact: 4800000000,
+            jobs_created: 45680,
+            programs_active: 28,
+            ppp_goals: null,
+            tax_targets: null,
+            export_goals: null,
+            regulatory_priorities: null
+        };
+
+        // Mock Data for Enhanced Features
+        const mockData = {
+            policyStories: [
+                {
+                    id: 'job_creation',
+                    title: 'Job Creation',
+                    stages: [
+                        { year: 2022, text: 'Identified unemployment as priority, launched NSSI with $500M budget' },
+                        { year: 2023, text: 'Scaled to 285 startups, creating 12,500 jobs across Nigeria' },
+                        { year: 2024, text: 'Expanded to rural areas, targeting 25,000 jobs by 2025' }
+                    ]
+                },
+                {
+                    id: 'digital_transformation',
+                    title: 'Digital Transformation',
+                    stages: [
+                        { year: 2022, text: 'Launched Digital Nigeria 2030 vision with focus on connectivity' },
+                        { year: 2023, text: 'Established 15 innovation hubs across major cities' },
+                        { year: 2024, text: 'Achieved 78% financial inclusion through FinTech initiatives' }
+                    ]
+                }
+            ],
+            sentimentData: {
+                current: 0.75,
+                trend: [0.65, 0.68, 0.72, 0.71, 0.75, 0.74, 0.76],
+                sources: {
+                    twitter: 12500,
+                    news: 2300,
+                    blogs: 434
+                }
+            },
+            ecosystemScores: {
+                overall: 82,
+                categories: {
+                    funding: 75,
+                    talent: 80,
+                    infrastructure: 70,
+                    regulation: 85,
+                    innovation: 88,
+                    market: 78
+                }
+            },
+            blockchainLedger: [
+                {
+                    program: "NSSI",
+                    jobs: 12500,
+                    revenue: 180000000,
+                    hash: "0x1a2b3c4d5e6f7890",
+                    timestamp: "2024-03-15T10:30:00Z"
+                }
+            ],
+            countryBenchmarks: {
+                nigeria: { roi: 2.4, jobs: 36.7, innovation: 82, compliance: 94 },
+                ghana: { roi: 2.1, jobs: 28.4, innovation: 75, compliance: 88 },
+                kenya: { roi: 2.3, jobs: 32.1, innovation: 79, compliance: 91 },
+                south_africa: { roi: 2.6, jobs: 35.2, innovation: 85, compliance: 96 },
+                egypt: { roi: 2.2, jobs: 29.8, innovation: 76, compliance: 89 }
+            }
+        };
+
+        // Initialize Dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            bindDataElements();
+            setupCountrySelector();
+            setupActuarialToggle();
+            updateLastUpdated();
+            renderPolicyJourney();
+            initializeDragAndDrop();
+            
+            // Auto-update every 30 seconds for demo
+            setInterval(updateDashboardData, 30000);
+        });
+
+        // Data Binding
+        function bindDataElements() {
+            document.querySelectorAll('[data-bind]').forEach(element => {
+                const [key, format] = element.getAttribute('data-bind').split('|');
+                const value = governmentData[key];
+                
+                if (value !== undefined) {
+                    element.textContent = formatValue(value, format);
+                }
+            });
+        }
+
+        // Value Formatting
+        function formatValue(value, format) {
+            switch(format) {
+                case 'currency':
+                    return new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        notation: 'compact',
+                        maximumFractionDigits: 1
+                    }).format(value);
+                case 'number':
+                    return new Intl.NumberFormat('en-US').format(value);
+                case 'percentage':
+                    return `${value}%`;
+                default:
+                    return value;
+            }
+        }
+
+        // Enhanced Chart Initialization
+        function initializeCharts() {
+            // Success Story Timeline Chart
+            const timelineCtx = document.getElementById('successTimelineChart').getContext('2d');
+            new Chart(timelineCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Key Milestones',
+                        data: [
+                            { x: new Date('2023-07-01'), y: 840, story: 'NSSI: 12,500 jobs created' },
+                            { x: new Date('2023-10-01'), y: 1200, story: 'AgriTech Hub: 45,000 farmers reached' },
+                            { x: new Date('2024-01-01'), y: 1500, story: 'FinTech Sandbox: 78% financial inclusion' },
+                            { x: new Date('2024-03-01'), y: 1800, story: 'Women Entrepreneurs: 5,500 jobs created' }
+                        ],
+                        backgroundColor: 'var(--economic-green)',
+                        pointRadius: 8,
+                        pointHoverRadius: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => context.raw.story
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'month'
+                            },
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Economic Impact ($M)',
+                                color: '#ffffff'
+                            },
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Spend vs Outcome Chart
+            const spendCtx = document.getElementById('spendOutcomeChart').getContext('2d');
+            new Chart(spendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Q1 2023', 'Q2 2023', 'Q3 2023', 'Q4 2023', 'Q1 2024'],
+                    datasets: [{
+                        label: 'Government Spend ($M)',
+                        data: [125, 200, 350, 500, 625],
+                        borderColor: '#1e40af',
+                        backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Economic Outcome ($M)',
+                        data: [300, 480, 840, 1200, 1500],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: { 
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+
+            // Sentiment Trend Chart
+            const sentimentCtx = document.getElementById('sentimentTrendChart').getContext('2d');
+            new Chart(sentimentCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    datasets: [{
+                        label: 'Positive Sentiment',
+                        data: mockData.sentimentData.trend,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: { 
+                            ticks: { 
+                                color: '#ffffff',
+                                callback: function(value) {
+                                    return (value * 100) + '%';
+                                }
+                            },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            min: 0.5,
+                            max: 0.8
+                        }
+                    }
+                }
+            });
+
+            // Ecosystem Radar Chart
+            const radarCtx = document.getElementById('ecosystemRadarChart').getContext('2d');
+            new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Funding', 'Talent', 'Infrastructure', 'Regulation', 'Innovation', 'Market'],
+                    datasets: [{
+                        label: 'Nigeria',
+                        data: [
+                            mockData.ecosystemScores.categories.funding,
+                            mockData.ecosystemScores.categories.talent,
+                            mockData.ecosystemScores.categories.infrastructure,
+                            mockData.ecosystemScores.categories.regulation,
+                            mockData.ecosystemScores.categories.innovation,
+                            mockData.ecosystemScores.categories.market
+                        ],
+                        backgroundColor: 'rgba(30, 64, 175, 0.2)',
+                        borderColor: '#1e40af',
+                        pointBackgroundColor: '#1e40af',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#1e40af'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            pointLabels: {
+                                color: '#ffffff'
+                            },
+                            ticks: {
+                                color: '#ffffff',
+                                backdropColor: 'transparent'
+                            },
+                            min: 0,
+                            max: 100
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    }
+                }
+            });
+
+            // Counterfactual Analysis Chart
+            const counterfactualCtx = document.getElementById('counterfactualChart').getContext('2d');
+            new Chart(counterfactualCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jobs Created', 'Tax Revenue', 'Survival Rate'],
+                    datasets: [
+                        {
+                            label: 'With Auxeira',
+                            data: [12500, 180, 96],
+                            backgroundColor: 'var(--economic-green)'
+                        },
+                        {
+                            label: 'Without Auxeira',
+                            data: [8000, 120, 75],
+                            backgroundColor: 'var(--terminal-gray)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: { 
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+
+            // Update sentiment value display
+            document.getElementById('sentimentValue').textContent = 
+                Math.round(mockData.sentimentData.current * 100) + '%';
+        }
+
+        // Policy Journey Rendering
+        function renderPolicyJourney() {
+            const accordion = document.getElementById('policyJourney');
+            accordion.innerHTML = mockData.policyStories.map(story => `
+                <div class="accordion-item glass-card">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#${story.id}" style="background: transparent; color: white;">
+                            ${story.title}: A Policy Success Story
+                        </button>
+                    </h2>
+                    <div id="${story.id}" class="accordion-collapse collapse" data-bs-parent="#policyJourney">
+                        <div class="accordion-body">
+                            ${story.stages.map(s => `
+                                <div class="timeline-item mb-3">
+                                    <div class="d-flex">
+                                        <div class="timeline-badge bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center" 
+                                             style="width: 40px; height: 40px; flex-shrink: 0;">
+                                            ${s.year}
+                                        </div>
+                                        <div class="timeline-content">
+                                            <p class="mb-0">${s.text}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // AI Policy Impact Simulator
+        function runPolicySimulation() {
+            const taxIncentives = parseInt(document.getElementById('taxIncentivesSlider').value);
+            const budget = parseInt(document.getElementById('budgetSlider').value);
+            const sector = document.getElementById('sectorSelect').value;
+
+            // Mock AI calculations
+            const baseJobs = budget * 0.018;
+            const incentiveMultiplier = 1 + (taxIncentives / 100);
+            const sectorMultipliers = {
+                fintech: 1.2,
+                agritech: 1.1,
+                healthtech: 1.15,
+                cleantech: 1.25
+            };
+
+            const predictedJobs = Math.round(baseJobs * incentiveMultiplier * sectorMultipliers[sector]);
+            const predictedROI = (2.4 + (taxIncentives * 0.02)).toFixed(1);
+            const predictedRevenue = Math.round(budget * 0.36 * incentiveMultiplier);
+
+            // Update results
+            document.getElementById('predictedJobs').textContent = predictedJobs.toLocaleString();
+            document.getElementById('predictedROI').textContent = predictedROI + 'x';
+            document.getElementById('predictedRevenue').textContent = '$' + predictedRevenue + 'M';
+
+            // Update simulation chart
+            updateSimulationChart(predictedJobs, predictedROI, predictedRevenue);
+
+            // Show results
+            document.getElementById('simulationResult').style.display = 'block';
+        }
+
+        function updateSimulationChart(jobs, roi, revenue) {
+            const ctx = document.getElementById('simulationChart').getContext('2d');
+            if (window.simulationChart) {
+                window.simulationChart.destroy();
+            }
+            window.simulationChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jobs Created', 'ROI Multiplier', 'Tax Revenue ($M)'],
+                    datasets: [{
+                        label: 'Predicted Impact',
+                        data: [jobs / 1000, parseFloat(roi), revenue],
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(30, 64, 175, 0.8)',
+                            'rgba(124, 58, 237, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: { 
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Cross-Country Benchmarking
+        function runBenchmarking() {
+            const country = document.getElementById('benchmarkCountry').value;
+            const metric = document.getElementById('benchmarkMetric').value;
+            
+            const nigeriaValue = mockData.countryBenchmarks.nigeria[metric];
+            const compareValue = mockData.countryBenchmarks[country][metric];
+            const difference = ((nigeriaValue - compareValue) / compareValue * 100).toFixed(1);
+            
+            const ctx = document.getElementById('benchmarkChart').getContext('2d');
+            if (window.benchmarkChart) {
+                window.benchmarkChart.destroy();
+            }
+            
+            window.benchmarkChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Nigeria', country.charAt(0).toUpperCase() + country.slice(1).replace('_', ' ')],
+                    datasets: [{
+                        label: getMetricLabel(metric),
+                        data: [nigeriaValue, compareValue],
+                        backgroundColor: [
+                            'rgba(30, 64, 175, 0.8)',
+                            'rgba(16, 185, 129, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: { 
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+
+            // Generate AI insights
+            const insights = generateBenchmarkInsights(metric, difference, country);
+            document.getElementById('benchmarkInsights').innerHTML = `
+                <strong>AI Insights:</strong> ${insights}
+            `;
+        }
+
+        function getMetricLabel(metric) {
+            const labels = {
+                roi: 'Economic ROI Multiplier',
+                jobs: 'Jobs per $1M Invested',
+                innovation: 'Innovation Index Score',
+                compliance: 'Compliance Score (%)'
+            };
+            return labels[metric] || metric;
+        }
+
+        function generateBenchmarkInsights(metric, difference, country) {
+            const countryName = country.charAt(0).toUpperCase() + country.slice(1).replace('_', ' ');
+            if (parseFloat(difference) > 0) {
+                return `Nigeria outperforms ${countryName} by ${Math.abs(difference)}% in ${getMetricLabel(metric).toLowerCase()}. Consider sharing best practices with regional partners.`;
+            } else {
+                return `Nigeria trails ${countryName} by ${Math.abs(difference)}% in ${getMetricLabel(metric).toLowerCase()}. Explore adopting successful policies from ${countryName}.`;
+            }
+        }
+
+        // Story Modal Functions
+        function showStoryModal(storyId) {
+            const stories = {
+                nssi_story: {
+                    title: 'Nigeria Startup Support Initiative Success',
+                    content: `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Impact Highlights</h6>
+                                <ul>
+                                    <li>12,500 high-quality jobs created</li>
+                                    <li>$1.2B economic impact generated</li>
+                                    <li>285 startups supported across Nigeria</li>
+                                    <li>96% startup survival rate</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Success Story</h6>
+                                <p>"The NSSI program transformed our startup from a 5-person team to a 50-employee company serving clients across West Africa. The mentorship and funding were game-changers."</p>
+                                <p><strong>- Chidi Okonkwo, Tech Entrepreneur</strong></p>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Key Metrics</h6>
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <div class="h4 text-success">2.4x</div>
+                                    <small>ROI Multiplier</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="h4 text-success">36.7</div>
+                                    <small>Jobs per $1M</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="h4 text-success">$180M</div>
+                                    <small>Tax Revenue</small>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                },
+                agritech_story: {
+                    title: 'AgriTech Innovation Hub Impact',
+                    content: `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Transforming Agriculture</h6>
+                                <ul>
+                                    <li>45,000 farmers reached with IoT technology</li>
+                                    <li>35% average yield increase</li>
+                                    <li>8,500 jobs created in rural areas</li>
+                                    <li>$680M economic impact</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Farmer Testimonial</h6>
+                                <p>"The AgriTech Hub's smart farming tools helped me double my crop yield and connect directly with buyers. My family's income has tripled in just one year."</p>
+                                <p><strong>- Fatima Abdullahi, Smallholder Farmer</strong></p>
+                            </div>
+                        </div>
+                    `
+                }
+            };
+
+            const story = stories[storyId];
+            if (story) {
+                document.getElementById('storyModalTitle').textContent = story.title;
+                document.getElementById('storyModalBody').innerHTML = story.content;
+                const modal = new bootstrap.Modal(document.getElementById('storyModal'));
+                modal.show();
+            }
+        }
+
+        function showVisionModal(visionId) {
+            const visions = {
+                digital_nigeria: {
+                    title: 'Digital Nigeria 2030 Vision',
+                    content: `
+                        <div class="text-center mb-4">
+                            <div class="bg-primary rounded p-4 mb-3">
+                                <h3 class="text-white">Connecting 200 Million Nigerians</h3>
+                                <p class="text-white mb-0">Building Africa's largest digital economy by 2030</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>The Vision</h6>
+                                <p>Digital Nigeria 2030 aims to transform Nigeria into a fully digital society where every citizen has access to high-speed internet, digital skills, and opportunities in the digital economy.</p>
+                                <h6>Key Objectives</h6>
+                                <ul>
+                                    <li>Universal broadband access by 2027</li>
+                                    <li>Digital literacy for 50 million Nigerians</li>
+                                    <li>200,000 new tech jobs annually</li>
+                                    <li>$2.5B annual economic impact</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Expected Impact</h6>
+                                <div class="glass-card p-3">
+                                    <div class="row text-center">
+                                        <div class="col-6 mb-3">
+                                            <div class="h5 text-success">25,000</div>
+                                            <small>Annual Jobs</small>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <div class="h5 text-success">$2.5B</div>
+                                            <small>Economic Impact</small>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="h5 text-success">78%</div>
+                                            <small>Digital Inclusion</small>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="h5 text-success">15</div>
+                                            <small>Innovation Hubs</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                }
+            };
+
+            const vision = visions[visionId];
+            if (vision) {
+                document.getElementById('visionModalBody').innerHTML = vision.content;
+                const modal = new bootstrap.Modal(document.getElementById('visionModal'));
+                modal.show();
+            }
+        }
+
+        // Story Studio Drag and Drop
+        function initializeDragAndDrop() {
+            const draggableElements = document.querySelectorAll('.draggable-element');
+            const canvas = document.getElementById('storyCanvas');
+
+            draggableElements.forEach(element => {
+                element.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', e.target.getAttribute('data-type'));
+                });
+            });
+
+            canvas.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                canvas.style.backgroundColor = 'rgba(30, 64, 175, 0.1)';
+            });
+
+            canvas.addEventListener('dragleave', () => {
+                canvas.style.backgroundColor = '';
+            });
+
+            canvas.addEventListener('drop', (e) => {
+                e.preventDefault();
+                canvas.style.backgroundColor = '';
+                const type = e.dataTransfer.getData('text/plain');
+                addElementToCanvas(type);
+            });
+        }
+
+        function addElementToCanvas(type) {
+            const canvas = document.getElementById('storyCanvas');
+            const elements = {
+                metric: `
+                    <div class="glass-card mb-3">
+                        <h6><i class="fas fa-chart-line me-2"></i>Key Performance Metric</h6>
+                        <div class="h4 text-success">2.4x ROI Multiplier</div>
+                        <div class="text-muted">Economic return on government investment</div>
+                    </div>
+                `,
+                chart: `
+                    <div class="glass-card mb-3">
+                        <h6><i class="fas fa-chart-bar me-2"></i>Impact Visualization</h6>
+                        <div class="chart-container" style="height: 200px;">
+                            <canvas id="dynamicChart"></canvas>
+                        </div>
+                    </div>
+                `,
+                testimonial: `
+                    <div class="glass-card mb-3">
+                        <h6><i class="fas fa-quote-left me-2"></i>Success Story</h6>
+                        <p class="fst-italic">"This program transformed our community and created sustainable employment opportunities for our youth."</p>
+                        <p class="mb-0"><strong>- Community Leader</strong></p>
+                    </div>
+                `,
+                recommendation: `
+                    <div class="glass-card mb-3">
+                        <h6><i class="fas fa-lightbulb me-2"></i>Policy Recommendation</h6>
+                        <p>Based on the success of current initiatives, we recommend expanding the program to underserved regions and increasing focus on digital skills training.</p>
+                    </div>
+                `
+            };
+
+            if (elements[type]) {
+                // Remove placeholder text if it exists
+                if (canvas.querySelector('.text-muted.text-center')) {
+                    canvas.innerHTML = '';
+                }
+                canvas.innerHTML += elements[type];
+            }
+        }
+
+        function exportStory() {
+            const element = document.getElementById('storyCanvas');
+            const opt = {
+                margin: 1,
+                filename: 'policy-story.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function clearCanvas() {
+            const canvas = document.getElementById('storyCanvas');
+            canvas.innerHTML = '<div class="text-muted text-center py-5">Drag elements here to build your policy story</div>';
+        }
+
+        // Slider Value Updates
+        document.getElementById('taxIncentivesSlider').addEventListener('input', function() {
+            document.getElementById('taxIncentivesValue').textContent = this.value + '%';
+        });
+
+        document.getElementById('budgetSlider').addEventListener('input', function() {
+            document.getElementById('budgetValue').textContent = '$' + this.value + 'M';
+        });
+
+        // Country Selector
+        function setupCountrySelector() {
+            const selector = document.getElementById('countrySelector');
+            selector.addEventListener('change', function() {
+                const country = this.value;
+                console.log('Country changed to:', country);
+                // This would trigger API call to get country-specific data
+            });
+        }
+
+        // Actuarial Toggle
+        function setupActuarialToggle() {
+            const toggleButtons = document.querySelectorAll('.toggle-btn');
+            const content = document.getElementById('actuarialContent');
+            
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    toggleButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const model = this.getAttribute('data-model');
+                    updateActuarialContent(model);
+                });
+            });
+            
+            updateActuarialContent('projections');
+        }
+
+        function updateActuarialContent(model) {
+            const content = document.getElementById('actuarialContent');
+            // Implementation would be similar to previous version
+        }
+
+        // Profile Modal Functions
+        function openProfileModal() {
+            const modal = new bootstrap.Modal(document.getElementById('profileModal'));
+            modal.show();
+        }
+
+        function saveProfile() {
+            // Calculate completion percentage
+            const form = document.getElementById('profileForm');
+            const fields = ['ppp_goals', 'tax_targets', 'export_goals', 'regulatory_priorities'];
+            let completed = 0;
+            
+            fields.forEach(field => {
+                const element = form.querySelector(`[name="${field}"]`);
+                if (element && element.value) {
+                    governmentData[field] = element.value;
+                    completed++;
+                }
+            });
+
+            const completion = Math.min(100, (completed / fields.length) * 100 + 78);
+            
+            // Update UI
+            document.querySelector('.completion-progress-bar').style.width = `${completion}%`;
+            const badge = document.querySelector('.profile-completion .badge');
+            badge.textContent = `${Math.round(completion)}% Complete`;
+            
+            if (completion >= 100) {
+                badge.className = 'badge bg-success';
+                setTimeout(() => {
+                    document.getElementById('profileCompletion').style.display = 'none';
+                }, 2000);
+            }
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('profileModal'));
+            modal.hide();
+        }
+
+        // Update Dashboard Data
+        function updateDashboardData() {
+            // Simulate small changes in data
+            governmentData.economic_roi += (Math.random() - 0.5) * 0.1;
+            governmentData.job_creation_rate += (Math.random() - 0.5) * 2;
+            governmentData.compliance_score += (Math.random() - 0.5) * 1;
+            
+            // Ensure values stay within reasonable bounds
+            governmentData.economic_roi = Math.max(2.0, Math.min(3.0, governmentData.economic_roi));
+            governmentData.job_creation_rate = Math.max(30, Math.min(45, governmentData.job_creation_rate));
+            governmentData.compliance_score = Math.max(90, Math.min(100, governmentData.compliance_score));
+            
+            // Update displayed values
+            bindDataElements();
+            updateLastUpdated();
+        }
+
+        // Update Last Updated Timestamp
+        function updateLastUpdated() {
+            const now = new Date();
+            const timestamp = now.toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
+            document.getElementById('lastUpdated').textContent = timestamp;
+        }
+
+        // Paystack Payment Integration
+        function subscribeReport(reportType, amount) {
+            const handler = PaystackPop.setup({
+                key: 'pk_test_your_paystack_public_key', // Replace with actual key
+                email: 'adaora.okafor@fmiti.gov.ng',
+                amount: amount,
+                currency: 'USD',
+                ref: 'sub_' + Math.floor((Math.random() * 1000000000) + 1),
+                metadata: {
+                    reportType: reportType,
+                    userType: 'government_agency'
+                },
+                callback: function(response) {
+                    alert('Subscription successful! You now have access to premium narrative reports.');
+                    // Enable premium features
+                    document.querySelectorAll('.premium-feature').forEach(feature => {
+                        feature.style.opacity = '1';
+                    });
+                },
+                onClose: function() {
+                    alert('Subscription cancelled');
+                }
+            });
+            handler.openIframe();
+        }
+
+        function purchaseReport(reportName, amount) {
+            const handler = PaystackPop.setup({
+                key: 'pk_test_your_paystack_public_key',
+                email: 'adaora.okafor@fmiti.gov.ng',
+                amount: amount * 100,
+                currency: 'USD',
+                ref: 'gov_report_' + Math.floor((Math.random() * 1000000000) + 1),
+                metadata: {
+                    reportName: reportName,
+                    userType: 'government_agency'
+                },
+                callback: function(response) {
+                    alert('Payment successful! Your report will be generated and sent to your email.');
+                },
+                onClose: function() {
+                    alert('Payment cancelled');
+                }
+            });
+            handler.openIframe();
+        }
+
+        // Add event listeners for purchase buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.btn-government').forEach(button => {
+                if (button.textContent.includes('Purchase Report')) {
+                    button.addEventListener('click', function() {
+                        const reportItem = this.closest('.premium-report-item');
+                        const reportName = reportItem.querySelector('strong').textContent;
+                        const amount = parseInt(reportItem.querySelector('.badge').textContent.replace('$', '').replace(',', ''));
+                        purchaseReport(reportName, amount);
+                    });
+                }
+            });
+      
+
+        // ===== AI NARRATIVE GENERATION =====
+        async function generateAINarrative() {
+            const metrics = {
+                roi: 2.4,
+                jobs: 45680,
+                taxRevenue: 0.36,
+                compliance: 94,
+                programs: 285,
+                economicImpact: 4.8
+            };
+
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${getAPIKey()}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gemini-2.5-flash',
+                        messages: [{
+                            role: 'system',
+                            content: 'You are a policy analyst providing strategic insights for government officials.'
+                        }, {
+                            role: 'user',
+                            content: `Analyze this government program performance data and provide 3-4 strategic insights in a compelling narrative format:
+                            
+Economic ROI: ${metrics.roi}x
+Jobs Created: ${metrics.jobs.toLocaleString()}
+Tax Revenue ROI: $${metrics.taxRevenue} per $1 invested
+Compliance Score: ${metrics.compliance}%
+Active Programs: ${metrics.programs}
+Economic Impact: $${metrics.economicImpact}B
+
+Format as HTML with <div class="insight-card"> for each insight. Focus on trends, opportunities, and actionable recommendations.`
+                        }],
+                        max_tokens: 1000,
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) throw new Error('API call failed');
+                
+                const data = await response.json();
+                return data.choices[0].message.content;
+            } catch (error) {
+                console.error('AI narrative generation failed:', error);
+                return getFallbackNarrative();
+            }
+        }
+
+        function getFallbackNarrative() {
+            return `
+                <div class="insight-card mb-3 p-3" style="background: rgba(30, 64, 175, 0.1); border-left: 3px solid var(--government-blue); border-radius: 8px;">
+                    <h6 style="color: var(--government-blue);"><i class="fas fa-chart-line me-2"></i>Strong Economic Multiplier Effect</h6>
+                    <p style="color: #e0e0e0;">Nigeria's 2.4x economic ROI demonstrates exceptional value creation. Every $1 invested generates $2.40 in economic impact, outperforming regional benchmarks. This positions Nigeria as a leader in efficient public investment across Sub-Saharan Africa.</p>
+                </div>
+                <div class="insight-card mb-3 p-3" style="background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--economic-green); border-radius: 8px;">
+                    <h6 style="color: var(--economic-green);"><i class="fas fa-users me-2"></i>Job Creation Momentum</h6>
+                    <p style="color: #e0e0e0;">With 45,680 jobs created and a rate of 36.7 jobs per $1M invested, the startup ecosystem is driving significant employment growth. The AgriTech and FinTech sectors show particular strength, suggesting opportunities for targeted expansion.</p>
+                </div>
+                <div class="insight-card mb-3 p-3" style="background: rgba(245, 158, 11, 0.1); border-left: 3px solid var(--policy-gold); border-radius: 8px;">
+                    <h6 style="color: var(--policy-gold);"><i class="fas fa-coins me-2"></i>Tax Revenue Optimization Opportunity</h6>
+                    <p style="color: #e0e0e0;">Current tax ROI of $0.36 per dollar invested indicates room for improvement. Benchmark analysis suggests potential to reach $0.45 through enhanced compliance mechanisms and strategic sector targeting, representing $225M in additional annual revenue.</p>
+                </div>
+                <div class="insight-card mb-3 p-3" style="background: rgba(139, 92, 246, 0.1); border-left: 3px solid var(--terminal-purple); border-radius: 8px;">
+                    <h6 style="color: var(--terminal-purple);"><i class="fas fa-rocket me-2"></i>Scale-Up Readiness</h6>
+                    <p style="color: #e0e0e0;">With 94% compliance and 285 active programs, the infrastructure is mature for scaling. Consider launching Digital Nigeria 2030 initiative to capture the next wave of growth, targeting 200M connected citizens and $2.5B additional economic impact.</p>
+                </div>
+            `;
+        }
+
+        function getAPIKey() {
+            return process.env.OPENAI_API_KEY || 'placeholder_key';
+        }
+
+        async function refreshAINarrative() {
+            const container = document.getElementById('aiNarrativeContainer');
+            container.innerHTML = `
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Generating fresh insights...</p>
+                </div>
+            `;
+            
+            const narrative = await generateAINarrative();
+            container.innerHTML = narrative;
+        }
+
+        // ===== X POST SCANNING =====
+        async function scanXPosts() {
+            // Mock X post data with sentiment analysis
+            return [
+                {
+                    policy: 'Digital Nigeria 2030',
+                    sentiment: 0.75,
+                    mentions: 1247,
+                    trending: true,
+                    sample: 'Excited about #DigitalNigeria2030! This will transform connectivity across the nation. 🚀'
+                },
+                {
+                    policy: 'Startup Support Initiative',
+                    sentiment: 0.82,
+                    mentions: 892,
+                    trending: false,
+                    sample: 'The NSSI has been a game-changer for Nigerian startups. More funding, less bureaucracy! 💪'
+                },
+                {
+                    policy: 'AgriTech Hub',
+                    sentiment: 0.68,
+                    mentions: 634,
+                    trending: false,
+                    sample: 'AgriTech Hub helping farmers adopt IoT. Yields up 40%! #Innovation'
+                }
+            ];
+        }
+
+        function renderXPostSentiment(posts) {
+            return posts.map(post => `
+                <div class="glass-card mb-3 p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0"><i class="fab fa-x-twitter me-2"></i>${post.policy}</h6>
+                        ${post.trending ? '<span class="badge bg-danger"><i class="fas fa-fire me-1"></i>Trending</span>' : ''}
+                    </div>
+                    <div class="mb-2">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar ${post.sentiment > 0.7 ? 'bg-success' : post.sentiment > 0.5 ? 'bg-warning' : 'bg-danger'}" 
+                                         style="width: ${post.sentiment * 100}%">
+                                        ${Math.round(post.sentiment * 100)}% Positive
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="ms-3 text-muted">${post.mentions} mentions</span>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-0"><i class="fas fa-quote-left me-1"></i>${post.sample}</p>
+                </div>
+            `).join('');
+        }
+
+        // ===== CHART PROJECTIONS =====
+        function addProjectionsToChart(chart, historicalData, months = 6) {
+            // Simple linear regression for projection
+            const n = historicalData.length;
+            const sumX = historicalData.reduce((sum, _, i) => sum + i, 0);
+            const sumY = historicalData.reduce((sum, val) => sum + val, 0);
+            const sumXY = historicalData.reduce((sum, val, i) => sum + (i * val), 0);
+            const sumX2 = historicalData.reduce((sum, _, i) => sum + (i * i), 0);
+            
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+            
+            // Generate projections
+            const projections = [];
+            for (let i = n; i < n + months; i++) {
+                const value = slope * i + intercept;
+                projections.push(Math.max(0, value)); // Ensure non-negative
+            }
+            
+            return projections;
+        }
+
+        // ===== DATABASE FORMULAS =====
+        const DatabaseFormulas = {
+            calculateROI: (economicImpact, investment) => {
+                return (economicImpact - investment) / investment;
+            },
+            
+            calculateJobCreationRate: (jobs, investmentMillions) => {
+                return jobs / investmentMillions;
+            },
+            
+            calculateTaxROI: (taxRevenue, investment) => {
+                return taxRevenue / investment;
+            },
+            
+            calculatePolicyEffectiveness: (actualOutcome, targetOutcome) => {
+                return (actualOutcome / targetOutcome) * 100;
+            },
+            
+            calculateEcosystemHealth: (sectors) => {
+                const weights = { fintech: 0.3, agritech: 0.25, healthtech: 0.2, edtech: 0.15, other: 0.1 };
+                return sectors.reduce((score, sector) => {
+                    return score + (sector.score * (weights[sector.name.toLowerCase()] || 0.1));
+                }, 0);
+            }
+        };
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Load AI narrative
+            refreshAINarrative();
+            
+            // Update last update time
+            document.getElementById('lastUpdateTime').textContent = new Date().toLocaleString();
+            
+            // Load X post sentiment if on Policy Tracker tab
+            const xPostContainer = document.getElementById('xPostSentiment');
+            if (xPostContainer) {
+                const posts = await scanXPosts();
+                xPostContainer.innerHTML = renderXPostSentiment(posts);
+            }
+        });
+  });
+    </script>
+
+    <!-- Investment Opportunity Upload Modal -->
+    <div class="modal fade" id="investmentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="background: var(--terminal-darker); border: 1px solid var(--glass-border);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--glass-border);">
+                    <h5 class="modal-title"><i class="fas fa-upload me-2"></i>Upload Investment Opportunity</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="investmentForm">
+                        <div class="mb-3">
+                            <label class="form-label">Opportunity Title *</label>
+                            <input type="text" class="form-control" id="oppTitle" required 
+                                   style="background: var(--glass-bg); border: 1px solid var(--glass-border); color: white;">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Description *</label>
+                            <textarea class="form-control" id="oppDescription" rows="4" required
+                                      style="background: var(--glass-bg); border: 1px solid var(--glass-border); color: white;"></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Investment Amount Required *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background: var(--glass-bg); border: 1px solid var(--glass-border); color: white;">$</span>
+                                    <input type="number" class="form-control" id="oppAmount" required
+                                           style="background: var(--glass-bg); border: 1px solid var(--glass-border); color: white;">
+                                    <span class="input-group-text" style="background: var(--glass-bg); border: 1px solid var(--glass-border); color: white;">M</span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Timeline (Years) *</label>
+                                <input type="number" class="form-control" id="oppTimeline" required
+                                       style="background: var(--glass-bg); border: 1px solid var(--glass-border); color: white;">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Sector *</label>
+                            <select class="form-select" id="oppSector" required
+                                    style="background: var(--glass-bg); border: 1px solid var(--glass-border); color: white;">
+                                <option value="">Select sector...</option>
+                                <option value="infrastructure">Infrastructure</option>
+                                <option value="technology">Technology</option>
+                                <option value="agriculture">Agriculture</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="education">Education</option>
+                                <option value="energy">Energy</option>
+                                <option value="manufacturing">Manufacturing</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Your Role *</label>
+                            <select class="form-select" id="oppRole" required
+                                    style="background: var(--glass-bg); border: 1px solid var(--glass-border); color: white;">
+                                <option value="">Select your role...</option>
+                                <option value="lead">Lead Investor</option>
+                                <option value="co-investor">Co-Investor</option>
+                                <option value="advisor">Advisor</option>
+                                <option value="government">Government Agency</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Skills/Expertise Required</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="skillFinance" value="finance">
+                                        <label class="form-check-label" for="skillFinance">Financial Expertise</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="skillTech" value="technical">
+                                        <label class="form-check-label" for="skillTech">Technical/Engineering</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="skillLegal" value="legal">
+                                        <label class="form-check-label" for="skillLegal">Legal/Regulatory</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="skillMarketing" value="marketing">
+                                        <label class="form-check-label" for="skillMarketing">Marketing/Sales</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="skillOperations" value="operations">
+                                        <label class="form-check-label" for="skillOperations">Operations</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="skillStrategy" value="strategy">
+                                        <label class="form-check-label" for="skillStrategy">Strategy/Advisory</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Supporting Documents</label>
+                            <input type="file" class="form-control" id="oppDocuments" multiple
+                                   style="background: var(--glass-bg); border: 1px solid var(--glass-border); color: white;">
+                            <small class="text-muted">Upload pitch deck, business plan, financial projections, etc.</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Contact Email *</label>
+                            <input type="email" class="form-control" id="oppEmail" required
+                                   style="background: var(--glass-bg); border: 1px solid var(--glass-border); color: white;">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid var(--glass-border);">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-government" onclick="submitInvestmentOpportunity()">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Opportunity
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

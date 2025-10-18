@@ -1,0 +1,48 @@
+{
+  "environments": {
+    "production": {
+      "s3_bucket": "dashboard.auxeira.com",
+      "cloudfront_distribution": "E2SK5CDOUJ7KKB",
+      "backup_bucket": "auxeira-dashboard-backups",
+      "cache_control": "no-cache, no-store, must-revalidate"
+    },
+    "staging": {
+      "s3_bucket": "staging.dashboard.auxeira.com", 
+      "cloudfront_distribution": "E1STAGING123",
+      "backup_bucket": "auxeira-staging-backups",
+      "cache_control": "max-age=300"
+    }
+  },
+  "files": {
+    "dashboards": [
+      "esg_education.html",
+      "esg_poverty.html",
+      "esg_hunger.html", 
+      "esg_health.html",
+      "esg_cities.html",
+      "esg_climate.html",
+      "esg_consumption.html",
+      "esg_energy.html",
+      "esg_gender.html",
+      "esg_inequalities.html",
+      "esg_innovation.html",
+      "esg_justice.html",
+      "esg_land.html",
+      "esg_ocean.html",
+      "esg_partnerships.html",
+      "esg_water.html",
+      "esg_work.html"
+    ],
+    "assets": [
+      "esg_enhanced_framework.js",
+      "esg_leaderboard_system.js", 
+      "profile_completion_system.js",
+      "user_centric_ai_system.js"
+    ]
+  },
+  "validation": {
+    "min_file_size": 30000,
+    "required_content": ["<!DOCTYPE html>", "ESG", "Auxeira"],
+    "performance_threshold": 3.0
+  }
+}

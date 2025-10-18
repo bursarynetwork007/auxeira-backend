@@ -1,0 +1,595 @@
+// ============================================================================
+// CENTRAL DASHBOARD DATA SCHEMA
+// All dashboard data with timestamps for real-time updates
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------------------------------
+// DASHBOARD FILE LOCATION TRACKING
+// ----------------------------------------------------------------------------
+
+model DashboardLocation {
+  id                String   @id @default(cuid())
+  dashboardType     String   @unique // startup, vc, angel_investor, etc.
+  originalPath      String   // Original file location
+  currentPath       String   // Current file location
+  s3Bucket          String?  // If deployed to S3
+  cloudFrontUrl     String?  // If using CloudFront
+  isActive          Boolean  @default(true)
+  lastAccessed      DateTime @default(now())
+  movedAt           DateTime @default(now())
+  notes             String?  // Reason for move, etc.
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([dashboardType])
+  @@index([isActive])
+}
+
+// ----------------------------------------------------------------------------
+// STARTUP FOUNDER DASHBOARD DATA
+// ----------------------------------------------------------------------------
+
+model StartupProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  companyName       String
+  industry          String
+  stage             String   // Seed, Series A, Series B, etc.
+  foundedDate       DateTime
+  
+  // SSE Score Data (updated hourly)
+  sseScore          Int      @default(0)
+  sseScoreHistory   Json     // Array of {date, score, factors}
+  lastSSEUpdate     DateTime @default(now())
+  
+  // Metrics (updated daily)
+  mrr               Float    @default(0)
+  arr               Float    @default(0)
+  growthRate        Float    @default(0)
+  burnRate          Float    @default(0)
+  runway            Int      @default(0) // months
+  employees         Int      @default(0)
+  customers         Int      @default(0)
+  lastMetricsUpdate DateTime @default(now())
+  
+  // Fundraising
+  currentRound      String?
+  targetAmount      Float?
+  raisedAmount      Float    @default(0)
+  valuation         Float?
+  
+  // Dashboard Location
+  dashboardLocation DashboardLocation? @relation(fields: [dashboardLocationId], references: [id])
+  dashboardLocationId String?
+  
+  // Investor Matches (updated daily)
+  investorMatches   InvestorMatch[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([sseScore])
+  @@index([lastSSEUpdate])
+}
+
+model InvestorMatch {
+  id                String   @id @default(cuid())
+  startupId         String
+  startup           StartupProfile @relation(fields: [startupId], references: [id], onDelete: Cascade)
+  
+  investorId        String
+  investorName      String
+  investorType      String   // Angel, VC, Corporate, Government, ESG
+  matchScore        Int      // 0-100
+  matchFactors      Json     // Detailed matching factors
+  
+  status            String   @default("pending") // pending, contacted, meeting, rejected, invested
+  lastUpdated       DateTime @default(now())
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([startupId])
+  @@index([matchScore])
+  @@index([status])
+}
+
+// ----------------------------------------------------------------------------
+// ANGEL INVESTOR DASHBOARD DATA
+// ----------------------------------------------------------------------------
+
+model AngelProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  name              String
+  email             String
+  tier              String   @default("free") // free, standard, premium
+  
+  // Investment Profile
+  totalInvested     Float    @default(0)
+  portfolioValue    Float    @default(0)
+  activeInvestments Int      @default(0)
+  exits             Int      @default(0)
+  avgCheckSize      Float    @default(0)
+  
+  // Performance Metrics (updated daily)
+  totalROI          Float    @default(0)
+  alphaScore        Int      @default(0)
+  nudgeScore        Int      @default(0)
+  avgIRR            Float    @default(0)
+  successRate       Float    @default(0)
+  lastMetricsUpdate DateTime @default(now())
+  
+  // Preferences
+  preferredStages   String[] // Pre-seed, Seed, Series A
+  sectors           String[] // SaaS, Fintech, AI/ML
+  geographies       String[] // US, Europe, Asia
+  profileCompletion Int      @default(0)
+  
+  // Dashboard Location
+  dashboardLocation DashboardLocation? @relation(fields: [dashboardLocationId], references: [id])
+  dashboardLocationId String?
+  
+  // Portfolio Companies
+  portfolioCompanies AngelPortfolioCompany[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([alphaScore])
+  @@index([lastMetricsUpdate])
+}
+
+model AngelPortfolioCompany {
+  id                String   @id @default(cuid())
+  angelId           String
+  angel             AngelProfile @relation(fields: [angelId], references: [id], onDelete: Cascade)
+  
+  companyName       String
+  sector            String
+  stage             String
+  investment        Float
+  currentValue      Float
+  roi               Float
+  sseScore          Int
+  
+  // Updated metrics (updated weekly)
+  studentsReached   Int?     // For education ESG
+  teachersTrained   Int?     // For education ESG
+  literacyGain      Float?   // For education ESG
+  jobsCreated       Int?     // For impact tracking
+  
+  status            String   // Strong Performer, Healthy, Monitor, At Risk
+  lastUpdate        DateTime @default(now())
+  nextMilestone     String?
+  riskLevel         String   // low, medium, high
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([angelId])
+  @@index([roi])
+  @@index([sseScore])
+}
+
+// ----------------------------------------------------------------------------
+// VENTURE CAPITAL DASHBOARD DATA
+// ----------------------------------------------------------------------------
+
+model VCFund {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  fundName          String
+  fundNumber        String
+  vintage           Int
+  
+  // Fund Size & Deployment
+  fundSize          Float
+  deployedCapital   Float    @default(0)
+  remainingCapital  Float
+  lpCount           Int      @default(0)
+  
+  // Target Returns
+  targetIRR         Float
+  targetMOIC        Float
+  targetDPI         Float
+  
+  // Current Performance (updated daily)
+  currentIRR        Float    @default(0)
+  currentMOIC       Float    @default(0)
+  currentDPI        Float    @default(0)
+  alphaScore        Int      @default(0)
+  portfolioValue    Float    @default(0)
+  unrealizedGains   Float    @default(0)
+  realizedGains     Float    @default(0)
+  lastMetricsUpdate DateTime @default(now())
+  
+  // Dashboard Location
+  dashboardLocation DashboardLocation? @relation(fields: [dashboardLocationId], references: [id])
+  dashboardLocationId String?
+  
+  // Portfolio
+  totalInvestments  Int      @default(0)
+  activeInvestments Int      @default(0)
+  exits             Int      @default(0)
+  
+  portfolioCompanies VCPortfolioCompany[]
+  lpReports         LPReport[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([currentIRR])
+  @@index([alphaScore])
+}
+
+model VCPortfolioCompany {
+  id                String   @id @default(cuid())
+  fundId            String
+  fund              VCFund   @relation(fields: [fundId], references: [id], onDelete: Cascade)
+  
+  companyName       String
+  sector            String
+  stage             String
+  investment        Float
+  currentValue      Float
+  moic              Float
+  irr               Float
+  sseScore          Int
+  
+  // Real-time metrics (updated hourly for active monitoring)
+  lastRound         DateTime?
+  nextMilestone     String?
+  riskLevel         String
+  alphaSignal       String   // strong_buy, buy, hold, sell, strong_sell
+  founderSentiment  Int
+  marketTrend       String
+  quarterlyGrowth   Float
+  burnRate          Float
+  runway            Int
+  employees         Int
+  mrr               Float
+  churnRate         Float
+  
+  lastUpdate        DateTime @default(now())
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([fundId])
+  @@index([irr])
+  @@index([moic])
+  @@index([alphaSignal])
+}
+
+model LPReport {
+  id                String   @id @default(cuid())
+  fundId            String
+  fund              VCFund   @relation(fields: [fundId], references: [id], onDelete: Cascade)
+  
+  reportId          String   @unique
+  reportPeriod      String   // Q4 2024
+  reportType        String   // Standard, Premium
+  generatedDate     DateTime @default(now())
+  
+  // Report Data (JSON)
+  performance       Json
+  companies         Json
+  riskAssessment    Json
+  marketIntel       Json
+  valueAdd          Json
+  benchmarks        Json?
+  predictions       Json?
+  
+  // Payment
+  isPaid            Boolean  @default(false)
+  paymentAmount     Float?
+  paymentDate       DateTime?
+  paymentReference  String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([fundId])
+  @@index([reportPeriod])
+  @@index([generatedDate])
+}
+
+// ----------------------------------------------------------------------------
+// CORPORATE PARTNER DASHBOARD DATA
+// ----------------------------------------------------------------------------
+
+model CorporatePartner {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  companyName       String
+  partnerName       String
+  title             String
+  tier              String   @default("free") // free, executive, enterprise
+  
+  // Billing
+  seats             Int      @default(1)
+  baseSeats         Int      @default(1)
+  execSeats         Int      @default(0)
+  monthlyPrice      Float    @default(0)
+  status            String   @default("active")
+  
+  // Performance Metrics (updated daily)
+  shadowValue       Float    @default(0) // Unrealized paper gains
+  influence         Int      @default(0) // 0-100
+  streak            Int      @default(0)
+  saves             Int      @default(0)
+  conversionRate    Float    @default(0)
+  totalExposure     Float    @default(0)
+  rank              Int      @default(999)
+  score             Int      @default(0)
+  lastMetricsUpdate DateTime @default(now())
+  
+  // Dashboard Location
+  dashboardLocation DashboardLocation? @relation(fields: [dashboardLocationId], references: [id])
+  dashboardLocationId String?
+  
+  // Ecosystem Engagement
+  ecosystemPulse    Json?    // Real-time signals
+  blindAuctions     Json?    // Active auctions
+  mirrorFeed        Json?    // Founder requests
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([shadowValue])
+  @@index([rank])
+}
+
+// ----------------------------------------------------------------------------
+// GOVERNMENT AGENCY DASHBOARD DATA
+// ----------------------------------------------------------------------------
+
+model GovernmentAgency {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  agencyName        String
+  directorName      String
+  title             String
+  location          String
+  
+  // Budget & Allocation
+  totalBudget       Float
+  deployedCapital   Float    @default(0)
+  remainingCapital  Float
+  
+  // Economic Impact (updated monthly)
+  economicROI       Float    @default(0)
+  jobsCreated       Int      @default(0)
+  taxRevenueROI     Float    @default(0)
+  complianceScore   Int      @default(0)
+  innovationIndex   Int      @default(0)
+  exportGrowth      Float    @default(0)
+  lastMetricsUpdate DateTime @default(now())
+  
+  // Dashboard Location
+  dashboardLocation DashboardLocation? @relation(fields: [dashboardLocationId], references: [id])
+  dashboardLocationId String?
+  
+  // Program Management
+  activePrograms    Int      @default(0)
+  startupsSupported Int      @default(0)
+  
+  programs          GovernmentProgram[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([economicROI])
+  @@index([jobsCreated])
+}
+
+model GovernmentProgram {
+  id                String   @id @default(cuid())
+  agencyId          String
+  agency            GovernmentAgency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  
+  programName       String
+  sector            String
+  stage             String
+  budgetAllocated   Float
+  economicImpact    Float
+  roi               Float
+  complianceScore   Int
+  
+  // Impact Metrics (updated quarterly)
+  startupsSupported Int
+  jobsCreated       Int
+  taxRevenue        Float
+  sdgAlignment      Int[]    // SDG numbers
+  
+  status            String
+  lastUpdate        DateTime @default(now())
+  nextMilestone     String?
+  riskLevel         String
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([agencyId])
+  @@index([roi])
+  @@index([economicImpact])
+}
+
+// ----------------------------------------------------------------------------
+// ESG EDUCATION INVESTOR DASHBOARD DATA
+// ----------------------------------------------------------------------------
+
+model ESGEducationInvestor {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  name              String
+  title             String
+  tier              String   @default("free")
+  
+  // Investment Profile
+  totalInvested     Float    @default(0)
+  portfolioValue    Float    @default(0)
+  activeInvestments Int      @default(0)
+  
+  // Education Impact Metrics (updated monthly)
+  totalROI          Float    @default(0)
+  educationROI      Float    @default(0)
+  impactScore       Int      @default(0)
+  studentsReached   Int      @default(0)
+  teachersTrained   Int      @default(0)
+  schoolsSupported  Int      @default(0)
+  literacyGain      Float    @default(0)
+  numeracyGain      Float    @default(0)
+  genderParity      Float    @default(0)
+  lastMetricsUpdate DateTime @default(now())
+  
+  // Dashboard Location
+  dashboardLocation DashboardLocation? @relation(fields: [dashboardLocationId], references: [id])
+  dashboardLocationId String?
+  
+  // Focus Areas
+  educationFocus    String[] // Early Childhood, STEM, etc.
+  sdgFocus          Int[]    // SDG 4, 5, 8, 10
+  geographies       String[]
+  
+  portfolioCompanies ESGPortfolioCompany[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([impactScore])
+  @@index([studentsReached])
+}
+
+model ESGPortfolioCompany {
+  id                String   @id @default(cuid())
+  investorId        String
+  investor          ESGEducationInvestor @relation(fields: [investorId], references: [id], onDelete: Cascade)
+  
+  companyName       String
+  sector            String
+  stage             String
+  investment        Float
+  currentValue      Float
+  roi               Float
+  impactScore       Int
+  
+  // Education Impact (updated quarterly)
+  studentsReached   Int      @default(0)
+  teachersTrained   Int      @default(0)
+  schoolsSupported  Int      @default(0)
+  sdgAlignment      Int[]
+  
+  // Learning Outcomes
+  literacyGain      Float?
+  numeracyGain      Float?
+  digitalLiteracy   Float?
+  genderParity      Float?
+  
+  status            String
+  lastUpdate        DateTime @default(now())
+  nextMilestone     String?
+  riskLevel         String
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([investorId])
+  @@index([impactScore])
+  @@index([studentsReached])
+}
+
+// ----------------------------------------------------------------------------
+// MARKET INTELLIGENCE (SHARED ACROSS ALL DASHBOARDS)
+// ----------------------------------------------------------------------------
+
+model MarketIntelligence {
+  id                String   @id @default(cuid())
+  
+  // Sector Data (updated daily)
+  sector            String   @unique
+  growth            Float
+  funding           Float
+  dealCount         Int
+  avgValuation      Float
+  momentum          String   // accelerating, stable, declining
+  
+  // Trends
+  hotKeywords       String[]
+  emergingTrends    String[]
+  riskFactors       String[]
+  
+  lastUpdate        DateTime @default(now())
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([sector])
+  @@index([growth])
+  @@index([lastUpdate])
+}
+
+// ----------------------------------------------------------------------------
+// DATA UPDATE SCHEDULE
+// ----------------------------------------------------------------------------
+
+model DataUpdateSchedule {
+  id                String   @id @default(cuid())
+  
+  entityType        String   // startup, angel, vc, corporate, government, esg
+  entityId          String
+  metric            String   // sseScore, irr, shadowValue, etc.
+  
+  updateFrequency   String   // hourly, daily, weekly, monthly, quarterly
+  lastUpdate        DateTime @default(now())
+  nextUpdate        DateTime
+  
+  isActive          Boolean  @default(true)
+  retryCount        Int      @default(0)
+  lastError         String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([entityType, entityId, metric])
+  @@index([nextUpdate, isActive])
+}
+
+// ----------------------------------------------------------------------------
+// AUDIT LOG FOR DATA CHANGES
+// ----------------------------------------------------------------------------
+
+model DataAuditLog {
+  id                String   @id @default(cuid())
+  
+  entityType        String
+  entityId          String
+  field             String
+  oldValue          Json?
+  newValue          Json?
+  
+  changeReason      String?  // scheduled_update, manual_override, api_sync
+  changedBy         String?  // userId or 'system'
+  
+  timestamp         DateTime @default(now())
+  
+  @@index([entityType, entityId])
+  @@index([timestamp])
+}

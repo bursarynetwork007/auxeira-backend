@@ -1,0 +1,133 @@
+service: auxeira-backend
+frameworkVersion: ^4.0.0
+
+package:
+  patterns:
+    - '!awscliv2.zip'
+    - '!.serverless/**'
+    - '!node_modules/aws-sdk/**'
+    - '!**/*.zip'
+    - '!**/*.backup'
+    - '!aws/**'
+    - '!.env*'
+    - '!README.md'
+    - '!Dockerfile'
+    - '!docker-compose.yml'
+    - '!package-original.json'
+    - '!src/types/**'
+    - '!src/websocket/**'
+    - '!src/ml-pipeline/**'
+    - 'lambda-enhanced.js'
+    - 'src/services/auth-dynamodb.service.js'
+    - 'package.json'
+    - 'node_modules/**'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  memorySize: 2048
+  timeout: 29
+  deploymentBucket:
+    name: auxeira-backend-deployment-bucket-${self:provider.stage}
+  environment:
+    NODE_ENV: production
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-users-${self:provider.stage}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-sessions-${self:provider.stage}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-users-${self:provider.stage}/index/*"
+        
+
+          
+functions:
+  api:
+    handler: lambda-enhanced.handler
+    events:
+      - http:
+          path: /
+          method: ANY
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Requested-With
+              - Accept
+            allowCredentials: false
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Requested-With
+              - x-csrf-token
+              - Accept
+            allowCredentials: false
+
+
+
+    environment:
+      USERS_TABLE: ${self:service}-users-${self:provider.stage}
+      SESSIONS_TABLE: ${self:service}-sessions-${self:provider.stage}
+      JWT_SECRET: ${env:JWT_SECRET, 'your-super-secret-jwt-key-change-in-production'}
+      JWT_REFRESH_SECRET: ${env:JWT_REFRESH_SECRET, 'your-super-secret-refresh-key-change-in-production'}
+
+resources:
+  Resources:        
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-users-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: UserIdIndex
+            KeySchema:
+              - AttributeName: id
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+        
+    SessionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-sessions-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: sessionId
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: sessionId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: UserIdIndex
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+        TimeToLiveSpecification:
+          AttributeName: expiresAt
+          Enabled: true

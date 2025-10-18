@@ -1,0 +1,3708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira VC Dashboard - AI-Powered Value Creation Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #1a1a1a;
+            --accent-bg: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #666666;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-yellow: #f59e0b;
+            --accent-gold: #FFD700;
+            --accent-esg: #00b894;
+            --border-color: #333333;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, #1a1a2e 50%, var(--primary-bg) 100%);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Glass Morphism Effects */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+        }
+
+        .glass-card {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Critical Action Banner */
+        .critical-banner {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3); }
+            50% { box-shadow: 0 4px 30px rgba(59, 130, 246, 0.5); }
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            border-bottom: 2px solid var(--border-color);
+            background: var(--secondary-bg);
+            border-radius: 12px 12px 0 0;
+            padding: 0.5rem;
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 8px;
+            margin: 0 0.25rem;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border: none;
+        }
+
+        .nav-tabs .nav-link.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Portfolio Cards */
+        .portfolio-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portfolio-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue), var(--accent-purple));
+        }
+
+        .portfolio-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 25px 50px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Metrics Cards */
+        .metric-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .metric-card:hover::before {
+            opacity: 1;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Signal Badges */
+        .signal-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .signal-strong-buy { background: var(--accent-green); color: white; }
+        .signal-buy { background: var(--accent-blue); color: white; }
+        .signal-hold { background: var(--accent-yellow); color: black; }
+        .signal-sell { background: var(--accent-red); color: white; }
+
+        /* Risk Level Indicators */
+        .risk-low { color: var(--accent-green); }
+        .risk-medium { color: var(--accent-yellow); }
+        .risk-high { color: var(--accent-red); }
+
+        /* Deal Flow Cards */
+        .deal-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .deal-card:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
+        }
+
+        .sse-score {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Charts Container */
+        .chart-container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            height: 350px; /* Fixed height to prevent stretching */
+        }
+
+        .chart-container canvas {
+            max-height: 300px;
+        }
+
+        /* Behavioral Nudges */
+        .nudge-card {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(245, 158, 11, 0.1));
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            animation: gentle-pulse 3s infinite;
+        }
+
+        @keyframes gentle-pulse {
+            0%, 100% { border-color: rgba(239, 68, 68, 0.3); }
+            50% { border-color: rgba(239, 68, 68, 0.6); }
+        }
+
+        .loss-aversion {
+            color: var(--accent-red);
+            font-weight: bold;
+        }
+
+        .peer-comparison {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+        }
+
+        /* SSE Causal Impact Display */
+        .causal-impact {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .counterfactual {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        /* New Feature Highlight */
+        .feature-highlight {
+            position: relative;
+            border: 2px solid transparent;
+            background: linear-gradient(var(--secondary-bg), var(--secondary-bg)) padding-box,
+                        linear-gradient(135deg, var(--accent-blue), var(--accent-purple)) border-box;
+        }
+
+        .feature-tag {
+            position: absolute;
+            top: -10px;
+            right: 15px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        /* Actuarial Scenario Styles */
+        .scenario-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .scenario-control-group {
+            background: var(--glass-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .scenario-slider {
+            width: 100%;
+            margin: 1rem 0;
+        }
+
+        .scenario-description {
+            background: var(--glass-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .projection-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+
+        .projection-table th,
+        .projection-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .projection-table th {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .projection-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Leaderboard Styles */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .leaderboard-table th {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .leaderboard-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .rank-1 { background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), transparent); }
+        .rank-2 { background: linear-gradient(90deg, rgba(192, 192, 192, 0.1), transparent); }
+        .rank-3 { background: linear-gradient(90deg, rgba(205, 127, 50, 0.1), transparent); }
+
+        /* Add Startup Button */
+        .add-startup-btn {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .add-startup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Integration Icons */
+        .integration-icons {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .integration-icon {
+            text-align: center;
+            padding: 1rem;
+            width: 120px;
+        }
+
+        .integration-icon i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent-blue);
+        }
+
+        /* Profile Completion Nudge */
+        .profile-nudge {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(59, 130, 246, 0.1));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            animation: gentle-pulse 3s infinite;
+        }
+
+        /* Report Cards */
+        .report-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .report-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Drag & Drop Upload Area */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Progress Bar */
+        .progress {
+            height: 10px;
+            background-color: var(--secondary-bg);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+            transition: width 0.3s ease;
+        }
+
+        /* Investor Pledge Cards */
+        .pledge-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .expertise-tag {
+            display: inline-block;
+            background: var(--accent-blue);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container-fluid {
+                padding: 0.5rem;
+            }
+            
+            .metric-value {
+                font-size: 2rem;
+            }
+            
+            .portfolio-card, .deal-card {
+                padding: 1rem;
+            }
+        }
+    
+        /* Innovation Thesis Builder Styles */
+        .thesis-canvas {
+            min-height: 300px;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .thesis-canvas.drag-over {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .sector-palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .sector-chip {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            cursor: move;
+            transition: all 0.3s ease;
+        }
+
+        .sector-chip:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .sector-chip i {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--accent-blue);
+        }
+
+        .sector-chip.in-thesis {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .thesis-sector {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .thesis-sector .remove-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        .risk-meter {
+            height: 20px;
+            background: linear-gradient(90deg, var(--accent-green) 0%, var(--accent-yellow) 50%, var(--accent-red) 100%);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .risk-level {
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: width 0.5s ease;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Critical Action Banner -->
+    <div class="critical-banner">
+        <div class="container-fluid">
+            <div class="d-flex align-items-center justify-content-between flex-wrap">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-brain me-2 fa-pulse"></i>
+                    <div>
+                        <strong>AUXEIRA VALUE CREATION PLATFORM:</strong>
+                        <span class="ms-2">Gina Copilot Active • <span id="criticalAlertsCount">3</span> high-priority interventions</span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="dropdown">
+                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell me-1"></i> Notifications
+                            <span class="badge bg-danger">3</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-robot me-2"></i>Gina Copilot: HealthTech needs attention</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-handshake me-2"></i>New co-investment opportunity</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-chart-line me-2"></i>Market shift detected</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="openGinaModal()"><i class="fas fa-comments me-2"></i>Chat with Gina Copilot</a></li>
+                        </ul>
+                    </div>
+                    <span class="badge bg-success">
+                        <i class="fas fa-circle fa-pulse me-1"></i>Live SSE Analysis
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Container -->
+    <div class="container-fluid py-4">
+        <!-- Dashboard Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h2 mb-1">Auxeira Value Creation Platform</h1>
+                        <p class="text-muted mb-0">
+                            <span id="fundName">Alpha Ventures</span> • <span id="fundNumber">Fund III</span> • 
+                            <span class="badge bg-primary ms-2">SSE Enabled</span>
+                        </p>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="text-end">
+                            <div class="small text-white">SSE Impact (YTD)</div>
+                            <div class="fw-bold text-success">+$45M Value Created</div>
+                        </div>
+                        <button class="btn btn-outline-primary" onclick="refreshData()">
+                            <i class="fas fa-sync-alt me-1"></i>Refresh AI Insights
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Completion Nudge -->
+        <div class="profile-nudge">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-user-circle me-3 fa-2x text-warning"></i>
+                    <div>
+                        <h6 class="mb-1">Complete your profile to unlock personalized insights</h6>
+                        <p class="mb-0 text-white">Add your investment preferences, sectors of interest, and risk tolerance for better AI recommendations</p>
+                    </div>
+                </div>
+                <button class="btn btn-warning" onclick="openProfileModal()">
+                    <i class="fas fa-edit me-2"></i>Complete Profile
+                </button>
+            </div>
+        </div>
+
+        <!-- Enhanced Navigation Tabs -->
+        <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="portfolio-tab" data-bs-toggle="tab" data-bs-target="#portfolio" type="button" role="tab">
+                    <i class="fas fa-briefcase me-2"></i>Portfolio Dashboard
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="copilot-tab" data-bs-toggle="tab" data-bs-target="#copilot" type="button" role="tab">
+                    <i class="fas fa-robot me-2"></i>Gina Copilot
+                    <span class="badge bg-danger ms-2">Live</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="deals-tab" data-bs-toggle="tab" data-bs-target="#deals" type="button" role="tab">
+                    <i class="fas fa-handshake me-2"></i>Deals & Co-Investment
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab">
+                    <i class="fas fa-chart-bar me-2"></i>Reports
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="liquidity-tab" data-bs-toggle="tab" data-bs-target="#liquidity" type="button" role="tab">
+                    <i class="fas fa-chart-line me-2"></i>Liquidity & Exit Simulator
+                    <span class="badge bg-info ms-2">New</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="leaderboard-tab" data-bs-toggle="tab" data-bs-target="#leaderboard" type="button" role="tab">
+                    <i class="fas fa-trophy me-2"></i>Leaderboard
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="market-tab" data-bs-toggle="tab" data-bs-target="#market" type="button" role="tab">
+                    <i class="fas fa-globe me-2"></i>Market Intelligence
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="thesis-builder-tab" data-bs-toggle="tab" data-bs-target="#thesis-builder" type="button" role="tab">
+                    <i class="fas fa-lightbulb me-2"></i>Innovation Thesis
+                    <span class="badge bg-warning ms-2">AI</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="value-playbook-tab" data-bs-toggle="tab" data-bs-target="#value-playbook" type="button" role="tab">
+                    <i class="fas fa-tasks me-2"></i>Value Playbook
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="esg-tracker-tab" data-bs-toggle="tab" data-bs-target="#esg-tracker" type="button" role="tab">
+                    <i class="fas fa-leaf me-2"></i>ESG & Impact
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="network-matcher-tab" data-bs-toggle="tab" data-bs-target="#network-matcher" type="button" role="tab">
+                    <i class="fas fa-network-wired me-2"></i>Co-Investment Network
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="report-generator-tab" data-bs-toggle="tab" data-bs-target="#report-generator" type="button" role="tab">
+                    <i class="fas fa-file-alt me-2"></i>LP Reports
+                    <span class="badge bg-success ms-2">7 Types</span>
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="dashboardTabContent">
+            <!-- Portfolio Dashboard Tab -->
+            <div class="tab-pane fade show active" id="portfolio" role="tabpanel" aria-labelledby="portfolio-tab">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="mb-0">
+                                <i class="fas fa-briefcase me-2"></i>Portfolio Dashboard
+                            </h5>
+                            <button class="add-startup-btn" onclick="openAddStartupModal()">
+                                <i class="fas fa-plus me-2"></i>Add Startup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Journey Narrative (NEW - Storytelling) -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="glass-card p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-book-open me-2 text-primary"></i>
+                                    Your Portfolio Journey
+                                    <span class="badge bg-primary ms-2">Strategic Intelligence</span>
+                                </h5>
+                                <button class="btn btn-sm btn-outline-primary" onclick="refreshPortfolioStory()">
+                                    <i class="fas fa-sync me-1"></i>Refresh Story
+                                </button>
+                            </div>
+                            <div id="portfolioJourneyNarrative">
+                                <div class="text-center py-4">
+                                    <i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i>
+                                    <p class="text-muted">Crafting your portfolio narrative...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Metrics -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <div class="metric-value text-success" id="currentIRR">28.4%</div>
+                            <div class="metric-label">Current IRR</div>
+                            <div class="small text-muted">Target: 25%</div>
+                            <div class="small text-success">+2.1%</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <div class="metric-value text-primary" id="currentMOIC">2.8x</div>
+                            <div class="metric-label">Current MOIC</div>
+                            <div class="small text-muted">Target: 3.5x</div>
+                            <div class="small text-primary">+0.3x</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <div class="metric-value text-warning" id="currentDPI">0.9x</div>
+                            <div class="metric-label">Current DPI</div>
+                            <div class="small text-muted">Target: 1.2x</div>
+                            <div class="small text-warning">+0.1x</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <div class="metric-value text-info" id="portfolioValue">$450M</div>
+                            <div class="metric-label">Portfolio Value</div>
+                            <div class="small text-muted">Target: $625M</div>
+                            <div class="small text-info">+$45M</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Performance Charts -->
+                <div class="row mb-4">
+                    <div class="col-lg-6">
+                        <div class="chart-container">
+                            <h6 class="mb-3">Portfolio Performance Trend</h6>
+                            <canvas id="performanceChart" height="300"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="chart-container">
+                            <h6 class="mb-3">Sector Allocation</h6>
+                            <canvas id="sectorChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Companies Grid -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="glass-card p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-building me-2"></i>Portfolio Companies
+                                    <span class="badge bg-secondary ms-2" id="portfolioCount">6</span>
+                                </h5>
+                                <div class="d-flex gap-2">
+                                    <select class="form-select form-select-sm" id="sortBy" onchange="sortPortfolio()">
+                                        <option value="irr">Sort by IRR</option>
+                                        <option value="moic">Sort by MOIC</option>
+                                        <option value="value">Sort by Value</option>
+                                        <option value="risk">Sort by Risk</option>
+                                        <option value="sse">Sort by SSE Score</option>
+                                    </select>
+                                    <select class="form-select form-select-sm" id="filterBy" onchange="filterPortfolio()">
+                                        <option value="all">All Companies</option>
+                                        <option value="high_performers">High Performers (IRR >30%)</option>
+                                        <option value="at_risk">At Risk (Runway <18mo)</option>
+                                        <option value="strong_signals">Strong Buy Signals</option>
+                                        <option value="unicorn_potential">Unicorn Potential (>$10M)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row" id="portfolioGrid">
+                                <!-- Portfolio companies will be dynamically loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gina Copilot Tab -->
+            <div class="tab-pane fade" id="copilot" role="tabpanel" aria-labelledby="copilot-tab">
+                <div class="row mb-4">
+                    <div class="col-lg-8">
+                        <div class="glass-card p-4 feature-highlight">
+                            <div class="feature-tag">AI-POWERED</div>
+                            <h5 class="mb-3">
+                                <i class="fas fa-robot me-2"></i>Gina Value Creation Copilot
+                                <span class="badge bg-success ms-2">Live Analysis</span>
+                            </h5>
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="causal-impact">
+                                        <h6 class="text-success">
+                                            <i class="fas fa-arrow-up me-2"></i>SSE Causal Impact
+                                        </h6>
+                                        <div class="fw-bold fs-5">50% Reduction in Failures</div>
+                                        <div class="small text-muted">Based on 10K+ simulations</div>
+                                        <div class="mt-2">
+                                            <span class="badge bg-success">+20% IRR Boost</span>
+                                            <span class="badge bg-primary ms-1">+25% Faster Milestones</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="counterfactual">
+                                        <h6 class="text-danger">
+                                            <i class="fas fa-arrow-down me-2"></i>Without SSE
+                                        </h6>
+                                        <div class="fw-bold fs-5">35% Lower Value Creation</div>
+                                        <div class="small text-muted">Counterfactual analysis</div>
+                                        <div class="mt-2">
+                                            <span class="badge bg-danger">Higher Failure Risk</span>
+                                            <span class="badge bg-warning ms-1">Slower Growth</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- AI Intervention Alerts -->
+                            <h6 class="mb-3">Priority Interventions</h6>
+                            <div class="nudge-card">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                                    <strong>HealthTech Runway Alert</strong>
+                                    <span class="badge bg-danger ms-auto">High Priority</span>
+                                </div>
+                                <p class="mb-2">Burn rate increased 25% - runway down to 14 months</p>
+                                <div class="loss-aversion text-danger fw-bold">
+                                    <i class="fas fa-money-bill-wave me-1"></i>Potential loss: $5M investment at risk
+                                </div>
+                                <div class="peer-comparison mt-2">
+                                    <small>
+                                        <strong>Peer Benchmark:</strong> Similar companies maintain 18+ month runway
+                                    </small>
+                                </div>
+                                <div class="mt-3">
+                                    <button class="btn btn-warning btn-sm me-2">
+                                        <i class="fas fa-phone me-1"></i>Schedule Bridge Funding Call
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-chart-line me-1"></i>Run SSE Scenario
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="nudge-card">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-rocket text-success me-2"></i>
+                                    <strong>DataCorp Follow-on Opportunity</strong>
+                                    <span class="badge bg-success ms-auto">High Potential</span>
+                                </div>
+                                <p class="mb-2">Strong Q3 performance - SSE predicts 2.5x additional returns</p>
+                                <div class="text-success fw-bold">
+                                    <i class="fas fa-chart-line me-1"></i>SSE Uplift: +45% valuation increase
+                                </div>
+                                <div class="peer-comparison mt-2">
+                                    <small>
+                                        <strong>Market Signal:</strong> Top quartile performance in AI/ML sector
+                                    </small>
+                                </div>
+                                <div class="mt-3">
+                                    <button class="btn btn-success btn-sm me-2">
+                                        <i class="fas fa-handshake me-1"></i>Evaluate Series B Participation
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-calculator me-1"></i>Run Exit Simulation
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="glass-card p-4">
+                            <h6 class="mb-3">Ask Gina Copilot</h6>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" placeholder="e.g., How can I improve HealthTech's runway?">
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                            <div class="causal-impact">
+                                <h6 class="text-success mb-3">Recent AI Insights</h6>
+                                <div class="small">
+                                    <p><strong>HealthTech Optimization:</strong> Implementing milestone-based rewards could extend runway by 6 months. Similar portfolio companies achieved 25% cost reduction with this approach.</p>
+                                    <div class="peer-comparison">
+                                        <small>
+                                            <strong>Peer Success:</strong> Sequoia-backed HealthTech reduced burn by 30% using SSE rewards
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deals & Co-Investment Tab -->
+            <div class="tab-pane fade" id="deals" role="tabpanel" aria-labelledby="deals-tab">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="glass-card p-4 feature-highlight">
+                            <div class="feature-tag">AI-RECOMMENDED</div>
+                            <h5 class="mb-4">
+                                <i class="fas fa-handshake me-2"></i>Deals & Co-Investment
+                                <span class="badge bg-success ms-2">SSE-Vetted</span>
+                            </h5>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-8">
+                                    <div class="causal-impact p-3">
+                                        <h6 class="text-success mb-3">
+                                            <i class="fas fa-chart-line me-2"></i>Joint SSE Value Creation
+                                        </h6>
+                                        <div class="row text-center">
+                                            <div class="col-4">
+                                                <div class="fw-bold fs-4 text-success">25%</div>
+                                                <div class="text-muted">Higher IRR</div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="fw-bold fs-4 text-primary">18%</div>
+                                                <div class="text-muted">Faster Growth</div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="fw-bold fs-4 text-info">32%</div>
+                                                <div class="text-muted">Risk Reduction</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="glass p-3 text-center">
+                                        <h6 class="mb-3">Your Deal Match Score</h6>
+                                        <div class="fw-bold fs-2 text-primary">84</div>
+                                        <div class="text-muted">Top 25% of VCs</div>
+                                        <div class="mt-3">
+                                            <span class="badge bg-success">+12% This Quarter</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Founder Stories (NEW - Storytelling) -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-user-circle me-2 text-info"></i>
+                                        Featured Founder Story
+                                        <span class="badge bg-info ms-2">Strategic Intelligence</span>
+                                    </h6>
+                                    <button class="btn btn-sm btn-outline-info" onclick="loadNextFounderStory()">
+                                        <i class="fas fa-arrow-right me-1"></i>Next Story
+                                    </button>
+                                </div>
+                                <div id="founderStoryContainer">
+                                    <div class="text-center py-3">
+                                        <i class="fas fa-spinner fa-spin fa-2x text-info mb-2"></i>
+                                        <p class="text-muted small">Loading founder story...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Upload Startup Button -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h6 class="mb-0">AI-Recommended Deals</h6>
+                                <button class="btn btn-primary" onclick="openUploadStartupModal()">
+                                    <i class="fas fa-upload me-2"></i>Upload Your Startup for Co-Investment
+                                </button>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="deal-card glass p-3 mb-3">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="bg-primary rounded-circle p-2 me-3">
+                                                <i class="fas fa-robot text-white"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-0">QuantumAI</h6>
+                                                <small class="text-muted">AI Infrastructure • Series A</small>
+                                            </div>
+                                            <span class="badge bg-success">98% Match</span>
+                                        </div>
+                                        <p class="small text-muted mb-2">Quantum computing for AI acceleration, 3.2x revenue growth</p>
+                                        <div class="peer-comparison">
+                                            <small>
+                                                <strong>SSE Synergy:</strong> Joint rewards yield 25% higher IRR
+                                            </small>
+                                        </div>
+                                        <div class="mt-3">
+                                            <button class="btn btn-primary btn-sm me-2">
+                                                <i class="fas fa-handshake me-1"></i>Connect
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-chart-line me-1"></i>View SSE Impact
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="deal-card glass p-3 mb-3">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="bg-success rounded-circle p-2 me-3">
+                                                <i class="fas fa-leaf text-white"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-0">ClimateTech Solutions</h6>
+                                                <small class="text-muted">Climate Tech • Series B</small>
+                                            </div>
+                                            <span class="badge bg-success">92% Match</span>
+                                        </div>
+                                        <p class="small text-muted mb-2">Carbon capture technology with 90% efficiency improvement</p>
+                                        <div class="peer-comparison">
+                                            <small>
+                                                <strong>SSE Synergy:</strong> Complementary reward structures
+                                            </small>
+                                        </div>
+                                        <div class="mt-3">
+                                            <button class="btn btn-primary btn-sm me-2">
+                                                <i class="fas fa-handshake me-1"></i>Connect
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-chart-line me-1"></i>View SSE Impact
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Co-Investment Partners</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-dark table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>VC Firm</th>
+                                                    <th>Focus Area</th>
+                                                    <th>Match Score</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="fw-bold">Andreessen Horowitz</td>
+                                                    <td>AI/ML, Crypto</td>
+                                                    <td><span class="text-success">95</span></td>
+                                                    <td><button class="btn btn-primary btn-sm">Connect</button></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="fw-bold">Sequoia Capital</td>
+                                                    <td>Enterprise, Consumer</td>
+                                                    <td><span class="text-success">92</span></td>
+                                                    <td><button class="btn btn-primary btn-sm">Connect</button></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="fw-bold">Benchmark</td>
+                                                    <td>Early Stage</td>
+                                                    <td><span class="text-warning">85</span></td>
+                                                    <td><button class="btn btn-primary btn-sm">Connect</button></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="fw-bold">Generation Impact</td>
+                                                    <td>Sustainable Tech</td>
+                                                    <td><span class="text-success">88</span></td>
+                                                    <td><button class="btn btn-primary btn-sm">Connect</button></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="mt-3 text-center">
+                                        <button class="btn btn-outline-primary">
+                                            <i class="fas fa-sync-alt me-2"></i>Refresh Matches
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div class="tab-pane fade" id="reports" role="tabpanel" aria-labelledby="reports-tab">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="glass-card p-4">
+                            <h5 class="mb-4">
+                                <i class="fas fa-chart-bar me-2"></i>Reports
+                                <span class="badge bg-primary ms-2">6 Report Types</span>
+                            </h5>
+                            
+                            <div class="row">
+                                <!-- ESG Report -->
+                                <div class="col-md-4 mb-4">
+                                    <div class="report-card">
+                                        <div class="d-flex align-items-start mb-3">
+                                            <div class="bg-success rounded-circle p-3 me-3">
+                                                <i class="fas fa-leaf text-white"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">ESG Performance Report</h6>
+                                                <small class="text-muted">Environmental, Social & Governance metrics</small>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span class="text-muted">ESG Score</span>
+                                                <span class="fw-bold text-success">87/100</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar" style="width: 87%"></div>
+                                            </div>
+                                        </div>
+                                        <p class="small text-muted mb-3">Track sustainability metrics and impact across portfolio</p>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-outline-success btn-sm">
+                                                <i class="fas fa-download me-1"></i>Download
+                                            </button>
+                                            <button class="btn btn-success btn-sm">
+                                                <i class="fas fa-chart-line me-1"></i>View Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- LP Report -->
+                                <div class="col-md-4 mb-4">
+                                    <div class="report-card">
+                                        <div class="d-flex align-items-start mb-3">
+                                            <div class="bg-primary rounded-circle p-3 me-3">
+                                                <i class="fas fa-users text-white"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">LP Performance Report</h6>
+                                                <small class="text-muted">Limited Partner portfolio updates</small>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span class="text-muted">Fund IRR</span>
+                                                <span class="fw-bold text-primary">28.4%</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar" style="width: 81%"></div>
+                                            </div>
+                                        </div>
+                                        <p class="small text-muted mb-3">Comprehensive performance metrics for LPs</p>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-download me-1"></i>Download
+                                            </button>
+                                            <button class="btn btn-primary btn-sm">
+                                                <i class="fas fa-chart-line me-1"></i>View Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Portfolio Report -->
+                                <div class="col-md-4 mb-4">
+                                    <div class="report-card">
+                                        <div class="d-flex align-items-start mb-3">
+                                            <div class="bg-warning rounded-circle p-3 me-3">
+                                                <i class="fas fa-briefcase text-white"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">Portfolio Health Report</h6>
+                                                <small class="text-muted">Overall portfolio performance & risk</small>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span class="text-muted">Health Score</span>
+                                                <span class="fw-bold text-warning">92/100</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar" style="width: 92%"></div>
+                                            </div>
+                                        </div>
+                                        <p class="small text-muted mb-3">Comprehensive analysis of portfolio companies</p>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-outline-warning btn-sm">
+                                                <i class="fas fa-download me-1"></i>Download
+                                            </button>
+                                            <button class="btn btn-warning btn-sm">
+                                                <i class="fas fa-chart-line me-1"></i>View Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Market Trends Report -->
+                                <div class="col-md-4 mb-4">
+                                    <div class="report-card">
+                                        <div class="d-flex align-items-start mb-3">
+                                            <div class="bg-info rounded-circle p-3 me-3">
+                                                <i class="fas fa-chart-line text-white"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">Market Trends Report</h6>
+                                                <small class="text-muted">Sector analysis & market intelligence</small>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span class="text-muted">Market Sentiment</span>
+                                                <span class="fw-bold text-info">Bullish</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar" style="width: 78%"></div>
+                                            </div>
+                                        </div>
+                                        <p class="small text-muted mb-3">Analysis of market trends and investment opportunities</p>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-outline-info btn-sm">
+                                                <i class="fas fa-download me-1"></i>Download
+                                            </button>
+                                            <button class="btn btn-info btn-sm">
+                                                <i class="fas fa-chart-line me-1"></i>View Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Due Diligence Report -->
+                                <div class="col-md-4 mb-4">
+                                    <div class="report-card">
+                                        <div class="d-flex align-items-start mb-3">
+                                            <div class="bg-purple rounded-circle p-3 me-3">
+                                                <i class="fas fa-search text-white"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">Due Diligence Report</h6>
+                                                <small class="text-muted">Investment analysis & risk assessment</small>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span class="text-muted">Risk Score</span>
+                                                <span class="fw-bold" style="color: #8b5cf6;">Medium</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar" style="width: 65%; background-color: #8b5cf6;"></div>
+                                            </div>
+                                        </div>
+                                        <p class="small text-muted mb-3">Comprehensive due diligence for potential investments</p>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-outline-purple btn-sm">
+                                                <i class="fas fa-download me-1"></i>Download
+                                            </button>
+                                            <button class="btn btn-purple btn-sm">
+                                                <i class="fas fa-chart-line me-1"></i>View Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Exit Strategy Report -->
+                                <div class="col-md-4 mb-4">
+                                    <div class="report-card">
+                                        <div class="d-flex align-items-start mb-3">
+                                            <div class="bg-danger rounded-circle p-3 me-3">
+                                                <i class="fas fa-sign-out-alt text-white"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">Exit Strategy Report</h6>
+                                                <small class="text-muted">Liquidity planning & exit scenarios</small>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span class="text-muted">Exit Probability</span>
+                                                <span class="fw-bold text-danger">68%</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar" style="width: 68%"></div>
+                                            </div>
+                                        </div>
+                                        <p class="small text-muted mb-3">Strategic exit planning and scenario analysis</p>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-outline-danger btn-sm">
+                                                <i class="fas fa-download me-1"></i>Download
+                                            </button>
+                                            <button class="btn btn-danger btn-sm">
+                                                <i class="fas fa-chart-line me-1"></i>View Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liquidity & Exit Simulator Tab -->
+            <div class="tab-pane fade" id="liquidity" role="tabpanel" aria-labelledby="liquidity-tab">
+                <!-- Content remains the same as before -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="glass-card p-4 feature-highlight">
+                            <div class="feature-tag">EXIT SIMULATION</div>
+                            <h5 class="mb-4">
+                                <i class="fas fa-chart-line me-2"></i>Liquidity & Exit Simulator
+                                <span class="badge bg-info ms-2">Powered by SSE</span>
+                            </h5>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-4">
+                                    <div class="causal-impact text-center p-3">
+                                        <div class="fw-bold fs-4 text-success">18 Months</div>
+                                        <div class="text-muted">SSE Runway Extension</div>
+                                        <div class="small mt-2">+34% Exit Probability</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="causal-impact text-center p-3">
+                                        <div class="fw-bold fs-4 text-primary">$15.2B</div>
+                                        <div class="text-muted">Q4 2025 Exit Forecast</div>
+                                        <div class="small mt-2">AI/ML Dominance: 40%</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="counterfactual text-center p-3">
+                                        <div class="fw-bold fs-4 text-danger">20% Lower</div>
+                                        <div class="text-muted">MOIC Without SSE</div>
+                                        <div class="small mt-2">Counterfactual Analysis</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="scenario-controls mb-4">
+                                <h6 class="mb-3">Exit Scenario Parameters</h6>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Market Conditions</label>
+                                        <select class="form-select" id="marketConditions">
+                                            <option value="bullish">Bullish (2024 Peak)</option>
+                                            <option value="stable" selected>Stable (Current)</option>
+                                            <option value="volatile">Volatile (2023 Levels)</option>
+                                            <option value="recession">Recession Scenario</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">SSE Implementation</label>
+                                        <select class="form-select" id="sseImplementation">
+                                            <option value="full">Full SSE (Recommended)</option>
+                                            <option value="partial">Partial SSE</option>
+                                            <option value="none">No SSE</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Sector Focus</label>
+                                        <select class="form-select" id="sectorFocus">
+                                            <option value="ai_ml">AI/ML (45% Growth)</option>
+                                            <option value="fintech">Fintech</option>
+                                            <option value="healthcare">Healthcare</option>
+                                            <option value="all" selected>All Sectors</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Time Horizon</label>
+                                        <select class="form-select" id="timeHorizon">
+                                            <option value="6m">6 Months</option>
+                                            <option value="12m" selected>12 Months</option>
+                                            <option value="18m">18 Months</option>
+                                            <option value="24m">24 Months</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="chart-container glass p-3">
+                                        <h6 class="mb-3">Exit Value Projection</h6>
+                                        <canvas id="exitProjectionChart" height="300"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="glass p-3">
+                                        <h6 class="mb-3">Simulation Results</h6>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <span class="text-muted">Expected Exit Value</span>
+                                                <span class="fw-bold text-success">$42.5M</span>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <span class="text-muted">SSE Value Add</span>
+                                                <span class="fw-bold text-primary">+$8.3M</span>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <span class="text-muted">Probability of Exit</span>
+                                                <span class="fw-bold text-info">68%</span>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <span class="text-muted">Time to Exit</span>
+                                                <span class="fw-bold">14.2 months</span>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4">
+                                            <button class="btn btn-primary w-100 mb-2">
+                                                <i class="fas fa-file-pdf me-2"></i>Export to LP Report
+                                            </button>
+                                            <button class="btn btn-outline-primary w-100">
+                                                <i class="fas fa-share me-2"></i>Share with Co-Investors
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- What-If Actuarial Scenario -->
+                            <div class="scenario-description mt-4">
+                                <h6 class="mb-3">What-If Actuarial Scenario Analysis</h6>
+                                
+                                <div class="scenario-controls">
+                                    <div class="scenario-control-group">
+                                        <label class="form-label fw-bold">Economic Growth Rate</label>
+                                        <input type="range" class="scenario-slider" id="growthRate" min="-5" max="10" value="2.5" step="0.5">
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-muted">-5%</span>
+                                            <span class="fw-bold" id="growthRateValue">2.5%</span>
+                                            <span class="text-muted">10%</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="scenario-control-group">
+                                        <label class="form-label fw-bold">Market Volatility</label>
+                                        <input type="range" class="scenario-slider" id="volatility" min="10" max="50" value="25" step="1">
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-muted">10%</span>
+                                            <span class="fw-bold" id="volatilityValue">25%</span>
+                                            <span class="text-muted">50%</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="scenario-control-group">
+                                        <label class="form-label fw-bold">Interest Rate Change</label>
+                                        <input type="range" class="scenario-slider" id="interestRate" min="-2" max="4" value="0.5" step="0.25">
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-muted">-2%</span>
+                                            <span class="fw-bold" id="interestRateValue">+0.5%</span>
+                                            <span class="text-muted">+4%</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="scenario-control-group">
+                                        <label class="form-label fw-bold">Sector Concentration</label>
+                                        <input type="range" class="scenario-slider" id="sectorConcentration" min="0" max="100" value="65" step="1">
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-muted">0%</span>
+                                            <span class="fw-bold" id="sectorConcentrationValue">65%</span>
+                                            <span class="text-muted">100%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-lg-6">
+                                        <div class="chart-container">
+                                            <h6 class="mb-3">Portfolio Value Projection</h6>
+                                            <canvas id="scenarioChart" height="300"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="chart-container">
+                                            <h6 class="mb-3">Risk-Return Profile</h6>
+                                            <canvas id="riskReturnChart" height="300"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="scenario-description mt-4">
+                                    <h6 class="mb-3">Scenario Analysis & Qualitative Description</h6>
+                                    <div id="scenarioDescription">
+                                        <!-- Dynamic scenario description will be loaded here -->
+                                    </div>
+                                    
+                                    <table class="projection-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Metric</th>
+                                                <th>Current</th>
+                                                <th>1-Year Projection</th>
+                                                <th>3-Year Projection</th>
+                                                <th>5-Year Projection</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="projectionTable">
+                                            <!-- Dynamic projection data will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaderboard Tab -->
+            <div class="tab-pane fade" id="leaderboard" role="tabpanel" aria-labelledby="leaderboard-tab">
+                <!-- Content remains the same as before -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="glass-card p-4">
+                            <h5 class="mb-4">
+                                <i class="fas fa-trophy me-2"></i>VC Performance Leaderboard
+                            </h5>
+                            <div class="table-responsive">
+                                <table class="leaderboard-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Rank</th>
+                                            <th>VC Firm</th>
+                                            <th>Fund</th>
+                                            <th>IRR</th>
+                                            <th>MOIC</th>
+                                            <th>DPI</th>
+                                            <th>Alpha Score</th>
+                                            <th>Trend</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="leaderboardBody">
+                                        <!-- Leaderboard data will be dynamically loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="chart-container">
+                            <h6 class="mb-3">Top Performers by IRR</h6>
+                            <canvas id="irrLeaderboardChart" height="300"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="chart-container">
+                            <h6 class="mb-3">Sector Performance Ranking</h6>
+                            <canvas id="sectorLeaderboardChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Intelligence Tab -->
+            <div class="tab-pane fade" id="market" role="tabpanel" aria-labelledby="market-tab">
+                <!-- Content remains the same as before -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="metric-card text-center">
+                            <div class="fs-1 mb-2">📈</div>
+                            <div class="metric-label">Market Sentiment</div>
+                            <div class="fw-bold text-success">BULLISH</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card text-center">
+                            <div class="metric-value text-success">78</div>
+                            <div class="metric-label">Liquidity Score</div>
+                            <div class="small text-success">HIGH</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card text-center">
+                            <div class="metric-value text-warning">23.5</div>
+                            <div class="metric-label">Volatility Index</div>
+                            <div class="small text-warning">MODERATE</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card text-center">
+                            <div class="metric-value text-info">$15.2B</div>
+                            <div class="metric-label">Q4 Funding Forecast</div>
+                            <div class="small text-info">PROJECTED</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="chart-container">
+                            <h6 class="mb-3">Sector Performance & Trends</h6>
+                            <canvas id="sectorTrendsChart" height="400"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="glass-card p-4">
+                            <h6 class="mb-3">Emerging Opportunities</h6>
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item bg-transparent border-0 px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Quantum Computing</span>
+                                        <span class="badge bg-success">Hot</span>
+                                    </div>
+                                </div>
+                                <div class="list-group-item bg-transparent border-0 px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Climate Tech</span>
+                                        <span class="badge bg-primary">Growing</span>
+                                    </div>
+                                </div>
+                                <div class="list-group-item bg-transparent border-0 px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Web3 Infrastructure</span>
+                                        <span class="badge bg-warning">Watch</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
+
+                <!-- Innovation Thesis Builder -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="glass-card p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-lightbulb me-2" style="color: var(--accent-gold);"></i>
+                                    Innovation Thesis Builder
+                                </h5>
+                                <button class="btn btn-sm btn-primary" onclick="uploadStartupOpportunity()">
+                                    <i class="fas fa-upload me-2"></i>Upload Startup Opportunity
+                                </button>
+                            </div>
+
+                            <!-- Drag and Drop Sector Mapping -->
+                            <div class="mb-4">
+                                <h6 class="mb-3">Sector Focus Areas</h6>
+                                <p class="text-muted small mb-3">Drag sectors to build your investment thesis. Click to adjust allocation.</p>
+                                
+                                <div class="thesis-canvas mb-4" id="thesisCanvas">
+                                    <div class="text-center text-muted py-5">
+                                        <i class="fas fa-mouse-pointer fa-2x mb-3"></i>
+                                        <p>Drag sectors from below to build your thesis</p>
+                                    </div>
+                                </div>
+
+                                <div class="sector-palette">
+                                    <div class="sector-chip" draggable="true" data-sector="AI/ML" data-growth="32" data-risk="medium">
+                                        <i class="fas fa-brain"></i>
+                                        <span>AI/ML</span>
+                                        <small class="d-block">32% growth</small>
+                                    </div>
+                                    <div class="sector-chip" draggable="true" data-sector="Quantum" data-growth="45" data-risk="high">
+                                        <i class="fas fa-atom"></i>
+                                        <span>Quantum Computing</span>
+                                        <small class="d-block">45% growth</small>
+                                    </div>
+                                    <div class="sector-chip" draggable="true" data-sector="Climate Tech" data-growth="28" data-risk="medium">
+                                        <i class="fas fa-leaf"></i>
+                                        <span>Climate Tech</span>
+                                        <small class="d-block">28% growth</small>
+                                    </div>
+                                    <div class="sector-chip" draggable="true" data-sector="Fintech" data-growth="22" data-risk="low">
+                                        <i class="fas fa-coins"></i>
+                                        <span>Fintech</span>
+                                        <small class="d-block">22% growth</small>
+                                    </div>
+                                    <div class="sector-chip" draggable="true" data-sector="Healthtech" data-growth="26" data-risk="medium">
+                                        <i class="fas fa-heartbeat"></i>
+                                        <span>Healthtech</span>
+                                        <small class="d-block">26% growth</small>
+                                    </div>
+                                    <div class="sector-chip" draggable="true" data-sector="Cybersecurity" data-growth="35" data-risk="low">
+                                        <i class="fas fa-shield-alt"></i>
+                                        <span>Cybersecurity</span>
+                                        <small class="d-block">35% growth</small>
+                                    </div>
+                                    <div class="sector-chip" draggable="true" data-sector="Web3" data-growth="40" data-risk="high">
+                                        <i class="fas fa-cubes"></i>
+                                        <span>Web3/Blockchain</span>
+                                        <small class="d-block">40% growth</small>
+                                    </div>
+                                    <div class="sector-chip" draggable="true" data-sector="Enterprise SaaS" data-growth="18" data-risk="low">
+                                        <i class="fas fa-building"></i>
+                                        <span>Enterprise SaaS</span>
+                                        <small class="d-block">18% growth</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Risk & IRR Analysis -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="glass-card p-3 mb-3">
+                                        <h6 class="mb-3">Portfolio Risk Score</h6>
+                                        <div class="risk-indicator mb-3">
+                                            <div class="risk-meter">
+                                                <div class="risk-level" id="riskLevel" style="width: 0%"></div>
+                                            </div>
+                                            <div class="d-flex justify-content-between mt-2">
+                                                <small class="text-success">Low</small>
+                                                <small class="text-warning">Medium</small>
+                                                <small class="text-danger">High</small>
+                                            </div>
+                                        </div>
+                                        <div id="riskScore" class="text-center">
+                                            <span class="fs-3 fw-bold">-</span>
+                                            <p class="text-muted small mb-0">Add sectors to calculate risk</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="glass-card p-3 mb-3">
+                                        <h6 class="mb-3">Projected IRR</h6>
+                                        <div id="irrProjection" class="text-center">
+                                            <span class="fs-3 fw-bold text-success">-</span>
+                                            <p class="text-muted small mb-0">Based on sector growth & risk profiles</p>
+                                        </div>
+                                        <div class="mt-3">
+                                            <div class="d-flex justify-content-between small mb-1">
+                                                <span>Conservative</span>
+                                                <span id="irrConservative">-</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between small mb-1">
+                                                <span>Base Case</span>
+                                                <span id="irrBase">-</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between small">
+                                                <span>Optimistic</span>
+                                                <span id="irrOptimistic">-</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- AI Suggestions -->
+                            <div class="glass-card p-3 mt-3" id="aiSuggestions" style="display: none;">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-robot me-2 text-primary"></i>AI Thesis Optimization Suggestions
+                                </h6>
+                                <div id="suggestionsList"></div>
+                            </div>
+
+                            <!-- Save Thesis Button -->
+                            <div class="text-end mt-3">
+                                <button class="btn btn-outline-secondary me-2" onclick="clearThesis()">
+                                    <i class="fas fa-trash me-2"></i>Clear
+                                </button>
+                                <button class="btn btn-primary" onclick="saveThesis()">
+                                    <i class="fas fa-save me-2"></i>Save Thesis
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+</div>
+                </div>
+            </div>
+        </div>
+
+        
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Startup Modal -->
+    <div class="modal fade" id="addStartupModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus-circle me-2"></i>Add Startup to Portfolio
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <p class="text-muted">Send a connection request to a startup. They'll need to accept your request before they appear in your portfolio.</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Startup Name</label>
+                        <input type="text" class="form-control" id="startupName" placeholder="Enter startup name">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Website URL</label>
+                        <input type="url" class="form-control" id="startupWebsite" placeholder="https://example.com">
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Sector</label>
+                            <select class="form-select" id="startupSector">
+                                <option value="">Select Sector</option>
+                                <option value="AI/ML">AI/ML</option>
+                                <option value="Fintech">Fintech</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Cybersecurity">Cybersecurity</option>
+                                <option value="Enterprise SaaS">Enterprise SaaS</option>
+                                <option value="Climate Tech">Climate Tech</option>
+                                <option value="EdTech">EdTech</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Stage</label>
+                            <select class="form-select" id="startupStage">
+                                <option value="">Select Stage</option>
+                                <option value="Pre-Seed">Pre-Seed</option>
+                                <option value="Seed">Seed</option>
+                                <option value="Series A">Series A</option>
+                                <option value="Series B">Series B</option>
+                                <option value="Series C+">Series C+</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Investment Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="investmentAmount" placeholder="Amount">
+                            <span class="input-group-text">.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Personal Message (Optional)</label>
+                        <textarea class="form-control" id="startupMessage" rows="3" placeholder="Add a personal message to the startup team..."></textarea>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Note:</strong> The startup will receive a notification to accept your portfolio request. Once accepted, they'll appear in your portfolio with preliminary data.
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="sendStartupRequest()">
+                        <i class="fas fa-paper-plane me-2"></i>Send Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Startup Modal -->
+    <div class="modal fade" id="uploadStartupModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">
+                        <i class="fas fa-upload me-2"></i>Upload Your Startup for Co-Investment
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <p class="text-muted">Upload your startup details to showcase it to potential co-investors. Include comprehensive information to attract the right investment partners.</p>
+                    </div>
+                    
+                    <!-- Drag & Drop Upload Area -->
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-muted"></i>
+                        <h5>Drag & Drop Startup Files</h5>
+                        <p class="text-muted">Upload pitch deck, financials, team info, and other relevant documents</p>
+                        <button class="btn btn-primary mt-2">
+                            <i class="fas fa-folder-open me-2"></i>Browse Files
+                        </button>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Startup Name</label>
+                                <input type="text" class="form-control" placeholder="Enter startup name">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Website</label>
+                                <input type="url" class="form-control" placeholder="https://example.com">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Sector</label>
+                                <select class="form-select">
+                                    <option value="">Select Sector</option>
+                                    <option value="AI/ML">AI/ML</option>
+                                    <option value="Fintech">Fintech</option>
+                                    <option value="Healthcare">Healthcare</option>
+                                    <option value="Cybersecurity">Cybersecurity</option>
+                                    <option value="Enterprise SaaS">Enterprise SaaS</option>
+                                    <option value="Climate Tech">Climate Tech</option>
+                                    <option value="EdTech">EdTech</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Stage</label>
+                                <select class="form-select">
+                                    <option value="">Select Stage</option>
+                                    <option value="Pre-Seed">Pre-Seed</option>
+                                    <option value="Seed">Seed</option>
+                                    <option value="Series A">Series A</option>
+                                    <option value="Series B">Series B</option>
+                                    <option value="Series C+">Series C+</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Funding Goal</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" placeholder="Amount">
+                                    <span class="input-group-text">.00</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Current Runway (Months)</label>
+                                <input type="number" class="form-control" placeholder="e.g., 18">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Monthly Recurring Revenue (MRR)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" placeholder="Amount">
+                                    <span class="input-group-text">.00</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Team Size</label>
+                                <input type="number" class="form-control" placeholder="Number of employees">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Company Description</label>
+                        <textarea class="form-control" rows="3" placeholder="Describe your company, product, and value proposition..."></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Investment Thesis</label>
+                        <textarea class="form-control" rows="3" placeholder="Why is this a good investment opportunity?"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Expertise Needed</label>
+                        <div>
+                            <span class="expertise-tag">Marketing</span>
+                            <span class="expertise-tag">Product Development</span>
+                            <span class="expertise-tag">Sales</span>
+                            <span class="expertise-tag">International Expansion</span>
+                            <span class="expertise-tag">Technical Advisory</span>
+                        </div>
+                        <input type="text" class="form-control mt-2" placeholder="Add expertise tags...">
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Note:</strong> Your startup will be reviewed by our team before being listed for co-investment opportunities. This process typically takes 1-2 business days.
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">
+                        <i class="fas fa-upload me-2"></i>Upload Startup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gina Copilot Modal -->
+    <div class="modal fade" id="ginaModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">
+                        <i class="fas fa-robot text-primary me-2"></i>Auxeira Gina Value Creation Copilot
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="glass p-3 mb-3">
+                                <h6 class="mb-3">Ask Gina Copilot</h6>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="e.g., How can I improve HealthTech's runway?">
+                                    <button class="btn btn-primary">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="glass p-3">
+                                <h6 class="mb-3">Recent Insights</h6>
+                                <div class="nudge-card">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-lightbulb text-warning me-2"></i>
+                                        <strong>AI Insight: HealthTech Runway Optimization</strong>
+                                    </div>
+                                    <p>Based on SSE analysis, implementing milestone-based rewards could extend runway by 6 months. Similar portfolio companies achieved 25% cost reduction with this approach.</p>
+                                    <div class="peer-comparison">
+                                        <small>
+                                            <strong>Peer Success:</strong> Sequoia-backed HealthTech reduced burn by 30% using SSE rewards
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="glass p-3">
+                                <h6 class="mb-3">Gina Capabilities</h6>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Predictive Value Creation</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Liquidity Forecasting</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>SSE Impact Analysis</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Peer Benchmarking</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Exit Strategy Simulation</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Co-Investment Matching</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+            <!-- Innovation Thesis Builder Tab -->
+            <div class="tab-pane fade" id="thesis-builder" role="tabpanel" aria-labelledby="thesis-builder-tab">
+                <div id="thesisBuilderContainer"></div>
+            </div>
+
+            <!-- Value Creation Playbook Tab -->
+            <div class="tab-pane fade" id="value-playbook" role="tabpanel" aria-labelledby="value-playbook-tab">
+                <div id="valuePlaybookContainer"></div>
+            </div>
+
+            <!-- ESG & Impact Tracker Tab -->
+            <div class="tab-pane fade" id="esg-tracker" role="tabpanel" aria-labelledby="esg-tracker-tab">
+                <div id="esgTrackerContainer"></div>
+            </div>
+
+            <!-- Co-Investment Network Matcher Tab -->
+            <div class="tab-pane fade" id="network-matcher" role="tabpanel" aria-labelledby="network-matcher-tab">
+                <div id="networkMatcherContainer"></div>
+            </div>
+
+            <!-- Advanced Report Generator Tab -->
+            <div class="tab-pane fade" id="report-generator" role="tabpanel" aria-labelledby="report-generator-tab">
+                <div id="reportGeneratorContainer"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Profile Completion Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-circle me-2"></i>Complete Your Profile
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <p class="text-muted">Complete your profile to unlock personalized AI insights and better deal recommendations.</p>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Investment Focus</label>
+                            <select class="form-select" multiple>
+                                <option value="ai_ml" selected>AI/ML</option>
+                                <option value="fintech">Fintech</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="climate">Climate Tech</option>
+                                <option value="enterprise">Enterprise SaaS</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Preferred Investment Stage</label>
+                            <select class="form-select">
+                                <option value="seed">Seed</option>
+                                <option value="series_a" selected>Series A</option>
+                                <option value="series_b">Series B</option>
+                                <option value="growth">Growth Stage</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Risk Tolerance</label>
+                            <select class="form-select">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Geographic Focus</label>
+                            <select class="form-select" multiple>
+                                <option value="north_america" selected>North America</option>
+                                <option value="europe">Europe</option>
+                                <option value="asia">Asia</option>
+                                <option value="latin_america">Latin America</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Investment Thesis</label>
+                        <textarea class="form-control" rows="3" placeholder="Describe your investment approach and thesis..."></textarea>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Note:</strong> This information helps our AI provide more relevant insights and deal recommendations.
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveProfile()">
+                        <i class="fas fa-save me-2"></i>Save Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const portfolioCompanies = [
+            {
+                id: 'company_1',
+                name: 'CloudSec',
+                sector: 'Cybersecurity',
+                stage: 'Series B',
+                investment: 8000000,
+                currentValue: 24000000,
+                moic: 3.0,
+                irr: 45.2,
+                sseScore: 92,
+                riskLevel: 'low',
+                alphaSignal: 'strong_buy',
+                runway: 18,
+                employees: 85,
+                mrr: 1200000,
+                churnRate: 2.1
+            },
+            {
+                id: 'company_2',
+                name: 'HealthTech',
+                sector: 'Healthcare',
+                stage: 'Series A',
+                investment: 5000000,
+                currentValue: 12000000,
+                moic: 2.4,
+                irr: 32.1,
+                sseScore: 78,
+                riskLevel: 'medium',
+                alphaSignal: 'hold',
+                runway: 14,
+                employees: 45,
+                mrr: 850000,
+                churnRate: 3.8
+            },
+            {
+                id: 'company_3',
+                name: 'FinanceApp',
+                sector: 'Fintech',
+                stage: 'Seed',
+                investment: 2000000,
+                currentValue: 8000000,
+                moic: 4.0,
+                irr: 78.5,
+                sseScore: 88,
+                riskLevel: 'high',
+                alphaSignal: 'strong_buy',
+                runway: 22,
+                employees: 25,
+                mrr: 320000,
+                churnRate: 1.5
+            },
+            {
+                id: 'company_4',
+                name: 'TechCo',
+                sector: 'Enterprise SaaS',
+                stage: 'Series C',
+                investment: 12000000,
+                currentValue: 36000000,
+                moic: 3.0,
+                irr: 28.9,
+                sseScore: 85,
+                riskLevel: 'low',
+                alphaSignal: 'buy',
+                runway: 24,
+                employees: 150,
+                mrr: 2800000,
+                churnRate: 1.8
+            }
+        ];
+
+        const leaderboardData = [
+            { rank: 1, name: 'Sequoia Capital', fund: 'Growth Fund VII', irr: 42.5, moic: 4.2, dpi: 2.1, alphaScore: 89, trend: 'up' },
+            { rank: 2, name: 'Andreessen Horowitz', fund: 'Fund VIII', irr: 38.7, moic: 3.9, dpi: 1.8, alphaScore: 85, trend: 'up' },
+            { rank: 3, name: 'Alpha Ventures', fund: 'Fund III', irr: 28.4, moic: 2.8, dpi: 0.9, alphaScore: 76, trend: 'up' },
+            { rank: 4, name: 'Benchmark', fund: 'Benchmark 2022', irr: 35.2, moic: 3.5, dpi: 1.5, alphaScore: 82, trend: 'stable' },
+            { rank: 5, name: 'Accel', fund: 'Accel XIV', irr: 31.8, moic: 3.2, dpi: 1.2, alphaScore: 79, trend: 'up' }
+        ];
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPortfolioData();
+            loadLeaderboardData();
+            initializeCharts();
+            initializeScenarioControls();
+            initializeUploadFunctionality();
+        });
+
+        function loadPortfolioData() {
+            const portfolioGrid = document.getElementById('portfolioGrid');
+            portfolioGrid.innerHTML = '';
+
+            portfolioCompanies.forEach(company => {
+                const companyCard = createPortfolioCard(company);
+                portfolioGrid.appendChild(companyCard);
+            });
+
+            document.getElementById('portfolioCount').textContent = portfolioCompanies.length;
+        }
+
+        function createPortfolioCard(company) {
+            const col = document.createElement('div');
+            col.className = 'col-lg-6 mb-4';
+            
+            const riskClass = company.riskLevel === 'low' ? 'risk-low' : 
+                             company.riskLevel === 'medium' ? 'risk-medium' : 'risk-high';
+            
+            const signalClass = `signal-${company.alphaSignal.replace('_', '-')}`;
+            
+            col.innerHTML = `
+                <div class="portfolio-card" onclick="openCompanyDetails('${company.id}')">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="mb-1">${company.name}</h6>
+                            <small class="text-muted">${company.sector} • ${company.stage}</small>
+                        </div>
+                        <span class="badge ${riskClass}">${company.riskLevel} risk</span>
+                    </div>
+                    
+                    <div class="row text-center mb-3">
+                        <div class="col-4">
+                            <div class="h5 text-success mb-0">${company.irr.toFixed(1)}%</div>
+                            <small class="text-muted">IRR</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="h5 text-primary mb-0">${company.moic.toFixed(1)}x</div>
+                            <small class="text-muted">MOIC</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="h5 text-info mb-0">${company.sseScore}</div>
+                            <small class="text-muted">SSE</small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="small">
+                            <span class="text-muted">Value:</span>
+                            <span class="text-white fw-bold">$${(company.currentValue / 1000000).toFixed(1)}M</span>
+                        </div>
+                        <div class="small">
+                            <span class="text-muted">MRR:</span>
+                            <span class="text-success fw-bold">$${(company.mrr / 1000).toFixed(0)}K</span>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="small text-muted">
+                            ${company.employees} employees • ${company.runway}mo runway
+                        </div>
+                        <div class="small text-muted">
+                            Churn: ${company.churnRate}%
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="signal-badge ${signalClass}">
+                            ${company.alphaSignal.replace('_', ' ')}
+                        </span>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-chart-line me-1"></i>Details
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return col;
+        }
+
+        function loadLeaderboardData() {
+            const leaderboardBody = document.getElementById('leaderboardBody');
+            leaderboardBody.innerHTML = '';
+            
+            leaderboardData.forEach(firm => {
+                const row = document.createElement('tr');
+                if (firm.rank <= 3) {
+                    row.className = `rank-${firm.rank}`;
+                }
+                
+                const trendIcon = firm.trend === 'up' ? 'fa-arrow-up text-success' : 
+                                 firm.trend === 'down' ? 'fa-arrow-down text-danger' : 'fa-minus text-warning';
+                
+                row.innerHTML = `
+                    <td>
+                        <span class="fw-bold">${firm.rank}</span>
+                        ${firm.rank === 1 ? '<i class="fas fa-crown text-warning ms-1"></i>' : ''}
+                    </td>
+                    <td class="fw-bold">${firm.name}</td>
+                    <td>${firm.fund}</td>
+                    <td class="text-success fw-bold">${firm.irr}%</td>
+                    <td class="text-primary fw-bold">${firm.moic}x</td>
+                    <td class="text-warning fw-bold">${firm.dpi}x</td>
+                    <td class="text-info fw-bold">${firm.alphaScore}</td>
+                    <td><i class="fas ${trendIcon}"></i></td>
+                `;
+                
+                leaderboardBody.appendChild(row);
+            });
+        }
+
+        function initializeCharts() {
+            // Performance Chart
+            const perfCtx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(perfCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Q1 2023', 'Q2 2023', 'Q3 2023', 'Q4 2023', 'Q1 2024', 'Q2 2024', 'Q3 2024'],
+                    datasets: [{
+                        label: 'IRR %',
+                        data: [18.5, 21.2, 24.8, 26.1, 27.3, 28.0, 28.4],
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'MOIC',
+                        data: [1.8, 2.1, 2.3, 2.5, 2.6, 2.7, 2.8],
+                        borderColor: '#3B82F6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#b3b3b3' },
+                            grid: { color: '#333333' }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            min: 15,
+                            max: 35,
+                            ticks: { color: '#b3b3b3' },
+                            grid: { color: '#333333' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            min: 1.5,
+                            max: 3.5,
+                            ticks: { color: '#b3b3b3' },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+
+            // Sector Chart
+            const sectorCtx = document.getElementById('sectorChart').getContext('2d');
+            new Chart(sectorCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['AI/ML', 'Fintech', 'Healthcare', 'Cybersecurity', 'Enterprise SaaS'],
+                    datasets: [{
+                        data: [25, 20, 18, 15, 22],
+                        backgroundColor: [
+                            '#8B5CF6',
+                            '#3B82F6',
+                            '#10B981',
+                            '#F59E0B',
+                            '#EF4444'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#1a1a1a'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { color: '#ffffff' }
+                        }
+                    }
+                }
+            });
+
+            // Exit Projection Chart
+            const exitCtx = document.getElementById('exitProjectionChart').getContext('2d');
+            new Chart(exitCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Current', '3 Months', '6 Months', '9 Months', '12 Months'],
+                    datasets: [{
+                        label: 'With SSE',
+                        data: [25, 28, 32, 36, 42.5],
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Without SSE',
+                        data: [25, 26, 27.5, 29, 31],
+                        borderColor: '#EF4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderDash: [5, 5]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: $${context.raw}M`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#b3b3b3' },
+                            grid: { color: '#333333' }
+                        },
+                        y: {
+                            ticks: { 
+                                color: '#b3b3b3',
+                                callback: function(value) {
+                                    return '$' + value + 'M';
+                                }
+                            },
+                            grid: { color: '#333333' }
+                        }
+                    }
+                }
+            });
+
+            // IRR Leaderboard Chart
+            const irrCtx = document.getElementById('irrLeaderboardChart').getContext('2d');
+            const topFirms = leaderboardData.slice(0, 5);
+            
+            new Chart(irrCtx, {
+                type: 'bar',
+                data: {
+                    labels: topFirms.map(firm => firm.name),
+                    datasets: [{
+                        label: 'IRR %',
+                        data: topFirms.map(firm => firm.irr),
+                        backgroundColor: [
+                            '#FFD700',
+                            '#C0C0C0',
+                            '#CD7F32',
+                            '#3B82F6',
+                            '#10B981'
+                        ],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#b3b3b3' },
+                            grid: { color: '#333333' }
+                        },
+                        y: {
+                            ticks: { color: '#b3b3b3' },
+                            grid: { color: '#333333' }
+                        }
+                    }
+                }
+            });
+
+            // Sector Trends Chart
+            const trendsCtx = document.getElementById('sectorTrendsChart').getContext('2d');
+            new Chart(trendsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['AI/ML', 'Cybersecurity', 'Fintech', 'Healthcare', 'Enterprise SaaS'],
+                    datasets: [{
+                        label: 'Growth Rate %',
+                        data: [45.2, 32.1, 23.8, 18.5, 15.7],
+                        backgroundColor: [
+                            '#8B5CF6',
+                            '#F59E0B',
+                            '#3B82F6',
+                            '#10B981',
+                            '#6B7280'
+                        ],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#b3b3b3' },
+                            grid: { color: '#333333' }
+                        },
+                        y: {
+                            ticks: { color: '#b3b3b3' },
+                            grid: { color: '#333333' }
+                        }
+                    }
+                }
+            });
+
+            // Initialize scenario charts
+            updateScenarioCharts();
+        }
+
+        function initializeScenarioControls() {
+            // Add event listeners to scenario controls
+            document.getElementById('growthRate').addEventListener('input', updateScenarioCharts);
+            document.getElementById('volatility').addEventListener('input', updateScenarioCharts);
+            document.getElementById('interestRate').addEventListener('input', updateScenarioCharts);
+            document.getElementById('sectorConcentration').addEventListener('input', updateScenarioCharts);
+            
+            // Set initial values
+            updateSliderValues();
+        }
+
+        function initializeUploadFunctionality() {
+            const uploadArea = document.getElementById('uploadArea');
+            
+            // Drag and drop functionality
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', function() {
+                this.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    showNotification(`Uploaded ${files.length} file(s) successfully`, 'success');
+                }
+            });
+        }
+
+        function updateSliderValues() {
+            document.getElementById('growthRateValue').textContent = document.getElementById('growthRate').value + '%';
+            document.getElementById('volatilityValue').textContent = document.getElementById('volatility').value + '%';
+            
+            const interestRate = parseFloat(document.getElementById('interestRate').value);
+            document.getElementById('interestRateValue').textContent = (interestRate >= 0 ? '+' : '') + interestRate + '%';
+            
+            document.getElementById('sectorConcentrationValue').textContent = document.getElementById('sectorConcentration').value + '%';
+        }
+
+        function updateScenarioCharts() {
+            updateSliderValues();
+            
+            // Get current scenario values
+            const growthRate = parseFloat(document.getElementById('growthRate').value);
+            const volatility = parseFloat(document.getElementById('volatility').value);
+            const interestRate = parseFloat(document.getElementById('interestRate').value);
+            const sectorConcentration = parseFloat(document.getElementById('sectorConcentration').value);
+            
+            // Update scenario description
+            updateScenarioDescription(growthRate, volatility, interestRate, sectorConcentration);
+            
+            // Update projection table
+            updateProjectionTable(growthRate, volatility, interestRate, sectorConcentration);
+        }
+
+        function updateScenarioDescription(growthRate, volatility, interestRate, sectorConcentration) {
+            const descriptionEl = document.getElementById('scenarioDescription');
+            
+            let description = '';
+            
+            // Growth rate analysis
+            if (growthRate > 3) {
+                description += `<p><strong>Economic Growth:</strong> With a ${growthRate}% growth rate assumption, the portfolio is positioned to benefit from strong macroeconomic tailwinds. This scenario typically correlates with higher startup valuations and increased exit opportunities.</p>`;
+            } else if (growthRate < 1) {
+                description += `<p><strong>Economic Growth:</strong> The ${growthRate}% growth rate indicates a challenging economic environment. Portfolio companies may face headwinds in fundraising and customer acquisition, requiring more conservative cash management.</p>`;
+            } else {
+                description += `<p><strong>Economic Growth:</strong> The ${growthRate}% growth rate represents a stable economic environment. Portfolio performance should align with historical averages, with selective outperformance in high-growth sectors.</p>`;
+            }
+            
+            // Volatility analysis
+            if (volatility > 35) {
+                description += `<p><strong>Market Volatility:</strong> High volatility (${volatility}%) suggests significant market uncertainty. This increases the risk premium required by investors and may impact valuation multiples, particularly for later-stage companies.</p>`;
+            } else if (volatility < 20) {
+                description += `<p><strong>Market Volatility:</strong> Low volatility (${volatility}%) indicates stable market conditions, which typically support higher valuation multiples and more predictable exit timelines.</p>`;
+            } else {
+                description += `<p><strong>Market Volatility:</strong> Moderate volatility (${volatility}%) reflects normal market fluctuations. Portfolio companies should maintain standard risk management practices.</p>`;
+            }
+            
+            // Interest rate analysis
+            if (interestRate > 1) {
+                description += `<p><strong>Interest Rates:</strong> Rising interest rates (+${interestRate}%) increase the cost of capital and may pressure valuations, particularly for companies with longer paths to profitability. Debt-heavy portfolio companies may face refinancing challenges.</p>`;
+            } else if (interestRate < 0) {
+                description += `<p><strong>Interest Rates:</strong> Declining interest rates (${interestRate}%) create favorable financing conditions and typically support higher valuation multiples across all stages.</p>`;
+            } else {
+                description += `<p><strong>Interest Rates:</strong> Stable interest rates (${interestRate}%) maintain current financing conditions, with minimal impact on portfolio valuations.</p>`;
+            }
+            
+            // Sector concentration analysis
+            if (sectorConcentration > 75) {
+                description += `<p><strong>Sector Concentration:</strong> High sector concentration (${sectorConcentration}%) increases portfolio correlation risk. While this can amplify returns in favorable market conditions, it also heightens vulnerability to sector-specific downturns.</p>`;
+            } else if (sectorConcentration < 50) {
+                description += `<p><strong>Sector Concentration:</strong> Low sector concentration (${sectorConcentration}%) provides diversification benefits, reducing portfolio volatility but potentially limiting upside from sector-specific tailwinds.</p>`;
+            } else {
+                description += `<p><strong>Sector Concentration:</strong> Moderate sector concentration (${sectorConcentration}%) balances diversification benefits with the ability to capitalize on sector-specific opportunities.</p>`;
+            }
+            
+            descriptionEl.innerHTML = description;
+        }
+
+        function updateProjectionTable(growthRate, volatility, interestRate, sectorConcentration) {
+            const tableBody = document.getElementById('projectionTable');
+            
+            // Calculate impact on projections
+            const growthImpact = (growthRate - 2.5) / 10;
+            const volatilityImpact = (volatility - 25) / 100;
+            const interestImpact = interestRate / 20;
+            const concentrationImpact = (sectorConcentration - 65) / 100;
+            
+            // Base projections
+            const baseIRR = 28.4;
+            const baseMOIC = 2.8;
+            const baseValue = 450;
+            const baseDPI = 0.9;
+            
+            // Calculate adjusted projections
+            const year1IRR = baseIRR + growthImpact * 5 - volatilityImpact * 2 + interestImpact * 3 - concentrationImpact * 1;
+            const year3IRR = baseIRR + growthImpact * 8 - volatilityImpact * 3 + interestImpact * 5 - concentrationImpact * 2;
+            const year5IRR = baseIRR + growthImpact * 12 - volatilityImpact * 4 + interestImpact * 7 - concentrationImpact * 3;
+            
+            const year1MOIC = baseMOIC + growthImpact * 0.3 - volatilityImpact * 0.1 + interestImpact * 0.2 - concentrationImpact * 0.05;
+            const year3MOIC = baseMOIC + growthImpact * 0.5 - volatilityImpact * 0.2 + interestImpact * 0.3 - concentrationImpact * 0.1;
+            const year5MOIC = baseMOIC + growthImpact * 0.8 - volatilityImpact * 0.3 + interestImpact * 0.5 - concentrationImpact * 0.15;
+            
+            const year1Value = baseValue * (1 + growthImpact * 0.1 - volatilityImpact * 0.05 + interestImpact * 0.08 - concentrationImpact * 0.02);
+            const year3Value = baseValue * (1 + growthImpact * 0.2 - volatilityImpact * 0.1 + interestImpact * 0.15 - concentrationImpact * 0.05);
+            const year5Value = baseValue * (1 + growthImpact * 0.3 - volatilityImpact * 0.15 + interestImpact * 0.22 - concentrationImpact * 0.08);
+            
+            const year1DPI = baseDPI + growthImpact * 0.1 - volatilityImpact * 0.05 + interestImpact * 0.08 - concentrationImpact * 0.02;
+            const year3DPI = baseDPI + growthImpact * 0.2 - volatilityImpact * 0.1 + interestImpact * 0.15 - concentrationImpact * 0.05;
+            const year5DPI = baseDPI + growthImpact * 0.3 - volatilityImpact * 0.15 + interestImpact * 0.22 - concentrationImpact * 0.08;
+            
+            const rows = [
+                { metric: 'IRR (%)', current: baseIRR, y1: year1IRR, y3: year3IRR, y5: year5IRR },
+                { metric: 'MOIC (x)', current: baseMOIC, y1: year1MOIC, y3: year3MOIC, y5: year5MOIC },
+                { metric: 'Portfolio Value ($M)', current: baseValue, y1: year1Value, y3: year3Value, y5: year5Value },
+                { metric: 'DPI (x)', current: baseDPI, y1: year1DPI, y3: year3DPI, y5: year5DPI }
+            ];
+            
+            let tableHTML = '';
+            
+            rows.forEach(row => {
+                tableHTML += `
+                    <tr>
+                        <td>${row.metric}</td>
+                        <td>${row.current.toFixed(1)}</td>
+                        <td>${row.y1.toFixed(1)}</td>
+                        <td>${row.y3.toFixed(1)}</td>
+                        <td>${row.y5.toFixed(1)}</td>
+                    </tr>
+                `;
+            });
+            
+            tableBody.innerHTML = tableHTML;
+        }
+
+        function openAddStartupModal() {
+            const modal = new bootstrap.Modal(document.getElementById('addStartupModal'));
+            modal.show();
+        }
+
+        function openUploadStartupModal() {
+            const modal = new bootstrap.Modal(document.getElementById('uploadStartupModal'));
+            modal.show();
+        }
+
+        function sendStartupRequest() {
+            const name = document.getElementById('startupName').value;
+            const website = document.getElementById('startupWebsite').value;
+            const sector = document.getElementById('startupSector').value;
+            const stage = document.getElementById('startupStage').value;
+            const amount = document.getElementById('investmentAmount').value;
+            const message = document.getElementById('startupMessage').value;
+            
+            if (!name || !website || !sector || !stage || !amount) {
+                showNotification('Please fill in all required fields', 'warning');
+                return;
+            }
+            
+            // Simulate sending request
+            showNotification(`Connection request sent to ${name}. They'll receive a notification to join your portfolio.`, 'info');
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addStartupModal'));
+            modal.hide();
+            
+            // Reset form
+            document.getElementById('startupName').value = '';
+            document.getElementById('startupWebsite').value = '';
+            document.getElementById('startupSector').value = '';
+            document.getElementById('startupStage').value = '';
+            document.getElementById('investmentAmount').value = '';
+            document.getElementById('startupMessage').value = '';
+        }
+
+        function openGinaModal() {
+            const modal = new bootstrap.Modal(document.getElementById('ginaModal'));
+            modal.show();
+        }
+
+        function openProfileModal() {
+            const modal = new bootstrap.Modal(document.getElementById('profileModal'));
+            modal.show();
+        }
+
+        function saveProfile() {
+            showNotification('Profile updated successfully! You will now receive more personalized insights.', 'success');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('profileModal'));
+            modal.hide();
+        }
+
+        function refreshData() {
+            // Simulate data refresh
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Refreshing...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                showNotification('AI insights refreshed successfully', 'success');
+            }, 2000);
+        }
+
+        function openCompanyDetails(companyId) {
+            const company = portfolioCompanies.find(c => c.id === companyId);
+            if (company) {
+                showNotification(`Opening detailed view for ${company.name}`, 'info');
+            }
+        }
+
+        function sortPortfolio() {
+            const sortBy = document.getElementById('sortBy').value;
+            
+            portfolioCompanies.sort((a, b) => {
+                switch (sortBy) {
+                    case 'irr': return b.irr - a.irr;
+                    case 'moic': return b.moic - a.moic;
+                    case 'value': return b.currentValue - a.currentValue;
+                    case 'risk': 
+                        const riskOrder = { low: 1, medium: 2, high: 3 };
+                        return riskOrder[a.riskLevel] - riskOrder[b.riskLevel];
+                    case 'sse': return b.sseScore - a.sseScore;
+                    default: return 0;
+                }
+            });
+            
+            loadPortfolioData();
+        }
+
+        function filterPortfolio() {
+            const filterBy = document.getElementById('filterBy').value;
+            let filteredCompanies = [...portfolioCompanies];
+            
+            switch (filterBy) {
+                case 'high_performers':
+                    filteredCompanies = portfolioCompanies.filter(c => c.irr > 30);
+                    break;
+                case 'at_risk':
+                    filteredCompanies = portfolioCompanies.filter(c => c.runway < 18);
+                    break;
+                case 'strong_signals':
+                    filteredCompanies = portfolioCompanies.filter(c => c.alphaSignal === 'strong_buy');
+                    break;
+                case 'unicorn_potential':
+                    filteredCompanies = portfolioCompanies.filter(c => c.currentValue > 10000000);
+                    break;
+            }
+            
+            // Update portfolio grid with filtered companies
+            const portfolioGrid = document.getElementById('portfolioGrid');
+            portfolioGrid.innerHTML = '';
+            
+            filteredCompanies.forEach(company => {
+                const companyCard = createPortfolioCard(company);
+                portfolioGrid.appendChild(companyCard);
+            });
+        }
+
+        function showNotification(message, type) {
+            // Create and show a notification
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(alert);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+    </script>
+
+    
+    <!-- Startup Upload Modal -->
+    <div class="modal fade" id="startupUploadModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">
+                        <i class="fas fa-rocket me-2"></i>Upload Startup Investment Opportunity
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="startupUploadForm">
+                        <div class="mb-3">
+                            <label class="form-label">Startup Name *</label>
+                            <input type="text" class="form-control" id="startupOppName" required placeholder="Enter startup name">
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Sector *</label>
+                                <select class="form-select" id="startupOppSector" required>
+                                    <option value="">Select Sector</option>
+                                    <option value="AI/ML">AI/ML</option>
+                                    <option value="Quantum">Quantum Computing</option>
+                                    <option value="Climate Tech">Climate Tech</option>
+                                    <option value="Fintech">Fintech</option>
+                                    <option value="Healthtech">Healthtech</option>
+                                    <option value="Cybersecurity">Cybersecurity</option>
+                                    <option value="Web3">Web3/Blockchain</option>
+                                    <option value="Enterprise SaaS">Enterprise SaaS</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Stage *</label>
+                                <select class="form-select" id="startupOppStage" required>
+                                    <option value="">Select Stage</option>
+                                    <option value="Pre-Seed">Pre-Seed</option>
+                                    <option value="Seed">Seed</option>
+                                    <option value="Series A">Series A</option>
+                                    <option value="Series B">Series B</option>
+                                    <option value="Series C+">Series C+</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Funding Needed *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="startupOppFunding" required placeholder="e.g., 2000000">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description *</label>
+                            <textarea class="form-control" id="startupOppDescription" rows="4" required placeholder="Describe the opportunity, value proposition, and why you're leading this investment..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Investment Role</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="investmentRole" id="roleLeadInvestor" value="Lead Investor" checked>
+                                <label class="form-check-label" for="roleLeadInvestor">
+                                    Lead Investor
+                                </label>
+                            </div>
+                            <small class="text-muted">As the lead investor, you'll coordinate the round and set terms</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Pitch Deck / Documents</label>
+                            <input type="file" class="form-control" id="startupOppDocs" accept=".pdf,.ppt,.pptx" multiple>
+                            <small class="text-muted">Upload pitch deck, financials, or other supporting documents</small>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Lead Investor Benefits:</strong> Priority access to deal flow, ability to set investment terms, and coordination of syndicate members.
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitStartupOpportunity()">
+                        <i class="fas fa-upload me-2"></i>Upload Opportunity
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+        // ===== INNOVATION THESIS BUILDER =====
+        let selectedSectors = [];
+
+        // Initialize drag and drop
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('thesisCanvas');
+            const chips = document.querySelectorAll('.sector-chip');
+
+            chips.forEach(chip => {
+                chip.addEventListener('dragstart', handleDragStart);
+                chip.addEventListener('dragend', handleDragEnd);
+            });
+
+            if (canvas) {
+                canvas.addEventListener('dragover', handleDragOver);
+                canvas.addEventListener('drop', handleDrop);
+                canvas.addEventListener('dragleave', handleDragLeave);
+            }
+        });
+
+        function handleDragStart(e) {
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+            e.dataTransfer.setData('sector', this.dataset.sector);
+            e.dataTransfer.setData('growth', this.dataset.growth);
+            e.dataTransfer.setData('risk', this.dataset.risk);
+        }
+
+        function handleDragEnd(e) {
+            // Remove drag-over class
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('drag-over');
+            return false;
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            e.preventDefault();
+
+            const canvas = document.getElementById('thesisCanvas');
+            canvas.classList.remove('drag-over');
+
+            const sector = e.dataTransfer.getData('sector');
+            const growth = parseFloat(e.dataTransfer.getData('growth'));
+            const risk = e.dataTransfer.getData('risk');
+
+            // Check if sector already added
+            if (selectedSectors.find(s => s.name === sector)) {
+                alert('Sector already added to thesis');
+                return false;
+            }
+
+            // Add sector to thesis
+            selectedSectors.push({ name: sector, growth, risk });
+
+            // Update canvas
+            updateThesisCanvas();
+
+            // Calculate risk and IRR
+            calculateRiskAndIRR();
+
+            // Generate AI suggestions
+            generateAISuggestions();
+
+            return false;
+        }
+
+        function updateThesisCanvas() {
+            const canvas = document.getElementById('thesisCanvas');
+            
+            if (selectedSectors.length === 0) {
+                canvas.innerHTML = `
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-mouse-pointer fa-2x mb-3"></i>
+                        <p>Drag sectors from below to build your thesis</p>
+                    </div>
+                `;
+                return;
+            }
+
+            canvas.innerHTML = selectedSectors.map((sector, index) => `
+                <div class="thesis-sector">
+                    <span>${sector.name}</span>
+                    <small class="d-block">${sector.growth}% growth</small>
+                    <div class="remove-btn" onclick="removeSector(${index})">
+                        <i class="fas fa-times"></i>
+                    </div>
+                </div>
+            `).join('');
+
+            // Mark chips as in-thesis
+            document.querySelectorAll('.sector-chip').forEach(chip => {
+                if (selectedSectors.find(s => s.name === chip.dataset.sector)) {
+                    chip.classList.add('in-thesis');
+                } else {
+                    chip.classList.remove('in-thesis');
+                }
+            });
+        }
+
+        function removeSector(index) {
+            selectedSectors.splice(index, 1);
+            updateThesisCanvas();
+            calculateRiskAndIRR();
+            
+            if (selectedSectors.length === 0) {
+                document.getElementById('aiSuggestions').style.display = 'none';
+            } else {
+                generateAISuggestions();
+            }
+        }
+
+        function calculateRiskAndIRR() {
+            if (selectedSectors.length === 0) {
+                document.getElementById('riskScore').innerHTML = `
+                    <span class="fs-3 fw-bold">-</span>
+                    <p class="text-muted small mb-0">Add sectors to calculate risk</p>
+                `;
+                document.getElementById('riskLevel').style.width = '0%';
+                document.getElementById('irrProjection').innerHTML = `
+                    <span class="fs-3 fw-bold text-success">-</span>
+                    <p class="text-muted small mb-0">Based on sector growth & risk profiles</p>
+                `;
+                document.getElementById('irrConservative').textContent = '-';
+                document.getElementById('irrBase').textContent = '-';
+                document.getElementById('irrOptimistic').textContent = '-';
+                return;
+            }
+
+            // Calculate weighted risk score
+            const riskWeights = { low: 1, medium: 2, high: 3 };
+            const avgRisk = selectedSectors.reduce((sum, s) => sum + riskWeights[s.risk], 0) / selectedSectors.length;
+            const riskScore = Math.round((avgRisk / 3) * 100);
+            const riskLevel = avgRisk < 1.5 ? 'Low' : avgRisk < 2.5 ? 'Medium' : 'High';
+            const riskColor = avgRisk < 1.5 ? 'success' : avgRisk < 2.5 ? 'warning' : 'danger';
+
+            document.getElementById('riskScore').innerHTML = `
+                <span class="fs-3 fw-bold text-${riskColor}">${riskScore}</span>
+                <p class="text-muted small mb-0">${riskLevel} Risk Portfolio</p>
+            `;
+            document.getElementById('riskLevel').style.width = `${riskScore}%`;
+
+            // Calculate IRR based on growth rates and risk
+            const avgGrowth = selectedSectors.reduce((sum, s) => sum + s.growth, 0) / selectedSectors.length;
+            const riskAdjustment = avgRisk * 2; // Risk reduces IRR
+            
+            const conservativeIRR = Math.max(0, avgGrowth * 0.6 - riskAdjustment);
+            const baseIRR = Math.max(0, avgGrowth * 0.8 - riskAdjustment * 0.7);
+            const optimisticIRR = avgGrowth * 1.2 - riskAdjustment * 0.5;
+
+            document.getElementById('irrProjection').innerHTML = `
+                <span class="fs-3 fw-bold text-success">${baseIRR.toFixed(1)}%</span>
+                <p class="text-muted small mb-0">Projected Base Case IRR</p>
+            `;
+            document.getElementById('irrConservative').textContent = `${conservativeIRR.toFixed(1)}%`;
+            document.getElementById('irrBase').textContent = `${baseIRR.toFixed(1)}%`;
+            document.getElementById('irrOptimistic').textContent = `${optimisticIRR.toFixed(1)}%`;
+        }
+
+        function generateAISuggestions() {
+            if (selectedSectors.length === 0) {
+                document.getElementById('aiSuggestions').style.display = 'none';
+                return;
+            }
+
+            const suggestions = [];
+
+            // Diversification suggestion
+            if (selectedSectors.length < 3) {
+                suggestions.push({
+                    type: 'diversification',
+                    title: 'Increase Diversification',
+                    message: 'Consider adding more sectors to reduce concentration risk. Aim for 4-6 sectors for optimal diversification.',
+                    impact: 'High'
+                });
+            }
+
+            // Risk balance suggestion
+            const highRiskCount = selectedSectors.filter(s => s.risk === 'high').length;
+            if (highRiskCount > selectedSectors.length / 2) {
+                suggestions.push({
+                    type: 'risk',
+                    title: 'Balance Risk Profile',
+                    message: 'Your portfolio has high concentration in high-risk sectors. Consider adding low-risk sectors like Fintech or Enterprise SaaS.',
+                    impact: 'Medium'
+                });
+            }
+
+            // Growth opportunity suggestion
+            const hasQuantum = selectedSectors.find(s => s.name === 'Quantum');
+            const hasWeb3 = selectedSectors.find(s => s.name === 'Web3');
+            if (!hasQuantum && !hasWeb3) {
+                suggestions.push({
+                    type: 'opportunity',
+                    title: 'High-Growth Opportunity',
+                    message: 'Quantum Computing and Web3 show exceptional growth potential (40-45%). Consider allocating 10-15% to capture upside.',
+                    impact: 'High'
+                });
+            }
+
+            // Display suggestions
+            if (suggestions.length > 0) {
+                document.getElementById('aiSuggestions').style.display = 'block';
+                document.getElementById('suggestionsList').innerHTML = suggestions.map(s => `
+                    <div class="alert alert-info mb-2">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>${s.title}</strong>
+                                <p class="mb-0 small">${s.message}</p>
+                            </div>
+                            <span class="badge bg-primary">${s.impact} Impact</span>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('aiSuggestions').style.display = 'none';
+            }
+        }
+
+        function clearThesis() {
+            if (selectedSectors.length === 0) return;
+            
+            if (confirm('Are you sure you want to clear your thesis?')) {
+                selectedSectors = [];
+                updateThesisCanvas();
+                calculateRiskAndIRR();
+                document.getElementById('aiSuggestions').style.display = 'none';
+            }
+        }
+
+        function saveThesis() {
+            if (selectedSectors.length === 0) {
+                alert('Please add sectors to your thesis before saving');
+                return;
+            }
+
+            const thesisData = {
+                sectors: selectedSectors,
+                timestamp: new Date().toISOString(),
+                riskScore: document.getElementById('riskScore').textContent,
+                baseIRR: document.getElementById('irrBase').textContent
+            };
+
+            console.log('Thesis saved:', thesisData);
+            alert('Investment thesis saved successfully!');
+        }
+
+        // Upload Startup Opportunity Modal
+        function uploadStartupOpportunity() {
+            const modal = new bootstrap.Modal(document.getElementById('startupUploadModal'));
+            modal.show();
+        }
+
+        function submitStartupOpportunity() {
+            const form = document.getElementById('startupUploadForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const opportunityData = {
+                name: document.getElementById('startupOppName').value,
+                sector: document.getElementById('startupOppSector').value,
+                stage: document.getElementById('startupOppStage').value,
+                fundingNeeded: document.getElementById('startupOppFunding').value,
+                description: document.getElementById('startupOppDescription').value,
+                role: 'Lead Investor',
+                timestamp: new Date().toISOString()
+            };
+
+            console.log('Startup Opportunity Uploaded:', opportunityData);
+            alert('Startup opportunity uploaded successfully! Our team will review and add to your pipeline.');
+
+            bootstrap.Modal.getInstance(document.getElementById('startupUploadModal')).hide();
+            form.reset();
+        }
+    </script>
+
+    <!-- Auxeira AI Client Library -->
+    <script src="auxeira-ai-client.js"></script>
+    
+    <!-- Deep Innovation Features -->
+    <script src="innovation-thesis-builder.js"></script>
+    <script src="portfolio-value-playbook.js"></script>
+    <script src="predictive-exit-simulator.js"></script>
+    <script src="esg-impact-tracker.js"></script>
+    <script src="coinvestment-network-matcher.js"></script>
+    <script src="advanced-report-generator.js"></script>
+    
+    <!-- Strategic Storytelling Engine -->
+    <script src="strategic-storytelling-engine.js"></script>
+    <script>
+        // AI-Powered Dashboard Enhancement
+        // Initialize AI features on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Initializing AI-powered features...');
+            
+            // Wait for AI client to initialize
+            await auxeiraAI.init();
+            
+            // Load AI-powered overview section
+            loadAIOverview();
+            
+            // Setup tab change listeners for lazy loading
+            document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+                tab.addEventListener('shown.bs.tab', function(event) {
+                    const targetId = event.target.getAttribute('data-bs-target');
+                    handleTabChange(targetId);
+                });
+            });
+            
+            // Initialize deep innovation features on first tab view
+            console.log('Deep innovation features loaded and ready');
+            
+            // Initialize storytelling narratives
+            loadPortfolioJourneyNarrative();
+            
+            // Load founder story when deals tab is clicked
+            document.querySelector('#deals-tab')?.addEventListener('shown.bs.tab', function() {
+                if (!window.founderStoryLoaded) {
+                    loadFounderStory(0);
+                    window.founderStoryLoaded = true;
+                }
+            });
+        });
+        
+        // Load Portfolio Journey Narrative
+        async function loadPortfolioJourneyNarrative() {
+            const container = document.getElementById('portfolioJourneyNarrative');
+            if (!container) return;
+            
+            try {
+                const portfolioData = {
+                    totalInvested: 50000000, // $50M
+                    currentValue: 125000000, // $125M
+                    companies: 12,
+                    timeframe: '3 years'
+                };
+                
+                const narrative = await storytellingEngine.generatePortfolioJourney(portfolioData);
+                container.innerHTML = narrative.html;
+            } catch (error) {
+                console.error('Error loading portfolio narrative:', error);
+                container.innerHTML = '<p class="text-muted">Unable to load narrative at this time.</p>';
+            }
+        }
+        
+        // Refresh portfolio story
+        async function refreshPortfolioStory() {
+            storytellingEngine.clearCache();
+            await loadPortfolioJourneyNarrative();
+        }
+        
+        // Load Founder Story
+        let currentFounderIndex = 0;
+        const founderStories = [
+            {
+                name: 'Sarah Chen',
+                company: 'QuantumAI',
+                background: 'Google Brain and Stanford AI Lab',
+                vision: 'Make AI infrastructure 10x more efficient and accessible to every developer',
+                traction: { users: '2,500', revenue: '450', timeframe: '18 months' }
+            },
+            {
+                name: 'Marcus Johnson',
+                company: 'CloudSecure',
+                background: 'cybersecurity at Amazon and Microsoft',
+                vision: 'Protect every cloud workload with zero-trust security that just works',
+                traction: { users: '1,200', revenue: '380', timeframe: '12 months' }
+            },
+            {
+                name: 'Priya Patel',
+                company: 'HealthTech',
+                background: 'digital health at Mayo Clinic',
+                vision: 'Democratize healthcare access through AI-powered diagnostics',
+                traction: { users: '5,000', revenue: '620', timeframe: '24 months' }
+            }
+        ];
+        
+        async function loadFounderStory(index = 0) {
+            const container = document.getElementById('founderStoryContainer');
+            if (!container) return;
+            
+            try {
+                const founderData = founderStories[index];
+                const narrative = await storytellingEngine.generateFounderStory(founderData);
+                container.innerHTML = narrative.html;
+            } catch (error) {
+                console.error('Error loading founder story:', error);
+                container.innerHTML = '<p class="text-muted">Unable to load founder story at this time.</p>';
+            }
+        }
+        
+        async function loadNextFounderStory() {
+            currentFounderIndex = (currentFounderIndex + 1) % founderStories.length;
+            await loadFounderStory(currentFounderIndex);
+        }
+
+        // Load AI-powered overview content
+        async function loadAIOverview() {
+            const data = {
+                portfolioValue: '$125M',
+                irr: 28.5,
+                moic: 3.2,
+                activeCompanies: 12,
+                exits: 3,
+                sseImpact: {
+                    valueCreated: 45000000,
+                    jobsCreated: 450,
+                    survivalRate: 0.92
+                }
+            };
+            
+            // Check if AI overview section exists, if not create it
+            let overviewSection = document.getElementById('ai-overview-section');
+            if (!overviewSection) {
+                // Find the portfolio metrics section and add AI overview before it
+                const portfolioTab = document.getElementById('portfolio');
+                if (portfolioTab) {
+                    overviewSection = document.createElement('div');
+                    overviewSection.id = 'ai-overview-section';
+                    overviewSection.className = 'row mb-4';
+                    portfolioTab.insertBefore(overviewSection, portfolioTab.firstChild);
+                }
+            }
+            
+            if (overviewSection) {
+                await auxeiraAI.loadSection('VC', 'overview', 'ai-overview-section', data);
+            }
+        }
+
+        // Handle tab changes and load AI content
+        async function handleTabChange(targetId) {
+            console.log('Tab changed to:', targetId);
+            
+            // Initialize deep innovation features on demand
+            if (targetId === '#thesis-builder' && !window.thesisBuilderInitialized) {
+                thesisBuilder.initialize('thesisBuilderContainer');
+                window.thesisBuilderInitialized = true;
+            } else if (targetId === '#value-playbook' && !window.valuePlaybookInitialized) {
+                valuePlaybook.initialize('valuePlaybookContainer');
+                window.valuePlaybookInitialized = true;
+            } else if (targetId === '#esg-tracker' && !window.esgTrackerInitialized) {
+                esgTracker.initialize('esgTrackerContainer');
+                window.esgTrackerInitialized = true;
+            } else if (targetId === '#network-matcher' && !window.networkMatcherInitialized) {
+                coinvestmentMatcher.initialize('networkMatcherContainer');
+                window.networkMatcherInitialized = true;
+            } else if (targetId === '#report-generator' && !window.reportGeneratorInitialized) {
+                reportGenerator.initialize('reportGeneratorContainer');
+                window.reportGeneratorInitialized = true;
+            }
+            
+            switch(targetId) {
+                case '#copilot':
+                    await loadAICopilot();
+                    break;
+                case '#deals':
+                    await loadAIDealFlow();
+                    break;
+                case '#reports':
+                    await loadAIReports();
+                    break;
+                case '#liquidity':
+                    await loadAIAnalytics();
+                    break;
+            }
+        }
+
+        // Load AI Copilot insights
+        async function loadAICopilot() {
+            const copilotSection = document.getElementById('ai-copilot-insights');
+            if (!copilotSection) {
+                const copilotTab = document.getElementById('copilot');
+                if (copilotTab) {
+                    const newSection = document.createElement('div');
+                    newSection.id = 'ai-copilot-insights';
+                    newSection.className = 'row mb-4';
+                    copilotTab.insertBefore(newSection, copilotTab.firstChild);
+                    
+                    const data = {
+                        portfolioHealth: 85,
+                        topRecommendations: 3,
+                        urgentActions: 1
+                    };
+                    
+                    await auxeiraAI.loadSection('VC', 'copilot', 'ai-copilot-insights', data);
+                }
+            }
+        }
+
+        // Load AI Deal Flow
+        async function loadAIDealFlow() {
+            const dealSection = document.getElementById('ai-deal-flow');
+            if (!dealSection) {
+                const dealsTab = document.getElementById('deals');
+                if (dealsTab) {
+                    const newSection = document.createElement('div');
+                    newSection.id = 'ai-deal-flow';
+                    newSection.className = 'row mb-4';
+                    dealsTab.insertBefore(newSection, dealsTab.firstChild);
+                    
+                    const data = {
+                        deals: [
+                            { name: 'CloudSecure AI', sector: 'Cybersecurity', match: 94, sse_score: 88 },
+                            { name: 'QuantumEdge', sector: 'Quantum Computing', match: 89, sse_score: 92 },
+                            { name: 'BioSynth Labs', sector: 'Biotech', match: 87, sse_score: 85 }
+                        ]
+                    };
+                    
+                    await auxeiraAI.loadSection('VC', 'dealflow', 'ai-deal-flow', data);
+                }
+            }
+        }
+
+        // Load AI Reports
+        async function loadAIReports() {
+            const reportsSection = document.getElementById('ai-reports-hub');
+            if (!reportsSection) {
+                const reportsTab = document.getElementById('reports');
+                if (reportsTab) {
+                    const newSection = document.createElement('div');
+                    newSection.id = 'ai-reports-hub';
+                    newSection.className = 'row mb-4';
+                    reportsTab.insertBefore(newSection, reportsTab.firstChild);
+                    
+                    const data = {
+                        reportType: 'quarterly',
+                        sector_funding: 11100000000,
+                        topSector: 'Defense Tech'
+                    };
+                    
+                    await auxeiraAI.loadSection('VC', 'reports', 'ai-reports-hub', data);
+                }
+            }
+        }
+
+        // Load AI Analytics (IRR Simulator)
+        async function loadAIAnalytics() {
+            const analyticsSection = document.getElementById('ai-analytics-simulator');
+            if (!analyticsSection) {
+                const liquidityTab = document.getElementById('liquidity');
+                if (liquidityTab) {
+                    const newSection = document.createElement('div');
+                    newSection.id = 'ai-analytics-simulator';
+                    newSection.className = 'row mb-4';
+                    liquidityTab.insertBefore(newSection, liquidityTab.firstChild);
+                    
+                    const data = {
+                        base_irr: 28,
+                        variables: { market_shift: 5 },
+                        scenarios: ['optimistic', 'base', 'pessimistic']
+                    };
+                    
+                    await auxeiraAI.loadSection('VC', 'analytics', 'ai-analytics-simulator', data);
+                }
+            }
+        }
+
+        // Enhanced refresh function with AI
+        async function refreshData() {
+            console.log('Refreshing AI insights...');
+            auxeiraAI.clearCache();
+            
+            // Show loading indicator
+            const refreshBtn = document.querySelector('[onclick="refreshData()"]');
+            if (refreshBtn) {
+                const originalHTML = refreshBtn.innerHTML;
+                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Refreshing...';
+                refreshBtn.disabled = true;
+                
+                // Reload current tab content
+                await loadAIOverview();
+                
+                setTimeout(() => {
+                    refreshBtn.innerHTML = originalHTML;
+                    refreshBtn.disabled = false;
+                }, 2000);
+            }
+        }
+
+        // Generate causal narrative for a company
+        async function showCausalImpact(companyName) {
+            const baselineMetrics = {
+                jobs: 25,
+                revenue: 2000000,
+                survival_probability: 0.65
+            };
+            
+            const sseMetrics = {
+                jobs: 34,
+                revenue: 2700000,
+                survival_probability: 0.85
+            };
+            
+            const narrative = await auxeiraAI.generateCausalNarrative(companyName, baselineMetrics, sseMetrics);
+            
+            // Display in modal or dedicated section
+            const modalBody = document.querySelector('#causalImpactModal .modal-body');
+            if (modalBody) {
+                modalBody.innerHTML = narrative;
+                const modal = new bootstrap.Modal(document.getElementById('causalImpactModal'));
+                modal.show();
+            }
+        }
+    </script>
+
+</body>
+</html>

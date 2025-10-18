@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESG Investor Dashboard - Auxeira</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>body { margin: 0; background: #0f172a; min-height: 100vh; color: white; }</style>
+</head>
+<body>
+    <div id="root">Loading...</div>
+    <script>
+        setTimeout(() => {
+            const { createElement: h } = React;
+            const { createRoot } = ReactDOM;
+            const Dashboard = () => {
+                React.useEffect(() => {
+                    new Chart(document.getElementById('myChart'), {
+                        type: 'radar',
+                        data: {
+                            labels: ['Environmental', 'Social', 'Governance', 'Innovation', 'Impact'],
+                            datasets: [{
+                                label: 'ESG Score',
+                                data: [92, 88, 95, 85, 90],
+                                backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                                borderColor: '#10b981',
+                                borderWidth: 3
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { labels: { color: '#94a3b8' } } },
+                            scales: {
+                                r: { 
+                                    ticks: { color: '#94a3b8', backdropColor: 'transparent' },
+                                    grid: { color: '#334155' },
+                                    pointLabels: { color: '#94a3b8' }
+                                }
+                            }
+                        }
+                    });
+                }, []);
+                return h('div', { className: 'min-h-screen bg-slate-900 text-white p-8' },
+                    h('div', { className: 'max-w-7xl mx-auto' },
+                        h('h1', { className: 'text-4xl font-bold mb-8 text-green-400' }, '🌱 ESG Investor Dashboard'),
+                        h('div', { className: 'grid grid-cols-1 md:grid-cols-3 gap-6 mb-8' },
+                            h('div', { className: 'bg-slate-800 rounded-lg p-6 shadow-xl' },
+                                h('h3', { className: 'text-gray-400 text-sm mb-2' }, 'Impact Score'),
+                                h('p', { className: 'text-3xl font-bold text-green-400' }, '92/100'),
+                                h('p', { className: 'text-green-400 text-sm mt-2' }, 'Excellent rating')
+                            ),
+                            h('div', { className: 'bg-slate-800 rounded-lg p-6 shadow-xl' },
+                                h('h3', { className: 'text-gray-400 text-sm mb-2' }, 'Portfolio Companies'),
+                                h('p', { className: 'text-3xl font-bold text-blue-400' }, '15'),
+                                h('p', { className: 'text-blue-400 text-sm mt-2' }, 'All ESG certified')
+                            ),
+                            h('div', { className: 'bg-slate-800 rounded-lg p-6 shadow-xl' },
+                                h('h3', { className: 'text-gray-400 text-sm mb-2' }, 'Carbon Offset'),
+                                h('p', { className: 'text-3xl font-bold text-emerald-400' }, '-340t'),
+                                h('p', { className: 'text-green-400 text-sm mt-2' }, 'CO₂ reduced')
+                            )
+                        ),
+                        h('div', { className: 'bg-slate-800 rounded-lg p-6 shadow-xl mb-8' },
+                            h('h2', { className: 'text-2xl font-bold mb-6' }, 'ESG Performance'),
+                            h('div', { style: { height: '300px' } }, h('canvas', { id: 'myChart' }))
+                        )
+                    )
+                );
+            };
+            ReactDOM.createRoot(document.getElementById('root')).render(h(Dashboard));
+        }, 1000);
+    </script>
+</body>
+</html>
