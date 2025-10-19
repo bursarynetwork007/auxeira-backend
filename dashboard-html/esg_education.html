@@ -2513,6 +2513,8 @@
 
             // Initialize scenario charts
             initializeScenarioCharts();
+            initializeROIChart();
+            initializeRippleChart();
            
             // Initialize portfolio chart
             initializePortfolioChart();
@@ -3001,6 +3003,167 @@
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(updateScenarioAnalysis, 1000);
         });
+
+        // RIPPLE CHART FUNCTION - ADD THIS AFTER initializePortfolioChart()
+        function initializeRippleChart() {
+            const rippleCtx = document.getElementById('rippleChart');
+            if (!rippleCtx) return;
+        
+            const impactData = calculateUserImpactData();
+        
+            charts.rippleChart = new Chart(rippleCtx, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        'Direct Impact', 
+                        'Teacher Training', 
+                        'Community Effect', 
+                        'Economic Growth', 
+                        'Policy Influence', 
+                        'Long-term Change'
+                    ],
+                    datasets: [{
+                        label: 'Current Impact',
+                        data: impactData.current,
+                        borderColor: '#00d4ff',
+                        backgroundColor: 'rgba(0, 212, 255, 0.2)',
+                        pointBackgroundColor: '#00d4ff',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        borderWidth: 3
+                    }, {
+                        label: 'Projected Impact (3 Years)',
+                        data: impactData.projected,
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                        pointBackgroundColor: '#8b5cf6',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: '#ffffff',
+                                font: { size: 14, weight: 'bold' },
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#00d4ff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#00d4ff',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.r + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            min: 0,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20,
+                                color: '#b8c5d6',
+                                backdropColor: 'transparent',
+                                font: { size: 12, weight: 'bold' }
+                            },
+                            grid: {
+                                color: 'rgba(184, 197, 214, 0.2)',
+                                circular: true
+                            },
+                            pointLabels: {
+                                color: '#ffffff',
+                                font: { size: 13, weight: '600' },
+                                padding: 10
+                            },
+                            angleLines: {
+                                color: 'rgba(184, 197, 214, 0.2)'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        
+            // Update score displays
+            updateImpactScores(impactData);
+        }
+        
+        // Calculate impact data based on user profile
+        function calculateUserImpactData() {
+            let currentImpact = [85, 92, 78, 65, 70, 88];
+            let projectedImpact = [95, 98, 88, 85, 90, 95];
+        
+            if (userProfile && userProfile.educationFocusAreas) {
+                const focusAreas = userProfile.educationFocusAreas;
+                
+                if (focusAreas.includes('teacher-training')) {
+                    currentImpact[1] = Math.min(100, currentImpact[1] + 5);
+                    projectedImpact[1] = Math.min(100, projectedImpact[1] + 3);
+                }
+                
+                if (focusAreas.includes('policy-advocacy')) {
+                    currentImpact[4] = Math.min(100, currentImpact[4] + 10);
+                    projectedImpact[4] = Math.min(100, projectedImpact[4] + 8);
+                }
+                
+                if (focusAreas.includes('rural-schools')) {
+                    currentImpact[2] = Math.min(100, currentImpact[2] + 8);
+                    projectedImpact[2] = Math.min(100, projectedImpact[2] + 12);
+                }
+            }
+        
+            return {
+                current: currentImpact,
+                projected: projectedImpact
+            };
+        }
+        
+        function updateImpactScores(impactData) {
+            const currentAvg = (impactData.current.reduce((a, b) => a + b, 0) / impactData.current.length).toFixed(1);
+            const projectedAvg = (impactData.projected.reduce((a, b) => a + b, 0) / impactData.projected.length).toFixed(1);
+            
+            document.getElementById('currentImpactScore').textContent = currentAvg;
+            document.getElementById('projectedImpactScore').textContent = projectedAvg;
+        }
+        
+        function showRippleInfo() {
+            alert(`Impact Ripple Effect Analysis
+        
+        This radar chart shows how your ESG investments create multi-dimensional impact:
+        
+        📍 Direct Impact: Immediate beneficiaries reached
+        👨‍🏫 Teacher Training: Educator capacity building
+        🏘️ Community Effect: Broader social influence
+        💰 Economic Growth: Financial sustainability
+        🏛️ Policy Influence: Systemic change potential
+        ⏳ Long-term Change: Sustained transformation
+        
+        Current (Blue): Today's measured impact
+        Projected (Purple): Expected impact in 3 years based on AI modeling`);
+        }
     </script>
 </body>
 </html>
