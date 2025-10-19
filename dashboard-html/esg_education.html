@@ -880,6 +880,56 @@
                 font-size: 0.9rem;
             }
         }
+
+            /* Ripple Chart Specific Styling */
+            .ripple-chart-container {
+                position: relative;
+            }
+            
+            .ripple-chart-container canvas {
+                max-height: 500px;
+                margin: 0 auto;
+            }
+            
+            .impact-scores {
+                background: rgba(0, 212, 255, 0.05);
+                border-radius: 15px;
+                border: 2px solid rgba(0, 212, 255, 0.2);
+                padding: 1.5rem;
+                margin-top: 2rem;
+            }
+            
+            .score-display {
+                font-size: 3rem;
+                font-weight: 900;
+                line-height: 1;
+            }
+            
+            .text-purple {
+                color: #8b5cf6;
+            }
+            
+            @keyframes rippleGlow {
+                0%, 100% {
+                    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+                }
+                50% {
+                    box-shadow: 0 0 40px rgba(139, 92, 246, 0.5);
+                }
+            }
+            
+            .ripple-chart-container {
+                animation: rippleGlow 3s ease-in-out infinite;
+            }
+            
+            /* Responsive */
+            @media (max-width: 768px) {
+                .score-display {
+                    font-size: 2rem;
+                }
+            }
+
+   
     </style>
 </head>
 <body>
