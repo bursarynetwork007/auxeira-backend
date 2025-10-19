@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESG Investor Dashboards - Auxeira</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; background: linear-gradient(135deg, #22c55e 0%, #3b82f6 100%); min-height: 100vh; }
+        .sdg-card { transition: all 0.3s; }
+        .sdg-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); }
+    </style>
+<script src="../utils/auth-guard.js"></script>
+</head>
+<body>
+    <div class="min-h-screen py-12 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <div class="text-6xl mb-4">🌍</div>
+                <h1 class="text-5xl font-bold text-white mb-4">ESG Impact Investing</h1>
+                <p class="text-xl text-green-100">UN Sustainable Development Goals (SDG) Aligned Dashboards</p>
+                <p class="text-green-200 mt-2">Choose your impact area</p>
+            </div>
+            
+            <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 mb-8">
+                <h2 class="text-2xl font-bold text-white mb-4">About ESG Dashboards</h2>
+                <p class="text-green-100">
+                    Each dashboard is aligned with specific UN Sustainable Development Goals (SDGs) and provides 
+                    impact metrics, learning outcomes, and investment analytics tailored to that sector.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- SDG 1: No Poverty -->
+                <div class="sdg-card bg-white rounded-xl p-6 shadow-2xl opacity-50 cursor-not-allowed">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">🏚️</div>
+                        <div>
+                            <div class="text-xs font-bold text-red-600 mb-1">SDG 1</div>
+                            <h3 class="text-xl font-bold text-gray-900">No Poverty</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Microfinance, financial inclusion, and poverty alleviation investments</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-800">
+                        🚧 Coming Soon
+                    </div>
+                </div>
+                
+                <!-- SDG 2: Zero Hunger -->
+                <div class="sdg-card bg-white rounded-xl p-6 shadow-2xl opacity-50 cursor-not-allowed">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">🌾</div>
+                        <div>
+                            <div class="text-xs font-bold text-yellow-600 mb-1">SDG 2</div>
+                            <h3 class="text-xl font-bold text-gray-900">Zero Hunger</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">AgriTech, food security, and sustainable agriculture investments</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-800">
+                        🚧 Coming Soon
+                    </div>
+                </div>
+                
+                <!-- SDG 3: Good Health -->
+                <div class="sdg-card bg-white rounded-xl p-6 shadow-2xl opacity-50 cursor-not-allowed">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">🏥</div>
+                        <div>
+                            <div class="text-xs font-bold text-green-600 mb-1">SDG 3</div>
+                            <h3 class="text-xl font-bold text-gray-900">Good Health</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">HealthTech, telemedicine, and healthcare access investments</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-800">
+                        🚧 Coming Soon
+                    </div>
+                </div>
+                
+                <!-- SDG 4: Quality Education - LIVE -->
+                <a href="esg_education.html" class="sdg-card bg-white rounded-xl p-6 shadow-2xl hover:shadow-3xl">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">🎓</div>
+                        <div>
+                            <div class="text-xs font-bold text-red-600 mb-1">SDG 4</div>
+                            <h3 class="text-xl font-bold text-gray-900">Quality Education</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">EdTech, teacher training, and learning outcome investments</p>
+                    <div class="flex gap-2">
+                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">✅ Live</span>
+                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Students Reached</span>
+                        <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">Learning ROI</span>
+                    </div>
+                </a>
+                
+                <!-- SDG 5: Gender Equality -->
+                <div class="sdg-card bg-white rounded-xl p-6 shadow-2xl opacity-50 cursor-not-allowed">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">⚖️</div>
+                        <div>
+                            <div class="text-xs font-bold text-red-600 mb-1">SDG 5</div>
+                            <h3 class="text-xl font-bold text-gray-900">Gender Equality</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Women-led businesses, gender equity, and empowerment investments</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-800">
+                        🚧 Coming Soon
+                    </div>
+                </div>
+                
+                <!-- SDG 6: Clean Water -->
+                <div class="sdg-card bg-white rounded-xl p-6 shadow-2xl opacity-50 cursor-not-allowed">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">💧</div>
+                        <div>
+                            <div class="text-xs font-bold text-blue-600 mb-1">SDG 6</div>
+                            <h3 class="text-xl font-bold text-gray-900">Clean Water</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Water tech, sanitation, and clean water access investments</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-800">
+                        🚧 Coming Soon
+                    </div>
+                </div>
+                
+                <!-- SDG 7: Affordable Energy -->
+                <div class="sdg-card bg-white rounded-xl p-6 shadow-2xl opacity-50 cursor-not-allowed">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">⚡</div>
+                        <div>
+                            <div class="text-xs font-bold text-yellow-600 mb-1">SDG 7</div>
+                            <h3 class="text-xl font-bold text-gray-900">Affordable Energy</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Renewable energy, clean power, and energy access investments</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-800">
+                        🚧 Coming Soon
+                    </div>
+                </div>
+                
+                <!-- SDG 8: Decent Work -->
+                <div class="sdg-card bg-white rounded-xl p-6 shadow-2xl opacity-50 cursor-not-allowed">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">💼</div>
+                        <div>
+                            <div class="text-xs font-bold text-red-600 mb-1">SDG 8</div>
+                            <h3 class="text-xl font-bold text-gray-900">Decent Work</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Job creation, skills training, and economic growth investments</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-800">
+                        🚧 Coming Soon
+                    </div>
+                </div>
+                
+                <!-- SDG 9: Industry & Innovation -->
+                <div class="sdg-card bg-white rounded-xl p-6 shadow-2xl opacity-50 cursor-not-allowed">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">🏭</div>
+                        <div>
+                            <div class="text-xs font-bold text-orange-600 mb-1">SDG 9</div>
+                            <h3 class="text-xl font-bold text-gray-900">Industry & Innovation</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Infrastructure, innovation, and sustainable industrialization</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-800">
+                        🚧 Coming Soon
+                    </div>
+                </div>
+                
+                <!-- SDG 10: Reduced Inequalities -->
+                <div class="sdg-card bg-white rounded-xl p-6 shadow-2xl opacity-50 cursor-not-allowed">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">🤝</div>
+                        <div>
+                            <div class="text-xs font-bold text-pink-600 mb-1">SDG 10</div>
+                            <h3 class="text-xl font-bold text-gray-900">Reduced Inequalities</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Financial inclusion, equity, and social justice investments</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-800">
+                        🚧 Coming Soon
+                    </div>
+                </div>
+                
+                <!-- SDG 11: Sustainable Cities -->
+                <div class="sdg-card bg-white rounded-xl p-6 shadow-2xl opacity-50 cursor-not-allowed">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">🏙️</div>
+                        <div>
+                            <div class="text-xs font-bold text-yellow-600 mb-1">SDG 11</div>
+                            <h3 class="text-xl font-bold text-gray-900">Sustainable Cities</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Smart cities, urban planning, and sustainable communities</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-800">
+                        🚧 Coming Soon
+                    </div>
+                </div>
+                
+                <!-- SDG 12: Responsible Consumption -->
+                <div class="sdg-card bg-white rounded-xl p-6 shadow-2xl opacity-50 cursor-not-allowed">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">♻️</div>
+                        <div>
+                            <div class="text-xs font-bold text-yellow-600 mb-1">SDG 12</div>
+                            <h3 class="text-xl font-bold text-gray-900">Responsible Consumption</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Circular economy, waste reduction, and sustainable consumption</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-800">
+                        🚧 Coming Soon
+                    </div>
+                </div>
+                
+                <!-- SDG 13: Climate Action -->
+                <div class="sdg-card bg-white rounded-xl p-6 shadow-2xl opacity-50 cursor-not-allowed">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">🌡️</div>
+                        <div>
+                            <div class="text-xs font-bold text-green-600 mb-1">SDG 13</div>
+                            <h3 class="text-xl font-bold text-gray-900">Climate Action</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Climate tech, carbon reduction, and climate resilience investments</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-800">
+                        🚧 Coming Soon
+                    </div>
+                </div>
+                
+                <!-- SDG 14: Life Below Water -->
+                <div class="sdg-card bg-white rounded-xl p-6 shadow-2xl opacity-50 cursor-not-allowed">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">🐟</div>
+                        <div>
+                            <div class="text-xs font-bold text-blue-600 mb-1">SDG 14</div>
+                            <h3 class="text-xl font-bold text-gray-900">Life Below Water</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Ocean conservation, marine tech, and sustainable fisheries</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-800">
+                        🚧 Coming Soon
+                    </div>
+                </div>
+                
+                <!-- SDG 15: Life on Land -->
+                <div class="sdg-card bg-white rounded-xl p-6 shadow-2xl opacity-50 cursor-not-allowed">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">🌳</div>
+                        <div>
+                            <div class="text-xs font-bold text-green-600 mb-1">SDG 15</div>
+                            <h3 class="text-xl font-bold text-gray-900">Life on Land</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Reforestation, biodiversity, and ecosystem conservation</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-800">
+                        🚧 Coming Soon
+                    </div>
+                </div>
+                
+                <!-- SDG 16: Peace & Justice -->
+                <div class="sdg-card bg-white rounded-xl p-6 shadow-2xl opacity-50 cursor-not-allowed">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">⚖️</div>
+                        <div>
+                            <div class="text-xs font-bold text-blue-600 mb-1">SDG 16</div>
+                            <h3 class="text-xl font-bold text-gray-900">Peace & Justice</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Legal tech, governance, and justice system investments</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-800">
+                        🚧 Coming Soon
+                    </div>
+                </div>
+                
+                <!-- SDG 17: Partnerships -->
+                <div class="sdg-card bg-white rounded-xl p-6 shadow-2xl opacity-50 cursor-not-allowed">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-4xl">🤝</div>
+                        <div>
+                            <div class="text-xs font-bold text-blue-600 mb-1">SDG 17</div>
+                            <h3 class="text-xl font-bold text-gray-900">Partnerships</h3>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">Multi-stakeholder partnerships and global cooperation</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-800">
+                        🚧 Coming Soon
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 bg-white/10 backdrop-blur-lg rounded-xl p-8">
+                <h2 class="text-2xl font-bold text-white mb-4 text-center">ESG Investment Stats</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center text-white">
+                    <div>
+                        <div class="text-4xl font-bold">17</div>
+                        <div class="text-sm text-green-200">SDG Dashboards</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-bold">1</div>
+                        <div class="text-sm text-green-200">Live Now</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-bold">16</div>
+                        <div class="text-sm text-green-200">Coming Soon</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-bold">100%</div>
+                        <div class="text-sm text-green-200">Impact Aligned</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <a href="index.html" class="inline-block bg-white/20 backdrop-blur-lg text-white px-6 py-3 rounded-lg hover:bg-white/30 transition">
+                    ← Back to All Dashboards
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

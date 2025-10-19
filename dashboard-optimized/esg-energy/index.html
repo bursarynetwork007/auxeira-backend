@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDG 7: Clean Energy - Auxeira ESG Intelligence Platform</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Paystack -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    
+    <style>
+        :root {
+            --terminal-bg: #0a0a0a;
+            --terminal-dark: #1a1a1a;
+            --terminal-green: #00ff41;
+            --terminal-blue: #00d4ff;
+            --terminal-purple: #b300ff;
+            --terminal-yellow: #ffff00;
+            --terminal-red: #ff0040;
+            --terminal-cyan: #00ffff;
+            --terminal-white: #ffffff;
+            --terminal-gray: #808080;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, var(--terminal-bg) 0%, #2a0845 50%, #1a1a2e 100%);
+            color: var(--terminal-white);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--terminal-green);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.2);
+        }
+
+        .terminal-header {
+            background: var(--terminal-dark);
+            border-bottom: 2px solid var(--terminal-green);
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            color: var(--terminal-green) !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--terminal-white) !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--terminal-green) !important;
+        }
+
+        .main-content {
+            margin-top: 80px;
+            padding: 20px 0;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(255, 255, 0, 0.2) 0%, rgba(255, 165, 0, 0.2) 100%);
+            border: 2px solid var(--terminal-yellow);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            color: var(--terminal-yellow);
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 255, 0, 0.5);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--terminal-white);
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--terminal-yellow);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: var(--terminal-green);
+            background: rgba(255, 255, 0, 0.1);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--terminal-yellow);
+            display: block;
+        }
+
+        .metric-label {
+            color: var(--terminal-white);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .tab-content {
+            background: var(--glass-bg);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        .nav-tabs .nav-link {
+            background: transparent;
+            border: 1px solid var(--terminal-yellow);
+            color: var(--terminal-white);
+            margin-right: 10px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: var(--terminal-yellow);
+            border-color: var(--terminal-yellow);
+            color: var(--terminal-dark);
+        }
+
+        .story-card {
+            background: linear-gradient(135deg, rgba(255, 255, 0, 0.1) 0%, rgba(255, 165, 0, 0.1) 100%);
+            border: 1px solid var(--terminal-yellow);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .story-title {
+            color: var(--terminal-yellow);
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .impact-badge {
+            background: var(--terminal-yellow);
+            color: var(--terminal-dark);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--terminal-yellow) 0%, #ffa500 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: bold;
+            color: var(--terminal-dark);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 255, 0, 0.3);
+        }
+
+        .compliance-badge {
+            background: var(--terminal-green);
+            color: var(--terminal-dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 10px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .accessibility-controls {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .accessibility-btn {
+            background: var(--terminal-dark);
+            border: 1px solid var(--terminal-yellow);
+            color: var(--terminal-white);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .accessibility-btn:hover {
+            background: var(--terminal-yellow);
+            color: var(--terminal-dark);
+        }
+
+        .high-contrast {
+            --glass-bg: rgba(0, 0, 0, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.8);
+        }
+
+        .chart-container { 
+            margin: 20px 0; 
+            padding: 20px; 
+            background: rgba(255,255,255,0.05); 
+            border-radius: 12px; 
+        }
+        
+        .chart-title { 
+            color: var(--terminal-green); 
+            margin-bottom: 15px; 
+        }
+        
+        .premium-report-card { 
+            position: relative; 
+            padding: 20px; 
+            margin-bottom: 15px; 
+        }
+        
+        .price-tag { 
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+            background: var(--terminal-green); 
+            color: var(--terminal-dark); 
+            padding: 4px 8px; 
+            border-radius: 12px; 
+            font-weight: bold; 
+        }
+        
+        .update-indicator { 
+            animation: fadeIn 0.5s ease-in; 
+        }
+        
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+        
+        .locked-content { 
+            border: 2px dashed var(--terminal-yellow); 
+        }
+        
+        .generate-report-btn:disabled { 
+            opacity: 0.6; 
+            cursor: not-allowed; 
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .accessibility-controls {
+                position: relative;
+                top: auto;
+                right: auto;
+                flex-direction: row;
+                justify-content: center;
+                margin: 20px 0;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="leaderboard_styles.css">
+<script src="../utils/auth-guard.js"></script>
+</head>
+<body>
+    <!-- Accessibility Controls -->
+    <div class="accessibility-controls">
+        <button class="accessibility-btn" onclick="toggleHighContrast()" aria-label="Toggle high contrast mode">
+            <i class="fas fa-adjust"></i>
+        </button>
+        <button class="accessibility-btn" onclick="increaseFontSize()" aria-label="Increase font size">
+            <i class="fas fa-search-plus"></i>
+        </button>
+        <button class="accessibility-btn" onclick="decreaseFontSize()" aria-label="Decrease font size">
+            <i class="fas fa-search-minus"></i>
+        </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg terminal-header">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-bolt me-2"></i>Auxeira | SDG 7: Clean Energy
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#overview">Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#analytics">Analytics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#portfolio">Portfolio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reports">Reports</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container main-content">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1 class="hero-title">Clean Energy Intelligence</h1>
+            <p class="hero-subtitle">
+                Accelerating the global transition to sustainable energy through data-driven investment strategies
+            </p>
+            
+            <!-- Compliance Badges -->
+            <div class="compliance-badges mb-4">
+                <span class="compliance-badge">SFDR Article 9</span>
+                <span class="compliance-badge">CSRD Compliant</span>
+                <span class="compliance-badge">TCFD Aligned</span>
+                <span class="compliance-badge">IEA Standards</span>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="row mt-4">
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="metric-card">
+                        <span class="metric-value">167GW</span>
+                        <div class="metric-label">Clean Energy Capacity</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="metric-card">
+                        <span class="metric-value">45%</span>
+                        <div class="metric-label">Carbon Reduction</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="metric-card">
+                        <span class="metric-value">$2.8B</span>
+                        <div class="metric-label">Investment Value</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="metric-card">
+                        <span class="metric-value">94%</span>
+                        <div class="metric-label">Grid Reliability</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                    <i class="fas fa-chart-line me-2"></i>Overview
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab">
+                    <i class="fas fa-brain me-2"></i>Analytics
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="portfolio-tab" data-bs-toggle="tab" data-bs-target="#portfolio" type="button" role="tab">
+                    <i class="fas fa-briefcase me-2"></i>Portfolio
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab">
+                    <i class="fas fa-file-alt me-2"></i>Reports
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="mainTabContent">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <h3 class="text-warning mb-4">
+                    <i class="fas fa-bolt me-2"></i>Clean Energy Impact Overview
+                </h3>
+
+                <!-- Success Stories -->
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="story-card">
+                            <h4 class="story-title org-placeholder">BlackRock Powers Kenya's Solar Revolution with 500MW Grid Integration</h4>
+                            <p class="mb-3">
+                                Our renewable energy fund enabled the construction of East Africa's largest solar farm, 
+                                providing clean electricity to 2.3 million people while creating 1,200 permanent jobs 
+                                and reducing carbon emissions by 850,000 tons annually.
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="impact-badge">850K Tons CO2 Saved</span>
+                                <small class="text-muted">Impact Score: 96%</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6 mb-4">
+                        <div class="story-card">
+                            <h4 class="story-title">Smart Grid Technology Transforms Rural Access</h4>
+                            <p class="mb-3">
+                                AI-powered microgrid deployment across 45 rural communities achieved 99.7% uptime 
+                                reliability while reducing energy costs by 40% and enabling 15,000 households 
+                                to access clean electricity for the first time.
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="impact-badge">15K Households Connected</span>
+                                <small class="text-muted">Impact Score: 92%</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Regional Impact Chart -->
+                <div class="glass-card mt-4">
+                    <h5 class="text-success mb-3">Regional Clean Energy Deployment</h5>
+                    <canvas id="regionalChart" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div class="tab-pane fade" id="analytics" role="tabpanel">
+                <h3 class="text-warning mb-4">
+                    <i class="fas fa-brain me-2"></i>AI-Powered Energy Analytics
+                </h3>
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="glass-card">
+                            <h5 class="text-success mb-3">Predictive Energy Modeling</h5>
+                            <p class="mb-3">
+                                Our AI models predict that increasing renewable energy capacity by 35% could 
+                                generate an additional $1.2B in economic value while reducing grid carbon 
+                                intensity by 28% across our portfolio.
+                            </p>
+                            
+                            <!-- What-If Analysis -->
+                            <div class="what-if-analysis">
+                                <h6 class="text-warning">What-If Scenario Analysis</h6>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Investment Amount ($M)</label>
+                                        <input type="range" class="form-range" min="50" max="1000" value="250" id="investmentSlider">
+                                        <span id="investmentValue">$250M</span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Technology Focus</label>
+                                        <select class="form-select" id="technologyFocus">
+                                            <option>Solar + Storage</option>
+                                            <option>Wind Power</option>
+                                            <option>Smart Grid</option>
+                                            <option>Green Hydrogen</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Projected Impact</label>
+                                        <div class="impact-projection">
+                                            <span id="projectedCapacity" class="text-success">125 MW</span>
+                                            <small class="d-block text-muted">Additional Capacity</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="glass-card">
+                            <h5 class="text-success mb-3">Key Insights</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-up text-success me-2"></i>
+                                    Solar costs down 85% since 2010
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-chart-line text-warning me-2"></i>
+                                    Battery storage market growing 30% annually
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-globe text-info me-2"></i>
+                                    Africa leads in off-grid innovation
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-lightbulb text-yellow me-2"></i>
+                                    Green hydrogen breakthrough potential
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Energy Trends Chart -->
+                <div class="glass-card mt-4">
+                    <h5 class="text-success mb-3">Energy Capacity Growth Trends</h5>
+                    <canvas id="trendsChart" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Portfolio Tab -->
+            <div class="tab-pane fade" id="portfolio" role="tabpanel">
+                <h3 class="text-warning mb-4">
+                    <i class="fas fa-briefcase me-2"></i>Living Clean Energy Portfolio
+                </h3>
+
+                <div class="row">
+                    <div class="col-lg-4 mb-4">
+                        <div class="glass-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Solar Power Fund</h5>
+                                <span class="badge bg-success">Outperforming</span>
+                            </div>
+                            <p class="text-muted mb-3">Large-scale solar installations across emerging markets</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <strong class="text-success">$850M</strong>
+                                    <small class="d-block text-muted">AUM</small>
+                                </div>
+                                <div class="col-6">
+                                    <strong class="text-warning">24%</strong>
+                                    <small class="d-block text-muted">IRR</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 mb-4">
+                        <div class="glass-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Smart Grid Infrastructure</h5>
+                                <span class="badge bg-warning">Scaling</span>
+                            </div>
+                            <p class="text-muted mb-3">AI-powered grid modernization and storage solutions</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <strong class="text-success">$425M</strong>
+                                    <small class="d-block text-muted">AUM</small>
+                                </div>
+                                <div class="col-6">
+                                    <strong class="text-warning">19%</strong>
+                                    <small class="d-block text-muted">IRR</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 mb-4">
+                        <div class="glass-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Green Hydrogen Initiative</h5>
+                                <span class="badge bg-info">Emerging</span>
+                            </div>
+                            <p class="text-muted mb-3">Next-generation hydrogen production and distribution</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <strong class="text-success">$320M</strong>
+                                    <small class="d-block text-muted">AUM</small>
+                                </div>
+                                <div class="col-6">
+                                    <strong class="text-warning">35%</strong>
+                                    <small class="d-block text-muted">IRR</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Performance Chart -->
+                <div class="glass-card mt-4">
+                    <h5 class="text-success mb-3">Portfolio Performance vs Benchmarks</h5>
+                    <canvas id="portfolioChart" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div class="tab-pane fade" id="reports" role="tabpanel">
+                <h3 class="text-warning mb-4">
+                    <i class="fas fa-file-alt me-2"></i>Clean Energy Intelligence Reports
+                </h3>
+
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="glass-card">
+                            <h5 class="text-success">Global Clean Energy Outlook</h5>
+                            <p class="text-muted mb-3">
+                                Comprehensive analysis of renewable energy trends, policy impacts, and investment opportunities
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-success">Free Access</span>
+                                <button class="btn btn-outline-success btn-sm">Download</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 mb-4">
+                        <div class="glass-card premium-report-card">
+                            <div class="price-tag">$399</div>
+                            <h5 class="text-warning">Grid Modernization Strategy Report</h5>
+                            <p class="text-muted mb-3">
+                                Advanced analytics on smart grid deployment, storage integration, and demand response optimization
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-warning">Premium Report</span>
+                                <button class="btn btn-primary btn-sm report-btn premium" data-price="$399">
+                                    <span class="report-title" style="display: none;">Grid Modernization Strategy</span>
+                                    <span class="report-description" style="display: none;">Smart grid deployment analytics</span>
+                                    Preview
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI-Generated Premium Reports -->
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="glass-card premium-report-card">
+                            <div class="price-tag">$449</div>
+                            <h5 class="text-info">Energy Storage Market Analysis</h5>
+                            <p class="text-muted mb-3">
+                                Battery technology roadmaps, cost projections, and grid-scale deployment strategies
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-info">AI-Generated</span>
+                                <button class="btn btn-primary btn-sm report-btn premium" data-price="$449">
+                                    <span class="report-title" style="display: none;">Energy Storage Market Analysis</span>
+                                    <span class="report-description" style="display: none;">Battery technology and deployment</span>
+                                    Generate Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 mb-4">
+                        <div class="glass-card premium-report-card">
+                            <div class="price-tag">$499</div>
+                            <h5 class="text-danger">Carbon Impact Assessment</h5>
+                            <p class="text-muted mb-3">
+                                Detailed carbon reduction analysis with TCFD-compliant climate risk modeling
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-danger">TCFD Compliant</span>
+                                <button class="btn btn-primary btn-sm report-btn premium" data-price="$499">
+                                    <span class="report-title" style="display: none;">Carbon Impact Assessment</span>
+                                    <span class="report-description" style="display: none;">TCFD-compliant climate analysis</span>
+                                    Generate Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart Initialization -->
+    <script>
+        let fontSize = 16;
+        
+        function toggleHighContrast() {
+            document.body.classList.toggle('high-contrast');
+        }
+        
+        function increaseFontSize() {
+            fontSize += 2;
+            document.body.style.fontSize = fontSize + 'px';
+        }
+        
+        function decreaseFontSize() {
+            if (fontSize > 12) {
+                fontSize -= 2;
+                document.body.style.fontSize = fontSize + 'px';
+            }
+        }
+
+        // What-if analysis interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            const investmentSlider = document.getElementById('investmentSlider');
+            const investmentValue = document.getElementById('investmentValue');
+            const projectedCapacity = document.getElementById('projectedCapacity');
+            
+            if (investmentSlider) {
+                investmentSlider.addEventListener('input', function() {
+                    const value = this.value;
+                    investmentValue.textContent = `$${value}M`;
+                    
+                    // Calculate projected capacity
+                    const capacity = Math.round(value * 0.5);
+                    projectedCapacity.textContent = `${capacity} MW`;
+                });
+            }
+
+            // Initialize charts
+            initializeRegionalChart();
+            initializeTrendsChart();
+            initializePortfolioChart();
+        });
+
+        function initializeRegionalChart() {
+            const ctx = document.getElementById('regionalChart');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Sub-Saharan Africa', 'South Asia', 'Latin America', 'Southeast Asia', 'MENA'],
+                    datasets: [{
+                        label: 'Solar Capacity (GW)',
+                        data: [45, 38, 32, 28, 22],
+                        backgroundColor: 'rgba(255, 255, 0, 0.7)',
+                        borderColor: 'var(--terminal-yellow)',
+                        borderWidth: 2
+                    }, {
+                        label: 'Wind Capacity (GW)',
+                        data: [28, 25, 35, 18, 15],
+                        backgroundColor: 'rgba(0, 255, 65, 0.7)',
+                        borderColor: 'var(--terminal-green)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Clean Energy Capacity by Region',
+                            color: 'var(--terminal-white)',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            labels: { color: 'var(--terminal-white)' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: 'var(--terminal-white)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: 'var(--terminal-white)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeTrendsChart() {
+            const ctx = document.getElementById('trendsChart');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024', '2025 (Proj)', '2026 (Proj)'],
+                    datasets: [{
+                        label: 'Clean Energy Capacity (GW)',
+                        data: [78, 89, 98, 112, 127, 145, 167],
+                        borderColor: 'var(--terminal-yellow)',
+                        backgroundColor: 'rgba(255, 255, 0, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'AI Projection',
+                        data: [null, null, null, null, 127, 145, 167],
+                        borderColor: 'var(--terminal-green)',
+                        borderDash: [5, 5],
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Energy Capacity Growth with AI Projections',
+                            color: 'var(--terminal-white)',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            labels: { color: 'var(--terminal-white)' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: 'var(--terminal-white)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: 'var(--terminal-white)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializePortfolioChart() {
+            const ctx = document.getElementById('portfolioChart');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                    datasets: [{
+                        label: 'Portfolio Performance (%)',
+                        data: [15.2, 16.8, 18.1, 19.5, 21.2, 22.8, 24.1, 25.6, 26.9, 28.2],
+                        borderColor: 'var(--terminal-green)',
+                        backgroundColor: 'rgba(0, 255, 65, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Clean Energy Index',
+                        data: [12.5, 13.2, 14.1, 15.8, 16.5, 17.2, 18.9, 19.4, 20.1, 21.3],
+                        borderColor: 'var(--terminal-yellow)',
+                        backgroundColor: 'rgba(255, 255, 0, 0.1)',
+                        tension: 0.4,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Portfolio vs Benchmark Performance',
+                            color: 'var(--terminal-white)',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            labels: { color: 'var(--terminal-white)' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: { color: 'var(--terminal-white)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: 'var(--terminal-white)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+    
+    <!-- AI Dashboard Administrator -->
+    <script src="esg_leaderboard_system.js"></script>
+    <script src="esg_enhanced_framework.js"></script>
+</body>
+</html>
