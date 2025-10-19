@@ -2510,14 +2510,19 @@
                     }
                 }
             });
-
+        
             // Initialize scenario charts
             initializeScenarioCharts();
+            
+            // REMOVED: initializeROIChart(); // This function doesn't exist
+            
+            // Initialize ripple chart
             initializeRippleChart();
            
             // Initialize portfolio chart
             initializePortfolioChart();
         }
+        
 
         function initializeScenarioCharts() {
             // Scenario Impact Chart with real data
