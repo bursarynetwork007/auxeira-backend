@@ -1,0 +1,19 @@
+{
+  "name": "auxeira-backend",
+  "version": "1.0.0",
+  "description": "Auxeira Backend Server with Real Database",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "server": "node server.js",
+    "generate-db": "node generate-database.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "express-rate-limit": "^7.1.5",
+    "dotenv": "^16.0.3"
+  }
+}
