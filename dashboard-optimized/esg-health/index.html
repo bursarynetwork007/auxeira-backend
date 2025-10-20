@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira SDG 3: Good Health & Well-being - Institutional ESG Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="profile_completion_system.js"></script>
+    <style>
+        :root {
+            --primary-color: #e11d48;
+            --secondary-color: #f43f5e;
+            --primary-color-rgb: 225, 29, 72;
+            --secondary-color-rgb: 244, 63, 94;
+            --dark-bg: #0a0a0a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #050505 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        
+        .high-contrast {
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.3);
+        }
+        
+        .accessibility-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .accessibility-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .accessibility-btn:hover, .accessibility-btn:focus {
+            background: var(--primary-color);
+            outline: 2px solid #10b981;
+        }
+        
+        .live-update-bar {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            padding: 0.5rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .update-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        .dashboard-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 2rem 0;
+            position: relative;
+        }
+        
+        .sdg-badge {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .compliance-badges {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .compliance-badge {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .compliance-badge.sfdr {
+            border-color: #10b981;
+            color: #10b981;
+        }
+        
+        .compliance-badge.csrd {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .compliance-badge.tcfd {
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+        
+        .nav-tabs {
+            background: var(--glass-bg);
+            border-radius: 12px;
+            padding: 0.5rem;
+            margin: 2rem 0;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            margin: 0 0.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-primary);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary-color);
+        }
+        
+        .glass-card.ai-powered::before {
+            content: '🤖 AI-Generated';
+            position: absolute;
+            top: -10px;
+            right: 15px;
+            background: linear-gradient(45deg, #1e40af, #7c3aed);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        .metric-card {
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .metric-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .metric-change {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        .metric-change.positive {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        
+        .chart-container {
+            height: 400px;
+            margin: 1rem 0;
+            position: relative;
+        }
+        
+        .story-card {
+            background: linear-gradient(135deg, rgba(225, 29, 72, 0.1), rgba(244, 63, 94, 0.1));
+            border: 1px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .story-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .story-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+        
+        .impact-score {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+        
+        .report-preview {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .report-preview.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .report-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .report-preview-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+        
+        .report-preview.locked .report-preview-text::after {
+            content: '... [Premium Content - Unlock to read more]';
+            color: #f59e0b;
+            font-weight: bold;
+        }
+        
+        .report-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .price-tag {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        .btn-unlock {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .btn-unlock:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .personalized-content {
+            border-left: 3px solid var(--primary-color);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            background: rgba(225, 29, 72, 0.05);
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .profile-indicator {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .compliance-badges {
+                flex-direction: column;
+            }
+        }
+        
+        .nav-link:focus,
+        .btn-unlock:focus,
+        .accessibility-btn:focus {
+            outline: 2px solid #10b981;
+            outline-offset: 2px;
+        }
+    </style>
+    <script src="ai_dashboard_administrator.js"></script>
+    <style>
+        .chart-container { margin: 20px 0; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px; }
+        .chart-title { color: var(--terminal-green); margin-bottom: 15px; }
+        .premium-report-card { position: relative; padding: 20px; margin-bottom: 15px; }
+        .price-tag { position: absolute; top: 10px; right: 10px; background: var(--terminal-green); color: var(--terminal-dark); padding: 4px 8px; border-radius: 12px; font-weight: bold; }
+        .update-indicator { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .locked-content { border: 2px dashed var(--terminal-yellow); }
+        .generate-report-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    </style>
+    <link rel="stylesheet" href="leaderboard_styles.css">
+<script src="../utils/api-client.js"></script>
+<script src="../utils/auth-guard.js"></script>
+</head>
+<body>
+    <div class="accessibility-controls">
+        <button class="accessibility-btn" onclick="toggleHighContrast()" aria-label="Toggle high contrast mode">
+            <i class="fas fa-adjust"></i>
+        </button>
+        <button class="accessibility-btn" onclick="increaseFontSize()" aria-label="Increase font size">
+            <i class="fas fa-plus"></i>
+        </button>
+        <button class="accessibility-btn" onclick="decreaseFontSize()" aria-label="Decrease font size">
+            <i class="fas fa-minus"></i>
+        </button>
+    </div>
+
+    <div class="live-update-bar">
+        <div class="update-indicator">
+            <div class="pulse-dot"></div>
+            <span>Live Healthcare Data Feed Active</span>
+        </div>
+        <div>
+            Last updated: <span id="updateTimestamp">2024-10-16 14:23:45 UTC</span>
+        </div>
+    </div>
+    
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="sdg-badge">
+                <i class="fas fa-heartbeat"></i>
+                SDG 3: Good Health & Well-being
+            </div>
+            <h1><span id="orgName">BlackRock</span> Healthcare Access & Medical Innovation Dashboard</h1>
+            <p class="lead">Institutional-grade analytics for global health investments with real-time impact tracking and AI-powered insights</p>
+            <div class="compliance-badges">
+                <div class="compliance-badge sfdr">
+                    <i class="fas fa-check-circle"></i>
+                    SFDR Article 9 Compliant
+                </div>
+                <div class="compliance-badge csrd">
+                    <i class="fas fa-shield-alt"></i>
+                    CSRD Reporting Ready
+                </div>
+                <div class="compliance-badge tcfd">
+                    <i class="fas fa-leaf"></i>
+                    TCFD Aligned
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="profile-indicator">
+            <i class="fas fa-user-circle"></i>
+            <span>Personalized for: <strong id="userProfile">ESG Fund Manager - Healthcare Access & Medical Innovation</strong></span>
+        </div>
+
+        <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
+                    <i class="fas fa-chart-line me-2"></i>Health Impact Overview
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="stories-tab" data-bs-toggle="tab" data-bs-target="#stories" type="button" role="tab" aria-controls="stories" aria-selected="false">
+                    <i class="fas fa-book-open me-2"></i>Success Stories
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="portfolio-tab" data-bs-toggle="tab" data-bs-target="#portfolio" type="button" role="tab" aria-controls="portfolio" aria-selected="false">
+                    <i class="fas fa-briefcase me-2"></i>Healthcare Portfolio
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
+                    <i class="fas fa-brain me-2"></i>AI Health Analytics
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab" aria-controls="reports" aria-selected="false">
+                    <i class="fas fa-file-alt me-2"></i>Premium Health Reports
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="dashboardTabContent">
+            <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="glass-card metric-card">
+                            <div class="metric-number" id="metric1">89.2M</div>
+                            <div class="metric-label">People with Healthcare Access</div>
+                            <div class="metric-change positive">+12.4M this year</div>
+                            <div class="sr-only">89.2 million people with healthcare access, increased by 12.4 million this year</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card metric-card">
+                            <div class="metric-number" id="metric2">94%</div>
+                            <div class="metric-label">Treatment Success Rate</div>
+                            <div class="metric-change positive">+8% improvement</div>
+                            <div class="sr-only">94% treatment success rate, improved by 8%</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card metric-card">
+                            <div class="metric-number" id="metric3">340%</div>
+                            <div class="metric-label">Health ROI</div>
+                            <div class="metric-change positive">+67% vs benchmark</div>
+                            <div class="sr-only">340% health return on investment, 67% above benchmark</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card metric-card">
+                            <div class="metric-number" id="metric4">96</div>
+                            <div class="metric-label">Health Impact Score</div>
+                            <div class="metric-change positive">+11 points</div>
+                            <div class="sr-only">Health impact score of 96, increased by 11 points</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card ai-powered">
+                    <h4 class="mb-3">Healthcare Analytics & AI Health Predictions</h4>
+                    <div class="chart-container">
+                        <canvas id="mainChart" aria-label="Main healthcare analytics chart showing treatment outcomes and AI predictions"></canvas>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="glass-card ai-powered">
+                            <h5 class="mb-3">Disease Risk Assessment</h5>
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="riskChart" aria-label="Healthcare risk assessment by disease category"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="glass-card ai-powered">
+                            <h5 class="mb-3">Regional Health Impact</h5>
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="regionalChart" aria-label="Regional healthcare impact analysis"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="stories" role="tabpanel" aria-labelledby="stories-tab">
+                <div class="personalized-content">
+                    <h5><i class="fas fa-user-tie me-2"></i>Curated for <span id="orgNameStories">BlackRock</span> Healthcare Investment Focus</h5>
+                    <p>These success stories align with your portfolio's healthcare access mandate and medical innovation impact measurement frameworks.</p>
+                </div>
+
+                <div class="story-card">
+                    <div class="story-header">
+                        <div>
+                            <div class="story-title">Revolutionary Telemedicine Network Transforms Rural Healthcare</div>
+                            <div class="text-muted">Digital Health Partnership • 2022-2024</div>
+                        </div>
+                        <div class="impact-score">98% Impact Score</div>
+                    </div>
+                    <p class="mb-3">
+                        Comprehensive telemedicine platform serving 45 million people across remote regions in Sub-Saharan Africa and Southeast Asia. 
+                        Through AI-powered diagnostics and mobile health technology, this initiative has achieved 94% diagnostic accuracy while 
+                        reducing healthcare costs by 67% and improving treatment outcomes by 89%. The program demonstrates scalable digital health 
+                        solutions for underserved populations with measurable impact on maternal mortality, infectious disease management, and chronic care.
+                    </p>
+                    <div class="row text-center mt-3">
+                        <div class="col-3">
+                            <div class="h5" style="color: var(--primary-color)">45M</div>
+                            <small>Patients Served</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="h5" style="color: var(--primary-color)">94%</div>
+                            <small>Diagnostic Accuracy</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="h5" style="color: var(--primary-color)">67%</div>
+                            <small>Cost Reduction</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="h5" style="color: var(--primary-color)">$2.1B</div>
+                            <small>Health Economic Impact</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="story-card">
+                    <div class="story-header">
+                        <div>
+                            <div class="story-title">AI-Powered Drug Discovery Accelerates Rare Disease Treatment</div>
+                            <div class="text-muted">Pharmaceutical Innovation Initiative • 2023-2024</div>
+                        </div>
+                        <div class="impact-score">95% Impact Score</div>
+                    </div>
+                    <p class="mb-3">
+                        Machine learning platform that reduced drug discovery time from 10-15 years to 3-5 years for rare diseases affecting 
+                        300 million people globally. The initiative has identified 47 promising drug candidates, with 12 entering clinical trials 
+                        and 3 receiving regulatory approval. This breakthrough approach demonstrates how AI can accelerate medical innovation 
+                        while maintaining safety standards and reducing development costs by 78%.
+                    </p>
+                    <div class="row text-center mt-3">
+                        <div class="col-3">
+                            <div class="h5" style="color: var(--primary-color)">47</div>
+                            <small>Drug Candidates</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="h5" style="color: var(--primary-color)">78%</div>
+                            <small>Cost Reduction</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="h5" style="color: var(--primary-color)">300M</div>
+                            <small>Patients Impacted</small>
+                        </div>
+                        <div class="col-3">
+                            <div class="h5" style="color: var(--primary-color)">3</div>
+                            <small>Approved Treatments</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="portfolio" role="tabpanel" aria-labelledby="portfolio-tab">
+                <div class="glass-card ai-powered">
+                    <h4 class="mb-3">Active Healthcare Investments</h4>
+                    <div class="chart-container">
+                        <canvas id="portfolioChart" aria-label="Healthcare portfolio performance and allocation chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Digital Health Platforms</h5>
+                            <p class="text-muted mb-3">Telemedicine & AI Diagnostics</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="h4" style="color: var(--primary-color)">$890M</div>
+                                    <div class="small">Investment</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 text-info">45M</div>
+                                    <div class="small">Patients Served</div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Health Impact Score</span>
+                                    <span style="color: var(--primary-color)">98/100</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar" style="width: 98%; background-color: var(--primary-color);"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Pharmaceutical Innovation</h5>
+                            <p class="text-muted mb-3">Drug Discovery & Development</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="h4" style="color: var(--primary-color)">$1.2B</div>
+                                    <div class="small">Investment</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 text-info">47</div>
+                                    <div class="small">Drug Candidates</div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Innovation Score</span>
+                                    <span style="color: var(--primary-color)">95/100</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar" style="width: 95%; background-color: var(--primary-color);"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Healthcare Infrastructure</h5>
+                            <p class="text-muted mb-3">Hospitals & Medical Equipment</p>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="h4" style="color: var(--primary-color)">$670M</div>
+                                    <div class="small">Investment</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="h4 text-info">340</div>
+                                    <div class="small">Facilities</div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Access Score</span>
+                                    <span style="color: var(--primary-color)">92/100</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar" style="width: 92%; background-color: var(--primary-color);"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="analytics" role="tabpanel" aria-labelledby="analytics-tab">
+                <div class="glass-card ai-powered">
+                    <h4 class="mb-3">Predictive Health Impact Modeling</h4>
+                    <div class="chart-container">
+                        <canvas id="predictiveChart" aria-label="AI-powered predictive health impact analysis"></canvas>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Disease Prevention Forecast</h5>
+                            <p class="text-muted">AI models predict disease outbreak patterns and prevention effectiveness</p>
+                            <div class="chart-container" style="height: 250px;">
+                                <canvas id="preventionChart" aria-label="Disease prevention effectiveness forecast"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="glass-card">
+                            <h5 class="mb-3">Treatment Outcome Predictions</h5>
+                            <p class="text-muted">Machine learning analysis of treatment success rates by intervention type</p>
+                            <div class="chart-container" style="height: 250px;">
+                                <canvas id="treatmentChart" aria-label="Treatment outcome predictions by intervention"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="reports" role="tabpanel" aria-labelledby="reports-tab">
+                <div class="personalized-content">
+                    <h5><i class="fas fa-file-alt me-2"></i>Healthcare Reports for <span id="orgNameReports">BlackRock</span></h5>
+                    <p>AI-generated healthcare reports tailored to your medical innovation mandate and regulatory requirements.</p>
+                </div>
+
+                <div class="report-preview">
+                    <div class="report-title">SDG 3 Quarterly Health Impact Summary</div>
+                    <div class="report-preview-text">
+                        Comprehensive quarterly report analyzing healthcare access and medical innovation impact across your investment portfolio. 
+                        Key findings include significant progress in patient outcomes, strong correlation between digital health initiatives and 
+                        measurable health improvements, detailed SFDR Article 9 compliance metrics with CSRD-ready health impact disclosures, 
+                        and analysis of 89.2M people gaining healthcare access through portfolio investments.
+                    </div>
+                    <div class="report-price">
+                        <span class="text-success font-weight-bold">FREE REPORT</span>
+                        <button class="btn btn-success">Download PDF</button>
+                    </div>
+                </div>
+
+                <div class="report-preview locked">
+                    <div class="report-title">Advanced Healthcare Analytics & AI Insights</div>
+                    <div class="report-preview-text">
+                        Leveraging machine learning algorithms and comprehensive health data analysis, this report provides predictive insights 
+                        into global healthcare trends, disease prevention effectiveness, and treatment outcome optimization. Features advanced 
+                        epidemiological modeling, pharmaceutical pipeline analysis, and AI-powered investment recommendations for maximizing 
+                        health impact while maintaining target returns.
+                    </div>
+                    <div class="report-price">
+                        <div class="price-tag">$49</div>
+                        <button class="btn-unlock" onclick="purchaseReport('advanced-health-analytics', 49)">Unlock Report</button>
+                    </div>
+                </div>
+
+                <div class="report-preview locked">
+                    <div class="report-title">Healthcare Investment Optimization Strategy</div>
+                    <div class="report-preview-text">
+                        Comprehensive strategy report combining AI-powered health impact prediction with portfolio optimization recommendations. 
+                        Includes custom allocation models for maximizing SDG 3 health outcomes, regulatory compliance frameworks for healthcare 
+                        investments, risk assessment for pharmaceutical and medical device investments, and detailed analysis of emerging health 
+                        technologies with highest impact potential.
+                    </div>
+                    <div class="report-price">
+                        <div class="price-tag">$199</div>
+                        <button class="btn-unlock" onclick="purchaseReport('health-optimization-strategy', 199)">Unlock Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            personalizeContent();
+            startRealTimeUpdates();
+        });
+
+        // Personalization
+        function personalizeContent() {
+            const orgName = 'BlackRock';
+            document.getElementById('orgName').textContent = orgName;
+            document.getElementById('orgNameStories').textContent = orgName;
+            document.getElementById('orgNameReports').textContent = orgName;
+            document.getElementById('userProfile').textContent = 'ESG Fund Manager - Healthcare Access & Medical Innovation';
+        }
+
+        // Real-time updates
+        function startRealTimeUpdates() {
+            setInterval(updateTimestamp, 30000);
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('updateTimestamp').textContent = now.toISOString().replace('T', ' ').substr(0, 19) + ' UTC';
+        }
+
+        // Chart initialization
+        function initializeCharts() {
+            // Main Chart
+            const mainCtx = document.getElementById('mainChart').getContext('2d');
+            new Chart(mainCtx, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024', '2025 (Proj)', '2026 (Proj)'],
+                    datasets: [{
+                        label: 'Healthcare Access (Millions)',
+                        data: [45.2, 52.8, 61.4, 73.9, 89.2, 107.5, 128.3],
+                        borderColor: '#e11d48',
+                        backgroundColor: 'rgba(225, 29, 72, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
+                    scales: {
+                        y: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        x: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+                    }
+                }
+            });
+
+            // Risk Chart
+            const riskCtx = document.getElementById('riskChart').getContext('2d');
+            new Chart(riskCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Infectious Diseases', 'Chronic Conditions', 'Mental Health', 'Maternal Health', 'Other'],
+                    datasets: [{
+                        data: [35, 28, 18, 12, 7],
+                        backgroundColor: ['#e11d48', '#f43f5e', '#fb7185', '#fda4af', '#fecdd3']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#ffffff' } } }
+                }
+            });
+
+            // Regional Chart
+            const regionalCtx = document.getElementById('regionalChart').getContext('2d');
+            new Chart(regionalCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Sub-Saharan Africa', 'Southeast Asia', 'Latin America', 'South Asia', 'Middle East'],
+                    datasets: [{
+                        label: 'Health Impact Score',
+                        data: [96, 94, 89, 87, 82],
+                        backgroundColor: '#e11d48'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
+                    scales: {
+                        y: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        x: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+                    }
+                }
+            });
+
+            // Portfolio Chart
+            const portfolioCtx = document.getElementById('portfolioChart').getContext('2d');
+            new Chart(portfolioCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Digital Health', 'Pharmaceuticals', 'Infrastructure', 'Medical Devices', 'Preventive Care'],
+                    datasets: [{
+                        label: 'Investment ($M)',
+                        data: [890, 1200, 670, 450, 340],
+                        backgroundColor: '#e11d48'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
+                    scales: {
+                        y: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        x: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+                    }
+                }
+            });
+
+            // Predictive Chart
+            const predictiveCtx = document.getElementById('predictiveChart').getContext('2d');
+            new Chart(predictiveCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'High Impact Potential',
+                        data: [{x: 98, y: 24.5}, {x: 95, y: 22.8}, {x: 92, y: 19.4}, {x: 89, y: 18.2}],
+                        backgroundColor: '#e11d48'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
+                    scales: {
+                        y: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        x: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+                    }
+                }
+            });
+
+            // Prevention Chart
+            const preventionCtx = document.getElementById('preventionChart').getContext('2d');
+            new Chart(preventionCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025', 'Q2 2025'],
+                    datasets: [{
+                        label: 'Prevention Effectiveness (%)',
+                        data: [78, 82, 85, 89, 92, 95],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
+                    scales: {
+                        y: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        x: { ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+                    }
+                }
+            });
+
+            // Treatment Chart
+            const treatmentCtx = document.getElementById('treatmentChart').getContext('2d');
+            new Chart(treatmentCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Surgery', 'Medication', 'Therapy', 'Prevention', 'Digital Health', 'Rehabilitation'],
+                    datasets: [{
+                        label: 'Success Rate (%)',
+                        data: [92, 89, 85, 96, 94, 87],
+                        borderColor: '#e11d48',
+                        backgroundColor: 'rgba(225, 29, 72, 0.2)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
+                    scales: {
+                        r: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { color: '#ffffff' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Accessibility functions
+        function toggleHighContrast() {
+            document.body.classList.toggle('high-contrast');
+        }
+
+        function increaseFontSize() {
+            const currentSize = parseFloat(getComputedStyle(document.body).fontSize);
+            document.body.style.fontSize = (currentSize + 2) + 'px';
+        }
+
+        function decreaseFontSize() {
+            const currentSize = parseFloat(getComputedStyle(document.body).fontSize);
+            if (currentSize > 12) {
+                document.body.style.fontSize = (currentSize - 2) + 'px';
+            }
+        }
+
+        // Report purchase function
+        function purchaseReport(reportType, price) {
+            const handler = PaystackPop.setup({
+                key: publicKey // Fetched from backend,
+                email: 'user@blackrock.com',
+                amount: price * 100,
+                currency: 'USD',
+                ref: 'auxeira_' + reportType + '_' + Math.floor(Math.random() * 1000000),
+                metadata: {
+                    report_type: reportType,
+                    org_name: 'BlackRock',
+                    sdg: '3'
+                },
+                callback: function(response) {
+                    alert('Payment successful! Your healthcare report will be delivered within 24 hours.');
+                },
+                onClose: function() {
+                    alert('Payment cancelled');
+                }
+            });
+            handler.openIframe();
+        }
+    </script>
+    <script src="esg_leaderboard_system.js"></script>
+    <script src="esg_enhanced_framework.js"></script>
+</body>
+</html>

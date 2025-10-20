@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VC Dashboard Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.5.0/Recharts.js"></script>
+    <style>
+        body { margin: 0; background: #0f172a; color: white; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div id="root">Loading...</div>
+    
+    <script type="module">
+        import { createElement } from 'https://esm.sh/react@18';
+        import { createRoot } from 'https://esm.sh/react-dom@18/client';
+        
+        // Simple test component
+        const TestDashboard = () => {
+            return createElement('div', { 
+                style: { 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    minHeight: '100vh',
+                    flexDirection: 'column',
+                    gap: '20px'
+                }
+            }, 
+                createElement('h1', { style: { fontSize: '48px' } }, '🎉'),
+                createElement('h2', null, 'Dashboard Test Successful!'),
+                createElement('p', null, 'React and libraries are working')
+            );
+        };
+        
+        const root = createRoot(document.getElementById('root'));
+        root.render(createElement(TestDashboard));
+        
+        console.log('Test dashboard rendered!');
+    </script>
+</body>
+</html>
