@@ -5226,12 +5226,20 @@
                     localStorage.setItem('auxeira_refresh_token', data.data.refresh_token);
                 }
 
+                // Check if this is a test user
+                const testUsers = ['founder@startup.com', 'test@auxeira.com'];
+                const isTestUser = testUsers.includes(loginData.email);
+
                 const userData = {
-                    id: data.data?.user?.id || data.userId,
+                    userId: data.data?.user?.userId || data.data?.user?.id || data.userId,
+                    id: data.data?.user?.userId || data.data?.user?.id || data.userId,
                     email: data.data?.user?.email || loginData.email,
                     firstName: data.data?.user?.firstName || '',
                     lastName: data.data?.user?.lastName || '',
-                    userType: data.data?.user?.userType || 'venture_capital'
+                    userType: data.data?.user?.role || data.data?.user?.profileType || data.data?.user?.userType || 'venture_capital',
+                    role: data.data?.user?.role || data.data?.user?.profileType || 'venture_capital',
+                    tier: data.data?.user?.tier || (isTestUser ? 'founder' : 'founder'),
+                    onboardingCompleted: data.data?.user?.onboardingCompleted || isTestUser
                 };
                 
                 localStorage.setItem('auxeira_user', JSON.stringify(userData));
@@ -5244,6 +5252,27 @@
                 }
 
                 setTimeout(() => {
+                    // For test users, set all required localStorage flags
+                    if (isTestUser) {
+                        localStorage.setItem('onboarding_completed', 'true');
+                        localStorage.setItem('subscription_status', 'active');
+                        localStorage.setItem('subscription_tier', 'founder');
+                        localStorage.setItem('subscription_date', new Date().toISOString());
+                        
+                        // Redirect to dashboard
+                        const dashboardMap = {
+                            'startup_founder': 'https://dashboard.auxeira.com/startup_founder.html',
+                            'corporate_partner': 'https://dashboard.auxeira.com/corporate_partner.html',
+                            'venture_capital': 'https://dashboard.auxeira.com/venture_capital.html',
+                            'angel_investor': 'https://dashboard.auxeira.com/angel_investor.html',
+                            'government': 'https://dashboard.auxeira.com/government.html',
+                            'esg_funder': 'https://dashboard.auxeira.com/esg_funder.html'
+                        };
+                        window.location.href = dashboardMap[userData.userType] || 'https://dashboard.auxeira.com/venture_capital.html';
+                        return;
+                    }
+                    
+                    // Regular user flow
                     const dashboardMap = {
                         'startup_founder': 'https://dashboard.auxeira.com/startup_founder.html',
                         'corporate_partner': 'https://dashboard.auxeira.com/corporate_partner.html',
