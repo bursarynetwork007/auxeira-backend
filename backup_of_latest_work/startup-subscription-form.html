@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira Subscription Selector</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Bloomberg Terminal Aesthetic */
+        :root {
+            --bloomberg-dark: #0d1117;
+            --bloomberg-charcoal: #161b22;
+            --bloomberg-blue: #007bff;
+            --bloomberg-accent: #ffd700;
+            --bloomberg-text: #f0f6fc;
+            --bloomberg-text-secondary: #8b949e;
+            --bloomberg-gray: #30363d;
+            --bloomberg-success: #28a745;
+            --bloomberg-warning: #ffc107;
+            --bloomberg-danger: #dc3545;
+            --border-radius: 8px;
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.2);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bloomberg-dark);
+            color: var(--bloomberg-text);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--bloomberg-text);
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--bloomberg-text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: 2rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background-color: var(--bloomberg-charcoal);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--bloomberg-blue) 0%, var(--bloomberg-accent) 100%);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            font-size: 0.85rem;
+            color: var(--bloomberg-text-secondary);
+            text-align: center;
+        }
+
+        /* Main Content */
+        .content {
+            background: var(--bloomberg-charcoal);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            min-height: 500px;
+        }
+
+        /* Questionnaire Section */
+        .questionnaire {
+            display: none;
+        }
+
+        .questionnaire.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .question-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--bloomberg-text);
+            margin-bottom: 1.5rem;
+        }
+
+        .question-subtitle {
+            color: var(--bloomberg-text-secondary);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-btn {
+            background: var(--bloomberg-dark);
+            border: 2px solid var(--bloomberg-gray);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-align: left;
+            color: var(--bloomberg-text);
+        }
+
+        .option-btn:hover {
+            border-color: var(--bloomberg-blue);
+            background: rgba(0, 123, 255, 0.05);
+        }
+
+        .option-btn.selected {
+            border-color: var(--bloomberg-accent);
+            background: rgba(255, 215, 0, 0.1);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .option-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .option-description {
+            font-size: 0.85rem;
+            color: var(--bloomberg-text-secondary);
+        }
+
+        /* Recommendation Section */
+        .recommendation {
+            display: none;
+        }
+
+        .recommendation.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .recommendation-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .recommendation-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--bloomberg-success);
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendation-subtitle {
+            color: var(--bloomberg-text-secondary);
+        }
+
+        .recommended-tier-card {
+            background: rgba(0, 123, 255, 0.05);
+            border: 2px solid var(--bloomberg-blue);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .recommended-tier-name {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--bloomberg-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .recommended-tier-price {
+            font-size: 2.5rem;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--bloomberg-accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .recommended-tier-period {
+            color: var(--bloomberg-text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .urgency-badge {
+            background: linear-gradient(135deg, var(--bloomberg-danger) 0%, var(--bloomberg-warning) 100%);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+
+        .tier-benefits {
+            background: var(--bloomberg-dark);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .benefits-title {
+            font-weight: 600;
+            color: var(--bloomberg-accent);
+            margin-bottom: 1rem;
+        }
+
+        .benefits-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .benefits-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .benefits-list i {
+            color: var(--bloomberg-success);
+        }
+
+        .pricing-toggle-section {
+            background: var(--bloomberg-dark);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .toggle-label-text {
+            display: block;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: var(--bloomberg-text);
+        }
+
+        .pricing-toggle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 100px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bloomberg-charcoal);
+            transition: .4s;
+            border-radius: 30px;
+            border: 1px solid var(--bloomberg-gray);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 44px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--bloomberg-text);
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+        input:checked + .slider {
+            background-color: var(--bloomberg-blue);
+            border-color: var(--bloomberg-blue);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(52px);
+        }
+
+        .save-badge {
+            background-color: var(--bloomberg-success);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 0.5rem;
+        }
+
+        /* Pricing Section */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tier-card {
+            background: var(--bloomberg-dark);
+            border: 2px solid var(--bloomberg-gray);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .tier-card:hover {
+            border-color: var(--bloomberg-blue);
+        }
+
+        .tier-card.selected {
+            border-color: var(--bloomberg-accent);
+            background: rgba(255, 215, 0, 0.1);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .tier-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--bloomberg-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .tier-price {
+            font-size: 1.8rem;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--bloomberg-text);
+            margin-bottom: 0.25rem;
+        }
+
+        .tier-period {
+            font-size: 0.75rem;
+            color: var(--bloomberg-text-secondary);
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border-radius: var(--border-radius);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--bloomberg-blue) 0%, var(--bloomberg-accent) 100%);
+            color: var(--bloomberg-dark);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--bloomberg-charcoal);
+            color: var(--bloomberg-text);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            display: none;
+        }
+
+        .pricing-section.active {
+            display: block;
+        }
+
+        .pricing-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--bloomberg-text);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .pricing-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 1.5rem;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-rocket"></i> Welcome to Auxeira</h1>
+            <p>Let's find the perfect plan for your startup</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Step 1 of 3</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Question 1: Funding Raised -->
+            <div class="questionnaire active" id="q1">
+                <div class="question-title">How much funding have you raised?</div>
+                <div class="question-subtitle">This helps us understand your startup's stage and needs</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="selectAnswer('funding', 'less-10k', this)">
+                        <div class="option-title"><i class="fas fa-seedling"></i> Less than $10K</div>
+                        <div class="option-description">Bootstrap or pre-revenue stage</div>
+                    </button>
+                    <button class="option-btn" onclick="selectAnswer('funding', '10k-500k', this)">
+                        <div class="option-title"><i class="fas fa-plant"></i> $10K - $500K</div>
+                        <div class="option-description">Pre-Seed or Seed stage</div>
+                    </button>
+                    <button class="option-btn" onclick="selectAnswer('funding', '500k-5m', this)">
+                        <div class="option-title"><i class="fas fa-tree"></i> $500K - $5M</div>
+                        <div class="option-description">Series A stage</div>
+                    </button>
+                    <button class="option-btn" onclick="selectAnswer('funding', '5m-plus', this)">
+                        <div class="option-title"><i class="fas fa-forest"></i> $5M+</div>
+                        <div class="option-description">Series B or beyond</div>
+                    </button>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="nextQuestion()" id="q1-next" disabled>
+                        Continue <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Question 2: Monthly Revenue -->
+            <div class="questionnaire" id="q2">
+                <div class="question-title">What's your current monthly revenue?</div>
+                <div class="question-subtitle">Help us understand your revenue stage</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="selectAnswer('revenue', 'less-5k', this)">
+                        <div class="option-title"><i class="fas fa-chart-line"></i> Less than $5K</div>
+                        <div class="option-description">Pre-revenue or very early stage</div>
+                    </button>
+                    <button class="option-btn" onclick="selectAnswer('revenue', '5k-25k', this)">
+                        <div class="option-title"><i class="fas fa-chart-area"></i> $5K - $25K</div>
+                        <div class="option-description">Early traction phase</div>
+                    </button>
+                    <button class="option-btn" onclick="selectAnswer('revenue', '25k-100k', this)">
+                        <div class="option-title"><i class="fas fa-chart-pie"></i> $25K - $100K</div>
+                        <div class="option-description">Strong growth phase</div>
+                    </button>
+                    <button class="option-btn" onclick="selectAnswer('revenue', '100k-plus', this)">
+                        <div class="option-title"><i class="fas fa-chart-bar"></i> $100K+</div>
+                        <div class="option-description">Scaling phase</div>
+                    </button>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="prevQuestion()">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button class="btn btn-primary" onclick="nextQuestion()" id="q2-next" disabled>
+                        Continue <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Question 3: Team Size -->
+            <div class="questionnaire" id="q3">
+                <div class="question-title">How many people are on your team?</div>
+                <div class="question-subtitle">This helps us tailor features and support for your needs</div>
+                <div class="options-grid">
+                    <button class="option-btn" onclick="selectAnswer('team', 'less-5', this)">
+                        <div class="option-title"><i class="fas fa-user"></i> Less than 5</div>
+                        <div class="option-description">Solo founder or small team</div>
+                    </button>
+                    <button class="option-btn" onclick="selectAnswer('team', '5-15', this)">
+                        <div class="option-title"><i class="fas fa-users"></i> 5 - 15</div>
+                        <div class="option-description">Growing team</div>
+                    </button>
+                    <button class="option-btn" onclick="selectAnswer('team', '15-50', this)">
+                        <div class="option-title"><i class="fas fa-people-carry"></i> 15 - 50</div>
+                        <div class="option-description">Established team</div>
+                    </button>
+                    <button class="option-btn" onclick="selectAnswer('team', '50-plus', this)">
+                        <div class="option-title"><i class="fas fa-sitemap"></i> 50+</div>
+                        <div class="option-description">Large organization</div>
+                    </button>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="prevQuestion()">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button class="btn btn-primary" onclick="showRecommendation()" id="q3-next" disabled>
+                        See My Recommendation <i class="fas fa-check"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recommendation Section -->
+            <div class="recommendation" id="recommendation">
+                <div class="recommendation-header">
+                    <div class="recommendation-title">
+                        <i class="fas fa-star"></i> Perfect Match Found!
+                    </div>
+                    <div class="recommendation-subtitle">Based on your startup's profile, we recommend:</div>
+                </div>
+
+                <div class="recommended-tier-card">
+                    <div class="urgency-badge">
+                        <i class="fas fa-clock"></i> Onboarding Offer - Limited Time
+                    </div>
+                    <div class="recommended-tier-name" id="recTierName">Startup</div>
+                    <div class="recommended-tier-price" id="recTierPrice">$149</div>
+                    <div class="recommended-tier-period" id="recTierPeriod">/month, billed monthly</div>
+                </div>
+
+                <div class="tier-benefits">
+                    <div class="benefits-title"><i class="fas fa-gift"></i> What You Get:</div>
+                    <ul class="benefits-list" id="recBenefits">
+                        <li><i class="fas fa-check-circle"></i> Access to all core features</li>
+                        <li><i class="fas fa-check-circle"></i> Priority support</li>
+                        <li><i class="fas fa-check-circle"></i> Monthly analytics reports</li>
+                    </ul>
+                </div>
+
+                <div class="pricing-toggle-section">
+                    <div class="toggle-label-text">Save 20% with annual billing</div>
+                    <div class="pricing-toggle">
+                        <span style="color: var(--bloomberg-text-secondary);">Monthly</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="pricingToggle" onchange="togglePricing()">
+                            <span class="slider"></span>
+                        </label>
+                        <span style="color: var(--bloomberg-text-secondary);">Annual</span>
+                        <span class="save-badge" id="saveBadge" style="display: none;">SAVE 20%</span>
+                    </div>
+                </div>
+
+                <div class="pricing-section active" id="pricingSection">
+                    <div class="pricing-title">Or choose a different plan:</div>
+                    <div class="pricing-grid" id="pricingGrid">
+                        <!-- Pricing cards will be populated here -->
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="backToQuestions()">
+                        <i class="fas fa-arrow-left"></i> Change Answers
+                    </button>
+                    <button class="btn btn-primary" onclick="proceedToPayment()" id="proceedBtn">
+                        <i class="fas fa-lock"></i> Proceed to Payment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TIER_DATA = {
+            founder: {
+                name: "Founder",
+                monthlyPrice: "FREE",
+                annualPrice: "Always FREE",
+                stage: "Bootstrap/Pre-revenue",
+                criteria: ["Raised <$10K", "<$5K MRR", "<5 employees"],
+                benefits: ["Basic analytics", "Community access", "Email support"]
+            },
+            startup: {
+                name: "Startup",
+                monthlyPrice: 149,
+                annualPrice: 119,
+                stage: "Pre-Seed to Seed",
+                criteria: ["$10K-$500K raised", "<$25K MRR", "5-15 employees"],
+                benefits: ["Advanced analytics", "Priority support", "Monthly reports", "API access"]
+            },
+            growth: {
+                name: "Growth",
+                monthlyPrice: 499,
+                annualPrice: 399,
+                stage: "Series A",
+                criteria: ["$500K-$5M raised", "$25K-$100K MRR", "15-50 employees"],
+                benefits: ["Custom reports", "Dedicated support", "Advanced API", "Team collaboration"]
+            },
+            scale: {
+                name: "Scale",
+                monthlyPrice: 999,
+                annualPrice: 799,
+                stage: "Series B+",
+                criteria: ["$5M+ raised", "$100K+ MRR", "50+ employees"],
+                benefits: ["White-label solution", "24/7 support", "Custom integrations", "SLA guarantee"]
+            }
+        };
+
+        let answers = {
+            funding: null,
+            revenue: null,
+            team: null
+        };
+
+        let isAnnual = false;
+        let recommendedTier = null;
+        let currentQuestion = 1;
+
+        function selectAnswer(question, value, element) {
+            answers[question] = value;
+            document.querySelectorAll(`[onclick*="selectAnswer('${question}"]`).forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            element.classList.add('selected');
+
+            const nextBtn = document.getElementById(`q${currentQuestion}-next`);
+            if (nextBtn) nextBtn.disabled = false;
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < 3) {
+                document.getElementById(`q${currentQuestion}`).classList.remove('active');
+                currentQuestion++;
+                document.getElementById(`q${currentQuestion}`).classList.add('active');
+                updateProgress();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 1) {
+                document.getElementById(`q${currentQuestion}`).classList.remove('active');
+                currentQuestion--;
+                document.getElementById(`q${currentQuestion}`).classList.add('active');
+                updateProgress();
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentQuestion / 3) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `Step ${currentQuestion} of 3`;
+        }
+
+        function showRecommendation() {
+            recommendedTier = calculateRecommendedTier();
+            displayRecommendation();
+            document.getElementById(`q${currentQuestion}`).classList.remove('active');
+            document.getElementById('recommendation').classList.add('active');
+            document.getElementById('progressFill').style.width = '100%';
+            document.getElementById('progressText').textContent = 'Recommendation';
+        }
+
+        function calculateRecommendedTier() {
+            // Logic to determine the best tier based on answers
+            if (answers.funding === 'less-10k') return 'founder';
+            if (answers.funding === '10k-500k') return 'startup';
+            if (answers.funding === '500k-5m') return 'growth';
+            if (answers.funding === '5m-plus') return 'scale';
+            return 'startup'; // Default
+        }
+
+        function displayRecommendation() {
+            const tier = TIER_DATA[recommendedTier];
+            document.getElementById('recTierName').textContent = tier.name;
+            document.getElementById('recTierPrice').textContent = isAnnual ? `$${tier.annualPrice}` : `$${tier.monthlyPrice}`;
+            document.getElementById('recTierPeriod').textContent = isAnnual ? `/mo, billed annually` : `/month, billed monthly`;
+
+            const benefitsList = document.getElementById('recBenefits');
+            benefitsList.innerHTML = tier.benefits.map(b => `
+                <li><i class="fas fa-check-circle"></i> ${b}</li>
+            `).join('');
+
+            renderPricingGrid();
+        }
+
+        function renderPricingGrid() {
+            const grid = document.getElementById('pricingGrid');
+            grid.innerHTML = '';
+
+            for (const key in TIER_DATA) {
+                const tier = TIER_DATA[key];
+                const price = isAnnual && tier.monthlyPrice !== "FREE" ? `$${tier.annualPrice}` : (tier.monthlyPrice === "FREE" ? "FREE" : `$${tier.monthlyPrice}`);
+                const period = tier.monthlyPrice === "FREE" ? "" : (isAnnual ? "/mo/yr" : "/mo");
+
+                const card = document.createElement('div');
+                card.className = `tier-card ${key === recommendedTier ? 'selected' : ''}`;
+                card.onclick = () => selectPricingTier(key, card);
+
+                card.innerHTML = `
+                    <div class="tier-name">${tier.name}</div>
+                    <div class="tier-price">${price}</div>
+                    <div class="tier-period">${period}</div>
+                `;
+
+                grid.appendChild(card);
+            }
+        }
+
+        function selectPricingTier(tier, element) {
+            recommendedTier = tier;
+            document.querySelectorAll('.tier-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+
+            const tierData = TIER_DATA[tier];
+            document.getElementById('recTierName').textContent = tierData.name;
+            document.getElementById('recTierPrice').textContent = isAnnual ? `$${tierData.annualPrice}` : `$${tierData.monthlyPrice}`;
+            document.getElementById('recTierPeriod').textContent = isAnnual ? `/mo, billed annually` : `/month, billed monthly`;
+        }
+
+        function togglePricing() {
+            isAnnual = document.getElementById('pricingToggle').checked;
+            const saveBadge = document.getElementById('saveBadge');
+            saveBadge.style.display = isAnnual ? 'inline-block' : 'none';
+            displayRecommendation();
+        }
+
+        function backToQuestions() {
+            currentQuestion = 1;
+            document.getElementById('recommendation').classList.remove('active');
+            document.getElementById('q1').classList.add('active');
+            updateProgress();
+        }
+
+        function proceedToPayment() {
+            const tier = TIER_DATA[recommendedTier];
+            const price = isAnnual ? tier.annualPrice : tier.monthlyPrice;
+            const period = isAnnual ? "annual" : "monthly";
+
+            // Redirect to payment gateway (Paystack, Stripe, etc.)
+            // For now, we'll show a confirmation
+            alert(`Proceeding to payment for ${tier.name} tier at $${price}/${period}. Redirecting to payment gateway...`);
+
+            // Replace with actual payment gateway integration:
+            // window.location.href = `/payment?tier=${recommendedTier}&period=${period}`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateProgress();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,408 @@
+/* Enhanced Responsive Design for All Dashboards */
+
+/* ============================================
+   DESKTOP FIRST APPROACH (Default: 1200px+)
+   ============================================ */
+
+/* Base responsive container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* ============================================
+   TABLET (1024px - 1199px)
+   ============================================ */
+@media (max-width: 1199px) {
+    .container {
+        max-width: 960px;
+        padding: 0 20px;
+    }
+    
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.3rem; }
+    h4 { font-size: 1.1rem; }
+    h5 { font-size: 1rem; }
+    h6 { font-size: 0.95rem; }
+    
+    .metric-card {
+        padding: 18px;
+    }
+    
+    .metric-value {
+        font-size: 2rem;
+    }
+    
+    .chart-container {
+        height: 300px;
+    }
+    
+    .btn {
+        padding: 9px 18px;
+        font-size: 0.9rem;
+    }
+}
+
+/* ============================================
+   TABLET (768px - 1023px)
+   ============================================ */
+@media (max-width: 1023px) {
+    .container {
+        max-width: 100%;
+        padding: 0 16px;
+    }
+    
+    body {
+        font-size: 15px;
+    }
+    
+    h1 { font-size: 1.75rem; }
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.2rem; }
+    h4 { font-size: 1rem; }
+    h5 { font-size: 0.95rem; }
+    h6 { font-size: 0.9rem; }
+    
+    .dashboard-header {
+        padding: 14px 0;
+    }
+    
+    .brand-logo {
+        font-size: 22px;
+    }
+    
+    .metric-card {
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+    
+    .metric-value {
+        font-size: 1.75rem;
+    }
+    
+    .metric-label {
+        font-size: 0.8rem;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+    
+    .glass-card {
+        padding: 20px;
+    }
+    
+    .btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
+    
+    .btn-sm {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+    }
+    
+    /* Stack columns for better mobile experience */
+    .row > [class*="col-"] {
+        margin-bottom: 12px;
+    }
+}
+
+/* ============================================
+   MOBILE (481px - 767px)
+   ============================================ */
+@media (max-width: 767px) {
+    .container {
+        padding: 0 12px;
+    }
+    
+    body {
+        font-size: 14px;
+    }
+    
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.2rem; }
+    h3 { font-size: 1.1rem; }
+    h4 { font-size: 0.95rem; }
+    h5 { font-size: 0.9rem; }
+    h6 { font-size: 0.85rem; }
+    
+    .dashboard-header {
+        padding: 12px 0;
+    }
+    
+    .brand-logo {
+        font-size: 18px;
+    }
+    
+    .metric-card {
+        padding: 14px;
+        margin-bottom: 10px;
+    }
+    
+    .metric-value {
+        font-size: 1.5rem;
+    }
+    
+    .metric-label {
+        font-size: 0.75rem;
+    }
+    
+    .metric-trend {
+        font-size: 0.8rem;
+    }
+    
+    .chart-container {
+        height: 200px;
+    }
+    
+    .glass-card {
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+    
+    .btn {
+        padding: 7px 14px;
+        font-size: 0.8rem;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    .btn-sm {
+        padding: 5px 10px;
+        font-size: 0.7rem;
+    }
+    
+    /* Full-width buttons on mobile */
+    .btn-primary, .btn-secondary {
+        width: 100%;
+    }
+    
+    /* Stack all columns on mobile */
+    .row > [class*="col-"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 12px;
+    }
+    
+    /* Tables responsive */
+    table {
+        font-size: 0.85rem;
+    }
+    
+    th, td {
+        padding: 8px 4px;
+    }
+    
+    /* Forms responsive */
+    .form-control, .form-select {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+    
+    .form-label {
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+    }
+}
+
+/* ============================================
+   SMALL MOBILE (<480px)
+   ============================================ */
+@media (max-width: 479px) {
+    .container {
+        padding: 0 10px;
+    }
+    
+    body {
+        font-size: 13px;
+    }
+    
+    h1 { font-size: 1.3rem; }
+    h2 { font-size: 1.1rem; }
+    h3 { font-size: 1rem; }
+    h4 { font-size: 0.9rem; }
+    h5 { font-size: 0.85rem; }
+    h6 { font-size: 0.8rem; }
+    
+    .dashboard-header {
+        padding: 10px 0;
+    }
+    
+    .brand-logo {
+        font-size: 16px;
+    }
+    
+    .metric-card {
+        padding: 12px;
+        margin-bottom: 8px;
+    }
+    
+    .metric-value {
+        font-size: 1.3rem;
+    }
+    
+    .metric-label {
+        font-size: 0.7rem;
+    }
+    
+    .chart-container {
+        height: 150px;
+    }
+    
+    .glass-card {
+        padding: 14px;
+        margin-bottom: 10px;
+    }
+    
+    .btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+        width: 100%;
+    }
+    
+    .btn-sm {
+        padding: 4px 8px;
+        font-size: 0.65rem;
+    }
+    
+    /* Adjust spacing */
+    .mt-4 { margin-top: 12px !important; }
+    .mb-4 { margin-bottom: 12px !important; }
+    .mt-5 { margin-top: 16px !important; }
+    .mb-5 { margin-bottom: 16px !important; }
+    
+    /* Reduce padding on containers */
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
+
+/* ============================================
+   BROWSER COMPATIBILITY
+   ============================================ */
+
+/* Ensure proper font rendering */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Ensure proper flex behavior across browsers */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -12px;
+    margin-left: -12px;
+}
+
+[class*="col-"] {
+    padding-right: 12px;
+    padding-left: 12px;
+}
+
+/* Ensure proper grid behavior */
+.glass-card {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Touch-friendly elements for mobile */
+@media (max-width: 767px) {
+    button, a, input[type="button"], input[type="submit"] {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Improve tap targets */
+    .btn {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* Prevent horizontal scroll on mobile */
+html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
+/* Ensure images are responsive */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Responsive tables */
+@media (max-width: 767px) {
+    table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    thead {
+        display: none;
+    }
+    
+    tbody, tr, td {
+        display: block;
+        width: 100%;
+    }
+    
+    tr {
+        margin-bottom: 12px;
+        border: 1px solid var(--glass-border);
+        border-radius: 8px;
+        padding: 8px;
+    }
+    
+    td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+    }
+    
+    td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 6px;
+        font-weight: bold;
+        text-align: left;
+    }
+}
+
+/* Ensure proper spacing for small screens */
+@media (max-width: 479px) {
+    .row {
+        margin-right: -8px;
+        margin-left: -8px;
+    }
+    
+    [class*="col-"] {
+        padding-right: 8px;
+        padding-left: 8px;
+    }
+}
+
+/* Print styles */
+@media print {
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .dashboard-header,
+    .btn,
+    .glass-card:hover {
+        display: none;
+    }
+}

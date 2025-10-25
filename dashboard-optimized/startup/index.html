@@ -13,8 +13,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Paystack -->
     <script src="https://js.paystack.co/v1/inline.js"></script>
-    <!-- Authentication Guard -->
-    <script src="../../utils/auth-guard.js"></script>
     
     <style>
         :root {
@@ -409,6 +407,7 @@
             100% { transform: rotate(360deg); }
         }
     </style>
+<script src="../utils/auth-guard.js"></script>
 </head>
 <body>
     <!-- Header -->
@@ -2129,33 +2128,23 @@
             });
         });
 
-        // Paystack Integration (for premium features) - SECURE VERSION
-        async function initializePayment(amount, email, callback) {
-            try {
-                // Fetch public key securely from backend
-                const response = await fetch('/api/config/paystack-public-key');
-                const data = await response.json();
-                const publicKey = data.data.publicKey;
-                
-                const handler = PaystackPop.setup({
-                    key: publicKey, // ✅ Fetched securely from backend
-                    email: email,
-                    amount: amount * 100, // Amount in kobo
-                    currency: 'USD',
-                    callback: function(response) {
-                        // Payment successful
-                        callback(true, response);
-                    },
-                    onClose: function() {
-                        // Payment cancelled
-                        callback(false, null);
-                    }
-                });
-                handler.openIframe();
-            } catch (error) {
-                console.error('Payment initialization error:', error);
-                callback(false, null);
-            }
+        // Paystack Integration (for premium features)
+        function initializePayment(amount, email, callback) {
+            const handler = PaystackPop.setup({
+                key: publicKey // Fetched from backend, // Replace with your public key
+                email: email,
+                amount: amount * 100, // Amount in kobo
+                currency: 'USD',
+                callback: function(response) {
+                    // Payment successful
+                    callback(true, response);
+                },
+                onClose: function() {
+                    // Payment cancelled
+                    callback(false, null);
+                }
+            });
+            handler.openIframe();
         }
 
 
