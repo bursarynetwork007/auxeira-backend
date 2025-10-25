@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira - Earn AUX Dashboard</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Responsive Design Enhancements -->
+    <link href="responsive-enhancements.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        /* Bloomberg Terminal / Glass-Morphism Aesthetic */
+        :root {
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #1a1a1a;
+            --accent-bg: #2a2a2a;
+            --neon-blue: #00d4ff;
+            --neon-purple: #8b5cf6;
+            --neon-gold: #fbbf24;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Glass Morphism Card */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 0 25px rgba(0, 212, 255, 0.15);
+        }
+
+        /* Header */
+        .dashboard-header {
+            background: var(--primary-bg);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand-logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Token Wallet Card */
+        .token-wallet {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(0, 212, 255, 0.2));
+            border: 2px solid rgba(139, 92, 246, 0.4);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .token-balance {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .token-label {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .token-value {
+            font-size: 1.5rem;
+            color: var(--success-green);
+            margin-bottom: 20px;
+        }
+
+        .token-stats {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .token-stat {
+            text-align: center;
+        }
+
+        .token-stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+        }
+
+        .token-stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Streak Card */
+        .streak-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .streak-number {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--success-green);
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .streak-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .streak-bonus {
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid var(--neon-gold);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .streak-bonus-text {
+            color: var(--neon-gold);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .streak-progress {
+            background: var(--accent-bg);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .streak-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-green), var(--neon-blue));
+            border-radius: 10px;
+            width: 70%;
+            transition: width 0.5s ease;
+        }
+
+        /* Task Card */
+        .task-card {
+            background: var(--secondary-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .task-card:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .task-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+        }
+
+        .task-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .task-reward {
+            text-align: right;
+            padding-left: 20px;
+        }
+
+        .task-reward-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--neon-gold);
+            margin-bottom: 10px;
+        }
+
+        .task-reward-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .task-difficulty {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .difficulty-easy {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-green);
+        }
+
+        .difficulty-medium {
+            background: rgba(251, 191, 36, 0.2);
+            color: var(--neon-gold);
+        }
+
+        .difficulty-hard {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger-red);
+        }
+
+        /* Token Utility Section */
+        .utility-card {
+            background: var(--secondary-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .utility-card:hover {
+            border-color: var(--neon-purple);
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.2);
+        }
+
+        .utility-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--neon-purple);
+        }
+
+        .utility-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .utility-cost {
+            font-size: 1.2rem;
+            color: var(--neon-gold);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .token-balance {
+                font-size: 2.5rem;
+            }
+            .streak-number {
+                font-size: 2.5rem;
+            }
+            .task-card {
+                flex-direction: column;
+            }
+            .task-reward {
+                padding-left: 0;
+                padding-top: 15px;
+                border-top: 1px solid var(--glass-border);
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="brand-logo">
+                    <i class="fas fa-coins me-2"></i>Earn AUX
+                </div>
+                <div class="text-end">
+                    <small class="text-secondary">Your Token Wallet & Rewards Hub</small>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Section 1: Token Wallet -->
+        <div class="token-wallet">
+            <div class="token-balance" id="tokenBalance">3,850</div>
+            <div class="token-label">AUX Tokens</div>
+            <div class="token-value" id="tokenValue">≈ $1,925 USD</div>
+            
+            <div class="token-stats">
+                <div class="token-stat">
+                    <div class="token-stat-value">+450</div>
+                    <div class="token-stat-label">This Month</div>
+                </div>
+                <div class="token-stat">
+                    <div class="token-stat-value">18</div>
+                    <div class="token-stat-label">Activities</div>
+                </div>
+                <div class="token-stat">
+                    <div class="token-stat-value">92%</div>
+                    <div class="token-stat-label">Avg Quality</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Learning Streak -->
+        <div class="row mb-4">
+            <div class="col-lg-6">
+                <div class="streak-card">
+                    <div class="streak-number">12</div>
+                    <div class="streak-label">Day Streak</div>
+                    
+                    <div class="streak-bonus">
+                        <div class="streak-bonus-text">
+                            <i class="fas fa-fire me-1"></i>Current Bonus: 1.25x
+                        </div>
+                        <small class="text-secondary">Your next activity will earn 25% extra tokens</small>
+                    </div>
+
+                    <div class="streak-progress">
+                        <div class="streak-progress-bar" style="width: 70%;"></div>
+                    </div>
+                    <small class="text-secondary">7 more days to unlock 1.5x bonus!</small>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="col-lg-6">
+                <div class="glass-card">
+                    <h5 class="mb-3">Your Progress</h5>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-secondary">Bronze Activities</small>
+                            <small class="text-primary">8 / 10</small>
+                        </div>
+                        <div style="background: var(--accent-bg); border-radius: 10px; height: 6px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #8b5cf6, #00d4ff); height: 100%; width: 80%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-secondary">Silver Activities</small>
+                            <small class="text-primary">6 / 8</small>
+                        </div>
+                        <div style="background: var(--accent-bg); border-radius: 10px; height: 6px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #fbbf24, #f59e0b); height: 100%; width: 75%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-secondary">Gold Activities</small>
+                            <small class="text-primary">4 / 5</small>
+                        </div>
+                        <div style="background: var(--accent-bg); border-radius: 10px; height: 6px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #10b981, #06b6d4); height: 100%; width: 80%;"></div>
+                        </div>
+                    </div>
+
+                    <hr style="border-color: var(--glass-border);">
+                    <p class="small text-secondary mb-0">Complete 2 more Silver activities to unlock Gold tier rewards!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: AI-Recommended Tasks -->
+        <h2 class="mb-4 text-primary">AI-Recommended Tasks for You</h2>
+        <p class="text-secondary mb-4">Based on your SSE score and current stage, here are the highest-value activities to complete next. These will boost your funding readiness while earning AUX tokens.</p>
+
+        <!-- Task 1: High Priority -->
+        <div class="task-card">
+            <div class="task-content">
+                <div class="task-title">
+                    <i class="fas fa-star me-2" style="color: var(--neon-gold);"></i>
+                    Customer Interview Series (5+ Interviews)
+                </div>
+                <div class="task-description">
+                    Conduct 5 in-depth customer interviews to validate your product-market fit and gather testimonials for investor pitches.
+                </div>
+                <div class="task-meta">
+                    <div class="task-meta-item">
+                        <i class="fas fa-calendar-alt" style="color: var(--neon-blue);"></i>
+                        <span>Due in 7 days</span>
+                    </div>
+                    <div class="task-meta-item">
+                        <i class="fas fa-chart-line" style="color: var(--success-green);"></i>
+                        <span>Boosts SSE by +15%</span>
+                    </div>
+                    <div class="task-meta-item">
+                        <span class="task-difficulty difficulty-medium">Medium</span>
+                    </div>
+                </div>
+            </div>
+            <div class="task-reward">
+                <div class="task-reward-label">Potential Reward</div>
+                <div class="task-reward-value">+450</div>
+                <button class="btn btn-primary btn-sm w-100">Start Activity</button>
+            </div>
+        </div>
+
+        <!-- Task 2: High Priority -->
+        <div class="task-card">
+            <div class="task-content">
+                <div class="task-title">
+                    <i class="fas fa-star me-2" style="color: var(--neon-gold);"></i>
+                    Financial Model Refinement
+                </div>
+                <div class="task-description">
+                    Update your 18-month financial projections with latest metrics. Include unit economics, CAC, LTV, and runway calculations.
+                </div>
+                <div class="task-meta">
+                    <div class="task-meta-item">
+                        <i class="fas fa-calendar-alt" style="color: var(--neon-blue);"></i>
+                        <span>Due in 3 days</span>
+                    </div>
+                    <div class="task-meta-item">
+                        <i class="fas fa-chart-line" style="color: var(--success-green);"></i>
+                        <span>Boosts Funding Readiness by +12%</span>
+                    </div>
+                    <div class="task-meta-item">
+                        <span class="task-difficulty difficulty-hard">Hard</span>
+                    </div>
+                </div>
+            </div>
+            <div class="task-reward">
+                <div class="task-reward-label">Potential Reward</div>
+                <div class="task-reward-value">+380</div>
+                <button class="btn btn-primary btn-sm w-100">Start Activity</button>
+            </div>
+        </div>
+
+        <!-- Task 3: Medium Priority -->
+        <div class="task-card">
+            <div class="task-content">
+                <div class="task-title">
+                    <i class="fas fa-lightbulb me-2" style="color: var(--neon-blue);"></i>
+                    Pitch Deck v3.0 Update
+                </div>
+                <div class="task-description">
+                    Create or refine your Series A pitch deck with updated metrics, team bios, market opportunity, and competitive positioning.
+                </div>
+                <div class="task-meta">
+                    <div class="task-meta-item">
+                        <i class="fas fa-calendar-alt" style="color: var(--neon-blue);"></i>
+                        <span>Due in 10 days</span>
+                    </div>
+                    <div class="task-meta-item">
+                        <i class="fas fa-chart-line" style="color: var(--success-green);"></i>
+                        <span>Boosts Funding Readiness by +10%</span>
+                    </div>
+                    <div class="task-meta-item">
+                        <span class="task-difficulty difficulty-medium">Medium</span>
+                    </div>
+                </div>
+            </div>
+            <div class="task-reward">
+                <div class="task-reward-label">Potential Reward</div>
+                <div class="task-reward-value">+320</div>
+                <button class="btn btn-primary btn-sm w-100">Start Activity</button>
+            </div>
+        </div>
+
+        <!-- Task 4: Medium Priority -->
+        <div class="task-card">
+            <div class="task-content">
+                <div class="task-title">
+                    <i class="fas fa-briefcase me-2" style="color: var(--neon-purple);"></i>
+                    Reference Customer Calls
+                </div>
+                <div class="task-description">
+                    Schedule and conduct 3 reference calls with your best customers. Prepare them to speak with potential investors.
+                </div>
+                <div class="task-meta">
+                    <div class="task-meta-item">
+                        <i class="fas fa-calendar-alt" style="color: var(--neon-blue);"></i>
+                        <span>Due in 14 days</span>
+                    </div>
+                    <div class="task-meta-item">
+                        <i class="fas fa-chart-line" style="color: var(--success-green);"></i>
+                        <span>Boosts SSE by +8%</span>
+                    </div>
+                    <div class="task-meta-item">
+                        <span class="task-difficulty difficulty-easy">Easy</span>
+                    </div>
+                </div>
+            </div>
+            <div class="task-reward">
+                <div class="task-reward-label">Potential Reward</div>
+                <div class="task-reward-value">+280</div>
+                <button class="btn btn-primary btn-sm w-100">Start Activity</button>
+            </div>
+        </div>
+
+        <!-- Task 5: Lower Priority -->
+        <div class="task-card">
+            <div class="task-content">
+                <div class="task-title">
+                    <i class="fas fa-chart-pie me-2" style="color: var(--warning-orange);"></i>
+                    Market Research & Competitive Analysis
+                </div>
+                <div class="task-description">
+                    Conduct comprehensive market sizing and competitive landscape analysis. Document TAM, SAM, and competitive advantages.
+                </div>
+                <div class="task-meta">
+                    <div class="task-meta-item">
+                        <i class="fas fa-calendar-alt" style="color: var(--neon-blue);"></i>
+                        <span>Due in 21 days</span>
+                    </div>
+                    <div class="task-meta-item">
+                        <i class="fas fa-chart-line" style="color: var(--success-green);"></i>
+                        <span>Boosts SSE by +6%</span>
+                    </div>
+                    <div class="task-meta-item">
+                        <span class="task-difficulty difficulty-medium">Medium</span>
+                    </div>
+                </div>
+            </div>
+            <div class="task-reward">
+                <div class="task-reward-label">Potential Reward</div>
+                <div class="task-reward-value">+250</div>
+                <button class="btn btn-primary btn-sm w-100">Start Activity</button>
+            </div>
+        </div>
+
+        <!-- Section 4: Token Utility -->
+        <h2 class="mb-4 text-primary mt-5">Redeem Your AUX Tokens</h2>
+        <p class="text-secondary mb-4">Use your earned AUX tokens to access premium mentorship, investor introductions, and growth resources.</p>
+
+        <div class="row mb-5">
+            <!-- Utility 1 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="utility-card">
+                    <div class="utility-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="utility-title">Series A VC Mentor Session</div>
+                    <div class="utility-cost">500 AUX</div>
+                    <small class="text-secondary">1-hour 1-on-1 session with a Series A-experienced VC</small>
+                    <div class="mt-3">
+                        <button class="btn btn-primary btn-sm w-100">Redeem</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Utility 2 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="utility-card">
+                    <div class="utility-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div class="utility-title">Investor Introduction</div>
+                    <div class="utility-cost">750 AUX</div>
+                    <small class="text-secondary">Warm introduction to a Series A investor match</small>
+                    <div class="mt-3">
+                        <button class="btn btn-primary btn-sm w-100">Redeem</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Utility 3 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="utility-card">
+                    <div class="utility-icon">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    <div class="utility-title">Legal Document Template</div>
+                    <div class="utility-cost">300 AUX</div>
+                    <small class="text-secondary">Series A-ready legal templates (SAFE, Term Sheet)</small>
+                    <div class="mt-3">
+                        <button class="btn btn-primary btn-sm w-100">Redeem</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Utility 4 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="utility-card">
+                    <div class="utility-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="utility-title">Financial Model Review</div>
+                    <div class="utility-cost">400 AUX</div>
+                    <small class="text-secondary">Expert review of your financial projections</small>
+                    <div class="mt-3">
+                        <button class="btn btn-primary btn-sm w-100">Redeem</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Utility 5 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="utility-card">
+                    <div class="utility-icon">
+                        <i class="fas fa-presentation"></i>
+                    </div>
+                    <div class="utility-title">Pitch Deck Coaching</div>
+                    <div class="utility-cost">600 AUX</div>
+                    <small class="text-secondary">3-session pitch coaching with a top pitch coach</small>
+                    <div class="mt-3">
+                        <button class="btn btn-primary btn-sm w-100">Redeem</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Utility 6 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="utility-card">
+                    <div class="utility-icon">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <div class="utility-title">Investor Network Access</div>
+                    <div class="utility-cost">1000 AUX</div>
+                    <small class="text-secondary">3-month access to Auxeira's investor network</small>
+                    <div class="mt-3">
+                        <button class="btn btn-primary btn-sm w-100">Redeem</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Token History -->
+        <h2 class="mb-4 text-primary">Recent Token Activity</h2>
+        
+        <div class="glass-card">
+            <div style="overflow-x: auto;">
+                <table class="table table-dark table-hover mb-0">
+                    <thead>
+                        <tr style="border-color: var(--glass-border);">
+                            <th style="color: var(--text-secondary);">Date</th>
+                            <th style="color: var(--text-secondary);">Activity</th>
+                            <th style="color: var(--text-secondary);">Type</th>
+                            <th style="color: var(--text-secondary); text-align: right;">Tokens</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-color: var(--glass-border);">
+                            <td style="color: var(--text-primary);">Today</td>
+                            <td style="color: var(--text-primary);">Customer Interview #8</td>
+                            <td><span class="badge bg-success">Earned</span></td>
+                            <td style="color: var(--success-green); text-align: right; font-weight: 600;">+75</td>
+                        </tr>
+                        <tr style="border-color: var(--glass-border);">
+                            <td style="color: var(--text-primary);">Yesterday</td>
+                            <td style="color: var(--text-primary);">Pitch Deck Draft Submitted</td>
+                            <td><span class="badge bg-success">Earned</span></td>
+                            <td style="color: var(--success-green); text-align: right; font-weight: 600;">+120</td>
+                        </tr>
+                        <tr style="border-color: var(--glass-border);">
+                            <td style="color: var(--text-primary);">2 days ago</td>
+                            <td style="color: var(--text-primary);">Redeemed: VC Mentor Session</td>
+                            <td><span class="badge bg-danger">Redeemed</span></td>
+                            <td style="color: var(--danger-red); text-align: right; font-weight: 600;">-500</td>
+                        </tr>
+                        <tr style="border-color: var(--glass-border);">
+                            <td style="color: var(--text-primary);">3 days ago</td>
+                            <td style="color: var(--text-primary);">Financial Model v2 Completed</td>
+                            <td><span class="badge bg-success">Earned</span></td>
+                            <td style="color: var(--success-green); text-align: right; font-weight: 600;">+255</td>
+                        </tr>
+                        <tr style="border-color: var(--glass-border);">
+                            <td style="color: var(--text-primary);">5 days ago</td>
+                            <td style="color: var(--text-primary);">Market Research Report</td>
+                            <td><span class="badge bg-success">Earned</span></td>
+                            <td style="color: var(--success-green); text-align: right; font-weight: 600;">+180</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Redeem button functionality
+        document.querySelectorAll('.utility-card .btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const cost = this.closest('.utility-card').querySelector('.utility-cost').textContent;
+                alert(`Redeeming ${cost}. Thank you for using Auxeira!`);
+            });
+        });
+
+        // Start Activity button functionality
+        document.querySelectorAll('.task-card .btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const taskTitle = this.closest('.task-card').querySelector('.task-title').textContent.trim();
+                alert(`Navigating to: ${taskTitle}\n\nYou'll be redirected to the Activity Submission form.`);
+            });
+        });
+    </script>
+</body>
+</html>
