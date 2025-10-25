@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VC Dashboard - Auxeira</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+    <script src="https://unpkg.com/recharts@2.5.0/dist/Recharts.min.js"></script>
+    <style>
+        body { margin: 0; background: #0f172a; min-height: 100vh; color: white; }
+    </style>
+</head>
+<body>
+    <div id="root">Loading...</div>
+    
+    <script>
+        setTimeout(() => {
+            console.log('React:', typeof React);
+            console.log('ReactDOM:', typeof ReactDOM);
+            console.log('Recharts:', typeof Recharts);
+            
+            if (typeof Recharts === 'undefined') {
+                // Recharts failed, use Chart.js instead
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+                script.onload = () => renderWithChartJS();
+                document.head.appendChild(script);
+            } else {
+                renderWithRecharts();
+            }
+        }, 1000);
+        
+        function renderWithChartJS() {
+            console.log('Using Chart.js instead');
+            const { createElement: h } = React;
+            const { createRoot } = ReactDOM;
+            
+            const Dashboard = () => {
+                React.useEffect(() => {
+                    const ctx = document.getElementById('myChart');
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                            datasets: [{
+                                label: 'Portfolio Value ($M)',
+                                data: [2.1, 2.3, 2.2, 2.5, 2.4, 2.8],
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                borderWidth: 3,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { labels: { color: '#94a3b8' } }
+                            },
+                            scales: {
+                                y: { 
+                                    ticks: { color: '#94a3b8' },
+                                    grid: { color: '#334155' }
+                                },
+                                x: { 
+                                    ticks: { color: '#94a3b8' },
+                                    grid: { color: '#334155' }
+                                }
+                            }
+                        }
+                    });
+                }, []);
+                
+                return h('div', { className: 'min-h-screen bg-slate-900 text-white p-8' },
+                    h('div', { className: 'max-w-7xl mx-auto' },
+                        h('h1', { className: 'text-4xl font-bold mb-8 text-blue-400' }, '🚀 Venture Capital Dashboard'),
+                        
+                        h('div', { className: 'grid grid-cols-1 md:grid-cols-3 gap-6 mb-8' },
+                            h('div', { className: 'bg-slate-800 rounded-lg p-6 shadow-xl' },
+                                h('h3', { className: 'text-gray-400 text-sm mb-2' }, 'Total AUM'),
+                                h('p', { className: 'text-3xl font-bold text-blue-400' }, '$2.8M'),
+                                h('p', { className: 'text-green-400 text-sm mt-2' }, '↑ 12% growth')
+                            ),
+                            h('div', { className: 'bg-slate-800 rounded-lg p-6 shadow-xl' },
+                                h('h3', { className: 'text-gray-400 text-sm mb-2' }, 'Portfolio Companies'),
+                                h('p', { className: 'text-3xl font-bold text-purple-400' }, '12'),
+                                h('p', { className: 'text-blue-400 text-sm mt-2' }, '3 added this quarter')
+                            ),
+                            h('div', { className: 'bg-slate-800 rounded-lg p-6 shadow-xl' },
+                                h('h3', { className: 'text-gray-400 text-sm mb-2' }, 'Average IRR'),
+                                h('p', { className: 'text-3xl font-bold text-green-400' }, '23%'),
+                                h('p', { className: 'text-green-400 text-sm mt-2' }, '↑ 5% YoY')
+                            )
+                        ),
+                        
+                        h('div', { className: 'bg-slate-800 rounded-lg p-6 shadow-xl mb-8' },
+                            h('h2', { className: 'text-2xl font-bold mb-6' }, 'Portfolio Performance'),
+                            h('div', { style: { height: '300px' } },
+                                h('canvas', { id: 'myChart' })
+                            )
+                        ),
+                        
+                        h('div', { className: 'bg-slate-800 rounded-lg p-6 shadow-xl' },
+                            h('h2', { className: 'text-2xl font-bold mb-6' }, 'Top Performers'),
+                            h('div', { className: 'space-y-4' },
+                                ['TechCo', 'StartupX', 'InnovateAI', 'DataFlow', 'CloudBase'].map((name, i) =>
+                                    h('div', { 
+                                        key: name,
+                                        className: 'flex items-center justify-between p-4 bg-slate-700 rounded-lg hover:bg-slate-600 transition cursor-pointer'
+                                    },
+                                        h('div', null,
+                                            h('h3', { className: 'font-semibold text-lg' }, name),
+                                            h('p', { className: 'text-sm text-gray-400' }, 'Series ' + ['B', 'A', 'Seed', 'A', 'B'][i])
+                                        ),
+                                        h('div', { className: 'text-right' },
+                                            h('p', { className: 'font-bold text-green-400 text-xl' }, '+' + (35 - i * 5) + '%'),
+                                            h('p', { className: 'text-sm text-gray-400' }, 'IRR')
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                );
+            };
+            
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            root.render(h(Dashboard));
+            console.log('✅ Dashboard with Chart.js rendered!');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira SSE - Subscription Plans</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; color: white;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .header { text-align: center; margin-bottom: 3rem; }
+        .header h1 { font-size: 3rem; margin-bottom: 1rem; }
+        .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .plan { 
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 2rem; text-align: center;
+            border: 2px solid rgba(255,255,255,0.2); transition: transform 0.3s ease;
+        }
+        .plan:hover { transform: translateY(-10px); }
+        .plan.featured { border-color: #ffd700; box-shadow: 0 0 30px rgba(255,215,0,0.3); }
+        .plan h3 { font-size: 1.8rem; margin-bottom: 1rem; }
+        .plan .price { font-size: 3rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .btn { 
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; 
+            padding: 1rem 2rem; border: none; border-radius: 50px; 
+            font-size: 1.1rem; cursor: pointer; text-decoration: none; display: inline-block;
+        }
+    </style>
+<script src="../utils/api-client.js"></script>
+<script src="../utils/auth-guard.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Auxeira SSE Platform</h1>
+            <p>AI-Powered Investment Intelligence • Ferrari-Level Analytics</p>
+        </div>
+        <div class="plans">
+            <div class="plan">
+                <h3>🌱 Founder</h3>
+                <div class="price">FREE</div>
+                <p>Basic SSE tracking, community access</p>
+                <a href="#" class="btn">Get Started Free</a>
+            </div>
+            <div class="plan featured">
+                <h3>🚀 Startup</h3>
+                <div class="price">$149</div>
+                <p>Full analytics, AI Copilot, investor matching</p>
+                <a href="#" class="btn">Start 30-Day Trial</a>
+            </div>
+            <div class="plan">
+                <h3>📈 Growth</h3>
+                <div class="price">$499</div>
+                <p>Advanced insights, portfolio optimization</p>
+                <a href="#" class="btn">Start 30-Day Trial</a>
+            </div>
+            <div class="plan">
+                <h3>🏆 Scale</h3>
+                <div class="price">$999</div>
+                <p>Custom AI models, API access, enterprise features</p>
+                <a href="#" class="btn">Start 30-Day Trial</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
