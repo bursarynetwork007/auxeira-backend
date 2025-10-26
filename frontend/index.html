@@ -5226,10 +5226,6 @@
                     localStorage.setItem('auxeira_refresh_token', data.data.refresh_token);
                 }
 
-                // Check if this is a test user
-                const testUsers = ['founder@startup.com', 'test@auxeira.com'];
-                const isTestUser = testUsers.includes(loginData.email);
-
                 const userData = {
                     userId: data.data?.user?.userId || data.data?.user?.id || data.userId,
                     id: data.data?.user?.userId || data.data?.user?.id || data.userId,
@@ -5237,25 +5233,10 @@
                     firstName: data.data?.user?.firstName || '',
                     lastName: data.data?.user?.lastName || '',
                     userType: data.data?.user?.role || data.data?.user?.profileType || data.data?.user?.userType || 'venture_capital',
-                    role: data.data?.user?.role || data.data?.user?.profileType || 'venture_capital',
-                    tier: data.data?.user?.tier || (isTestUser ? 'founder' : 'founder'),
-                    onboardingCompleted: data.data?.user?.onboardingCompleted || isTestUser
+                    role: data.data?.user?.role || data.data?.user?.profileType || 'venture_capital'
                 };
                 
-                // For test users, set all required localStorage flags
-                if (isTestUser) {
-                    localStorage.setItem('onboarding_completed', 'true');
-                    localStorage.setItem('subscription_status', 'active');
-                    localStorage.setItem('subscription_tier', 'founder');
-                    localStorage.setItem('subscription_date', new Date().toISOString());
-                }
-
-                // Store userData
                 localStorage.setItem('auxeira_user', JSON.stringify(userData));
-                
-                // Force synchronous write by reading back - ensures localStorage is persisted
-                localStorage.getItem('auxeira_user');
-                localStorage.getItem('auxeira_auth_token');
 
                 showNotification('Login successful! Redirecting...', 'success');
 
@@ -5264,7 +5245,6 @@
                     setTimeout(() => modal.classList.remove('show'), 1000);
                 }
 
-                // Minimal delay - localStorage is already persisted via synchronous read
                 setTimeout(() => {
                     const dashboardMap = {
                         'startup_founder': 'https://dashboard.auxeira.com/startup_founder.html',
@@ -5275,7 +5255,7 @@
                         'esg_funder': 'https://dashboard.auxeira.com/esg_funder.html'
                     };
                     window.location.href = dashboardMap[userData.userType] || 'https://dashboard.auxeira.com/venture_capital.html';
-                }, 100);
+                }, 1500);
                 
             } catch (error) {
                 console.error('Login error:', error);
