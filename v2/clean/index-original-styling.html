@@ -4478,6 +4478,105 @@
                 closeAuthModal();
             }
         });
+
+        // ============================================
+        // INTERACTIVE SECTIONS - Dropdowns/Accordions
+        // ============================================
+
+        // Toggle Partnership Tier Details
+        function toggleTier(tier) {
+            const content = document.getElementById(`${tier}-content`);
+            if (!content) return;
+            
+            const chevron = content.previousElementSibling?.querySelector('.chevron i');
+            
+            // Close other tiers on mobile for better UX
+            if (window.innerWidth < 768) {
+                document.querySelectorAll('.tier-content').forEach(otherContent => {
+                    if (otherContent !== content && otherContent.classList.contains('expanded')) {
+                        otherContent.classList.remove('expanded');
+                        const otherChevron = otherContent.previousElementSibling?.querySelector('.chevron i');
+                        if (otherChevron) {
+                            otherChevron.classList.remove('fa-chevron-up');
+                            otherChevron.classList.add('fa-chevron-down');
+                        }
+                    }
+                });
+            }
+            
+            // Toggle current tier
+            content.classList.toggle('expanded');
+            
+            if (content.classList.contains('expanded')) {
+                if (chevron) {
+                    chevron.classList.remove('fa-chevron-down');
+                    chevron.classList.add('fa-chevron-up');
+                }
+                
+                // Scroll into view on mobile
+                if (window.innerWidth < 768) {
+                    setTimeout(() => {
+                        content.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'nearest' 
+                        });
+                    }, 300);
+                }
+            } else {
+                if (chevron) {
+                    chevron.classList.remove('fa-chevron-up');
+                    chevron.classList.add('fa-chevron-down');
+                }
+            }
+        }
+
+        // Toggle Disclaimer Section
+        function toggleDisclaimer() {
+            const content = document.getElementById('disclaimer-content');
+            const chevron = document.getElementById('disclaimer-chevron');
+            const header = content?.previousElementSibling;
+            
+            if (!content) return;
+            
+            content.classList.toggle('expanded');
+            
+            if (content.classList.contains('expanded')) {
+                if (chevron) chevron.textContent = '▲';
+                if (header) header.setAttribute('aria-expanded', 'true');
+            } else {
+                if (chevron) chevron.textContent = '▼';
+                if (header) header.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (mobileMenu) {
+                mobileMenu.classList.toggle('active');
+            }
+            if (menuBtn) {
+                menuBtn.classList.toggle('active');
+            }
+        }
+
+        // Toggle Password Visibility
+        function togglePasswordVisibility(fieldId) {
+            const field = document.getElementById(fieldId);
+            const toggle = field?.nextElementSibling;
+            
+            if (!field) return;
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                if (toggle) toggle.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                field.type = 'password';
+                if (toggle) toggle.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        }
     </script>
 </body>
 </html>
