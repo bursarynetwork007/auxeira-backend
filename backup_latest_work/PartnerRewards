@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira - Partner Rewards Dashboard</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Responsive Design Enhancements -->
+    <link href="responsive-enhancements.css" rel="stylesheet">
+    
+    <style>
+        /* Bloomberg Terminal / Glass-Morphism Aesthetic */
+        :root {
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #1a1a1a;
+            --accent-bg: #2a2a2a;
+            --neon-blue: #00d4ff;
+            --neon-purple: #8b5cf6;
+            --neon-gold: #fbbf24;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Glass Morphism Card */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 0 25px rgba(0, 212, 255, 0.15);
+        }
+
+        /* Header */
+        .dashboard-header {
+            background: var(--primary-bg);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand-logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Metrics Cards */
+        .metric-card {
+            padding: 20px;
+            border-radius: 12px;
+            background: var(--accent-bg);
+            border-left: 4px solid var(--neon-blue);
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .metric-trend {
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .trend-up { color: var(--success-green); }
+
+        /* Event Category Badges */
+        .event-category {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .category-funding {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-green);
+        }
+
+        .category-tech {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--neon-blue);
+        }
+
+        .category-networking {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--neon-purple);
+        }
+
+        .category-partner {
+            background: rgba(251, 191, 36, 0.2);
+            color: var(--neon-gold);
+        }
+
+        /* Reward Card */
+        .reward-card {
+            background: var(--secondary-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .reward-card:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .reward-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--neon-blue);
+        }
+
+        .reward-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .reward-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--neon-gold);
+            margin-bottom: 10px;
+        }
+
+        .reward-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .hidden-gem-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(45deg, var(--neon-gold), var(--warning-orange));
+            color: var(--primary-bg);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+        }
+
+        .why-now {
+            background: rgba(251, 191, 36, 0.1);
+            border-left: 3px solid var(--neon-gold);
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .why-now i {
+            color: var(--neon-gold);
+            margin-right: 6px;
+        }
+
+        /* Event Card */
+        .event-card {
+            background: var(--secondary-bg);
+            border-left: 4px solid var(--neon-blue);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .event-card:hover {
+            background: var(--accent-bg);
+            border-left-width: 6px;
+        }
+
+        .event-date {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .event-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .event-location {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Form Styling */
+        .form-control, .form-select {
+            background: var(--accent-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            border-radius: 8px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: var(--accent-bg);
+            color: var(--text-primary);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .metric-value {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="brand-logo">
+                    <i class="fas fa-handshake me-2"></i>Partner Rewards
+                </div>
+                <div class="text-end">
+                    <small class="text-secondary">Unlock exclusive benefits & strategic advantages</small>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Section 1: Partnership Metrics -->
+        <h2 class="mb-4 text-primary">Your Partnership Benefits</h2>
+        
+        <div class="row mb-4">
+            <!-- Total Rewards Earned -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="metric-card" style="border-left-color: var(--neon-gold);">
+                    <div class="metric-label">Total Partner Rewards</div>
+                    <div class="metric-value text-warning">$24,500</div>
+                    <div class="metric-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> +$3,200 this month
+                    </div>
+                </div>
+            </div>
+
+            <!-- Introductions Made -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="metric-card" style="border-left-color: var(--success-green);">
+                    <div class="metric-label">Introductions Made</div>
+                    <div class="metric-value text-success">12</div>
+                    <div class="metric-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> +3 this quarter
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Savings -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="metric-card" style="border-left-color: var(--neon-blue);">
+                    <div class="metric-label">Total Savings</div>
+                    <div class="metric-value text-primary">$18,750</div>
+                    <div class="metric-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> AWS, HubSpot, Legal
+                    </div>
+                </div>
+            </div>
+
+            <!-- Partner Tier -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="metric-card" style="border-left-color: var(--neon-purple);">
+                    <div class="metric-label">Partner Tier</div>
+                    <div class="metric-value text-primary">Gold</div>
+                    <div class="metric-trend">
+                        <i class="fas fa-star"></i> Unlock Platinum in 2 weeks
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Industry Events List (Compact) -->
+        <h2 class="mb-4 text-primary mt-5">Upcoming Industry Events</h2>
+        <p class="text-secondary mb-3">Top 5 curated events for your stage. Register now to secure your Auxeira partner discount.</p>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Event 1 -->
+                <div class="event-card">
+                    <div class="event-date">November 15-17, 2024</div>
+                    <div class="event-title">TechCrunch Disrupt 2024</div>
+                    <div class="event-location"><i class="fas fa-map-marker-alt me-1"></i>San Francisco, CA</div>
+                    <span class="event-category category-tech">Technology</span>
+                    <p class="small text-secondary mb-2">The world's leading technology conference where startups pitch to investors and meet industry leaders.</p>
+                    <button class="btn btn-primary btn-sm">Register (Auxeira Discount)</button>
+                </div>
+
+                <!-- Event 2 -->
+                <div class="event-card">
+                    <div class="event-date">November 20, 2024</div>
+                    <div class="event-title">Series A Funding Masterclass</div>
+                    <div class="event-location"><i class="fas fa-map-marker-alt me-1"></i>Virtual</div>
+                    <span class="event-category category-funding">Funding</span>
+                    <p class="small text-secondary mb-2">Learn the ins and outs of Series A fundraising from experienced VCs and successful founders.</p>
+                    <button class="btn btn-primary btn-sm">Register (Free for Gold+ Partners)</button>
+                </div>
+
+                <!-- Event 3 -->
+                <div class="event-card">
+                    <div class="event-date">November 25, 2024</div>
+                    <div class="event-title">Startup Networking Summit</div>
+                    <div class="event-location"><i class="fas fa-map-marker-alt me-1"></i>New York, NY</div>
+                    <span class="event-category category-networking">Networking</span>
+                    <p class="small text-secondary mb-2">Connect with 500+ founders, investors, and corporate partners in an intimate setting.</p>
+                    <button class="btn btn-primary btn-sm">Register (Auxeira Discount)</button>
+                </div>
+
+                <!-- Event 4 -->
+                <div class="event-card">
+                    <div class="event-date">December 5, 2024</div>
+                    <div class="event-title">AWS for Startups Workshop</div>
+                    <div class="event-location"><i class="fas fa-map-marker-alt me-1"></i>Virtual</div>
+                    <span class="event-category category-partner">Partner Event</span>
+                    <p class="small text-secondary mb-2">Exclusive workshop on AWS services optimized for startup growth and scaling.</p>
+                    <button class="btn btn-primary btn-sm">Register (Free for All Partners)</button>
+                </div>
+
+                <!-- Event 5 -->
+                <div class="event-card">
+                    <div class="event-date">December 10, 2024</div>
+                    <div class="event-title">SaaS Growth Conference</div>
+                    <div class="event-location"><i class="fas fa-map-marker-alt me-1"></i>Austin, TX</div>
+                    <span class="event-category category-tech">Technology</span>
+                    <p class="small text-secondary mb-2">Deep dives into SaaS metrics, growth strategies, and best practices from industry leaders.</p>
+                    <button class="btn btn-primary btn-sm">Register (Auxeira Discount)</button>
+                </div>
+            </div>
+
+            <!-- Event Filters & Calendar Info -->
+            <div class="col-lg-4">
+                <div class="glass-card">
+                    <h5 class="mb-3">Event Filters & Stats</h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label small">Filter by Type</label>
+                        <select class="form-select form-select-sm" id="eventFilter">
+                            <option>All Events</option>
+                            <option>Funding</option>
+                            <option>Technology</option>
+                            <option>Networking</option>
+                            <option>Partner Events</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small">Filter by Format</label>
+                        <select class="form-select form-select-sm">
+                            <option>All Formats</option>
+                            <option>In-Person</option>
+                            <option>Virtual</option>
+                            <option>Hybrid</option>
+                        </select>
+                    </div>
+
+                    <hr style="border-color: var(--glass-border);">
+
+                    <h6 class="mb-3">Your Event Statistics</h6>
+                    <div class="mb-2">
+                        <small class="text-secondary">Events Registered</small>
+                        <div style="font-size: 1.5rem; color: var(--neon-blue); font-weight: 700;">8</div>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-secondary">Total Savings from Events</small>
+                        <div style="font-size: 1.5rem; color: var(--success-green); font-weight: 700;">$3,200</div>
+                    </div>
+                    <div>
+                        <small class="text-secondary">Networking Connections</small>
+                        <div style="font-size: 1.5rem; color: var(--neon-gold); font-weight: 700;">45</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: AI-Recommended Partners (Hidden Gems) -->
+        <h2 class="mb-4 text-primary mt-5"><i class="fas fa-lightbulb me-2"></i>AI-Recommended for Your Stage</h2>
+        <p class="text-secondary mb-4">These partners address critical blind spots most founders overlook. Highly recommended based on your current stage and metrics.</p>
+
+        <div class="row mb-5">
+            <!-- Hidden Gem 1: IP Protection -->
+            <div class="col-md-6 col-lg-4">
+                <div class="reward-card" style="border-left: 4px solid var(--neon-gold); position: relative;">
+                    <div class="hidden-gem-badge">Hidden Gem</div>
+                    <div class="reward-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="reward-title">Global IP Protection Suite</div>
+                    <div class="reward-value">$4,000</div>
+                    <div class="reward-description"><strong>Problem Solved:</strong> Protect your intellectual property across 50+ countries. Includes trademark filing, patent search, and IP strategy consultation.</div>
+                    <div class="why-now"><i class="fas fa-lightbulb"></i>Why now: Most startups wait until Series A to address IP, risking costly disputes.</div>
+                    <button class="btn btn-primary btn-sm w-100">Claim Reward</button>
+                </div>
+            </div>
+
+            <!-- Hidden Gem 2: Security/Compliance -->
+            <div class="col-md-6 col-lg-4">
+                <div class="reward-card" style="border-left: 4px solid var(--neon-gold); position: relative;">
+                    <div class="hidden-gem-badge">Hidden Gem</div>
+                    <div class="reward-icon"><i class="fas fa-lock"></i></div>
+                    <div class="reward-title">SOC 2 & Security Readiness</div>
+                    <div class="reward-value">$3,500</div>
+                    <div class="reward-description"><strong>Problem Solved:</strong> Achieve SOC 2 compliance and pass enterprise security audits. Unlock $100K+ in enterprise deals.</div>
+                    <div class="why-now"><i class="fas fa-lightbulb"></i>Why now: Enterprise customers require SOC 2 before signing contracts.</div>
+                    <button class="btn btn-primary btn-sm w-100">Claim Reward</button>
+                </div>
+            </div>
+
+            <!-- Hidden Gem 3: Talent/Culture -->
+            <div class="col-md-6 col-lg-4">
+                <div class="reward-card" style="border-left: 4px solid var(--neon-gold); position: relative;">
+                    <div class="hidden-gem-badge">Hidden Gem</div>
+                    <div class="reward-icon"><i class="fas fa-users"></i></div>
+                    <div class="reward-title">Specialized Tech Recruiting</div>
+                    <div class="reward-value">$2,500</div>
+                    <div class="reward-description"><strong>Problem Solved:</strong> Hire top engineering talent without the 20% recruiter fees. Access vetted candidate network.</div>
+                    <div class="why-now"><i class="fas fa-lightbulb"></i>Why now: Bad hires at this stage can derail your entire company.</div>
+                    <button class="btn btn-primary btn-sm w-100">Claim Reward</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Core Partner Rewards Catalog -->
+        <h2 class="mb-4 text-primary">Essential Partner Rewards</h2>
+        <p class="text-secondary mb-4">Proven solutions for core business functions. Redeem for exclusive discounts and credits.</p>
+
+        <div class="row mb-5">
+            <!-- AWS Credits -->
+            <div class="col-md-6 col-lg-4">
+                <div class="reward-card">
+                    <div class="reward-icon"><i class="fab fa-aws"></i></div>
+                    <div class="reward-title">Cloud Infrastructure</div>
+                    <div class="reward-value">$5,000</div>
+                    <div class="reward-description"><strong>Problem Solved:</strong> Scale your infrastructure without breaking the bank. 12 months of AWS computing credits.</div>
+                    <button class="btn btn-primary btn-sm w-100">Claim Reward</button>
+                </div>
+            </div>
+
+            <!-- HubSpot -->
+            <div class="col-md-6 col-lg-4">
+                <div class="reward-card">
+                    <div class="reward-icon"><i class="fas fa-chart-bar"></i></div>
+                    <div class="reward-title">Customer Acquisition & CRM</div>
+                    <div class="reward-value">50% Off</div>
+                    <div class="reward-description"><strong>Problem Solved:</strong> Track customers and automate sales. 50% off HubSpot Pro for 12 months ($3,600 value).</div>
+                    <button class="btn btn-primary btn-sm w-100">Claim Reward</button>
+                </div>
+            </div>
+
+            <!-- Legal Services -->
+            <div class="col-md-6 col-lg-4">
+                <div class="reward-card">
+                    <div class="reward-icon"><i class="fas fa-file-contract"></i></div>
+                    <div class="reward-title">Legal Foundation & Contracts</div>
+                    <div class="reward-value">$2,500</div>
+                    <div class="reward-description"><strong>Problem Solved:</strong> Proper incorporation, NDAs, and employment contracts. Avoid costly legal mistakes.</div>
+                    <button class="btn btn-primary btn-sm w-100">Claim Reward</button>
+                </div>
+            </div>
+
+            <!-- Stripe Processing -->
+            <div class="col-md-6 col-lg-4">
+                <div class="reward-card">
+                    <div class="reward-icon"><i class="fas fa-credit-card"></i></div>
+                    <div class="reward-title">Payment Processing</div>
+                    <div class="reward-value">$3,000</div>
+                    <div class="reward-description"><strong>Problem Solved:</strong> Accept payments globally with lower fees. $3,000 in processing credits for your first year.</div>
+                    <button class="btn btn-primary btn-sm w-100">Claim Reward</button>
+                </div>
+            </div>
+
+            <!-- LinkedIn Ads -->
+            <div class="col-md-6 col-lg-4">
+                <div class="reward-card">
+                    <div class="reward-icon"><i class="fab fa-linkedin"></i></div>
+                    <div class="reward-title">Talent Acquisition & Branding</div>
+                    <div class="reward-value">$2,000</div>
+                    <div class="reward-description"><strong>Problem Solved:</strong> Reach top talent and build your employer brand. $2,000 in LinkedIn Ads credits.</div>
+                    <button class="btn btn-primary btn-sm w-100">Claim Reward</button>
+                </div>
+            </div>
+
+            <!-- Slack Pro -->
+            <div class="col-md-6 col-lg-4">
+                <div class="reward-card">
+                    <div class="reward-icon"><i class="fab fa-slack"></i></div>
+                    <div class="reward-title">Team Communication</div>
+                    <div class="reward-value">40% Off</div>
+                    <div class="reward-description"><strong>Problem Solved:</strong> Keep your distributed team aligned and productive. 40% off Slack Pro for 12 months ($1,200 value).</div>
+                    <button class="btn btn-primary btn-sm w-100">Claim Reward</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Partner Introduction Request -->
+        <h2 class="mb-4 text-primary">Request Partner Introduction</h2>
+        <p class="text-secondary mb-4">Request a warm introduction to one of our corporate or government partners to explore collaboration opportunities.</p>
+
+        <div class="glass-card mb-5">
+            <form id="introductionForm">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Partner Company</label>
+                        <select class="form-select" required>
+                            <option value="">Select a partner...</option>
+                            <option>Amazon Web Services (AWS)</option>
+                            <option>HubSpot</option>
+                            <option>Stripe</option>
+                            <option>LinkedIn</option>
+                            <option>Google Cloud</option>
+                            <option>Microsoft Azure</option>
+                            <option>Slack</option>
+                            <option>Figma</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Contact Name (Optional)</label>
+                        <input type="text" class="form-control" placeholder="e.g., John Smith">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Your Name</label>
+                        <input type="text" class="form-control" required placeholder="Your full name">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Your Email</label>
+                        <input type="email" class="form-control" required placeholder="your@email.com">
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Purpose of Introduction</label>
+                        <textarea class="form-control" rows="4" required placeholder="Describe why you'd like to connect with this partner and what you hope to achieve..."></textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Request Introduction
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form submission
+        document.getElementById('introductionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Introduction request submitted! We will connect you within 2-3 business days.');
+            this.reset();
+        });
+
+        // Event filter
+        document.getElementById('eventFilter').addEventListener('change', function(e) {
+            const filterValue = e.target.value;
+            console.log('Filtering events by:', filterValue);
+        });
+
+        // Claim reward buttons with behavioral messaging
+        document.querySelectorAll('.reward-card .btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const rewardCard = this.closest('.reward-card');
+                const rewardTitle = rewardCard.querySelector('.reward-title').textContent;
+                const isHiddenGem = rewardCard.innerHTML.includes('Hidden Gem');
+                
+                if (isHiddenGem) {
+                    alert(`Claimed: ${rewardTitle}\n\nYou've unlocked a critical advantage. Check your email for redemption details and setup instructions.`);
+                } else {
+                    alert(`Claimed: ${rewardTitle}\n\nCheck your email for redemption details.`);
+                }
+            });
+        });
+
+        // Event registration buttons
+        document.querySelectorAll('.event-card .btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const eventTitle = this.closest('.event-card').querySelector('.event-title').textContent;
+                alert(`Registered for: ${eventTitle}\n\nConfirmation sent to your email.`);
+            });
+        });
+    </script>
+</body>
+</html>
