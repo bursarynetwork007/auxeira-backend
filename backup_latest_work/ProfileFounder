@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira - Founder Profile & Settings</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Responsive Design Enhancements -->
+    <link href="responsive-enhancements.css" rel="stylesheet">
+    
+    <style>
+        /* Bloomberg Terminal / Glass-Morphism Aesthetic */
+        :root {
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #1a1a1a;
+            --accent-bg: #2a2a2a;
+            --neon-blue: #00d4ff;
+            --neon-purple: #8b5cf6;
+            --neon-gold: #fbbf24;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .dashboard-header {
+            background: var(--primary-bg);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand-logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Subscription Status Card */
+        .subscription-status {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(0, 212, 255, 0.1));
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tier-badge {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tier-founder { background: rgba(169, 169, 169, 0.3); color: #c0c0c0; }
+        .tier-startup { background: rgba(16, 185, 129, 0.3); color: var(--success-green); }
+        .tier-growth { background: rgba(0, 212, 255, 0.3); color: var(--neon-blue); }
+        .tier-scale { background: rgba(251, 191, 36, 0.3); color: var(--neon-gold); }
+
+        .status-info {
+            flex: 1;
+            margin-left: 24px;
+        }
+
+        .status-info p {
+            margin: 4px 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Glass Morphism Card */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .glass-card h3 {
+            color: var(--neon-blue);
+            margin-bottom: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .glass-card h3 i {
+            margin-right: 10px;
+            font-size: 1.3rem;
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-label .tooltip-icon {
+            margin-left: 8px;
+            cursor: help;
+            color: var(--neon-blue);
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            background: var(--accent-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background: var(--accent-bg);
+            color: var(--text-primary);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .form-select {
+            background: var(--accent-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 12px 16px;
+        }
+
+        .form-select:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        .form-select option {
+            background: var(--secondary-bg);
+            color: var(--text-primary);
+        }
+
+        /* Tier Recommendation */
+        .tier-recommendation {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(0, 212, 255, 0.1));
+            border-left: 4px solid var(--success-green);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .tier-recommendation h6 {
+            color: var(--success-green);
+            margin-bottom: 8px;
+        }
+
+        /* Auto-Calculated Metrics Display */
+        .metrics-display {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric-item:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .metric-value {
+            color: var(--neon-blue);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--accent-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary-bg);
+            border-color: var(--neon-blue);
+            color: var(--text-primary);
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(0, 212, 255, 0.1);
+            border-left: 4px solid var(--neon-blue);
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .info-box i {
+            color: var(--neon-blue);
+            margin-right: 8px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .subscription-status {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .status-info {
+                margin-left: 0;
+                margin-top: 16px;
+            }
+
+            .glass-card {
+                padding: 16px;
+            }
+
+            .metric-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .metric-value {
+                margin-top: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="brand-logo">
+                    <i class="fas fa-user-circle me-2"></i>Founder Profile
+                </div>
+                <div class="text-end">
+                    <small class="text-secondary">Last Updated: Today at 2:45 PM</small>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mt-4 mb-5">
+        <!-- Subscription Status -->
+        <div class="subscription-status">
+            <div>
+                <div class="tier-badge tier-growth">GROWTH</div>
+            </div>
+            <div class="status-info">
+                <p><strong>Current Subscription Tier:</strong> Growth ($499/month)</p>
+                <p><strong>Next Renewal:</strong> November 25, 2025</p>
+                <p><strong>Status:</strong> <span style="color: var(--success-green);">Active</span></p>
+            </div>
+            <button class="btn btn-primary">Change Tier</button>
+        </div>
+
+        <!-- Section 1: Core Startup Data -->
+        <div class="glass-card">
+            <h3>
+                <i class="fas fa-building"></i>Core Startup Information
+            </h3>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                Tell us about your startup. This helps us personalize your dashboard and ensure you're on the correct tier.
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Startup Name
+                            <span class="tooltip-icon" title="Legal name of your startup">?</span>
+                        </label>
+                        <input type="text" class="form-control" placeholder="e.g., Auxeira Analytics" value="Auxeira Analytics">
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Industry/Sector
+                            <span class="tooltip-icon" title="Primary industry focus">?</span>
+                        </label>
+                        <select class="form-select">
+                            <option selected>FinTech</option>
+                            <option>HealthTech</option>
+                            <option>DeepTech</option>
+                            <option>SaaS</option>
+                            <option>E-Commerce</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Startup Stage
+                            <span class="tooltip-icon" title="Current funding stage">?</span>
+                        </label>
+                        <select class="form-select" onchange="updateTierRecommendation()">
+                            <option>Pre-Seed</option>
+                            <option>Seed</option>
+                            <option selected>Series A</option>
+                            <option>Series B</option>
+                            <option>Series C+</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Country of Incorporation
+                            <span class="tooltip-icon" title="Legal jurisdiction">?</span>
+                        </label>
+                        <input type="text" class="form-control" placeholder="e.g., United States" value="United States">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Subscription Tier Validation (Simplified) -->
+        <div class="glass-card">
+            <h3>
+                <i class="fas fa-chart-bar"></i>Subscription Tier Validation
+            </h3>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                Answer a few simple questions. We'll automatically calculate your metrics and recommend the right tier.
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Total Funding Raised
+                            <span class="tooltip-icon" title="Cumulative capital raised to date">?</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: var(--accent-bg); border: 1px solid var(--glass-border); color: var(--text-secondary);">$</span>
+                            <input type="number" class="form-control" placeholder="e.g., 500000" value="500000" onchange="updateTierRecommendation()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Monthly Recurring Revenue (MRR)
+                            <span class="tooltip-icon" title="Predictable monthly revenue">?</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: var(--accent-bg); border: 1px solid var(--glass-border); color: var(--text-secondary);">$</span>
+                            <input type="number" class="form-control" placeholder="e.g., 25000" value="25000" onchange="updateTierRecommendation()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Team Size (Employees)
+                            <span class="tooltip-icon" title="Total number of employees">?</span>
+                        </label>
+                        <input type="number" class="form-control" placeholder="e.g., 15" value="15" onchange="updateTierRecommendation()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tier Recommendation -->
+            <div class="tier-recommendation" id="tierRecommendation">
+                <h6><i class="fas fa-lightbulb me-2"></i>Recommended Tier</h6>
+                <p>Based on your metrics, you qualify for the <strong>GROWTH</strong> tier ($499/month). Your MRR ($25K-$100K) and team size (15-50 employees) align perfectly with this tier.</p>
+            </div>
+        </div>
+
+        <!-- Section 3: Simplified Financial Inputs (Auto-Calculate Metrics) -->
+        <div class="glass-card">
+            <h3>
+                <i class="fas fa-calculator"></i>Financial Inputs (We'll Calculate Your Metrics)
+            </h3>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                Answer these simple questions. We'll automatically calculate your LTV, CAC, and Runway.
+            </div>
+
+            <div class="row">
+                <!-- LTV Calculation Inputs -->
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Average Monthly Revenue Per Customer (ARPA)
+                            <span class="tooltip-icon" title="Average monthly spend per customer">?</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: var(--accent-bg); border: 1px solid var(--glass-border); color: var(--text-secondary);">$</span>
+                            <input type="number" class="form-control" placeholder="e.g., 150" value="150" id="arpa" onchange="calculateMetrics()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Average Customer Lifetime (Months)
+                            <span class="tooltip-icon" title="How long customers typically stay">?</span>
+                        </label>
+                        <input type="number" class="form-control" placeholder="e.g., 12" value="12" id="retention" onchange="calculateMetrics()">
+                    </div>
+                </div>
+
+                <!-- CAC Calculation Inputs -->
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Monthly Marketing & Sales Spend
+                            <span class="tooltip-icon" title="Total spend on acquisition">?</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: var(--accent-bg); border: 1px solid var(--glass-border); color: var(--text-secondary);">$</span>
+                            <input type="number" class="form-control" placeholder="e.g., 20000" value="20000" id="acqSpend" onchange="calculateMetrics()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            New Customers Acquired This Month
+                            <span class="tooltip-icon" title="Number of new customers">?</span>
+                        </label>
+                        <input type="number" class="form-control" placeholder="e.g., 157" value="157" id="newCustomers" onchange="calculateMetrics()">
+                    </div>
+                </div>
+
+                <!-- Runway Calculation Inputs -->
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Total Cash in Bank
+                            <span class="tooltip-icon" title="Current cash balance">?</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: var(--accent-bg); border: 1px solid var(--glass-border); color: var(--text-secondary);">$</span>
+                            <input type="number" class="form-control" placeholder="e.g., 450000" value="450000" id="totalCash" onchange="calculateMetrics()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Monthly Burn Rate
+                            <span class="tooltip-icon" title="Monthly operating expenses">?</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: var(--accent-bg); border: 1px solid var(--glass-border); color: var(--text-secondary);">$</span>
+                            <input type="number" class="form-control" placeholder="e.g., 25000" value="25000" id="burnRate" onchange="calculateMetrics()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Auto-Calculated Metrics Display -->
+            <div class="metrics-display">
+                <h6 style="color: var(--neon-blue); margin-bottom: 16px;">
+                    <i class="fas fa-magic me-2"></i>Your Auto-Calculated Metrics
+                </h6>
+                <div class="metric-item">
+                    <span class="metric-label">Customer Lifetime Value (LTV)</span>
+                    <span class="metric-value" id="ltv">$1,800</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Customer Acquisition Cost (CAC)</span>
+                    <span class="metric-value" id="cac">$127</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">LTV:CAC Ratio</span>
+                    <span class="metric-value" id="ltvCacRatio">14.2:1</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Runway</span>
+                    <span class="metric-value" id="runway">18 months</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Founder & Compliance -->
+        <div class="glass-card">
+            <h3>
+                <i class="fas fa-id-card"></i>Founder & Compliance Information
+            </h3>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                This information is used for identity verification and compliance purposes. It will not be shared publicly.
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Founder Full Name
+                            <span class="tooltip-icon" title="Your full legal name">?</span>
+                        </label>
+                        <input type="text" class="form-control" placeholder="e.g., John Doe" value="John Doe">
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Founder Email
+                            <span class="tooltip-icon" title="Primary contact email">?</span>
+                        </label>
+                        <input type="email" class="form-control" placeholder="e.g., john@auxeira.com" value="john@auxeira.com">
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Founder Role
+                            <span class="tooltip-icon" title="Your role in the startup">?</span>
+                        </label>
+                        <select class="form-select">
+                            <option selected>CEO</option>
+                            <option>CTO</option>
+                            <option>Co-Founder</option>
+                            <option>CFO</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Legal Entity Name
+                            <span class="tooltip-icon" title="Registered company name">?</span>
+                        </label>
+                        <input type="text" class="form-control" placeholder="e.g., Auxeira Technologies Inc." value="Auxeira Technologies Inc.">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-3 mb-5">
+            <button class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>Save Changes
+            </button>
+            <button class="btn btn-secondary">
+                <i class="fas fa-times me-2"></i>Cancel
+            </button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateTierRecommendation() {
+            const fundingRaised = parseInt(document.querySelector('input[placeholder*="500000"]').value) || 0;
+            const mrr = parseInt(document.querySelector('input[placeholder*="25000"]').value) || 0;
+            const teamSize = parseInt(document.querySelector('input[placeholder*="15"]').value) || 0;
+
+            let recommendedTier = 'Founder';
+            let tierClass = 'tier-founder';
+            let description = '';
+
+            if (fundingRaised >= 5000000 || mrr >= 100000 || teamSize >= 50) {
+                recommendedTier = 'SCALE';
+                tierClass = 'tier-scale';
+                description = 'Based on your metrics, you qualify for the <strong>SCALE</strong> tier ($999/month). Your significant funding, high MRR, and large team position you for enterprise-grade features.';
+            } else if (fundingRaised >= 500000 || mrr >= 25000 || teamSize >= 15) {
+                recommendedTier = 'GROWTH';
+                tierClass = 'tier-growth';
+                description = 'Based on your metrics, you qualify for the <strong>GROWTH</strong> tier ($499/month). Your MRR and team size align perfectly with this tier.';
+            } else if (fundingRaised >= 10000 || mrr >= 5000 || teamSize >= 5) {
+                recommendedTier = 'STARTUP';
+                tierClass = 'tier-startup';
+                description = 'Based on your metrics, you qualify for the <strong>STARTUP</strong> tier ($149/month). This tier provides essential tools for early-stage growth.';
+            } else {
+                recommendedTier = 'FOUNDER';
+                tierClass = 'tier-founder';
+                description = 'Based on your metrics, you qualify for the <strong>FOUNDER</strong> tier (FREE). This tier is perfect for pre-revenue startups.';
+            }
+
+            document.getElementById('tierRecommendation').innerHTML = `
+                <h6><i class="fas fa-lightbulb me-2"></i>Recommended Tier</h6>
+                <p>${description}</p>
+            `;
+        }
+
+        function calculateMetrics() {
+            // Get input values
+            const arpa = parseFloat(document.getElementById('arpa').value) || 0;
+            const retention = parseFloat(document.getElementById('retention').value) || 1;
+            const acqSpend = parseFloat(document.getElementById('acqSpend').value) || 0;
+            const newCustomers = parseFloat(document.getElementById('newCustomers').value) || 1;
+            const totalCash = parseFloat(document.getElementById('totalCash').value) || 0;
+            const burnRate = parseFloat(document.getElementById('burnRate').value) || 1;
+
+            // Calculate LTV
+            const ltv = arpa * retention;
+
+            // Calculate CAC
+            const cac = acqSpend / newCustomers;
+
+            // Calculate LTV:CAC Ratio
+            const ltvCacRatio = (ltv / cac).toFixed(1);
+
+            // Calculate Runway
+            const runway = (totalCash / burnRate).toFixed(1);
+
+            // Update display
+            document.getElementById('ltv').textContent = '$' + ltv.toLocaleString('en-US', {maximumFractionDigits: 0});
+            document.getElementById('cac').textContent = '$' + cac.toLocaleString('en-US', {maximumFractionDigits: 0});
+            document.getElementById('ltvCacRatio').textContent = ltvCacRatio + ':1';
+            document.getElementById('runway').textContent = runway + ' months';
+        }
+
+        // Initialize calculations on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            calculateMetrics();
+            updateTierRecommendation();
+        });
+    </script>
+</body>
+</html>
