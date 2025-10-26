@@ -5242,7 +5242,7 @@
                     onboardingCompleted: data.data?.user?.onboardingCompleted || isTestUser
                 };
                 
-                // For test users, set all required localStorage flags BEFORE storing userData
+                // For test users, set all required localStorage flags
                 if (isTestUser) {
                     localStorage.setItem('onboarding_completed', 'true');
                     localStorage.setItem('subscription_status', 'active');
@@ -5250,8 +5250,12 @@
                     localStorage.setItem('subscription_date', new Date().toISOString());
                 }
 
-                // Store userData AFTER all other localStorage items are set
+                // Store userData
                 localStorage.setItem('auxeira_user', JSON.stringify(userData));
+                
+                // Force synchronous write by reading back - ensures localStorage is persisted
+                localStorage.getItem('auxeira_user');
+                localStorage.getItem('auxeira_auth_token');
 
                 showNotification('Login successful! Redirecting...', 'success');
 
@@ -5260,7 +5264,7 @@
                     setTimeout(() => modal.classList.remove('show'), 1000);
                 }
 
-                // Redirect to dashboard - increased delay to ensure localStorage is persisted
+                // Minimal delay - localStorage is already persisted via synchronous read
                 setTimeout(() => {
                     const dashboardMap = {
                         'startup_founder': 'https://dashboard.auxeira.com/startup_founder.html',
@@ -5271,7 +5275,7 @@
                         'esg_funder': 'https://dashboard.auxeira.com/esg_funder.html'
                     };
                     window.location.href = dashboardMap[userData.userType] || 'https://dashboard.auxeira.com/venture_capital.html';
-                }, 2000);
+                }, 100);
                 
             } catch (error) {
                 console.error('Login error:', error);

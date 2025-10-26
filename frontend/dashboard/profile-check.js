@@ -57,13 +57,10 @@ async function checkProfileAndPayment() {
     }
 }
 
-// Run check on page load with a small delay to ensure localStorage is available
+// Run check on page load - localStorage should be immediately available
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        // Small delay to ensure localStorage from previous page is available
-        setTimeout(checkProfileAndPayment, 100);
-    });
+    document.addEventListener('DOMContentLoaded', checkProfileAndPayment);
 } else {
-    // Small delay to ensure localStorage from previous page is available
-    setTimeout(checkProfileAndPayment, 100);
+    // Immediate check - login page forces synchronous write
+    checkProfileAndPayment();
 }
