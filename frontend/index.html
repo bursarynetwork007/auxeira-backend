@@ -5762,9 +5762,7 @@
             }
         }
 
-        // Service Worker DISABLED - was caching old auth code
-        // TODO: Re-enable after auth flow is stable
-        /*
+        // Service Worker registration for PWA capabilities (production enhancement)
         if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
@@ -5775,7 +5773,6 @@
                         console.warn('SW registration failed:', registrationError);
                     });
             });
-        */
         }
 
         // Error boundary for unhandled errors
@@ -5927,9 +5924,8 @@
         }
     }
     </script>
-<!-- External scripts removed - they conflict with inline auth handlers -->
-<!-- <script src="js/api-config.js"></script> -->
-<!-- <script src="js/script.js"></script> -->
-<!-- <script src="js/api-integration.js"></script> -->
+<script src="js/api-config.js"></script>
+<script src="js/script.js"></script>
+<script src="js/api-integration.js"></script>
 </body>
 </html>
