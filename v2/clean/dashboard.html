@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Auxeira</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0e27;
+            color: #e4e4e7;
+            line-height: 1.6;
+        }
+        
+        /* Loading Screen */
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0e27;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #1e293b;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Main Content - Hidden until loaded */
+        #content {
+            display: none;
+        }
+        
+        #content.loaded {
+            display: block;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        /* Header */
+        header {
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #1e293b;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #1e293b;
+            color: #e4e4e7;
+        }
+        
+        .btn:hover { background: #334155; }
+        
+        /* Dashboard */
+        .dashboard {
+            padding: 2rem 0;
+        }
+        
+        .welcome {
+            margin-bottom: 2rem;
+        }
+        
+        .welcome h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome p { color: #94a3b8; }
+        
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        
+        .card h3 {
+            color: #3b82f6;
+            margin-bottom: 1rem;
+        }
+        
+        .card p { color: #94a3b8; }
+        
+        .metric {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #3b82f6;
+            margin: 1rem 0;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .status.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+        
+        .status.pending {
+            background: rgba(251, 191, 36, 0.1);
+            color: #fbbf24;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="content">
+        <header>
+            <div class="container">
+                <nav>
+                    <div class="logo">AUXEIRA</div>
+                    <div class="user-info">
+                        <span id="userName">Loading...</span>
+                        <button class="btn" onclick="logout()">Logout</button>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <main class="dashboard">
+            <div class="container">
+                <div class="welcome">
+                    <h1>Welcome back, <span id="userFirstName">User</span>!</h1>
+                    <p>Here's your startup performance overview</p>
+                </div>
+
+                <div class="cards">
+                    <div class="card">
+                        <h3>Success Score</h3>
+                        <div class="metric" id="successScore">--</div>
+                        <p>Based on verified performance data</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>Account Status</h3>
+                        <div style="margin: 1rem 0;">
+                            <span class="status active" id="accountStatus">Active</span>
+                        </div>
+                        <p>All systems operational</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>Partner Benefits</h3>
+                        <div class="metric" id="benefitsValue">$0</div>
+                        <p>Total value unlocked</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Your Profile</h3>
+                    <p><strong>Email:</strong> <span id="userEmail">--</span></p>
+                    <p><strong>Role:</strong> <span id="userRole">--</span></p>
+                    <p><strong>User ID:</strong> <span id="userId">--</span></p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Cookie utilities
+        function getCookie(name) {
+            return document.cookie.split('; ').reduce((r, v) => {
+                const parts = v.split('=');
+                return parts[0] === name ? decodeURIComponent(parts[1]) : r;
+            }, '');
+        }
+
+        function deleteCookie(name) {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        }
+
+        // Logout
+        function logout() {
+            deleteCookie('auxeira_token');
+            deleteCookie('auxeira_user');
+            window.location.href = 'index.html';
+        }
+
+        // Load dashboard data BEFORE showing content
+        async function loadDashboard() {
+            try {
+                // Get token from cookie
+                const token = getCookie('auxeira_token');
+                const userDataStr = getCookie('auxeira_user');
+                
+                if (!token || !userDataStr) {
+                    // Not logged in, redirect to home
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                // Parse user data
+                const userData = JSON.parse(userDataStr);
+                
+                // Populate UI with real data
+                document.getElementById('userName').textContent = userData.email;
+                document.getElementById('userFirstName').textContent = userData.firstName || 'User';
+                document.getElementById('userEmail').textContent = userData.email;
+                document.getElementById('userRole').textContent = userData.role || 'Startup Founder';
+                document.getElementById('userId').textContent = userData.userId;
+                
+                // Live stubs (replace with real API calls later)
+                document.getElementById('successScore').textContent = '85.7%';
+                document.getElementById('accountStatus').textContent = 'Active';
+                document.getElementById('benefitsValue').textContent = '$50K+';
+                
+                // Hide loading, show content
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').classList.add('loaded');
+                
+            } catch (error) {
+                console.error('Dashboard load error:', error);
+                // On any error, redirect to login
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Load dashboard when page loads
+        window.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+</body>
+</html>
