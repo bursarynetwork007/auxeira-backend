@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira - Funding Readiness Dashboard</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Responsive Design Enhancements -->
+    <link href="responsive-enhancements.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        /* Bloomberg Terminal / Glass-Morphism Aesthetic */
+        :root {
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #1a1a1a;
+            --accent-bg: #2a2a2a;
+            --neon-blue: #00d4ff;
+            --neon-purple: #8b5cf6;
+            --neon-gold: #fbbf24;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Glass Morphism Card */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 0 25px rgba(0, 212, 255, 0.15);
+        }
+
+        /* Header */
+        .dashboard-header {
+            background: var(--primary-bg);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand-logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Metrics Cards */
+        .metric-card {
+            padding: 20px;
+            border-radius: 12px;
+            background: var(--accent-bg);
+            border-left: 4px solid var(--neon-blue);
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .metric-trend {
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .trend-up { color: var(--success-green); }
+        .trend-down { color: var(--danger-red); }
+
+        /* Funding Readiness Circle */
+        .readiness-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: conic-gradient(var(--neon-blue) 0deg, var(--neon-blue) 252deg, var(--accent-bg) 252deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin: 20px auto;
+        }
+
+        .readiness-circle::before {
+            content: '';
+            width: 155px;
+            height: 155px;
+            border-radius: 50%;
+            background: var(--secondary-bg);
+            position: absolute;
+        }
+
+        .readiness-score {
+            font-size: 3.5rem;
+            font-weight: 700;
+            z-index: 1;
+            color: var(--neon-blue);
+        }
+
+        /* Checklist Styling */
+        .checklist-item {
+            padding: 15px;
+            border-left: 3px solid var(--neon-blue);
+            background: var(--secondary-bg);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .checklist-item:hover {
+            background: var(--accent-bg);
+            border-left-width: 5px;
+        }
+
+        .checklist-item.completed {
+            border-left-color: var(--success-green);
+        }
+
+        .checklist-item.in-progress {
+            border-left-color: var(--neon-gold);
+        }
+
+        .checklist-item.not-started {
+            border-left-color: var(--danger-red);
+        }
+
+        .checklist-status {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .status-completed {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-green);
+        }
+
+        .status-in-progress {
+            background: rgba(251, 191, 36, 0.2);
+            color: var(--neon-gold);
+        }
+
+        .status-not-started {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger-red);
+        }
+
+        /* Investor Card */
+        .investor-card {
+            background: var(--secondary-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .investor-card:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
+        }
+
+        .match-score {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+        }
+
+        /* Action Card */
+        .action-card {
+            background: var(--secondary-bg);
+            border-left: 3px solid var(--neon-blue);
+            padding: 15px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            margin-bottom: 15px;
+        }
+
+        .action-card:hover {
+            background: var(--accent-bg);
+            border-left-width: 5px;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: var(--accent-bg);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* Funding Acceleration Plan */
+        .acceleration-plan {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(0, 212, 255, 0.1));
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .week-card {
+            background: var(--secondary-bg);
+            border-left: 4px solid var(--neon-blue);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .week-card h6 {
+            color: var(--neon-blue);
+            margin-bottom: 12px;
+        }
+
+        .week-card ul {
+            margin-bottom: 0;
+            padding-left: 20px;
+        }
+
+        .week-card li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .metric-value {
+                font-size: 1.8rem;
+            }
+            .readiness-circle {
+                width: 140px;
+                height: 140px;
+            }
+            .readiness-circle::before {
+                width: 120px;
+                height: 120px;
+            }
+            .readiness-score {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="brand-logo">
+                    <i class="fas fa-dollar-sign me-2"></i>Funding Readiness
+                </div>
+                <div class="text-end">
+                    <small class="text-secondary">Series A Target Score: 85+</small>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Section 1: Funding Readiness Score & Key Metrics -->
+        <h2 class="mb-4 text-primary">Your Funding Readiness Score</h2>
+        
+        <div class="row mb-4">
+            <!-- Readiness Score Circle -->
+            <div class="col-lg-4">
+                <div class="glass-card text-center">
+                    <h5 class="mb-3">Funding Readiness Score</h5>
+                    <div class="readiness-circle" id="readinessCircle">
+                        <div class="readiness-score" id="readinessScore">72</div>
+                    </div>
+                    <p class="text-secondary mb-2">Current Score</p>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 72%"></div>
+                    </div>
+                    <small class="text-secondary">Target: 85+ for Series A Investor Introductions</small>
+                    <hr class="my-3" style="border-color: var(--glass-border);">
+                    <button class="btn btn-primary btn-sm w-100">
+                        <i class="fas fa-chart-line me-1"></i>View Score Breakdown
+                    </button>
+                </div>
+            </div>
+
+            <!-- Key Funding Metrics -->
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="metric-card" style="border-left-color: var(--neon-blue);">
+                            <div class="metric-label">Runway (Months)</div>
+                            <div class="metric-value text-primary">14</div>
+                            <div class="metric-trend trend-up">
+                                <i class="fas fa-arrow-up"></i> +2 months vs last quarter
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <div class="metric-card" style="border-left-color: var(--danger-red);">
+                            <div class="metric-label">Monthly Burn Rate</div>
+                            <div class="metric-value text-danger">$12,500</div>
+                            <div class="metric-trend trend-down">
+                                <i class="fas fa-arrow-down"></i> -8.3% (Good!)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <div class="metric-card" style="border-left-color: var(--neon-gold);">
+                            <div class="metric-label">Revenue Multiple</div>
+                            <div class="metric-value text-warning">13.2x</div>
+                            <div class="metric-trend">
+                                <i class="fas fa-info-circle"></i> Industry: 12x
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <div class="metric-card" style="border-left-color: var(--success-green);">
+                            <div class="metric-label">Team Size</div>
+                            <div class="metric-value text-success">12</div>
+                            <div class="metric-trend trend-up">
+                                <i class="fas fa-arrow-up"></i> +3 this quarter
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Series A Checklist -->
+        <h2 class="mb-4 text-primary mt-5">Series A Readiness Checklist</h2>
+        
+        <div class="row mb-4">
+            <div class="col-lg-6">
+                <div class="glass-card">
+                    <h5 class="mb-3">Milestones & Requirements</h5>
+                    
+                    <!-- Completed Items -->
+                    <div class="checklist-item completed">
+                        <div>
+                            <h6 class="mb-1">Product-Market Fit Validated</h6>
+                            <small class="text-secondary">Confirmed through customer interviews</small>
+                        </div>
+                        <span class="checklist-status status-completed">
+                            <i class="fas fa-check-circle"></i> Complete
+                        </span>
+                    </div>
+
+                    <div class="checklist-item completed">
+                        <div>
+                            <h6 class="mb-1">$10K+ MRR Achieved</h6>
+                            <small class="text-secondary">Current: $18,500/month</small>
+                        </div>
+                        <span class="checklist-status status-completed">
+                            <i class="fas fa-check-circle"></i> Complete
+                        </span>
+                    </div>
+
+                    <div class="checklist-item completed">
+                        <div>
+                            <h6 class="mb-1">Team of 10+ Employees</h6>
+                            <small class="text-secondary">Current: 12 team members</small>
+                        </div>
+                        <span class="checklist-status status-completed">
+                            <i class="fas fa-check-circle"></i> Complete
+                        </span>
+                    </div>
+
+                    <!-- In Progress Items -->
+                    <div class="checklist-item in-progress">
+                        <div>
+                            <h6 class="mb-1">Financial Model Complete</h6>
+                            <small class="text-secondary">80% complete - 2 days remaining</small>
+                        </div>
+                        <span class="checklist-status status-in-progress">
+                            <i class="fas fa-clock"></i> 80%
+                        </span>
+                    </div>
+
+                    <div class="checklist-item in-progress">
+                        <div>
+                            <h6 class="mb-1">10+ Customer Interviews</h6>
+                            <small class="text-secondary">8 of 10 completed</small>
+                        </div>
+                        <span class="checklist-status status-in-progress">
+                            <i class="fas fa-clock"></i> 80%
+                        </span>
+                    </div>
+
+                    <!-- Not Started Items -->
+                    <div class="checklist-item not-started">
+                        <div>
+                            <h6 class="mb-1">Legal Structure Optimized</h6>
+                            <small class="text-secondary">Requires legal review - 1 week</small>
+                        </div>
+                        <span class="checklist-status status-not-started">
+                            <i class="fas fa-times-circle"></i> Not Started
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Investor Alignment -->
+            <div class="col-lg-6">
+                <div class="glass-card">
+                    <h5 class="mb-3">Investor Alignment</h5>
+                    
+                    <div class="investor-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="mb-1">Sequoia Capital</h6>
+                                <small class="text-secondary">Series A, SaaS Focus</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="match-score">94%</div>
+                                <small class="text-success">Excellent Match</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="investor-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="mb-1">Andreessen Horowitz</h6>
+                                <small class="text-secondary">Series A, B2B SaaS</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="match-score">89%</div>
+                                <small class="text-success">Great Match</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="investor-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="mb-1">Bessemer Venture Partners</h6>
+                                <small class="text-secondary">Series A, Cloud Software</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="match-score">87%</div>
+                                <small class="text-primary">Good Match</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Investor Visibility & Matching -->
+        <h2 class="mb-4 text-primary mt-5">Investor Visibility & Matching</h2>
+        
+        <div class="glass-card mb-4">
+            <div class="row mb-4">
+                <!-- Visibility Settings -->
+                <div class="col-md-6">
+                    <div class="p-3" style="background: rgba(16, 185, 129, 0.1); border-radius: 8px;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="mb-1">Investor Visibility Status</h6>
+                                <small class="text-secondary">Your SSE Score: 72 (Threshold: 70)</small>
+                            </div>
+                            <span class="badge bg-success">Eligible</span>
+                        </div>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="investorVisibility" checked>
+                            <label class="form-check-label" for="investorVisibility">
+                                Enable Investor Visibility
+                            </label>
+                        </div>
+                        
+                        <p class="small mb-0">
+                            <i class="fas fa-info-circle me-1"></i>
+                            When enabled, qualified investors can discover your startup in deal flow. You maintain full control over who you connect with.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Targeting Filters -->
+                <div class="col-md-6">
+                    <div class="p-3" style="background: rgba(59, 130, 246, 0.1); border-radius: 8px;">
+                        <h6 class="text-primary mb-3">Targeting Filters</h6>
+                        
+                        <div class="mb-2">
+                            <label class="form-label small">Geographic Preference</label>
+                            <select class="form-select form-select-sm" style="background: var(--secondary-bg); color: var(--text-primary); border-color: var(--glass-border);">
+                                <option>Global</option>
+                                <option>North America</option>
+                                <option>Europe</option>
+                                <option>Asia-Pacific</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <label class="form-label small">Investor Type</label>
+                            <select class="form-select form-select-sm" style="background: var(--secondary-bg); color: var(--text-primary); border-color: var(--glass-border);">
+                                <option>All Types</option>
+                                <option>Angel Investors</option>
+                                <option>Venture Capital</option>
+                                <option>Corporate VC</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="form-label small">Sector Focus</label>
+                            <select class="form-select form-select-sm" style="background: var(--secondary-bg); color: var(--text-primary); border-color: var(--glass-border);">
+                                <option>FinTech</option>
+                                <option>SaaS</option>
+                                <option>HealthTech</option>
+                                <option>CleanTech</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matched Investors -->
+            <h6 class="mb-3">Highly Aligned Investors</h6>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="investor-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="mb-1">Sarah Chen</h6>
+                                <small class="text-secondary">Angel Investor • FinTech Focus</small>
+                            </div>
+                            <span class="badge bg-success">95% Match</span>
+                        </div>
+                        <p class="small mb-2">12 investments in B2B SaaS, avg check $150K</p>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-primary flex-fill">
+                                <i class="fas fa-user-plus me-1"></i>Connect
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-envelope me-1"></i>Message
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="investor-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="mb-1">Velocity Ventures</h6>
+                                <small class="text-secondary">VC Fund • Series A Focus</small>
+                            </div>
+                            <span class="badge bg-info">88% Match</span>
+                        </div>
+                        <p class="small mb-2">Portfolio: 23 startups, avg investment $2M</p>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-primary flex-fill">
+                                <i class="fas fa-user-plus me-1"></i>Connect
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-calendar me-1"></i>Schedule
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Funding Acceleration Plan -->
+        <h2 class="mb-4 text-primary mt-5">Funding Acceleration Plan</h2>
+        
+        <div class="acceleration-plan">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="text-neon-blue"><i class="fas fa-lightbulb me-2"></i>Your Personalized Roadmap to Series A</h4>
+                <span class="badge bg-primary">AI Generated</span>
+            </div>
+            <p class="text-secondary mb-4">Based on your current metrics and checklist, here's your week-by-week plan to reach 85+ Funding Readiness Score and unlock investor introductions.</p>
+            
+            <div class="row">
+                <!-- Week 1-2 -->
+                <div class="col-md-4">
+                    <div class="week-card">
+                        <h6><i class="fas fa-calendar me-2"></i>Week 1-2</h6>
+                        <ul>
+                            <li>Complete remaining 2 customer interviews</li>
+                            <li>Finalize financial projections (18-month model)</li>
+                            <li>Prepare pitch deck v3.0 with updated metrics</li>
+                            <li>Schedule legal structure review</li>
+                        </ul>
+                        <button class="btn btn-sm btn-primary mt-3 w-100">Start Tasks</button>
+                    </div>
+                </div>
+
+                <!-- Week 3-4 -->
+                <div class="col-md-4">
+                    <div class="week-card">
+                        <h6><i class="fas fa-calendar me-2"></i>Week 3-4</h6>
+                        <ul>
+                            <li>Complete legal structure optimization</li>
+                            <li>Prepare data room with key documents</li>
+                            <li>Schedule reference customer calls</li>
+                            <li>Finalize Series A investment thesis</li>
+                        </ul>
+                        <button class="btn btn-sm btn-primary mt-3 w-100">Schedule</button>
+                    </div>
+                </div>
+
+                <!-- Week 5-6 -->
+                <div class="col-md-4">
+                    <div class="week-card">
+                        <h6><i class="fas fa-calendar me-2"></i>Week 5-6</h6>
+                        <ul>
+                            <li>Launch investor outreach campaign</li>
+                            <li>Prepare for demo day (if applicable)</li>
+                            <li>Begin term sheet negotiations</li>
+                            <li>Celebrate reaching 85+ Funding Readiness!</li>
+                        </ul>
+                        <button class="btn btn-sm btn-primary mt-3 w-100">Plan</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Insights -->
+            <div class="action-card" style="border-left-color: var(--neon-blue); margin-top: 20px;">
+                <h6 class="text-primary mb-2"><i class="fas fa-brain me-2"></i>AI Insights & Recommendations</h6>
+                <p class="small mb-2">You're 13 points away from the 85+ Series A readiness threshold. The fastest path is to complete your customer interviews (2 remaining) and finalize your legal structure. These two items alone will add ~10 points to your score.</p>
+                <p class="small mb-0">Once you reach 85+, you'll unlock access to Auxeira's network of 500+ Series A-focused investors. Based on your metrics, you're an excellent fit for firms like Sequoia Capital (94% match), Andreessen Horowitz (89% match), and Bessemer Venture Partners (87% match).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Custom Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Update Readiness Circle based on score
+        document.addEventListener('DOMContentLoaded', () => {
+            const score = parseInt(document.getElementById('readinessScore').textContent);
+            const degrees = (score / 100) * 360;
+            const readinessCircle = document.getElementById('readinessCircle');
+            readinessCircle.style.background = `conic-gradient(var(--neon-blue) 0deg, var(--neon-blue) ${degrees}deg, var(--accent-bg) ${degrees}deg)`;
+        });
+
+        // Form styling for select elements
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('focus', function() {
+                this.style.borderColor = 'var(--neon-blue)';
+                this.style.boxShadow = '0 0 10px rgba(0, 212, 255, 0.2)';
+            });
+            select.addEventListener('blur', function() {
+                this.style.borderColor = 'var(--glass-border)';
+                this.style.boxShadow = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
