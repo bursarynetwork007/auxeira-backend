@@ -5242,6 +5242,15 @@
                     onboardingCompleted: data.data?.user?.onboardingCompleted || isTestUser
                 };
                 
+                // For test users, set all required localStorage flags BEFORE storing userData
+                if (isTestUser) {
+                    localStorage.setItem('onboarding_completed', 'true');
+                    localStorage.setItem('subscription_status', 'active');
+                    localStorage.setItem('subscription_tier', 'founder');
+                    localStorage.setItem('subscription_date', new Date().toISOString());
+                }
+
+                // Store userData AFTER all other localStorage items are set
                 localStorage.setItem('auxeira_user', JSON.stringify(userData));
 
                 showNotification('Login successful! Redirecting...', 'success');
@@ -5251,28 +5260,8 @@
                     setTimeout(() => modal.classList.remove('show'), 1000);
                 }
 
+                // Redirect to dashboard - increased delay to ensure localStorage is persisted
                 setTimeout(() => {
-                    // For test users, set all required localStorage flags
-                    if (isTestUser) {
-                        localStorage.setItem('onboarding_completed', 'true');
-                        localStorage.setItem('subscription_status', 'active');
-                        localStorage.setItem('subscription_tier', 'founder');
-                        localStorage.setItem('subscription_date', new Date().toISOString());
-                        
-                        // Redirect to dashboard
-                        const dashboardMap = {
-                            'startup_founder': 'https://dashboard.auxeira.com/startup_founder.html',
-                            'corporate_partner': 'https://dashboard.auxeira.com/corporate_partner.html',
-                            'venture_capital': 'https://dashboard.auxeira.com/venture_capital.html',
-                            'angel_investor': 'https://dashboard.auxeira.com/angel_investor.html',
-                            'government': 'https://dashboard.auxeira.com/government.html',
-                            'esg_funder': 'https://dashboard.auxeira.com/esg_funder.html'
-                        };
-                        window.location.href = dashboardMap[userData.userType] || 'https://dashboard.auxeira.com/venture_capital.html';
-                        return;
-                    }
-                    
-                    // Regular user flow
                     const dashboardMap = {
                         'startup_founder': 'https://dashboard.auxeira.com/startup_founder.html',
                         'corporate_partner': 'https://dashboard.auxeira.com/corporate_partner.html',
@@ -5282,7 +5271,7 @@
                         'esg_funder': 'https://dashboard.auxeira.com/esg_funder.html'
                     };
                     window.location.href = dashboardMap[userData.userType] || 'https://dashboard.auxeira.com/venture_capital.html';
-                }, 1500);
+                }, 2000);
                 
             } catch (error) {
                 console.error('Login error:', error);
