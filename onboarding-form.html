@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira - Complete Your Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #1a1a1a;
+            --accent-bg: #2a2a2a;
+            --neon-blue: #00d4ff;
+            --neon-purple: #8b5cf6;
+            --neon-gold: #fbbf24;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .onboarding-container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .brand-logo {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-label {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-control, .form-select {
+            background: var(--accent-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: var(--accent-bg);
+            border-color: var(--neon-blue);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.2rem rgba(0, 212, 255, 0.25);
+        }
+
+        .tier-badge {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 10px 5px;
+        }
+
+        .tier-founder { background: rgba(169, 169, 169, 0.3); color: #c0c0c0; }
+        .tier-startup { background: rgba(16, 185, 129, 0.3); color: #10b981; }
+        .tier-growth { background: rgba(0, 212, 255, 0.3); color: var(--neon-blue); }
+        .tier-scale { background: rgba(251, 191, 36, 0.3); color: var(--neon-gold); }
+
+        .tier-recommendation {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(139, 92, 246, 0.1));
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            border: none;
+            border-radius: 8px;
+            padding: 14px 32px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        .step.active {
+            color: var(--neon-blue);
+        }
+
+        .step.completed {
+            color: var(--neon-purple);
+        }
+
+        .step::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: var(--glass-border);
+            z-index: -1;
+        }
+
+        .step:last-child::after {
+            display: none;
+        }
+
+        .info-box {
+            background: rgba(0, 212, 255, 0.1);
+            border-left: 4px solid var(--neon-blue);
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="onboarding-container">
+        <div class="brand-logo">
+            <i class="fas fa-rocket me-2"></i>Welcome to Auxeira
+        </div>
+
+        <div class="progress-steps">
+            <div class="step active" id="step1">
+                <i class="fas fa-building fa-2x"></i>
+                <div>Company Info</div>
+            </div>
+            <div class="step" id="step2">
+                <i class="fas fa-chart-line fa-2x"></i>
+                <div>Metrics</div>
+            </div>
+            <div class="step" id="step3">
+                <i class="fas fa-check-circle fa-2x"></i>
+                <div>Complete</div>
+            </div>
+        </div>
+
+        <form id="onboardingForm">
+            <!-- Step 1: Company Information -->
+            <div class="form-step" id="formStep1">
+                <div class="glass-card">
+                    <h3><i class="fas fa-building me-2"></i>Company Information</h3>
+                    <div class="info-box">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Tell us about your startup to personalize your experience
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Startup Name *</label>
+                            <input type="text" class="form-control" name="startup_name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Industry *</label>
+                            <select class="form-select" name="industry" required>
+                                <option value="">Select...</option>
+                                <option>FinTech</option>
+                                <option>HealthTech</option>
+                                <option>DeepTech</option>
+                                <option>SaaS</option>
+                                <option>E-Commerce</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Startup Stage *</label>
+                            <select class="form-select" name="stage" required>
+                                <option value="">Select...</option>
+                                <option>Pre-Seed</option>
+                                <option>Seed</option>
+                                <option>Series A</option>
+                                <option>Series B</option>
+                                <option>Series C+</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Country *</label>
+                            <input type="text" class="form-control" name="country" required>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary w-100" onclick="nextStep(2)">
+                        Next <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Metrics -->
+            <div class="form-step" id="formStep2" style="display: none;">
+                <div class="glass-card">
+                    <h3><i class="fas fa-chart-bar me-2"></i>Business Metrics</h3>
+                    <div class="info-box">
+                        <i class="fas fa-info-circle me-2"></i>
+                        These metrics help us determine your subscription tier
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Total Funding Raised *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="funding_raised" required onchange="calculateTier()">
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Monthly Recurring Revenue *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="mrr" required onchange="calculateTier()">
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Team Size *</label>
+                            <input type="number" class="form-control" name="team_size" required onchange="calculateTier()">
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4">Financial Metrics (for dashboard calculations)</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Avg Revenue Per Customer (ARPA)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="arpa">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Customer Lifetime (months)</label>
+                            <input type="number" class="form-control" name="customer_lifetime_months">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Monthly Marketing Spend</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="monthly_marketing_spend">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">New Customers/Month</label>
+                            <input type="number" class="form-control" name="new_customers_per_month">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Total Cash on Hand</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="total_cash">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Monthly Burn Rate</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="monthly_burn_rate">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tier-recommendation" id="tierRecommendation">
+                        <h5><i class="fas fa-lightbulb me-2"></i>Your Subscription Tier</h5>
+                        <p id="tierDescription">Enter your metrics to see your recommended tier</p>
+                        <div id="tierBadge"></div>
+                    </div>
+
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="button" class="btn btn-secondary" onclick="nextStep(1)">
+                            <i class="fas fa-arrow-left me-2"></i>Back
+                        </button>
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            Complete Setup <i class="fas fa-check ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const PRICING_TIERS = {
+            founder: { price: 0, name: 'Founder (FREE)', class: 'tier-founder' },
+            startup: { price: 149, name: 'Startup', class: 'tier-startup' },
+            growth: { price: 499, name: 'Growth', class: 'tier-growth' },
+            scale: { price: 999, name: 'Scale', class: 'tier-scale' }
+        };
+
+        function nextStep(step) {
+            document.querySelectorAll('.form-step').forEach(s => s.style.display = 'none');
+            document.getElementById('formStep' + step).style.display = 'block';
+            
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+        }
+
+        function calculateTier() {
+            const funding = parseFloat(document.querySelector('[name="funding_raised"]').value) || 0;
+            const mrr = parseFloat(document.querySelector('[name="mrr"]').value) || 0;
+            const teamSize = parseFloat(document.querySelector('[name="team_size"]').value) || 0;
+
+            let tier = 'founder';
+            let description = '';
+
+            if (funding >= 5000000 || mrr >= 100000 || teamSize >= 50) {
+                tier = 'scale';
+                description = 'Your metrics qualify you for the SCALE tier ($999/month). Enterprise-grade features for established startups.';
+            } else if (funding >= 500000 || mrr >= 25000 || teamSize >= 15) {
+                tier = 'growth';
+                description = 'Your metrics qualify you for the GROWTH tier ($499/month). Advanced tools for scaling startups.';
+            } else if (funding >= 10000 || mrr >= 5000 || teamSize >= 5) {
+                tier = 'startup';
+                description = 'Your metrics qualify you for the STARTUP tier ($149/month). Essential tools for early-stage growth.';
+            } else {
+                tier = 'founder';
+                description = 'Your metrics qualify you for the FOUNDER tier (FREE). Perfect for pre-revenue startups.';
+            }
+
+            const tierInfo = PRICING_TIERS[tier];
+            document.getElementById('tierDescription').textContent = description;
+            document.getElementById('tierBadge').innerHTML = `<div class="tier-badge ${tierInfo.class}">${tierInfo.name}</div>`;
+            
+            return tier;
+        }
+
+        document.getElementById('onboardingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            data.tier = calculateTier();
+            
+            console.log('Onboarding data:', data);
+            
+            try {
+                const response = await fetch('/api/onboarding/complete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    localStorage.setItem('onboarding_complete', 'true');
+                    window.location.href = 'https://s3.amazonaws.com/dashboard.auxeira.com/startup_founder.html';
+                } else {
+                    alert('Error completing onboarding. Please try again.');
+                }
+            } catch (error) {
+                console.error('Onboarding error:', error);
+                alert('Error completing onboarding. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

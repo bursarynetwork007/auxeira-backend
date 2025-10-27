@@ -12,6 +12,8 @@ import { logger, loggers, logStartup, logShutdown, createRequestLogger } from '.
 import authRoutes from './routes/auth';
 import sseRoutes from './routes/sse';
 import kpiRoutes from './routes/kpi';
+import activityRewardsRoutes from './routes/activity-rewards';
+import onboardingRoutes from './routes/onboarding';
 
 // Load environment variables
 config();
@@ -165,6 +167,7 @@ app.get('/', (req, res) => {
       authentication: '/api/auth',
       sseScoring: '/api/sse',
       kpiDashboard: '/api/kpi',
+      activityRewards: '/api/activities',
       health: '/health',
     },
     features: [
@@ -175,6 +178,7 @@ app.get('/', (req, res) => {
       'Gamification & Achievements',
       'Goal Setting & Progress Tracking',
       'Benchmarking & Leaderboards',
+      'Activity Rewards System (25 activities)',
     ],
   });
 });
@@ -183,6 +187,8 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/sse', sseRoutes);
 app.use('/api/kpi', kpiRoutes);
+app.use('/api/activities', activityRewardsRoutes);
+app.use('/api/onboarding', onboardingRoutes);
 
 // 404 handler for undefined routes
 app.use('*', (req, res) => {
