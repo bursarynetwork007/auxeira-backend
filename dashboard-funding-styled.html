@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira - Startup Founder Dashboard</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        /* --- Bloomberg Terminal / Glass-Morphism Aesthetic CSS --- */
+        
+        /* Core Colors from Context */
+        :root {
+            --bg-dark: #0d1117;
+            --electric-blue: #007bff;
+            --gold-accent: #ffd700;
+            --text-light: #ffffff;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            
+            --primary-bg: var(--bg-dark);
+            --secondary-bg: #161b22;
+            --neon-blue: var(--electric-blue);
+            --neon-gold: var(--gold-accent);
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto; 
+        }
+
+        .dashboard-header {
+            background-color: var(--primary-bg);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--neon-blue);
+        }
+        
+        .nav-tabs {
+            border-bottom: 2px solid var(--glass-border);
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            border: none;
+            border-bottom: 3px solid transparent;
+            margin-right: 15px;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .nav-link:hover {
+            color: var(--neon-blue);
+            border-color: var(--neon-blue);
+        }
+
+        .nav-link.active {
+            color: var(--neon-gold) !important;
+            background-color: transparent !important;
+            border-color: var(--neon-gold) !important;
+            font-weight: bold;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        .sse-circle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .sse-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid var(--neon-blue);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.2) 0%, rgba(0, 0, 0, 0.5) 100%);
+            box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
+        }
+
+        .sse-score {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--neon-gold);
+        }
+        
+        .metric-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: transform 0.2s;
+        }
+        
+        .metric-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .ai-mentor {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(0, 212, 255, 0.1));
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .nudge-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid;
+            padding: 15px;
+            border-radius: 8px;
+            transition: transform 0.2s;
+            margin-bottom: 15px;
+        }
+        
+        .nudge-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .nudge-card.urgent {
+            border-left-color: var(--danger-red);
+        }
+
+        .nudge-card.opportunity {
+            border-left-color: var(--neon-blue);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            padding: 10px;
+        }
+
+        .btn-sm {
+            font-size: 0.85rem;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-red);
+            border-color: var(--danger-red);
+        }
+        
+        .btn-primary {
+            background-color: var(--neon-blue);
+            border-color: var(--neon-blue);
+        }
+        
+        .btn-success {
+            background-color: var(--success-green);
+            border-color: var(--success-green);
+        }
+        
+        .btn-warning {
+            background-color: var(--neon-gold);
+            border-color: var(--neon-gold);
+            color: var(--primary-bg) !important;
+        }
+        
+        .text-neon-blue { color: var(--neon-blue) !important; }
+        .text-neon-gold { color: var(--neon-gold) !important; }
+        .text-success { color: var(--success-green) !important; }
+        .text-danger { color: var(--danger-red) !important; }
+        .text-warning { color: var(--neon-gold) !important; }
+        
+        .tab-pane {
+            min-height: 500px;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--neon-blue);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-header .text-end {
+                text-align: center !important;
+                margin-top: 10px;
+            }
+            .nav-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .nav-item {
+                flex-shrink: 0;
+            }
+        }
+    
+        /* Enhanced Section Borders and Separation */
+        .narrative-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+        
+        .narrative-title {
+            border-bottom: 2px solid var(--neon-blue);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        
+        /* Enhanced glass card borders */
+        .glass-card {
+            border: 2px solid var(--glass-border) !important;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        /* Section separators */
+        .row + .row {
+            margin-top: 30px;
+        }
+        
+        /* Chart containers with clear borders */
+        .chart-container {
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Metric cards with enhanced borders */
+        .metric-card {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left-width: 4px !important;
+        }
+        
+        /* AI Mentor section border */
+        .ai-mentor {
+            border: 2px solid rgba(139, 92, 246, 0.4) !important;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
+        }
+        
+        /* Nudge cards with clearer borders */
+        .nudge-card {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left-width: 4px !important;
+        }
+        
+        /* Tab content padding and separation */
+        .tab-pane {
+            padding-top: 10px;
+        }
+        
+        /* Section headers with bottom border */
+        h2, h3, h4, h5 {
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            border-bottom: 2px solid var(--neon-blue);
+        }
+        
+        /* Horizontal rules with better visibility */
+        hr {
+            border-color: var(--glass-border) !important;
+            opacity: 0.5;
+            margin: 20px 0;
+        }
+
+    
+        /* === Funding Readiness Specific Styles === */
+        .readiness-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: conic-gradient(var(--neon-blue) 0deg, var(--neon-blue) 252deg, var(--accent-bg) 252deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin: 20px auto;
+        }
+        .readiness-circle::before {
+            content: '';
+            width: 155px;
+            height: 155px;
+            border-radius: 50%;
+            background: var(--secondary-bg);
+            position: absolute;
+        }
+        .readiness-score {
+            font-size: 3.5rem;
+            font-weight: 700;
+            z-index: 1;
+            color: var(--neon-blue);
+        }
+        .checklist-item {
+            padding: 15px;
+            border-left: 3px solid var(--neon-blue);
+            background: var(--secondary-bg);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        .checklist-item:hover {
+            background: var(--accent-bg);
+            border-left-width: 5px;
+        }
+        .checklist-item.completed {
+            border-left-color: var(--success-green);
+        }
+        .checklist-item.in-progress {
+            border-left-color: var(--neon-gold);
+        }
+        .checklist-item.not-started {
+            border-left-color: var(--danger-red);
+        }
+        .checklist-status {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        .progress-container {
+            background: var(--accent-bg);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        .week-card {
+            background: var(--secondary-bg);
+            border-left: 4px solid var(--neon-blue);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .week-card h6 {
+            color: var(--neon-blue);
+            margin-bottom: 12px;
+        }
+        .week-card ul {
+            margin-bottom: 0;
+            padding-left: 20px;
+        }
+        .week-card li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+            .readiness-circle {
+                width: 140px;
+                height: 140px;
+            }
+            .readiness-circle::before {
+                width: 120px;
+                height: 120px;
+            }
+            .readiness-score {
+                font-size: 2.5rem;
+            }
+        /* === End Funding Readiness Styles === */
+
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <div class="brand-logo">Auxeira</div>
+                </div>
+                <div class="col-md-8 text-end">
+                    <span class="text-secondary me-3" id="userWelcome">Welcome, Startup Founder</span>
+                    <span class="badge bg-warning text-dark me-3">1,247 AUX</span>
+                    <a href="profile.html" class="btn btn-sm btn-outline-light me-2">
+                        <i class="fas fa-user me-1"></i>Profile
+                    </a>
+                    <button onclick="logout()" class="btn btn-sm btn-danger">
+                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid mt-4">
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button">
+                    <i class="fas fa-tachometer-alt me-2"></i>Overview
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="growth-tab" data-bs-toggle="tab" data-bs-target="#growth" type="button">
+                    <i class="fas fa-chart-line me-2"></i>Growth Metrics
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="funding-tab" data-bs-toggle="tab" data-bs-target="#funding" type="button">
+                    <i class="fas fa-dollar-sign me-2"></i>Funding Readiness
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="earn-tab" data-bs-toggle="tab" data-bs-target="#earn" type="button">
+                    <i class="fas fa-coins me-2"></i>Earn AUX
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button">
+                    <i class="fas fa-trophy me-2"></i>Activity Rewards
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="partners-tab" data-bs-toggle="tab" data-bs-target="#partners" type="button">
+                    <i class="fas fa-handshake me-2"></i>Partner Rewards
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="dashboardTabContent">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <h2 class="mb-4 text-primary">Startup Success Engine (SSE) Overview</h2>
+                
+                <div class="row">
+                    <!-- Left Column: SSE Score & Core Metrics -->
+                    <div class="col-lg-4">
+                        <div class="glass-card mb-4 text-center">
+                            <h5 class="text-neon-blue mb-3">Your SSE Score</h5>
+                            <div class="sse-circle-container">
+                                <div class="sse-circle" id="sseCircle">
+                                    <div class="sse-score" id="sseScoreDisplay">78</div>
+                                </div>
+                            </div>
+                            <p class="lead fw-bold mb-1">Series A Readiness: <span class="text-warning">78%</span></p>
+                            <small class="text-secondary">Target: 85+ for Investor Introductions</small>
+                            
+                            <hr class="my-3" style="border-color: var(--glass-border);">
+                            
+                            <div class="row text-start">
+                                <div class="col-6">
+                                    <div class="metric-card" style="border-left-color: var(--success-green);">
+                                        <div class="metric-value text-success">$2.4M</div>
+                                        <div class="metric-label">Valuation</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="metric-card" style="border-left-color: var(--neon-blue);">
+                                        <div class="metric-value text-primary">$18.5K</div>
+                                        <div class="metric-label">Monthly MRR</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="metric-card" style="border-left-color: var(--danger-red);">
+                                        <div class="metric-value text-danger">$127</div>
+                                        <div class="metric-label">Customer CAC</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="metric-card" style="border-left-color: var(--neon-gold);">
+                                        <div class="metric-value text-warning">14</div>
+                                        <div class="metric-label">Runway (Months)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column: AI Mentor & Charts -->
+                    <div class="col-lg-8">
+                        <!-- AI Mentor Section -->
+                        <div class="ai-mentor mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4 class="text-neon-blue"><i class="fas fa-robot me-2"></i>Auxeira AI Mentor & Coach</h4>
+                                <button class="btn btn-light btn-sm">
+                                    <i class="fas fa-comments me-2"></i>Chat with Mentor
+                                </button>
+                            </div>
+                            <p class="text-secondary">Personalized, data-driven nudges to accelerate your FinTech startup's growth trajectory.</p>
+                            
+                            <div class="row mt-3">
+                                <!-- Nudge 1: Growth -->
+                                <div class="col-md-4">
+                                    <div class="nudge-card" style="border-left-color: var(--success-green);">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="text-success mb-1"><i class="fas fa-bullseye me-1"></i>Growth Nudge</h6>
+                                            <span class="badge bg-success">+100 AUX</span>
+                                        </div>
+                                        <p class="small mb-2">
+                                            <strong>Reduce CAC via Referrals:</strong> Launch a customer referral program. Projected 25% CAC reduction.
+                                        </p>
+                                        <button class="btn btn-sm btn-success w-100">Take Action</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Nudge 2: Validation -->
+                                <div class="col-md-4">
+                                    <div class="nudge-card" style="border-left-color: var(--neon-gold);">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="text-warning mb-1"><i class="fas fa-chart-line me-1"></i>Validation Nudge</h6>
+                                            <span class="badge bg-warning text-dark">+150 AUX</span>
+                                        </div>
+                                        <p class="small mb-2">
+                                            <strong>Complete Customer Interviews:</strong> Need 2 more interviews to reach Series A validation threshold.
+                                        </p>
+                                        <button class="btn btn-sm btn-warning w-100">Schedule Interviews</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Nudge 3: Funding -->
+                                <div class="col-md-4">
+                                    <div class="nudge-card" style="border-left-color: var(--neon-blue);">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="text-primary mb-1"><i class="fas fa-rocket me-1"></i>Funding Nudge</h6>
+                                            <span class="badge bg-primary">+200 AUX</span>
+                                        </div>
+                                        <p class="small mb-2">
+                                            <strong>Prepare Financial Projections:</strong> Update 18-month model to reflect recent MRR growth.
+                                        </p>
+                                        <button class="btn btn-sm btn-primary w-100">Update Model</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Growth Trajectory Chart -->
+                        <div class="glass-card mb-4">
+                            <h5 class="mb-3">Growth Trajectory & SSE Score History</h5>
+                            <div class="chart-container">
+                                <canvas id="growthChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ESG/Sustainability Impact Tracker & Urgent Actions -->
+                <div class="row mt-2">
+                    <div class="col-lg-6">
+                        <div class="glass-card mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="text-neon-blue"><i class="fas fa-leaf me-2"></i>ESG/Sustainability Impact Tracker</h5>
+                                <span class="badge bg-success">SDG 13 Aligned</span>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="metric-card" style="border-left-color: var(--success-green);">
+                                        <div class="metric-value text-success">-12.5%</div>
+                                        <div class="metric-label">Carbon Footprint Reduction</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="metric-card" style="border-left-color: var(--neon-blue);">
+                                        <div class="metric-value text-info">4.2</div>
+                                        <div class="metric-label">SDG Alignment Score</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-container" style="height: 200px;">
+                                <canvas id="esgImpactChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <div class="glass-card mb-4">
+                            <h5 class="mb-3">🚨 Urgent Actions & Opportunities</h5>
+                            
+                            <!-- Urgent Action 1 -->
+                            <div class="nudge-card urgent mb-3" style="border-left-color: var(--danger-red);">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-danger mb-0">Customer Interview #8</h6>
+                                        <p class="mb-0 small text-secondary">Required to unlock Series A assessment</p>
+                                    </div>
+                                    <button class="btn btn-sm btn-danger">Start Now</button>
+                                </div>
+                            </div>
+
+                            <!-- Urgent Action 2 -->
+                            <div class="nudge-card urgent mb-3" style="border-left-color: var(--warning-orange);">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-warning mb-0">Financial Model Update</h6>
+                                        <p class="mb-0 small text-secondary">Your projections are 30 days old - Overdue</p>
+                                    </div>
+                                    <button class="btn btn-sm btn-warning">Update</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Opportunity 1 -->
+                            <div class="nudge-card opportunity" style="border-left-color: var(--neon-blue);">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-primary mb-0">Investor Introduction</h6>
+                                        <p class="mb-0 small text-secondary">Warm intro to Series A investor - +500 AUX</p>
+                                    </div>
+                                    <button class="btn btn-sm btn-primary">Accept</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Placeholder tabs -->
+            <div class="tab-pane fade" id="growth" role="tabpanel">
+    <div class="container mt-4">
+        <!-- Section 0: Your Growth Story (Narrative) -->
+        <div class="narrative-section">
+            <div class="narrative-title">
+                <i class="fas fa-book me-2"></i>Your Growth Story
+            </div>
+            <div class="narrative-text">
+                Your startup is demonstrating <strong>exceptional growth momentum</strong>. Your MRR has grown <strong>40% in the last 3 months</strong>, driven by strong expansion revenue (128% NRR) and improved unit economics. Your LTV:CAC ratio of 14.9:1 is <strong>5x the ideal threshold</strong>, indicating you can afford to invest more aggressively in customer acquisition while maintaining profitability.
+            </div>
+            <div class="narrative-insight">
+                <i class="fas fa-lightbulb"></i>
+                <strong>Key Insight:</strong> Your biggest opportunity right now is to <strong>scale customer acquisition</strong> without sacrificing unit economics. Your churn rate (2.3%) is still slightly above the SaaS benchmark (1-2%), so addressing this could unlock an additional $50K+ in annual revenue.
+            </div>
+        </div>
+
+        <!-- Section 1: Core Financial Metrics -->
+        <h2 class="mb-4 text-primary">Core Financial Metrics</h2>
+        
+        <div class="row mb-4">
+            <!-- LTV Card -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="metric-card" style="border-left-color: var(--neon-blue);">
+                    <div class="metric-label">Customer Lifetime Value</div>
+                    <div class="metric-value text-primary">$1,890</div>
+                    <div class="metric-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> +5.2% vs last month
+                    </div>
+                    <small class="text-secondary d-block mt-2">
+                        <span class="health-indicator health-good"></span>Healthy LTV growth
+                    </small>
+                    <div class="metric-context">
+                        <strong>What This Means:</strong> Each customer generates $1,890 in lifetime revenue. This is growing, which means your customers are becoming more valuable over time.
+                    </div>
+                </div>
+            </div>
+
+            <!-- CAC Card -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="metric-card" style="border-left-color: var(--warning-orange);">
+                    <div class="metric-label">Customer Acquisition Cost</div>
+                    <div class="metric-value text-warning">$127</div>
+                    <div class="metric-trend trend-down">
+                        <i class="fas fa-arrow-down"></i> -15.2% (Excellent!)
+                    </div>
+                    <small class="text-secondary d-block mt-2">
+                        <span class="health-indicator health-good"></span>CAC optimization working
+                    </small>
+                    <div class="metric-context">
+                        <strong>What This Means:</strong> You're spending $127 to acquire each customer. The 15% reduction shows your marketing is becoming more efficient—this is a major win.
+                    </div>
+                </div>
+            </div>
+
+            <!-- LTV:CAC Ratio Card -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="metric-card" style="border-left-color: var(--success-green);">
+                    <div class="metric-label">LTV:CAC Ratio</div>
+                    <div class="metric-value text-success">14.9:1</div>
+                    <div class="metric-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> Ideal ratio: 3:1 or higher
+                    </div>
+                    <small class="text-secondary d-block mt-2">
+                        <span class="health-indicator health-good"></span>Exceptional unit economics
+                    </small>
+                    <div class="metric-context">
+                        <strong>What This Means:</strong> For every $1 spent on acquisition, you earn $14.90 in lifetime revenue. This is 5x the ideal threshold, meaning you have significant room to invest more in growth.
+                    </div>
+                </div>
+            </div>
+
+            <!-- NRR Card -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="metric-card" style="border-left-color: var(--neon-gold);">
+                    <div class="metric-label">Net Revenue Retention (NRR)</div>
+                    <div class="metric-value text-warning">128%</div>
+                    <div class="metric-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> +8% vs last quarter
+                    </div>
+                    <small class="text-secondary d-block mt-2">
+                        <span class="health-indicator health-good"></span>Strong expansion revenue
+                    </small>
+                    <div class="metric-context">
+                        <strong>What This Means:</strong> You're retaining 100% of existing customers AND growing 28% more revenue from them through upsells and expansions. This is a hallmark of product-market fit.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Additional Key Metrics -->
+        <div class="row mb-4">
+            <!-- Total Customers -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="metric-card" style="border-left-color: var(--neon-purple);">
+                    <div class="metric-label">Total Customers</div>
+                    <div class="metric-value text-primary">1,247</div>
+                    <div class="metric-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> +18% vs last quarter
+                    </div>
+                    <small class="text-secondary d-block mt-2">
+                        <span class="health-indicator health-good"></span>Steady customer growth
+                    </small>
+                </div>
+            </div>
+
+            <!-- Monthly Churn Rate -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="metric-card" style="border-left-color: var(--danger-red);">
+                    <div class="metric-label">Monthly Churn Rate</div>
+                    <div class="metric-value text-danger">2.3%</div>
+                    <div class="metric-trend trend-down">
+                        <i class="fas fa-arrow-down"></i> -0.9% vs last quarter
+                    </div>
+                    <small class="text-secondary d-block mt-2">
+                        <span class="health-indicator health-warning"></span>Above SaaS benchmark
+                    </small>
+                    <div class="metric-context">
+                        <strong>Opportunity:</strong> SaaS benchmark is 1-2%. Reducing churn to 1.5% would add ~$50K in annual revenue and significantly boost your Series A readiness.
+                    </div>
+                </div>
+            </div>
+
+            <!-- MRR -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="metric-card" style="border-left-color: var(--success-green);">
+                    <div class="metric-label">Monthly Recurring Revenue</div>
+                    <div class="metric-value text-success">$18,500</div>
+                    <div class="metric-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> +40% vs last quarter
+                    </div>
+                    <small class="text-secondary d-block mt-2">
+                        <span class="health-indicator health-good"></span>Strong MRR growth
+                    </small>
+                </div>
+            </div>
+
+            <!-- Payback Period -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="metric-card" style="border-left-color: var(--neon-blue);">
+                    <div class="metric-label">CAC Payback Period</div>
+                    <div class="metric-value text-primary">2.1 mo</div>
+                    <div class="metric-trend trend-down">
+                        <i class="fas fa-arrow-down"></i> -0.3 mo vs last quarter
+                    </div>
+                    <small class="text-secondary d-block mt-2">
+                        <span class="health-indicator health-good"></span>Excellent payback speed
+                    </small>
+                    <div class="metric-context">
+                        <strong>What This Means:</strong> You recover your customer acquisition cost in just 2.1 months. This allows you to reinvest quickly and scale aggressively.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: AI-Recommended Growth Levers -->
+        <div class="growth-levers">
+            <h2 class="mb-4 text-warning">
+                <i class="fas fa-rocket me-2"></i>AI-Recommended Growth Levers
+            </h2>
+            <p class="text-secondary mb-3">Based on your metrics, here are the highest-impact opportunities to accelerate growth:</p>
+
+            <div class="lever-card">
+                <h6 class="text-primary"><i class="fas fa-bullseye me-2"></i>Reduce Churn to 1.5% (SaaS Benchmark)</h6>
+                <p class="small mb-2">Your current churn (2.3%) is above the industry benchmark. Implementing a customer success program could reduce churn by 0.8%.</p>
+                <div class="lever-impact">
+                    <i class="fas fa-dollar-sign"></i> +$50K annual revenue impact
+                </div>
+            </div>
+
+            <div class="lever-card">
+                <h6 class="text-primary"><i class="fas fa-bullseye me-2"></i>Increase CAC Spend by 20%</h6>
+                <p class="small mb-2">Your LTV:CAC ratio (14.9:1) gives you room to spend more on acquisition. Increasing CAC spend by 20% while maintaining unit economics could add 150+ new customers.</p>
+                <div class="lever-impact">
+                    <i class="fas fa-users"></i> +150 customers, +$25K MRR
+                </div>
+            </div>
+
+            <div class="lever-card">
+                <h6 class="text-primary"><i class="fas fa-bullseye me-2"></i>Expand Upsell Program</h6>
+                <p class="small mb-2">Your NRR (128%) shows strong expansion potential. A structured upsell program targeting your top 20% of customers could increase NRR to 135%+.</p>
+                <div class="lever-impact">
+                    <i class="fas fa-chart-bar"></i> +$2K-3K additional MRR
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Trend Charts -->
+        <h2 class="mb-4 text-primary mt-5">Growth Trends & Analysis</h2>
+
+        <div class="row mb-4">
+            <div class="col-lg-6 mb-4">
+                <div class="glass-card">
+                    <h5 class="mb-3">MRR Trend (New vs Expansion vs Churn)</h5>
+                    <div class="chart-container">
+                        <canvas id="mrrChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mb-4">
+                <div class="glass-card">
+                    <h5 class="mb-3">Churn & Retention Trend</h5>
+                    <div class="chart-container">
+                        <canvas id="churnChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mb-4">
+                <div class="glass-card">
+                    <h5 class="mb-3">CAC Optimization Trend</h5>
+                    <div class="chart-container">
+                        <canvas id="cacTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mb-4">
+                <div class="glass-card">
+                    <h5 class="mb-3">LTV:CAC Ratio Evolution</h5>
+                    <div class="chart-container">
+                        <canvas id="ltvCacChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: AI Growth Prediction Simulator -->
+        <h2 class="mb-4 text-primary mt-5">AI Growth Prediction Simulator</h2>
+        <p class="text-secondary mb-4">Run "what-if" scenarios to see how different growth strategies impact your metrics and Series A readiness.</p>
+
+        <div class="ai-simulator">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">CAC Reduction (%)</label>
+                    <input type="range" class="form-range" id="cacReduction" min="0" max="30" value="0" oninput="updateSimulation()">
+                    <small class="text-secondary">Reduce CAC by <span id="cacValue">0</span>% through marketing optimization</small>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">MRR Growth (%)</label>
+                    <input type="range" class="form-range" id="mrrGrowth" min="0" max="100" value="0" oninput="updateSimulation()">
+                    <small class="text-secondary">Grow MRR by <span id="mrrValue">0</span>% through sales & marketing</small>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Churn Reduction (%)</label>
+                    <input type="range" class="form-range" id="churnReduction" min="0" max="2" step="0.1" value="0" oninput="updateSimulation()">
+                    <small class="text-secondary">Reduce churn by <span id="churnValue">0</span>% through customer success</small>
+                </div>
+            </div>
+
+            <button class="btn btn-primary mt-3" onclick="runFullSimulation()">
+                <i class="fas fa-magic me-2"></i>Run Full Simulation
+            </button>
+
+            <div id="simulationResults" style="display: none; margin-top: 24px;">
+                <h5 class="text-success mb-3">Projected Impact</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="metric-card" style="border-left-color: var(--success-green);">
+                            <div class="metric-label">Projected MRR</div>
+                            <div class="metric-value text-success" id="projectedMRR">$18,500</div>
+                            <small class="text-secondary">Growth: <span id="mrrGrowthPercent">0</span>%</small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <div class="metric-card" style="border-left-color: var(--neon-blue);">
+                            <div class="metric-label">Projected LTV:CAC Ratio</div>
+                            <div class="metric-value text-primary" id="projectedLtvCac">14.9:1</div>
+                            <small class="text-secondary">Change: <span id="ltvCacChange">0</span></small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <div class="metric-card" style="border-left-color: var(--neon-gold);">
+                            <div class="metric-label">Series A Readiness Score</div>
+                            <div class="metric-value text-warning" id="projectedSeriesA">78%</div>
+                            <small class="text-secondary">Projected increase: <span id="seriesAChange">0</span>%</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: Recommended Actions -->
+        <h2 class="mb-4 text-primary mt-5">Recommended Actions This Quarter</h2>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="action-card" style="border-left-color: var(--success-green);">
+                    <h6 class="text-success"><i class="fas fa-check-circle me-1"></i>Launch Customer Success Program</h6>
+                    <p class="small mb-2">Reduce churn from 2.3% to 1.5% through proactive support and engagement</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-success">+$50K ARR</span>
+                        <button class="btn btn-sm btn-primary">Start</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="action-card" style="border-left-color: var(--neon-blue);">
+                    <h6 class="text-primary"><i class="fas fa-rocket me-1"></i>Scale Paid Acquisition</h6>
+                    <p class="small mb-2">Increase CAC spend by 20% to acquire 150+ new customers this quarter</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary">+$25K MRR</span>
+                        <button class="btn btn-sm btn-primary">Plan</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="action-card" style="border-left-color: var(--neon-gold);">
+                    <h6 class="text-warning"><i class="fas fa-chart-bar me-1"></i>Expand Upsell Program</h6>
+                    <p class="small mb-2">Target top 20% of customers for premium tier upsells</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-warning text-dark">+$3K MRR</span>
+                        <button class="btn btn-sm btn-primary">Launch</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Custom Script -->
+
+            </div>
+
+            <div class="tab-pane fade" id="funding" role="tabpanel">
+    <div class="container mt-4">
+        <!-- Section 1: Funding Readiness Score & Key Metrics -->
+        <h2 class="mb-4 text-primary">Your Funding Readiness Score</h2>
+        
+        <div class="row mb-4">
+            <!-- Readiness Score Circle -->
+            <div class="col-lg-4">
+                <div class="glass-card text-center">
+                    <h5 class="mb-3">Funding Readiness Score</h5>
+                    <div class="readiness-circle" id="readinessCircle">
+                        <div class="readiness-score" id="readinessScore">72</div>
+                    </div>
+                    <p class="text-secondary mb-2">Current Score</p>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 72%"></div>
+                    </div>
+                    <small class="text-secondary">Target: 85+ for Series A Investor Introductions</small>
+                    <hr class="my-3" style="border-color: var(--glass-border);">
+                    <button class="btn btn-primary btn-sm w-100">
+                        <i class="fas fa-chart-line me-1"></i>View Score Breakdown
+                    </button>
+                </div>
+            </div>
+
+            <!-- Key Funding Metrics -->
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="metric-card" style="border-left-color: var(--neon-blue);">
+                            <div class="metric-label">Runway (Months)</div>
+                            <div class="metric-value text-primary">14</div>
+                            <div class="metric-trend trend-up">
+                                <i class="fas fa-arrow-up"></i> +2 months vs last quarter
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <div class="metric-card" style="border-left-color: var(--danger-red);">
+                            <div class="metric-label">Monthly Burn Rate</div>
+                            <div class="metric-value text-danger">$12,500</div>
+                            <div class="metric-trend trend-down">
+                                <i class="fas fa-arrow-down"></i> -8.3% (Good!)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <div class="metric-card" style="border-left-color: var(--neon-gold);">
+                            <div class="metric-label">Revenue Multiple</div>
+                            <div class="metric-value text-warning">13.2x</div>
+                            <div class="metric-trend">
+                                <i class="fas fa-info-circle"></i> Industry: 12x
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <div class="metric-card" style="border-left-color: var(--success-green);">
+                            <div class="metric-label">Team Size</div>
+                            <div class="metric-value text-success">12</div>
+                            <div class="metric-trend trend-up">
+                                <i class="fas fa-arrow-up"></i> +3 this quarter
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Series A Checklist -->
+        <h2 class="mb-4 text-primary mt-5">Series A Readiness Checklist</h2>
+        
+        <div class="row mb-4">
+            <div class="col-lg-6">
+                <div class="glass-card">
+                    <h5 class="mb-3">Milestones & Requirements</h5>
+                    
+                    <!-- Completed Items -->
+                    <div class="checklist-item completed">
+                        <div>
+                            <h6 class="mb-1">Product-Market Fit Validated</h6>
+                            <small class="text-secondary">Confirmed through customer interviews</small>
+                        </div>
+                        <span class="checklist-status status-completed">
+                            <i class="fas fa-check-circle"></i> Complete
+                        </span>
+                    </div>
+
+                    <div class="checklist-item completed">
+                        <div>
+                            <h6 class="mb-1">$10K+ MRR Achieved</h6>
+                            <small class="text-secondary">Current: $18,500/month</small>
+                        </div>
+                        <span class="checklist-status status-completed">
+                            <i class="fas fa-check-circle"></i> Complete
+                        </span>
+                    </div>
+
+                    <div class="checklist-item completed">
+                        <div>
+                            <h6 class="mb-1">Team of 10+ Employees</h6>
+                            <small class="text-secondary">Current: 12 team members</small>
+                        </div>
+                        <span class="checklist-status status-completed">
+                            <i class="fas fa-check-circle"></i> Complete
+                        </span>
+                    </div>
+
+                    <!-- In Progress Items -->
+                    <div class="checklist-item in-progress">
+                        <div>
+                            <h6 class="mb-1">Financial Model Complete</h6>
+                            <small class="text-secondary">80% complete - 2 days remaining</small>
+                        </div>
+                        <span class="checklist-status status-in-progress">
+                            <i class="fas fa-clock"></i> 80%
+                        </span>
+                    </div>
+
+                    <div class="checklist-item in-progress">
+                        <div>
+                            <h6 class="mb-1">10+ Customer Interviews</h6>
+                            <small class="text-secondary">8 of 10 completed</small>
+                        </div>
+                        <span class="checklist-status status-in-progress">
+                            <i class="fas fa-clock"></i> 80%
+                        </span>
+                    </div>
+
+                    <!-- Not Started Items -->
+                    <div class="checklist-item not-started">
+                        <div>
+                            <h6 class="mb-1">Legal Structure Optimized</h6>
+                            <small class="text-secondary">Requires legal review - 1 week</small>
+                        </div>
+                        <span class="checklist-status status-not-started">
+                            <i class="fas fa-times-circle"></i> Not Started
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Investor Alignment -->
+            <div class="col-lg-6">
+                <div class="glass-card">
+                    <h5 class="mb-3">Investor Alignment</h5>
+                    
+                    <div class="investor-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="mb-1">Sequoia Capital</h6>
+                                <small class="text-secondary">Series A, SaaS Focus</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="match-score">94%</div>
+                                <small class="text-success">Excellent Match</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="investor-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="mb-1">Andreessen Horowitz</h6>
+                                <small class="text-secondary">Series A, B2B SaaS</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="match-score">89%</div>
+                                <small class="text-success">Great Match</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="investor-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="mb-1">Bessemer Venture Partners</h6>
+                                <small class="text-secondary">Series A, Cloud Software</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="match-score">87%</div>
+                                <small class="text-primary">Good Match</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Investor Visibility & Matching -->
+        <h2 class="mb-4 text-primary mt-5">Investor Visibility & Matching</h2>
+        
+        <div class="glass-card mb-4">
+            <div class="row mb-4">
+                <!-- Visibility Settings -->
+                <div class="col-md-6">
+                    <div class="p-3" style="background: rgba(16, 185, 129, 0.1); border-radius: 8px;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="mb-1">Investor Visibility Status</h6>
+                                <small class="text-secondary">Your SSE Score: 72 (Threshold: 70)</small>
+                            </div>
+                            <span class="badge bg-success">Eligible</span>
+                        </div>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="investorVisibility" checked>
+                            <label class="form-check-label" for="investorVisibility">
+                                Enable Investor Visibility
+                            </label>
+                        </div>
+                        
+                        <p class="small mb-0">
+                            <i class="fas fa-info-circle me-1"></i>
+                            When enabled, qualified investors can discover your startup in deal flow. You maintain full control over who you connect with.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Targeting Filters -->
+                <div class="col-md-6">
+                    <div class="p-3" style="background: rgba(59, 130, 246, 0.1); border-radius: 8px;">
+                        <h6 class="text-primary mb-3">Targeting Filters</h6>
+                        
+                        <div class="mb-2">
+                            <label class="form-label small">Geographic Preference</label>
+                            <select class="form-select form-select-sm" style="background: var(--secondary-bg); color: var(--text-primary); border-color: var(--glass-border);">
+                                <option>Global</option>
+                                <option>North America</option>
+                                <option>Europe</option>
+                                <option>Asia-Pacific</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <label class="form-label small">Investor Type</label>
+                            <select class="form-select form-select-sm" style="background: var(--secondary-bg); color: var(--text-primary); border-color: var(--glass-border);">
+                                <option>All Types</option>
+                                <option>Angel Investors</option>
+                                <option>Venture Capital</option>
+                                <option>Corporate VC</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="form-label small">Sector Focus</label>
+                            <select class="form-select form-select-sm" style="background: var(--secondary-bg); color: var(--text-primary); border-color: var(--glass-border);">
+                                <option>FinTech</option>
+                                <option>SaaS</option>
+                                <option>HealthTech</option>
+                                <option>CleanTech</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matched Investors -->
+            <h6 class="mb-3">Highly Aligned Investors</h6>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="investor-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="mb-1">Sarah Chen</h6>
+                                <small class="text-secondary">Angel Investor • FinTech Focus</small>
+                            </div>
+                            <span class="badge bg-success">95% Match</span>
+                        </div>
+                        <p class="small mb-2">12 investments in B2B SaaS, avg check $150K</p>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-primary flex-fill">
+                                <i class="fas fa-user-plus me-1"></i>Connect
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-envelope me-1"></i>Message
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="investor-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="mb-1">Velocity Ventures</h6>
+                                <small class="text-secondary">VC Fund • Series A Focus</small>
+                            </div>
+                            <span class="badge bg-info">88% Match</span>
+                        </div>
+                        <p class="small mb-2">Portfolio: 23 startups, avg investment $2M</p>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-primary flex-fill">
+                                <i class="fas fa-user-plus me-1"></i>Connect
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-calendar me-1"></i>Schedule
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Funding Acceleration Plan -->
+        <h2 class="mb-4 text-primary mt-5">Funding Acceleration Plan</h2>
+        
+        <div class="acceleration-plan">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="text-neon-blue"><i class="fas fa-lightbulb me-2"></i>Your Personalized Roadmap to Series A</h4>
+                <span class="badge bg-primary">AI Generated</span>
+            </div>
+            <p class="text-secondary mb-4">Based on your current metrics and checklist, here's your week-by-week plan to reach 85+ Funding Readiness Score and unlock investor introductions.</p>
+            
+            <div class="row">
+                <!-- Week 1-2 -->
+                <div class="col-md-4">
+                    <div class="week-card">
+                        <h6><i class="fas fa-calendar me-2"></i>Week 1-2</h6>
+                        <ul>
+                            <li>Complete remaining 2 customer interviews</li>
+                            <li>Finalize financial projections (18-month model)</li>
+                            <li>Prepare pitch deck v3.0 with updated metrics</li>
+                            <li>Schedule legal structure review</li>
+                        </ul>
+                        <button class="btn btn-sm btn-primary mt-3 w-100">Start Tasks</button>
+                    </div>
+                </div>
+
+                <!-- Week 3-4 -->
+                <div class="col-md-4">
+                    <div class="week-card">
+                        <h6><i class="fas fa-calendar me-2"></i>Week 3-4</h6>
+                        <ul>
+                            <li>Complete legal structure optimization</li>
+                            <li>Prepare data room with key documents</li>
+                            <li>Schedule reference customer calls</li>
+                            <li>Finalize Series A investment thesis</li>
+                        </ul>
+                        <button class="btn btn-sm btn-primary mt-3 w-100">Schedule</button>
+                    </div>
+                </div>
+
+                <!-- Week 5-6 -->
+                <div class="col-md-4">
+                    <div class="week-card">
+                        <h6><i class="fas fa-calendar me-2"></i>Week 5-6</h6>
+                        <ul>
+                            <li>Launch investor outreach campaign</li>
+                            <li>Prepare for demo day (if applicable)</li>
+                            <li>Begin term sheet negotiations</li>
+                            <li>Celebrate reaching 85+ Funding Readiness!</li>
+                        </ul>
+                        <button class="btn btn-sm btn-primary mt-3 w-100">Plan</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Insights -->
+            <div class="action-card" style="border-left-color: var(--neon-blue); margin-top: 20px;">
+                <h6 class="text-primary mb-2"><i class="fas fa-brain me-2"></i>AI Insights & Recommendations</h6>
+                <p class="small mb-2">You're 13 points away from the 85+ Series A readiness threshold. The fastest path is to complete your customer interviews (2 remaining) and finalize your legal structure. These two items alone will add ~10 points to your score.</p>
+                <p class="small mb-0">Once you reach 85+, you'll unlock access to Auxeira's network of 500+ Series A-focused investors. Based on your metrics, you're an excellent fit for firms like Sequoia Capital (94% match), Andreessen Horowitz (89% match), and Bessemer Venture Partners (87% match).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Custom Script -->
+
+            </div>
+
+            <div class="tab-pane fade" id="earn" role="tabpanel">
+                <div class="glass-card">
+                    <h2>Earn AUX</h2>
+                    <p>Coming soon - awaiting your confirmation on Overview tab</p>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="activity" role="tabpanel">
+                <div class="glass-card">
+                    <h2>Activity Rewards</h2>
+                    <p>Coming soon - awaiting your confirmation on Overview tab</p>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="partners" role="tabpanel">
+                <div class="glass-card">
+                    <h2>Partner Rewards</h2>
+                    <p>Coming soon - awaiting your confirmation on Overview tab</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Chart data
+        const growthData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+            datasets: [
+                {
+                    label: 'MRR ($K)',
+                    data: [5, 7, 9, 11, 13, 15, 16, 17, 18.5, 20],
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    yAxisID: 'y',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'SSE Score',
+                    data: [55, 60, 65, 70, 72, 75, 76, 77, 78, 80],
+                    borderColor: '#ffd700',
+                    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                    yAxisID: 'y1',
+                    tension: 0.4,
+                    fill: false
+                }
+            ]
+        };
+
+        const esgData = {
+            labels: ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024'],
+            datasets: [
+                {
+                    label: 'Carbon Reduction (%)',
+                    data: [-5, -8, -10, -12.5],
+                    backgroundColor: '#10b981',
+                    borderColor: '#10b981',
+                    borderWidth: 1
+                }
+            ]
+        };
+
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Growth Chart
+            const growthCtx = document.getElementById('growthChart').getContext('2d');
+            new Chart(growthCtx, {
+                type: 'line',
+                data: growthData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#a1a1aa'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#a1a1aa' }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#a1a1aa' },
+                            title: {
+                                display: true,
+                                text: 'MRR ($K)',
+                                color: '#007bff'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: { color: '#ffd700' },
+                            title: {
+                                display: true,
+                                text: 'SSE Score',
+                                color: '#ffd700'
+                            },
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // ESG Chart
+            const esgCtx = document.getElementById('esgImpactChart').getContext('2d');
+            new Chart(esgCtx, {
+                type: 'bar',
+                data: esgData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#a1a1aa'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#a1a1aa' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#a1a1aa' },
+                            title: {
+                                display: true,
+                                text: 'Reduction (%)',
+                                color: '#10b981'
+                            }
+                        }
+                    }
+                }
+            });
+
+            console.log('Dashboard loaded successfully');
+        });
+
+        // Logout function
+        function logout() {
+            console.log("Logging out...");
+            document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            window.location.href = '/';
+        }
+    
+        // Growth Metrics Charts
+        // Chart Configuration
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'var(--text-secondary)',
+                        font: { size: 12 }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    ticks: { color: 'var(--text-secondary)' }
+                },
+                y: {
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    ticks: { color: 'var(--text-secondary)' }
+                }
+            }
+        };
+
+        // 1. MRR Trend Chart
+        const mrrData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+            datasets: [
+                {
+                    label: 'New Revenue',
+                    data: [800, 1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600],
+                    backgroundColor: 'rgba(16, 185, 129, 0.3)',
+                    borderColor: 'var(--success-green)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Expansion Revenue',
+                    data: [2000, 2200, 2500, 2800, 3100, 3400, 3700, 4000, 4300, 4600],
+                    backgroundColor: 'rgba(0, 212, 255, 0.3)',
+                    borderColor: 'var(--neon-blue)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Churned Revenue',
+                    data: [-300, -350, -400, -450, -500, -550, -600, -650, -700, -750],
+                    backgroundColor: 'rgba(239, 68, 68, 0.3)',
+                    borderColor: 'var(--danger-red)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }
+            ]
+        };
+
+        // 2. Churn & Retention Chart
+        const churnData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+            datasets: [
+                {
+                    label: 'Monthly Churn Rate (%)',
+                    data: [3.2, 3.0, 2.9, 2.7, 2.6, 2.5, 2.4, 2.3, 2.3, 2.3],
+                    borderColor: 'var(--danger-red)',
+                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                    yAxisID: 'y',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Retention Rate (%)',
+                    data: [96.8, 97.0, 97.1, 97.3, 97.4, 97.5, 97.6, 97.7, 97.7, 97.7],
+                    borderColor: 'var(--success-green)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                    yAxisID: 'y1',
+                    tension: 0.4,
+                    fill: true
+                }
+            ]
+        };
+
+        // 3. CAC Trend Chart
+        const cacTrendData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+            datasets: [
+                {
+                    label: 'Customer Acquisition Cost ($)',
+                    data: [200, 190, 180, 170, 160, 150, 140, 135, 130, 127],
+                    borderColor: 'var(--warning-orange)',
+                    backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }
+            ]
+        };
+
+        // 4. LTV:CAC Ratio Chart
+        const ltvCacData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+            datasets: [
+                {
+                    label: 'LTV:CAC Ratio',
+                    data: [9.5, 9.9, 10.5, 11.1, 11.8, 12.6, 13.5, 14.2, 14.6, 14.9],
+                    borderColor: 'var(--neon-blue)',
+                    backgroundColor: 'rgba(0, 212, 255, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }
+            ]
+        };
+
+        // Initialize Charts
+        document.addEventListener('DOMContentLoaded', () => {
+            new Chart(document.getElementById('mrrChart'), {
+                type: 'line',
+                data: mrrData,
+                options: chartOptions
+            });
+
+            new Chart(document.getElementById('churnChart'), {
+                type: 'line',
+                data: churnData,
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        y: {
+                            ...chartOptions.scales.y,
+                            title: { display: true, text: 'Churn Rate (%)' },
+                            min: 0,
+                            max: 5
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: { color: 'var(--success-green)' },
+                            min: 95,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('cacTrendChart'), {
+                type: 'line',
+                data: cacTrendData,
+                options: chartOptions
+            });
+
+            new Chart(document.getElementById('ltvCacChart'), {
+                type: 'line',
+                data: ltvCacData,
+                options: chartOptions
+            });
+        });
+
+        // Simulation Functions
+        function updateSimulation() {
+            const cacReduction = parseInt(document.getElementById('cacReduction').value);
+            const mrrGrowth = parseInt(document.getElementById('mrrGrowth').value);
+            const churnReduction = parseFloat(document.getElementById('churnReduction').value);
+
+            document.getElementById('cacValue').textContent = cacReduction;
+            document.getElementById('mrrValue').textContent = mrrGrowth;
+            document.getElementById('churnValue').textContent = churnReduction.toFixed(1);
+        }
+
+        function runFullSimulation() {
+            const cacReduction = parseInt(document.getElementById('cacReduction').value);
+            const mrrGrowth = parseInt(document.getElementById('mrrGrowth').value);
+            const churnReduction = parseFloat(document.getElementById('churnReduction').value);
+
+            const currentCAC = 127;
+            const currentMRR = 18500;
+            const currentLTV = 1890;
+            const currentLtvCac = 14.9;
+            const currentSeriesA = 78;
+
+            const newCAC = currentCAC * (1 - cacReduction / 100);
+            const newMRR = currentMRR * (1 + mrrGrowth / 100);
+            const newLTV = currentLTV * (1 + (mrrGrowth / 100) * 0.5);
+            const newLtvCac = newLTV / newCAC;
+            const seriesABoost = (cacReduction * 0.2) + (mrrGrowth * 0.15) + (churnReduction * 5);
+            const newSeriesA = Math.min(100, currentSeriesA + seriesABoost);
+
+            document.getElementById('projectedMRR').textContent = '$' + Math.round(newMRR);
+            document.getElementById('mrrGrowthPercent').textContent = '+' + mrrGrowth + '%';
+            document.getElementById('projectedLtvCac').textContent = newLtvCac.toFixed(1) + ':1';
+            document.getElementById('ltvCacChange').textContent = '+' + (newLtvCac - currentLtvCac).toFixed(1) + ' points';
+            document.getElementById('projectedSeriesA').textContent = Math.round(newSeriesA) + '%';
+            document.getElementById('seriesAChange').textContent = '+' + Math.round(seriesABoost) + '%';
+
+            document.getElementById('simulationResults').style.display = 'block';
+        }
+
+    
+        // Funding Readiness Scripts
+        // Update Readiness Circle based on score
+        document.addEventListener('DOMContentLoaded', () => {
+            const score = parseInt(document.getElementById('readinessScore').textContent);
+            const degrees = (score / 100) * 360;
+            const readinessCircle = document.getElementById('readinessCircle');
+            readinessCircle.style.background = `conic-gradient(var(--neon-blue) 0deg, var(--neon-blue) ${degrees}deg, var(--accent-bg) ${degrees}deg)`;
+        });
+
+        // Form styling for select elements
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('focus', function() {
+                this.style.borderColor = 'var(--neon-blue)';
+                this.style.boxShadow = '0 0 10px rgba(0, 212, 255, 0.2)';
+            });
+            select.addEventListener('blur', function() {
+                this.style.borderColor = 'var(--glass-border)';
+                this.style.boxShadow = 'none';
+            });
+        });
+
+    </script>
+</body>
+</html>

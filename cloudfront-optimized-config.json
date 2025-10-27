@@ -39,7 +39,7 @@
       }
     },
     "Compress": true,
-    "CachePolicyId": "CUSTOM_HTML_POLICY",
+    "CachePolicyId": "4b30d700-3cc9-4201-99b2-4e33092b06f4",
     "OriginRequestPolicyId": "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf",
     "ResponseHeadersPolicyId": "67f7725c-6f97-4210-82d7-5512b31e9d03",
     "SmoothStreaming": false,
@@ -66,7 +66,7 @@
           }
         },
         "Compress": true,
-        "CachePolicyId": "CUSTOM_HTML_POLICY",
+        "CachePolicyId": "4b30d700-3cc9-4201-99b2-4e33092b06f4",
         "OriginRequestPolicyId": "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf"
       },
       {
@@ -82,7 +82,7 @@
           }
         },
         "Compress": true,
-        "CachePolicyId": "CUSTOM_STATIC_POLICY",
+        "CachePolicyId": "678c72f8-7538-43be-b032-1bb22a82694c",
         "OriginRequestPolicyId": "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf"
       }
     ]
@@ -115,7 +115,7 @@
   "Enabled": true,
   "ViewerCertificate": {
     "CloudFrontDefaultCertificate": false,
-    "ACMCertificateArn": "REPLACE_WITH_YOUR_ACM_CERTIFICATE_ARN",
+    "ACMCertificateArn": "arn:aws:acm:us-east-1:615608124862:certificate/e233f5b2-3df7-4602-8251-51414a717772",
     "SSLSupportMethod": "sni-only",
     "MinimumProtocolVersion": "TLSv1.2_2021"
   },

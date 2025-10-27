@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira - Startup Founder Dashboard</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        /* --- Bloomberg Terminal / Glass-Morphism Aesthetic CSS --- */
+        
+        /* Core Colors from Context */
+        :root {
+            --bg-dark: #0d1117;
+            --electric-blue: #007bff;
+            --gold-accent: #ffd700;
+            --text-light: #ffffff;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            
+            --primary-bg: var(--bg-dark);
+            --secondary-bg: #161b22;
+            --neon-blue: var(--electric-blue);
+            --neon-gold: var(--gold-accent);
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto; 
+        }
+
+        .dashboard-header {
+            background-color: var(--primary-bg);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--neon-blue);
+        }
+        
+        .nav-tabs {
+            border-bottom: 2px solid var(--glass-border);
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            border: none;
+            border-bottom: 3px solid transparent;
+            margin-right: 15px;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .nav-link:hover {
+            color: var(--neon-blue);
+            border-color: var(--neon-blue);
+        }
+
+        .nav-link.active {
+            color: var(--neon-gold) !important;
+            background-color: transparent !important;
+            border-color: var(--neon-gold) !important;
+            font-weight: bold;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        .sse-circle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .sse-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid var(--neon-blue);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.2) 0%, rgba(0, 0, 0, 0.5) 100%);
+            box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
+        }
+
+        .sse-score {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--neon-gold);
+        }
+        
+        .metric-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: transform 0.2s;
+        }
+        
+        .metric-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .ai-mentor {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(0, 212, 255, 0.1));
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .nudge-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid;
+            padding: 15px;
+            border-radius: 8px;
+            transition: transform 0.2s;
+            margin-bottom: 15px;
+        }
+        
+        .nudge-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .nudge-card.urgent {
+            border-left-color: var(--danger-red);
+        }
+
+        .nudge-card.opportunity {
+            border-left-color: var(--neon-blue);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            padding: 10px;
+        }
+
+        .btn-sm {
+            font-size: 0.85rem;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-red);
+            border-color: var(--danger-red);
+        }
+        
+        .btn-primary {
+            background-color: var(--neon-blue);
+            border-color: var(--neon-blue);
+        }
+        
+        .btn-success {
+            background-color: var(--success-green);
+            border-color: var(--success-green);
+        }
+        
+        .btn-warning {
+            background-color: var(--neon-gold);
+            border-color: var(--neon-gold);
+            color: var(--primary-bg) !important;
+        }
+        
+        .text-neon-blue { color: var(--neon-blue) !important; }
+        .text-neon-gold { color: var(--neon-gold) !important; }
+        .text-success { color: var(--success-green) !important; }
+        .text-danger { color: var(--danger-red) !important; }
+        .text-warning { color: var(--neon-gold) !important; }
+        
+        .tab-pane {
+            min-height: 500px;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--neon-blue);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-header .text-end {
+                text-align: center !important;
+                margin-top: 10px;
+            }
+            .nav-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .nav-item {
+                flex-shrink: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <div class="brand-logo">Auxeira</div>
+                </div>
+                <div class="col-md-8 text-end">
+                    <span class="text-secondary me-3" id="userWelcome">Welcome, Startup Founder</span>
+                    <span class="badge bg-warning text-dark me-3">1,247 AUX</span>
+                    <a href="profile.html" class="btn btn-sm btn-outline-light me-2">
+                        <i class="fas fa-user me-1"></i>Profile
+                    </a>
+                    <button onclick="logout()" class="btn btn-sm btn-danger">
+                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid mt-4">
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button">
+                    <i class="fas fa-tachometer-alt me-2"></i>Overview
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="growth-tab" data-bs-toggle="tab" data-bs-target="#growth" type="button">
+                    <i class="fas fa-chart-line me-2"></i>Growth Metrics
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="funding-tab" data-bs-toggle="tab" data-bs-target="#funding" type="button">
+                    <i class="fas fa-dollar-sign me-2"></i>Funding Readiness
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="earn-tab" data-bs-toggle="tab" data-bs-target="#earn" type="button">
+                    <i class="fas fa-coins me-2"></i>Earn AUX
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button">
+                    <i class="fas fa-trophy me-2"></i>Activity Rewards
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="partners-tab" data-bs-toggle="tab" data-bs-target="#partners" type="button">
+                    <i class="fas fa-handshake me-2"></i>Partner Rewards
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="dashboardTabContent">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <h2 class="mb-4 text-primary">Startup Success Engine (SSE) Overview</h2>
+                
+                <div class="row">
+                    <!-- Left Column: SSE Score & Core Metrics -->
+                    <div class="col-lg-4">
+                        <div class="glass-card mb-4 text-center">
+                            <h5 class="text-neon-blue mb-3">Your SSE Score</h5>
+                            <div class="sse-circle-container">
+                                <div class="sse-circle" id="sseCircle">
+                                    <div class="sse-score" id="sseScoreDisplay">78</div>
+                                </div>
+                            </div>
+                            <p class="lead fw-bold mb-1">Series A Readiness: <span class="text-warning">78%</span></p>
+                            <small class="text-secondary">Target: 85+ for Investor Introductions</small>
+                            
+                            <hr class="my-3" style="border-color: var(--glass-border);">
+                            
+                            <div class="row text-start">
+                                <div class="col-6">
+                                    <div class="metric-card" style="border-left-color: var(--success-green);">
+                                        <div class="metric-value text-success">$2.4M</div>
+                                        <div class="metric-label">Valuation</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="metric-card" style="border-left-color: var(--neon-blue);">
+                                        <div class="metric-value text-primary">$18.5K</div>
+                                        <div class="metric-label">Monthly MRR</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="metric-card" style="border-left-color: var(--danger-red);">
+                                        <div class="metric-value text-danger">$127</div>
+                                        <div class="metric-label">Customer CAC</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="metric-card" style="border-left-color: var(--neon-gold);">
+                                        <div class="metric-value text-warning">14</div>
+                                        <div class="metric-label">Runway (Months)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column: AI Mentor & Charts -->
+                    <div class="col-lg-8">
+                        <!-- AI Mentor Section -->
+                        <div class="ai-mentor mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4 class="text-neon-blue"><i class="fas fa-robot me-2"></i>Auxeira AI Mentor & Coach</h4>
+                                <button class="btn btn-light btn-sm">
+                                    <i class="fas fa-comments me-2"></i>Chat with Mentor
+                                </button>
+                            </div>
+                            <p class="text-secondary">Personalized, data-driven nudges to accelerate your FinTech startup's growth trajectory.</p>
+                            
+                            <div class="row mt-3">
+                                <!-- Nudge 1: Growth -->
+                                <div class="col-md-4">
+                                    <div class="nudge-card" style="border-left-color: var(--success-green);">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="text-success mb-1"><i class="fas fa-bullseye me-1"></i>Growth Nudge</h6>
+                                            <span class="badge bg-success">+100 AUX</span>
+                                        </div>
+                                        <p class="small mb-2">
+                                            <strong>Reduce CAC via Referrals:</strong> Launch a customer referral program. Projected 25% CAC reduction.
+                                        </p>
+                                        <button class="btn btn-sm btn-success w-100">Take Action</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Nudge 2: Validation -->
+                                <div class="col-md-4">
+                                    <div class="nudge-card" style="border-left-color: var(--neon-gold);">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="text-warning mb-1"><i class="fas fa-chart-line me-1"></i>Validation Nudge</h6>
+                                            <span class="badge bg-warning text-dark">+150 AUX</span>
+                                        </div>
+                                        <p class="small mb-2">
+                                            <strong>Complete Customer Interviews:</strong> Need 2 more interviews to reach Series A validation threshold.
+                                        </p>
+                                        <button class="btn btn-sm btn-warning w-100">Schedule Interviews</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Nudge 3: Funding -->
+                                <div class="col-md-4">
+                                    <div class="nudge-card" style="border-left-color: var(--neon-blue);">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="text-primary mb-1"><i class="fas fa-rocket me-1"></i>Funding Nudge</h6>
+                                            <span class="badge bg-primary">+200 AUX</span>
+                                        </div>
+                                        <p class="small mb-2">
+                                            <strong>Prepare Financial Projections:</strong> Update 18-month model to reflect recent MRR growth.
+                                        </p>
+                                        <button class="btn btn-sm btn-primary w-100">Update Model</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Growth Trajectory Chart -->
+                        <div class="glass-card mb-4">
+                            <h5 class="mb-3">Growth Trajectory & SSE Score History</h5>
+                            <div class="chart-container">
+                                <canvas id="growthChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ESG/Sustainability Impact Tracker & Urgent Actions -->
+                <div class="row mt-2">
+                    <div class="col-lg-6">
+                        <div class="glass-card mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="text-neon-blue"><i class="fas fa-leaf me-2"></i>ESG/Sustainability Impact Tracker</h5>
+                                <span class="badge bg-success">SDG 13 Aligned</span>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="metric-card" style="border-left-color: var(--success-green);">
+                                        <div class="metric-value text-success">-12.5%</div>
+                                        <div class="metric-label">Carbon Footprint Reduction</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="metric-card" style="border-left-color: var(--neon-blue);">
+                                        <div class="metric-value text-info">4.2</div>
+                                        <div class="metric-label">SDG Alignment Score</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-container" style="height: 200px;">
+                                <canvas id="esgImpactChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <div class="glass-card mb-4">
+                            <h5 class="mb-3">🚨 Urgent Actions & Opportunities</h5>
+                            
+                            <!-- Urgent Action 1 -->
+                            <div class="nudge-card urgent mb-3" style="border-left-color: var(--danger-red);">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-danger mb-0">Customer Interview #8</h6>
+                                        <p class="mb-0 small text-secondary">Required to unlock Series A assessment</p>
+                                    </div>
+                                    <button class="btn btn-sm btn-danger">Start Now</button>
+                                </div>
+                            </div>
+
+                            <!-- Urgent Action 2 -->
+                            <div class="nudge-card urgent mb-3" style="border-left-color: var(--warning-orange);">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-warning mb-0">Financial Model Update</h6>
+                                        <p class="mb-0 small text-secondary">Your projections are 30 days old - Overdue</p>
+                                    </div>
+                                    <button class="btn btn-sm btn-warning">Update</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Opportunity 1 -->
+                            <div class="nudge-card opportunity" style="border-left-color: var(--neon-blue);">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-primary mb-0">Investor Introduction</h6>
+                                        <p class="mb-0 small text-secondary">Warm intro to Series A investor - +500 AUX</p>
+                                    </div>
+                                    <button class="btn btn-sm btn-primary">Accept</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Placeholder tabs -->
+            <div class="tab-pane fade" id="growth" role="tabpanel">
+                <div class="glass-card">
+                    <h2>Growth Metrics</h2>
+                    <p>Coming soon - awaiting your confirmation on Overview tab</p>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="funding" role="tabpanel">
+                <div class="glass-card">
+                    <h2>Funding Readiness</h2>
+                    <p>Coming soon - awaiting your confirmation on Overview tab</p>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="earn" role="tabpanel">
+                <div class="glass-card">
+                    <h2>Earn AUX</h2>
+                    <p>Coming soon - awaiting your confirmation on Overview tab</p>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="activity" role="tabpanel">
+                <div class="glass-card">
+                    <h2>Activity Rewards</h2>
+                    <p>Coming soon - awaiting your confirmation on Overview tab</p>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="partners" role="tabpanel">
+                <div class="glass-card">
+                    <h2>Partner Rewards</h2>
+                    <p>Coming soon - awaiting your confirmation on Overview tab</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Chart data
+        const growthData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+            datasets: [
+                {
+                    label: 'MRR ($K)',
+                    data: [5, 7, 9, 11, 13, 15, 16, 17, 18.5, 20],
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    yAxisID: 'y',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'SSE Score',
+                    data: [55, 60, 65, 70, 72, 75, 76, 77, 78, 80],
+                    borderColor: '#ffd700',
+                    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                    yAxisID: 'y1',
+                    tension: 0.4,
+                    fill: false
+                }
+            ]
+        };
+
+        const esgData = {
+            labels: ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024'],
+            datasets: [
+                {
+                    label: 'Carbon Reduction (%)',
+                    data: [-5, -8, -10, -12.5],
+                    backgroundColor: '#10b981',
+                    borderColor: '#10b981',
+                    borderWidth: 1
+                }
+            ]
+        };
+
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Growth Chart
+            const growthCtx = document.getElementById('growthChart').getContext('2d');
+            new Chart(growthCtx, {
+                type: 'line',
+                data: growthData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#a1a1aa'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#a1a1aa' }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#a1a1aa' },
+                            title: {
+                                display: true,
+                                text: 'MRR ($K)',
+                                color: '#007bff'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: { color: '#ffd700' },
+                            title: {
+                                display: true,
+                                text: 'SSE Score',
+                                color: '#ffd700'
+                            },
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // ESG Chart
+            const esgCtx = document.getElementById('esgImpactChart').getContext('2d');
+            new Chart(esgCtx, {
+                type: 'bar',
+                data: esgData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#a1a1aa'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#a1a1aa' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#a1a1aa' },
+                            title: {
+                                display: true,
+                                text: 'Reduction (%)',
+                                color: '#10b981'
+                            }
+                        }
+                    }
+                }
+            });
+
+            console.log('Dashboard loaded successfully');
+        });
+
+        // Logout function
+        function logout() {
+            console.log("Logging out...");
+            document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>

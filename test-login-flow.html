@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Flow Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #0a0e27;
+            color: #e4e4e7;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .step {
+            background: #1e293b;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+        .success { border-left-color: #10b981; }
+        .error { border-left-color: #ef4444; }
+        .pending { border-left-color: #fbbf24; }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+        }
+        button:hover { background: #2563eb; }
+        pre {
+            background: #0a0e27;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .cookie-display {
+            background: #334155;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Auxeira Login Flow Test</h1>
+    <p>Testing the complete authentication flow from login to dashboard</p>
+
+    <div id="steps"></div>
+
+    <button onclick="runTest()">▶️ Run Complete Test</button>
+    <button onclick="checkCookies()">🍪 Check Cookies</button>
+    <button onclick="clearCookies()">🗑️ Clear Cookies</button>
+    <button onclick="testDashboard()">📊 Test Dashboard Access</button>
+
+    <script>
+        const API_URL = 'https://6qfa3ssb10.execute-api.us-east-1.amazonaws.com/prod/api/auth/login';
+        const TEST_EMAIL = 'founder@startup.com';
+        const TEST_PASSWORD = 'Testpass123';
+
+        function addStep(title, content, status = 'pending') {
+            const stepsDiv = document.getElementById('steps');
+            const step = document.createElement('div');
+            step.className = `step ${status}`;
+            step.innerHTML = `
+                <h3>${title}</h3>
+                <div>${content}</div>
+            `;
+            stepsDiv.appendChild(step);
+            return step;
+        }
+
+        function updateStep(step, content, status) {
+            step.className = `step ${status}`;
+            step.querySelector('div').innerHTML = content;
+        }
+
+        function setCookie(name, value, days) {
+            const expires = new Date(Date.now() + days * 864e5).toUTCString();
+            document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Strict`;
+        }
+
+        function getCookie(name) {
+            return document.cookie.split('; ').reduce((r, v) => {
+                const parts = v.split('=');
+                return parts[0] === name ? decodeURIComponent(parts[1]) : r;
+            }, '');
+        }
+
+        function deleteCookie(name) {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        }
+
+        function checkCookies() {
+            const token = getCookie('auxeira_token');
+            const user = getCookie('auxeira_user');
+            
+            const step = addStep('🍪 Current Cookies', 'Checking...', 'pending');
+            
+            let content = '';
+            if (token) {
+                content += `<div class="cookie-display"><strong>Token:</strong> ${token.substring(0, 50)}...</div>`;
+            } else {
+                content += '<p>❌ No token found</p>';
+            }
+            
+            if (user) {
+                try {
+                    const userData = JSON.parse(user);
+                    content += `<div class="cookie-display"><strong>User Data:</strong><pre>${JSON.stringify(userData, null, 2)}</pre></div>`;
+                } catch (e) {
+                    content += `<div class="cookie-display"><strong>User Data (raw):</strong> ${user}</div>`;
+                }
+            } else {
+                content += '<p>❌ No user data found</p>';
+            }
+            
+            updateStep(step, content, token && user ? 'success' : 'error');
+        }
+
+        function clearCookies() {
+            deleteCookie('auxeira_token');
+            deleteCookie('auxeira_user');
+            addStep('🗑️ Cookies Cleared', 'All authentication cookies have been removed', 'success');
+        }
+
+        async function testDashboard() {
+            const token = getCookie('auxeira_token');
+            const step = addStep('📊 Dashboard Access Test', 'Checking authentication...', 'pending');
+            
+            if (!token) {
+                updateStep(step, '❌ No token found. Please login first.', 'error');
+                return;
+            }
+            
+            updateStep(step, `
+                ✅ Token found<br>
+                <a href="v2/clean/dashboard.html" target="_blank" style="color: #3b82f6;">Open Dashboard →</a>
+            `, 'success');
+        }
+
+        async function runTest() {
+            document.getElementById('steps').innerHTML = '';
+            
+            // Step 1: Clear existing cookies
+            const step1 = addStep('1️⃣ Clear Existing Cookies', 'Clearing...', 'pending');
+            deleteCookie('auxeira_token');
+            deleteCookie('auxeira_user');
+            updateStep(step1, '✅ Cookies cleared', 'success');
+            
+            // Step 2: Call login API
+            const step2 = addStep('2️⃣ Call Login API', 'Sending request...', 'pending');
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: TEST_EMAIL, 
+                        password: TEST_PASSWORD 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Login failed');
+                }
+                
+                updateStep(step2, `
+                    ✅ Login successful<br>
+                    <strong>User:</strong> ${data.data.user.firstName} ${data.data.user.lastName}<br>
+                    <strong>Email:</strong> ${data.data.user.email}<br>
+                    <strong>Role:</strong> ${data.data.user.role}<br>
+                    <pre>${JSON.stringify(data.data.user, null, 2)}</pre>
+                `, 'success');
+                
+                // Step 3: Store cookies
+                const step3 = addStep('3️⃣ Store Authentication Cookies', 'Storing...', 'pending');
+                
+                const userData = {
+                    userId: data.data.user.userId,
+                    email: data.data.user.email,
+                    firstName: data.data.user.firstName || '',
+                    lastName: data.data.user.lastName || '',
+                    role: data.data.user.role || 'startup_founder'
+                };
+                
+                setCookie('auxeira_token', data.data.access_token, 7);
+                setCookie('auxeira_user', JSON.stringify(userData), 7);
+                
+                updateStep(step3, `
+                    ✅ Cookies stored<br>
+                    <div class="cookie-display">
+                        <strong>Token:</strong> ${data.data.access_token.substring(0, 50)}...<br>
+                        <strong>User Data:</strong> <pre>${JSON.stringify(userData, null, 2)}</pre>
+                    </div>
+                `, 'success');
+                
+                // Step 4: Verify cookies
+                const step4 = addStep('4️⃣ Verify Cookies', 'Verifying...', 'pending');
+                const storedToken = getCookie('auxeira_token');
+                const storedUser = getCookie('auxeira_user');
+                
+                if (storedToken && storedUser) {
+                    updateStep(step4, `
+                        ✅ Cookies verified and accessible<br>
+                        Token length: ${storedToken.length} characters<br>
+                        User data: ${storedUser.length} characters
+                    `, 'success');
+                } else {
+                    updateStep(step4, '❌ Cookies not found after storage', 'error');
+                }
+                
+                // Step 5: Dashboard redirect simulation
+                const step5 = addStep('5️⃣ Dashboard Access', 'Ready to redirect...', 'success');
+                updateStep(step5, `
+                    ✅ Authentication complete!<br>
+                    <a href="v2/clean/dashboard.html" target="_blank" style="color: #3b82f6; font-weight: bold;">
+                        Click here to open Dashboard →
+                    </a><br>
+                    <small>Or the page would automatically redirect to dashboard.html</small>
+                `, 'success');
+                
+            } catch (error) {
+                updateStep(step2, `❌ Login failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-check cookies on load
+        window.addEventListener('load', () => {
+            checkCookies();
+        });
+    </script>
+</body>
+</html>

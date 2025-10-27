@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Status | Auxeira</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #e4e4e7;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 600px;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 3rem;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 1.5rem 0;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+        
+        .status-badge .icon {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+        
+        .message {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            color: #cbd5e1;
+        }
+        
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+        
+        .info-box h3 {
+            color: #3b82f6;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .info-box li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .info-box li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .user-info {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+        
+        .user-info p {
+            margin: 0.5rem 0;
+        }
+        
+        .user-info strong {
+            color: #10b981;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-block;
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(71, 85, 105, 0.5);
+            color: #e4e4e7;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(71, 85, 105, 0.7);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .footer a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 640px) {
+            .container {
+                padding: 2rem 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">AUXEIRA</div>
+        
+        <h1>Welcome to Auxeira!</h1>
+        
+        <p class="message">
+            Thank you for creating your account. Your registration has been successfully completed.
+        </p>
+        
+        <div class="status-badge">
+            <span class="icon">🚀</span>
+            Live Pilot Launching 2026
+        </div>
+        
+        <div class="user-info" id="userInfo">
+            <p><strong>Account Status:</strong> Active & Reserved</p>
+            <p><strong>Email:</strong> <span id="userEmail">Loading...</span></p>
+        </div>
+        
+        <div class="info-box">
+            <h3>What Happens Next?</h3>
+            <ul>
+                <li>Your account is reserved and ready for the pilot launch</li>
+                <li>You'll receive an email notification when your dashboard is available</li>
+                <li>Early access members get priority onboarding and support</li>
+                <li>No action required from you at this time</li>
+            </ul>
+        </div>
+        
+        <div class="info-box">
+            <h3>About the Pilot Program</h3>
+            <p style="color: #cbd5e1; line-height: 1.6;">
+                Auxeira is currently in development. Our live pilot program will launch in 2026, 
+                providing early access to our Bloomberg Terminal for Entrepreneurship. As a registered 
+                member, you'll be among the first to experience our actuarial intelligence platform.
+            </p>
+        </div>
+        
+        <div class="actions">
+            <a href="https://auxeira.com" class="btn btn-primary">Back to Homepage</a>
+            <a href="mailto:support@auxeira.com" class="btn btn-secondary">Contact Support</a>
+        </div>
+        
+        <div class="footer">
+            <p>Questions? Email us at <a href="mailto:support@auxeira.com">support@auxeira.com</a></p>
+            <p style="margin-top: 0.5rem;">© 2025 Auxeira. All rights reserved.</p>
+        </div>
+    </div>
+    
+    <script>
+        // Display user email if available
+        function displayUserInfo() {
+            try {
+                const userData = JSON.parse(localStorage.getItem('auxeira_user') || '{}');
+                if (userData.email) {
+                    document.getElementById('userEmail').textContent = userData.email;
+                } else {
+                    document.getElementById('userEmail').textContent = 'Not available';
+                }
+            } catch (e) {
+                document.getElementById('userEmail').textContent = 'Not available';
+            }
+        }
+        
+        window.addEventListener('DOMContentLoaded', displayUserInfo);
+    </script>
+</body>
+</html>
