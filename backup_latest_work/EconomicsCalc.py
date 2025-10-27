@@ -6,7 +6,7 @@ This module implements a dedicated REST API endpoint for calculating token rewar
 based on startup activities and startup stage/size. The algorithm ensures meaningful
 and fair reward distribution by controlling for startup size.
 
-Author: Manus AI
+Author: Emmanuel Luthuli
 Date: 2025-10-24
 Version: 1.0.0
 """
