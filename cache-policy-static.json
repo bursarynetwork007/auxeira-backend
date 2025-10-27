@@ -1,0 +1,24 @@
+{
+  "Name": "Auxeira-Static-LongCache",
+  "Comment": "Optimized for static assets - long TTL with versioning",
+  "DefaultTTL": 31536000,
+  "MaxTTL": 31536000,
+  "MinTTL": 86400,
+  "ParametersInCacheKeyAndForwardedToOrigin": {
+    "EnableAcceptEncodingGzip": true,
+    "EnableAcceptEncodingBrotli": true,
+    "QueryStringsConfig": {
+      "QueryStringBehavior": "whitelist",
+      "QueryStrings": {
+        "Quantity": 1,
+        "Items": ["v"]
+      }
+    },
+    "HeadersConfig": {
+      "HeaderBehavior": "none"
+    },
+    "CookiesConfig": {
+      "CookieBehavior": "none"
+    }
+  }
+}

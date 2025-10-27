@@ -1,0 +1,20 @@
+{
+  "Name": "Auxeira-HTML-ShortCache",
+  "Comment": "Optimized for HTML files - short TTL with must-revalidate",
+  "DefaultTTL": 60,
+  "MaxTTL": 300,
+  "MinTTL": 0,
+  "ParametersInCacheKeyAndForwardedToOrigin": {
+    "EnableAcceptEncodingGzip": true,
+    "EnableAcceptEncodingBrotli": true,
+    "QueryStringsConfig": {
+      "QueryStringBehavior": "all"
+    },
+    "HeadersConfig": {
+      "HeaderBehavior": "none"
+    },
+    "CookiesConfig": {
+      "CookieBehavior": "none"
+    }
+  }
+}
