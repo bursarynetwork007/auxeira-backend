@@ -1,0 +1,43 @@
+{
+  "CallerReference": "auxeira-dashboard-optimized-20251027-v3",
+  "Comment": "Optimized CloudFront for Auxeira Dashboard - No alias (will update DNS)",
+  "Enabled": true,
+  "Origins": {
+    "Quantity": 1,
+    "Items": [
+      {
+        "Id": "S3-dashboard-auxeira",
+        "DomainName": "dashboard.auxeira.com.s3.amazonaws.com",
+        "OriginPath": "",
+        "CustomHeaders": {
+          "Quantity": 0
+        },
+        "S3OriginConfig": {
+          "OriginAccessIdentity": ""
+        }
+      }
+    ]
+  },
+  "DefaultCacheBehavior": {
+    "TargetOriginId": "S3-dashboard-auxeira",
+    "ViewerProtocolPolicy": "redirect-to-https",
+    "AllowedMethods": {
+      "Quantity": 2,
+      "Items": ["HEAD", "GET"],
+      "CachedMethods": {
+        "Quantity": 2,
+        "Items": ["HEAD", "GET"]
+      }
+    },
+    "Compress": true,
+    "CachePolicyId": "4b30d700-3cc9-4201-99b2-4e33092b06f4",
+    "OriginRequestPolicyId": "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf"
+  },
+  "DefaultRootObject": "index.html",
+  "PriceClass": "PriceClass_All",
+  "ViewerCertificate": {
+    "CloudFrontDefaultCertificate": true
+  },
+  "HttpVersion": "http2and3",
+  "IsIPV6Enabled": true
+}
