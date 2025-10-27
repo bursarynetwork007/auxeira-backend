@@ -385,6 +385,7 @@
                 
                 if (response.ok) {
                     localStorage.setItem('onboarding_complete', 'true');
+                    // Use direct S3 URL to bypass CloudFront cache issues
                     window.location.href = 'https://s3.amazonaws.com/dashboard.auxeira.com/startup_founder.html';
                 } else {
                     alert('Error completing onboarding. Please try again.');

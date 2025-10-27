@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira Dashboard</title>
+    <script>
+        // Redirect to main site or appropriate dashboard
+        // Using direct S3 URLs to bypass CloudFront cache issues
+        const userData = JSON.parse(localStorage.getItem('auxeira_user') || '{}');
+        
+        if (userData.userType === 'startup_founder') {
+            window.location.href = 'https://s3.amazonaws.com/dashboard.auxeira.com/startup_founder.html';
+        } else {
+            // Redirect to main site
+            window.location.href = 'https://auxeira.com';
+        }
+    </script>
+</head>
+<body>
+    <p>Redirecting...</p>
+</body>
+</html>
