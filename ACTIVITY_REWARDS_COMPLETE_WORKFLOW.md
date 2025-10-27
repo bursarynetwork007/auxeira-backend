@@ -65,14 +65,15 @@ const assessment = await assessActivitySubmission(
 
 #### 3. Token Calculation
 ```typescript
-// Stage multipliers
-pre-seed: 1.5x
-seed: 1.3x
-series-a: 1.1x
-series-b: 0.9x
-series-c: 0.8x
-growth: 0.7x
-late-stage: 0.6x
+// Stage multipliers - INVERTED: larger startups get MORE tokens
+// Rationale: Same activity is more meaningful/impactful for larger organizations
+pre-seed: 0.6x
+seed: 0.7x
+series-a: 0.9x
+series-b: 1.1x
+series-c: 1.3x
+growth: 1.4x
+late-stage: 1.5x
 
 // Quality bonus
 < 0.7: 1.0x

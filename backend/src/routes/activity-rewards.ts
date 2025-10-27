@@ -661,15 +661,16 @@ function calculateTokens(
   startupStage: string,
   consistencyWeeks: number
 ): { final_tokens: number; breakdown: any } {
-  // Stage multipliers (from token_calculator_api.py)
+  // Stage multipliers - INVERTED: larger startups get MORE tokens
+  // Rationale: Same activity is more meaningful/impactful for larger organizations
   const stageMultipliers: { [key: string]: number } = {
-    'pre-seed': 1.5,
-    'seed': 1.3,
-    'series-a': 1.1,
-    'series-b': 0.9,
-    'series-c': 0.8,
-    'growth': 0.7,
-    'late-stage': 0.6,
+    'pre-seed': 0.6,
+    'seed': 0.7,
+    'series-a': 0.9,
+    'series-b': 1.1,
+    'series-c': 1.3,
+    'growth': 1.4,
+    'late-stage': 1.5,
   };
 
   // Quality bonus
