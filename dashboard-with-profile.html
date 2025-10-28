@@ -1717,7 +1717,7 @@
                 <div class="col-md-8 text-end">
                     <span class="text-secondary me-3" id="userWelcome">Welcome, Startup Founder</span>
                     <span class="badge bg-warning text-dark me-3">1,247 AUX</span>
-                    <button onclick="showProfile()" class="btn btn-sm btn-outline-light me-2">
+                    <button onclick="return showProfile(event);" class="btn btn-sm btn-outline-light me-2">
                         <i class="fas fa-user me-1"></i>Profile
                     </button>
                     <button onclick="logout()" class="btn btn-sm btn-danger">
@@ -5521,15 +5521,54 @@
 
     <script>
 
+    // Prevent frame-busting or parent frame interference
+    if (window.top !== window.self) {
+        // If loaded in iframe, break out
+        window.top.location = window.self.location;
+    }
+
+    // Global flag to prevent auth checks during modal operations
+    window.profileModalOpen = false;
+
+    // Override any potential redirect functions while modal is open
+    const originalLocationSetter = Object.getOwnPropertyDescriptor(window, 'location').set;
+    Object.defineProperty(window, 'location', {
+        set: function(value) {
+            if (window.profileModalOpen) {
+                console.warn('Blocked redirect while profile modal is open:', value);
+                return;
+            }
+            originalLocationSetter.call(window, value);
+        },
+        get: function() {
+            return window.location;
+        }
+    });
+
     // Profile Modal Functions
-    function showProfile() {
+    function showProfile(event) {
+        // Prevent any event propagation that might trigger auth checks
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        
+        // Set flag to prevent redirects
+        window.profileModalOpen = true;
+        
         document.getElementById('profileModal').style.display = 'block';
         document.body.style.overflow = 'hidden';
+        
+        // Return false to prevent any default behavior
+        return false;
     }
     
     function closeProfile() {
         document.getElementById('profileModal').style.display = 'none';
         document.body.style.overflow = 'auto';
+        
+        // Clear flag
+        window.profileModalOpen = false;
     }
     
     function saveProfile() {
