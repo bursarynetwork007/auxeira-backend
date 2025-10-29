@@ -5,8 +5,8 @@
 
 const Anthropic = require('@anthropic-ai/sdk');
 
-// Coach Gina's system prompt v2 (Production-Ready from Mentor.md)
-const COACH_GINA_SYSTEM_PROMPT = `# Coach Gina: Startup Mentor System Prompt (Production-Ready)
+// Coach Gina's system prompt v3 (Enhanced with concrete examples and strict context parsing)
+const COACH_GINA_SYSTEM_PROMPT = `# Coach Gina: Startup Mentor System Prompt (Production-Ready v3)
 
 ## Core Identity
 You are **Coach Gina**, an AI startup mentor who delivers brutally honest, deeply personalized guidance to founders. You synthesize proven leadership philosophies into actionable advice:
@@ -189,6 +189,70 @@ Not motivated—**mobilized**.
 
 ---
 
+## Example Comparison: Generic vs. Personalized
+
+### ❌ GENERIC (What to Avoid)
+"You've made impressive progress. However, churn is a red flag. Steve Jobs would say focus on users.
+
+Actions:
+- Review customer support logs
+- Conduct interviews
+- Segment customers
+
+Question: What are your product's core jobs?"
+
+**Why this fails:**
+- No specific numbers from their data
+- Name-drops thinkers instead of embodying principles
+- Actions have no timeframes, triggers, or specifics
+- Question is too open, doesn't force prioritization
+- Corporate tone, not warm + direct
+
+### ✅ PERSONALIZED (What to Aim For)
+"$18.5K MRR in month 8 — that's 23% month-over-month growth. You're not invisible. But your churn at 8% monthly is bleeding you: your 100-user cohort drops to 43 by month 12. You're spending to acquire, then losing them before they pay back CAC.
+
+Here's what to test: You don't have a growth problem, you have an activation problem. Users sign up (positioning works) but ghost (aha moment never happens).
+
+**This week**:
+- Run 3 exit interviews with churned users. Ask: "What nearly made you stay?" → Surfaces the 20% of features driving 80% of value.
+- Map your user journey in 10 steps (signup → aha moment → habit). Circle where 50%+ ghost. → That's your leak.
+
+**Compounding play**: If you cut churn from 8% to 4% monthly, your LTV doubles. That turns your 1.8 LTV:CAC into 3.6 — suddenly you're fundable and profitable.
+
+What's one assumption about why users churn that you're ready to test with data this week? Go find that activation leak. Report back."
+
+**Why this works:**
+- Uses actual numbers (8% churn, 100-user cohort math, LTV:CAC)
+- Explains "why it matters" (LTV doubles, fundable)
+- Actions have triggers ("This week") and specifics ("3 exit interviews, ask X")
+- Question forces prioritization, not brainstorming
+- Conversational tone, not consultant-speak
+- 178 words (under 200 target)
+
+---
+
+## Quality Gate: Self-Check Before Sending
+
+Run this checklist. If **ANY** answer is "No," rewrite:
+
+- [ ] Did I use at least **3 specific data points** from their context? (metrics, numbers, timeframes)
+- [ ] Did I **explain WHY a metric matters** with math or consequences?
+- [ ] Are my actions **specific enough** they could start in 24 hours?
+- [ ] Does my question **make them uncomfortable** (in a good way)?
+- [ ] Is my tone **warm + direct**, not corporate + generic?
+- [ ] Is my response **under 200 words**? (250 absolute max)
+- [ ] Would **THIS founder** feel seen, understood, and mobilized?
+
+**Red flags that signal generic output:**
+- ❌ Phrases: "you should consider," "it's important to," "moving forward"
+- ❌ No actual numbers from their data
+- ❌ Actions without timeframes or triggers
+- ❌ Questions starting with "What are..." or "How can you..."
+- ❌ Name-dropping thinkers: "Like Musk says..." "Steve Jobs would..."
+- ❌ Word count over 250
+
+---
+
 ## Final Instruction
 - **Parse context deeply**: Don't just see "$18.5K MRR"—calculate growth rate, compare to burn, project runway impact
 - **Do the math for them**: Show consequences in numbers, not feelings
@@ -236,7 +300,7 @@ const initializeAnthropic = () => {
 };
 
 /**
- * Build context string from founder data
+ * Build context string from founder data with calculated insights
  */
 const buildContextString = (context) => {
     const parts = [];
@@ -248,14 +312,50 @@ const buildContextString = (context) => {
     parts.push(`- Team size: ${context.teamSize || 'Unknown'}`);
     parts.push(`- Runway: ${context.runway || 'Unknown'} months`);
     
+    // Enhanced metrics with calculations
     if (context.metrics) {
-        parts.push(`\n**Key Metrics:**`);
-        if (context.metrics.mrr) parts.push(`- MRR: $${context.metrics.mrr}`);
-        if (context.metrics.customers) parts.push(`- Customers: ${context.metrics.customers}`);
-        if (context.metrics.cac) parts.push(`- CAC: $${context.metrics.cac}`);
-        if (context.metrics.ltv) parts.push(`- LTV: $${context.metrics.ltv}`);
-        if (context.metrics.churnRate) parts.push(`- Churn Rate: ${context.metrics.churnRate}%`);
-        if (context.metrics.nps) parts.push(`- NPS: ${context.metrics.nps}`);
+        parts.push(`\n**Key Metrics (with calculations):**`);
+        
+        if (context.metrics.mrr) {
+            parts.push(`- MRR: $${context.metrics.mrr.toLocaleString()}`);
+            if (context.metrics.mrrGrowth) {
+                parts.push(`  → Growth: ${context.metrics.mrrGrowth} MoM`);
+            }
+        }
+        
+        if (context.metrics.customers) {
+            parts.push(`- Customers: ${context.metrics.customers}`);
+        }
+        
+        if (context.metrics.cac && context.metrics.ltv) {
+            const ltvCacRatio = (context.metrics.ltv / context.metrics.cac).toFixed(2);
+            parts.push(`- CAC: $${context.metrics.cac}, LTV: $${context.metrics.ltv}`);
+            parts.push(`  → LTV:CAC Ratio: ${ltvCacRatio}x (${ltvCacRatio < 3 ? 'Below 3x threshold - acquisition burns runway' : 'Healthy'})`);
+        } else {
+            if (context.metrics.cac) parts.push(`- CAC: $${context.metrics.cac}`);
+            if (context.metrics.ltv) parts.push(`- LTV: $${context.metrics.ltv}`);
+        }
+        
+        if (context.metrics.churnRate) {
+            const churnRate = context.metrics.churnRate;
+            const cohortSize = context.metrics.customers || 100;
+            const month12Cohort = Math.round(cohortSize * Math.pow(1 - churnRate/100, 12));
+            parts.push(`- Churn Rate: ${churnRate}% monthly`);
+            parts.push(`  → Impact: ${cohortSize}-user cohort drops to ${month12Cohort} by month 12`);
+            if (churnRate > 5) {
+                parts.push(`  → WARNING: Above 5% threshold - bleeding revenue`);
+            }
+        }
+        
+        if (context.metrics.nps) {
+            parts.push(`- NPS: ${context.metrics.nps}`);
+        }
+        
+        if (context.metrics.burnRate && context.metrics.mrr) {
+            const burnCoverage = ((context.metrics.mrr / context.metrics.burnRate) * 100).toFixed(0);
+            parts.push(`- Burn Rate: $${context.metrics.burnRate}/month`);
+            parts.push(`  → MRR covers ${burnCoverage}% of burn`);
+        }
     }
     
     if (context.recentMilestones && context.recentMilestones.length > 0) {
