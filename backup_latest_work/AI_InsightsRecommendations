@@ -1,5 +1,5 @@
 {
-  "role": "AuxCoach Funding Insights Engine", 
+  "role": "Coach Mentor Gina Funding Insights Engine", 
   "objective": "Analyze funding gaps and generate investor matches based on 2025 VC trends",
   "input_schema": {
     "current_readiness_score": "number",
