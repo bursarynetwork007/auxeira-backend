@@ -1826,47 +1826,13 @@
                             </div>
                             <p class="text-secondary">Get personalized guidance from Coach Gina, your AI mentor combining insights from top founders and VCs.</p>
                             
-                            <div class="row mt-3">
-                                <!-- Nudge 1: Growth -->
-                                <div class="col-md-4">
-                                    <div class="nudge-card" style="border-left-color: var(--success-green);">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h6 class="text-success mb-1"><i class="fas fa-bullseye me-1"></i>Growth Nudge</h6>
-                                            <span class="badge bg-success">+100 AUX</span>
-                                        </div>
-                                        <p class="small mb-2">
-                                            <strong>Reduce CAC via Referrals:</strong> Launch a customer referral program. Projected 25% CAC reduction.
-                                        </p>
-                                        <button class="btn btn-sm btn-success w-100" id="growthNudgeBtn">Take Action</button>
+                            <div class="row mt-3" id="nudgesContainer">
+                                <!-- Dynamic nudges will be loaded here -->
+                                <div class="col-12 text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading nudges...</span>
                                     </div>
-                                </div>
-                                
-                                <!-- Nudge 2: Validation -->
-                                <div class="col-md-4">
-                                    <div class="nudge-card" style="border-left-color: var(--neon-gold);">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h6 class="text-warning mb-1"><i class="fas fa-chart-line me-1"></i>Validation Nudge</h6>
-                                            <span class="badge bg-warning text-dark">+150 AUX</span>
-                                        </div>
-                                        <p class="small mb-2">
-                                            <strong>Complete Customer Interviews:</strong> Need 2 more interviews to reach Series A validation threshold.
-                                        </p>
-                                        <button class="btn btn-sm btn-warning w-100" id="validationNudgeBtn">Schedule Interviews</button>
-                                    </div>
-                                </div>
-                                
-                                <!-- Nudge 3: Funding -->
-                                <div class="col-md-4">
-                                    <div class="nudge-card" style="border-left-color: var(--neon-blue);">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h6 class="text-primary mb-1"><i class="fas fa-rocket me-1"></i>Funding Nudge</h6>
-                                            <span class="badge bg-primary">+200 AUX</span>
-                                        </div>
-                                        <p class="small mb-2">
-                                            <strong>Prepare Financial Projections:</strong> Update 18-month model to reflect recent MRR growth.
-                                        </p>
-                                        <button class="btn btn-sm btn-primary w-100" id="fundingNudgeBtn">Update Model</button>
-                                    </div>
+                                    <p class="text-secondary mt-2 small">Generating personalized nudges...</p>
                                 </div>
                             </div>
                         </div>
@@ -1915,36 +1881,13 @@
                         <div class="glass-card mb-4">
                             <h5 class="mb-3">🚨 Urgent Actions & Opportunities</h5>
                             
-                            <!-- Urgent Action 1 -->
-                            <div class="nudge-card urgent mb-3" style="border-left-color: var(--danger-red);">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="text-danger mb-0">Customer Interview #8</h6>
-                                        <p class="mb-0 small text-secondary">Required to unlock Series A assessment</p>
+                            <div id="urgentActionsContainer">
+                                <!-- Dynamic urgent actions will be loaded here -->
+                                <div class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading urgent actions...</span>
                                     </div>
-                                    <button class="btn btn-sm btn-danger">Start Now</button>
-                                </div>
-                            </div>
-
-                            <!-- Urgent Action 2 -->
-                            <div class="nudge-card urgent mb-3" style="border-left-color: var(--warning-orange);">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="text-warning mb-0">Financial Model Update</h6>
-                                        <p class="mb-0 small text-secondary">Your projections are 30 days old - Overdue</p>
-                                    </div>
-                                    <button class="btn btn-sm btn-warning">Update</button>
-                                </div>
-                            </div>
-                            
-                            <!-- Opportunity 1 -->
-                            <div class="nudge-card opportunity" style="border-left-color: var(--neon-blue);">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="text-primary mb-0">Investor Introduction</h6>
-                                        <p class="mb-0 small text-secondary">Warm intro to Series A investor - +500 AUX</p>
-                                    </div>
-                                    <button class="btn btn-sm btn-primary">Accept</button>
+                                    <p class="text-secondary mt-2 small">Analyzing your startup data...</p>
                                 </div>
                             </div>
                         </div>
@@ -5652,9 +5595,10 @@
     
     <!-- AI Nudges Workflow Integration -->
     <script src="https://auxeira.com/js/nudges-workflow.js"></script>
+    <script src="https://auxeira.com/js/overview-dynamic.js"></script>
     <script>
         // Initialize Coach Gina and Nudges when page loads
-        let coachGina, nudgesWorkflow;
+        let coachGina, nudgesWorkflow, overviewDynamic;
         
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize Coach Gina with API endpoint
@@ -5662,22 +5606,33 @@
             coachGina = new CoachGinaChat(null, COACH_GINA_API);
             
             // Initialize Nudges Workflow
-            const NUDGES_API = 'https://YOUR-NUDGES-API-ENDPOINT/api/nudges';
+            const NUDGES_API = 'https://qh56ng61eh.execute-api.us-east-1.amazonaws.com/prod/api/nudges';
             nudgesWorkflow = new NudgesWorkflow(NUDGES_API);
+            
+            // Initialize Overview Dynamic Manager
+            const NUDGES_GENERATOR_API = 'https://koo8kun6ge.execute-api.us-east-1.amazonaws.com/prod/api/nudges/generate';
+            const URGENT_ACTIONS_API = 'https://yyf8vfdvs6.execute-api.us-east-1.amazonaws.com/prod/api/urgent-actions/generate';
+            overviewDynamic = new OverviewDynamicManager(NUDGES_GENERATOR_API, URGENT_ACTIONS_API);
             
             // Get founder context from page data
             const founderContext = {
+                startupName: 'Auxeira',
+                sseScore: 72,
                 stage: 'Series A',
                 industry: 'FinTech',
                 geography: 'United States',
                 teamSize: 12,
                 runway: 14,
                 mrr: 18500,
+                mrrGrowth: '+23%',
+                users: 2847,
                 customers: 1247,
                 cac: 127,
                 ltv: 1890,
                 churnRate: 2.3,
                 nps: 68,
+                interviewsCompleted: 8,
+                projectionsAge: '30 days old',
                 recentMilestones: [
                     'Achieved $18.5K MRR',
                     'Reduced CAC by 15.2%',
@@ -5689,6 +5644,15 @@
                     'Financial model needs updating'
                 ]
             };
+            
+            // Load dynamic nudges
+            overviewDynamic.initialize(founderContext).then(result => {
+                console.log('Dynamic nudges loaded:', result);
+                // Re-attach event handlers after dynamic content is loaded
+                attachNudgeHandlers();
+            }).catch(error => {
+                console.error('Failed to load dynamic nudges:', error);
+            });
             
             // Update Coach Gina with founder context
             coachGina.updateFounderContext(founderContext);
@@ -5702,27 +5666,29 @@
                 });
             }
             
-            // Attach click handlers to Nudge buttons
-            document.getElementById('growthNudgeBtn')?.addEventListener('click', function(e) {
-                e.preventDefault();
-                nudgesWorkflow.openGrowthNudge(founderContext);
-            });
-            
-            document.getElementById('validationNudgeBtn')?.addEventListener('click', function(e) {
-                e.preventDefault();
-                nudgesWorkflow.openValidationNudge({
-                    ...founderContext,
-                    interviewsCompleted: 8
+            // Function to attach nudge handlers (called after dynamic content loads)
+            function attachNudgeHandlers() {
+                document.getElementById('growthNudgeBtn')?.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    nudgesWorkflow.openGrowthNudge(founderContext);
                 });
-            });
-            
-            document.getElementById('fundingNudgeBtn')?.addEventListener('click', function(e) {
-                e.preventDefault();
-                nudgesWorkflow.openFundingNudge({
-                    ...founderContext,
-                    burnRate: 12500
+                
+                document.getElementById('validationNudgeBtn')?.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    nudgesWorkflow.openValidationNudge({
+                        ...founderContext,
+                        interviewsCompleted: 8
+                    });
                 });
-            });
+                
+                document.getElementById('fundingNudgeBtn')?.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    nudgesWorkflow.openFundingNudge({
+                        ...founderContext,
+                        burnRate: 12500
+                    });
+                });
+            }
         });
     </script>
 </body>

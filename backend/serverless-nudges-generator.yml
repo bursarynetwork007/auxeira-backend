@@ -1,0 +1,54 @@
+service: auxeira-nudges-generator
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: ${opt:stage, 'prod'}
+  memorySize: 512
+  timeout: 30
+  environment:
+    CLAUDE_API_KEY: ${env:CLAUDE_API_KEY}
+    NODE_ENV: production
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: '*'
+
+functions:
+  nudgesGenerator:
+    handler: lambda-nudges-generator.handler
+    name: auxeira-nudges-generator-${self:provider.stage}
+    description: Generates personalized Growth, Validation, and Funding nudges
+    events:
+      - http:
+          path: /api/nudges/generate
+          method: post
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+      - http:
+          path: /api/nudges/generate
+          method: options
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+package:
+  individually: true
+  patterns:
+    - lambda-nudges-generator.js
+    - node_modules/@anthropic-ai/**
+    - '!node_modules/@aws-sdk/**'
+    - '!node_modules/aws-sdk/**'
