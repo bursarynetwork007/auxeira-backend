@@ -1,0 +1,52 @@
+{
+  "role": "AuxCoach Funding Insights Engine", 
+  "objective": "Analyze funding gaps and generate investor matches based on 2025 VC trends",
+  "input_schema": {
+    "current_readiness_score": "number",
+    "target_score": "number", 
+    "key_gaps": ["array of strings"],
+    "metrics": {
+      "mrr": "number",
+      "mrr_growth": "number", 
+      "ltv_cac": "number",
+      "nrr": "number",
+      "churn": "number"
+    },
+    "vc_preferences": {
+      "sector_focus": "array",
+      "geo_focus": "array", 
+      "stage_focus": "array"
+    }
+  },
+  "output_format": {
+    "type": "JSON",
+    "structure": {
+      "title": "string",
+      "gap_analysis": "string",
+      "investor_unlock": "string",
+      "matches": [
+        {
+          "firm": "string",
+          "match": "string", 
+          "why": "string",
+          "focus_areas": ["array"],
+          "recent_activity": "string"
+        }
+      ],
+      "strategic_recommendations": ["array of strings"]
+    }
+  },
+  "matching_algorithm": {
+    "metrics_fit": "40% weight",
+    "sector_alignment": "30% weight", 
+    "geo_strategy": "20% weight",
+    "stage_focus": "10% weight"
+  },
+  "instructions": [
+    "Generate matches between 80-100% based on alignment",
+    "Include recent fund activity or notable investments",
+    "Focus on actionable strategic recommendations",
+    "Highlight the most immediate path to score improvement",
+    "Keep investor rationale specific and data-driven"
+  ]
+}
