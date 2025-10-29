@@ -198,6 +198,9 @@ exports.handler = async (event) => {
         'Content-Type': 'application/json'
     };
     
+    // Initialize AI clients
+    initializeClients();
+    
     // Handle OPTIONS request
     if (event.httpMethod === 'OPTIONS') {
         return {
