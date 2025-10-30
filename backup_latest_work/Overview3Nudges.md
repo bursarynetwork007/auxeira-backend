@@ -19,64 +19,17 @@
 
 # Behavioral-Optimized AI Nudge System with Startup-Sized Rewards
 
-## 🎯 **Enhanced AUX Reward Formula**
-
-// Dynamic AUX calculation based on coaching quality
-function calculateCoachingAux(startupStage, externalContext, coachingOutput) {
-  const stageBase = {
-    'pre_seed': 80, 'seed': 110, 'series_a': 150, 'series_b_plus': 200
-  };
-  
-  const signalStrength = assessSignalStrength(externalContext);
-  const coachingDepth = assessCoachingDepth(coachingOutput);
-  
-  return Math.min(
-    stageBase[startupStage] * signalStrength.multiplier + coachingDepth.bonus,
-    500 // Reasonable cap
-  );
-}
-
-function assessSignalStrength(externalContext) {
-  const signals = externalContext.toLowerCase();
-  let multiplier = 1.0;
-  
-  if (signals.includes('techcrunch') || signals.includes('viral') || signals.includes('trending')) {
-    multiplier = 2.0; // Major press or viral moment
-  } else if (signals.includes('featured') || signals.includes('press') || signals.match(/\d+\s*(likes|engagements|shares)/)) {
-    multiplier = 1.6; // Good traction signals
-  } else if (signals.includes('comments') || signals.includes('traffic') || signals.includes('engagement')) {
-    multiplier = 1.3; // Basic social signals
-  }
-  
-  return { multiplier, description: getSignalDescription(multiplier) };
-}
-
-function assessCoachingDepth(coachingOutput) {
-  // Analyze coaching quality
-  const wordCount = coachingOutput.split(' ').length;
-  const hasSpecificMetrics = /\d+%/.test(coachingOutput) || /\$\d+/.test(coachingOutput);
-  const hasTimeBound = /by (tomorrow|Friday|EOW|next week)/i.test(coachingOutput);
-  const hasPsychologicalHook = /(loss|fomo|urgency|compound|sunk cost)/i.test(coachingOutput);
-  
-  let bonus = 0;
-  if (hasSpecificMetrics && hasTimeBound && hasPsychologicalHook) bonus = 50; // Transformative
-  else if (hasSpecificMetrics || hasTimeBound) bonus = 25; // Actionable
-  
-  return { bonus, level: bonus === 50 ? 'transformative' : bonus === 25 ? 'actionable' : 'basic' };
-}
-
-    
-**Example Rewards:**
-- Pre-seed, Low difficulty: ~86 AUX
-- Series A, High difficulty: ~425 AUX  
-- Seed, Medium difficulty: ~187 AUX
+Perfect! I can see your current UI and understand you need **backward-compatible prompts** that maintain your existing JSON structure while incorporating the enhanced behavioral science and personalization. Here's the comprehensive enhanced prompt that works with your current UI:
 
 ---
- ENHANCED AI NUDGE GENERATOR SYSTEM
-Core Backend Logic
-javascript
-// Enhanced trigger with external context
-async function generateDailyNudge(user, section) {
+
+## 🚀 **ENHANCED BUT BACKWARD-COMPATIBLE AI PROMPT SYSTEM**
+
+### **Core Backend Logic** (Maintains Your Current JSON Structure)
+
+```javascript
+// Enhanced but compatible generator
+async function generateEnhancedNudge(user, section) {
   const externalContext = await fetchExternalContext(
     user.id, 
     user.startupUrl, 
@@ -84,197 +37,264 @@ async function generateDailyNudge(user, section) {
   );
   
   const prompt = getEnhancedPrompt(section, user, externalContext);
-  const coaching = await callGinaAI(prompt);
-  const auxReward = calculateCoachingAux(user.stage, externalContext, coaching);
+  const aiResponse = await callGinaAI(prompt);
+  const parsedResponse = JSON.parse(aiResponse);
   
-  return {
-    coaching_output: coaching,
-    aux_reward: auxReward,
-    section: section,
-    generated_at: new Date(),
-    external_signals: extractSignals(externalContext)
-  };
+  // Calculate dynamic AUX based on new formula but ensure it fits your range (50-300)
+  const calculatedAux = calculateDynamicAux(user.stage, externalContext, parsedResponse.difficulty);
+  parsedResponse.aux_reward = Math.min(Math.max(calculatedAux, 50), 300);
+  
+  return parsedResponse;
 }
-----
 
+function calculateDynamicAux(stage, externalContext, difficulty) {
+  const stageBase = {
+    'pre_seed': 60, 'seed': 80, 'series_a': 100, 'series_b_plus': 120
+  };
+  
+  const difficultyMultipliers = { 'Low': 1.2, 'Medium': 1.8, 'High': 2.5 };
+  const signalStrength = assessSignalStrength(externalContext);
+  
+  return Math.round(stageBase[stage] * difficultyMultipliers[difficulty] * signalStrength);
+}
 
-## 🚀 **COMPREHENSIVE AI PROMPTS**
+function assessSignalStrength(externalContext) {
+  const signals = externalContext.toLowerCase();
+  if (signals.includes('techcrunch') || signals.includes('viral')) return 1.6;
+  if (signals.includes('featured') || signals.match(/\d+\s*(likes|engagements|shares)/)) return 1.3;
+  return 1.0;
+}
+```
 
-### **1. Growth Nudge Prompt**
+---
 
+## 📝 **COMPREHENSIVE ENHANCED PROMPTS** (JSON Output Compatible)
+
+### **1. Enhanced Growth Nudge Prompt** 
 ```
 CONTEXT:
-You are Growth Engine specialist, blending Steve Jobs' user-obsession, Paul Graham's do-what-doesn't-scale wisdom, and Andrew Chen's growth loops. Your style: tactical, momentum-focused, turning small wins into compounding gains.
+You are a Growth Engine specialist blending Steve Jobs' user-obsession, Andrew Chen's growth loops, and Paul Graham's do-what-doesn't-scale wisdom. Generate high-impact, personalized growth nudges.
 
 FOUNDER PROFILE:
 - Startup: {startup_name}
-- Stage: {stage} | SSE: {current_sse} → Target: {next_threshold}
-- MRR: {mrr_trend} | Traction: {recent_wins}
-- Past Actions: {past_actions}
+- Stage: {stage} | Current SSE: {current_sse} → Target: {next_threshold}
+- MRR: {mrr_trend} | Past Actions: {past_actions}
 
 EXTERNAL CONTEXT:
 {external_context}
 
 BEHAVIORAL DIRECTIVES:
-→ Weave specific external signals into every element
-→ Create urgency around opportunity cost
-→ Frame as compounding habits, not one-off tasks
+→ Weave specific external signals into the description
+→ Create urgency using opportunity cost psychology
+→ Focus on 10x leverage points from actual data
 → Use loss aversion: "Don't let your [viral thread] momentum fade"
-→ Focus on 10x leverage points from their actual data
+→ Frame as compounding habits, not one-off tasks
 
-OUTPUT FORMAT (STRICT 100-word limit):
-1. QUICK STORY (40 words): Founder growth win mirroring their external signals
-2. INSIGHT: Icon principle + their biggest untapped leverage point
-3. 1-2 ACTIONS: Specific, time-bound nudge using their assets
-4. ECONOMIC TIE: Compounding/leverage principle applied to their context
-5. QUESTION: "What's your next 10x vector?"
-
-END: "Scale smart. Execute now."
+CRITICAL: OUTPUT MUST BE VALID JSON matching this exact structure:
+{
+  "goal": "Concise action title <10 words with measurable outcome",
+  "description": "1-sentence incorporating external signals + projected impact",
+  "button_text": "Action-oriented CTA",
+  "difficulty": "Low/Medium/High",
+  "workflow_type": "Modal/Redirect/Edit"
+}
 
 EXAMPLE OUTPUT:
-"Maria's Nairobi edtech hit 5K users by embedding in parent WhatsApp groups—echoing your X thread's engagement spike. Jobs: Fix one pain perfectly; your site analytics show onboarding drop-off at step 3. A/B test two onboarding flows by Friday—projected 20% conversion lift. Leverage: Small tweaks compound—like your 30% referral traffic goldmine. What's your next 10x vector? Scale smart. Execute now."```
+{
+  "goal": "Launch referral program leveraging X engagement",
+  "description": "Your viral X thread on problem Y shows demand—projected 25% CAC reduction by rewarding shares.",
+  "button_text": "Setup Referrals",
+  "difficulty": "Medium", 
+  "workflow_type": "Modal"
+}
+```
 
-
-----
-### **2. Validation Nudge Prompt**
-
+### **2. Enhanced Validation Nudge Prompt**
 ```
 CONTEXT:
-You are a Validation Scout, channeling Eric Ries' MVP rigor, Teresa Torres' continuous discovery, and Steve Blank's get-out-the-building urgency. Your style: curious, assumption-killing, turning uncertainty into actionable data.
+You are a Validation Scout channeling Eric Ries' MVP rigor, Teresa Torres' continuous discovery, and Steve Blank's customer development. Generate assumption-testing nudges.
 
 FOUNDER PROFILE:
-- Startup: {startup_name}
-- Stage: {stage} | SSE: {current_sse} → Target: {next_threshold}
-- MRR: {mrr_trend} | Validation Score: {validation_metrics}
-- Past Actions: {past_actions}
-- Riskiest Assumption: {current_assumption}
+- Startup: {startup_name}  
+- Stage: {stage} | Current SSE: {current_ssee} → Target: {next_threshold}
+- MRR: {mrr_trend} | Past Actions: {past_actions}
 
 EXTERNAL CONTEXT:
 {external_context}
 
 BEHAVIORAL DIRECTIVES:
-→ Use social/web feedback to challenge specific assumptions
-→ Frame validation as "killing bad ideas fast" not "being wrong"
+→ Use social/web feedback to target risky assumptions
+→ Frame validation as "killing bad ideas fast"
 → Leverage sunk cost fallacy reversal
-→ Make testing feel like a game with clear win conditions
-→ Connect to their actual user signals and complaints
+→ Make testing feel like discovery, not interrogation
+→ Connect to actual user complaints or requests
 
-OUTPUT FORMAT (STRICT 100-word limit):
-1. QUICK STORY (40 words): Founder pivot tale inspired by their web context
-2. INSIGHT: Icon wisdom + their most dangerous untested assumption
-3. 1-2 ACTIONS: Micro-test with gamification and clear success metrics
-4. ECONOMIC TIE: Sunk cost or opportunity cost principle
-5. QUESTION: "Which assumption scares you most to test?"
-
-END: "Validate or pivot. Your call."
+CRITICAL: OUTPUT MUST BE VALID JSON matching this exact structure:
+{
+  "goal": "Concise validation action <10 words",
+  "description": "1-sentence using external signals + validation impact", 
+  "button_text": "Action CTA",
+  "difficulty": "Low/Medium/High",
+  "workflow_type": "Modal/Redirect/Edit"
+}
 
 EXAMPLE OUTPUT:
-"Aisha's Lagos fintech pivoted from premium to freemium after 5 user exits—inspired by her Reddit thread on pricing pain. Ries: Build-Measure-Learn; your X comments flag subscription aversion. Run 3 concierge tests by Thursday—if <70% pay, pivot. Sunk cost: Each week on wrong features compounds tech debt. Which assumption scares you most to test? Validate or pivot. Your call."
+{
+  "goal": "Interview 5 Reddit commenters on pricing",
+  "description": "Your Reddit thread shows pricing confusion—validate premium model with 5 interviews to prevent build waste.",
+  "button_text": "Find Leads",
+  "difficulty": "High",
+  "workflow_type": "Redirect"
+}
 ```
 
-
-----
-
-### **3. Funding Nudge Prompt**
-
+### **3. Enhanced Funding Nudge Prompt**
 ```
 CONTEXT:
-You are AuxCoach Funding Strategist, fusing Elon Musk's first-principles thinking, Sheryl Sandberg's relationship math, and Naval Ravikant's specific knowledge focus. Your style: bold, traction-obsessed, turning metrics into narrative gold.
+You are a Funding Strategist fusing Elon Musk's first-principles thinking, Sheryl Sandberg's network math, and Naval Ravikant's leverage focus. Generate investor-ready preparation nudges.
 
 FOUNDER PROFILE:
 - Startup: {startup_name}
-- Stage: {stage} | SSE: {current_ssee} → Target: {next_threshold}
-- MRR: {mrr_trend} | Funding Goal: {funding_target}
-- Past Actions: {past_actions}
-- Investor Pipeline: {investor_status}
+- Stage: {stage} | Current SSE: {current_sse} → Target: {next_threshold} 
+- MRR: {mrr_trend} | Past Actions: {past_actions}
 
 EXTERNAL CONTEXT:
 {external_context}
 
 BEHAVIORAL DIRECTIVES:
-→ Always reference specific external signals for social proof
-→ Weave in loss aversion around fundraising windows
-→ Use founder stories that mirror their current traction
+→ Reference specific external signals for social proof
+→ Create FOMO around current traction momentum
 → Focus on verifiable metrics over vision
-→ Create FOMO around their current momentum
+→ Use loss aversion for fundraising timelines
+→ Weave in founder stories that mirror their position
 
-OUTPUT FORMAT (STRICT 100-word limit):
-1. QUICK STORY (40 words): Real founder funding win mirroring their signals
-2. INSIGHT: Icon principle + their strongest unamplified traction
-3. 1-2 ACTIONS: Specific investor-ready preparation tasks
-4. ECONOMIC TIE: Compound principle applied to their context
-5. QUESTION: "What metric would make investors fight for this?"
-
-END: "Fund it. Next step yours."
+CRITICAL: OUTPUT MUST BE VALID JSON matching this exact structure:
+{
+  "goal": "Concise funding prep <10 words",
+  "description": "1-sentence amplifying external signals + investor impact",
+  "button_text": "Action CTA",
+  "difficulty": "Low/Medium/High", 
+  "workflow_type": "Modal/Redirect/Edit"
+}
 
 EXAMPLE OUTPUT:
-"Thabo's Cape Town SaaS landed $500K by featuring TechCrunch coverage on slide 3—amplifying your recent media buzz. Musk: First principles—what's your defensible data moat? Your 45% MoM growth. Update deck by EOW highlighting 3 traction metrics from your blog. Compound: Weekly investor updates build trust—small touches, big checks. What metric would make investors fight for this? Fund it. Next step yours."
+{
+  "goal": "Update deck with TechCrunch mention",
+  "description": "Your TechCrunch feature builds credibility—add to slide 3 to increase warm intro response by 20%.",
+  "button_text": "Edit Deck",
+  "difficulty": "Medium",
+  "workflow_type": "Edit"
+}
 ```
 
-----
+---
 
-BACKEND INTEGRATION CODE
-// Enhanced external context fetcher (add to your existing toolchain)
-async function fetchEnhancedExternalContext(userId, startupUrl, socialHandles) {
+## 🎯 **DIRECT REPLACEMENT FOR YOUR CURRENT PROMPT**
+
+**Replace your current Core Prompt Template with this enhanced version:**
+
+```
+As a behavioral-optimized startup AI coach, generate a single high-impact nudge for [Section: Growth/Validation/Funding] to boost [User Startup]'s SSE from [Current SSE] toward [Next Threshold]. 
+
+CONTEXT: 
+- MRR: [MRR Trend Summary]
+- Past Actions: [Past Actions] 
+- Stage: [User Stage]
+- External Signals: [EXTERNAL_CONTEXT]
+
+BEHAVIORAL DIRECTIVES:
+→ Weave external signals naturally into the description
+→ Use urgency and loss aversion psychology  
+→ Focus on verifiable metrics and compounding effects
+→ Reference relevant founder icons and principles
+→ Prioritize quick wins if SSE <60
+
+Draw from top founder/VC playbooks (YC/a16z); maintain JSON structure.
+
+CRITICAL: OUTPUT VALID JSON ONLY:
+{
+  "goal": "Concise action title <10 words with measurable outcome",
+  "description": "1-sentence incorporating external signals + projected impact",
+  "button_text": "Action-oriented CTA", 
+  "difficulty": "Low/Medium/High",
+  "workflow_type": "Modal/Redirect/Edit"
+}
+```
+
+---
+
+## 🔄 **MINIMAL BACKEND CHANGES REQUIRED**
+
+Just add this function to your existing code:
+
+```javascript
+// Add to your existing backend
+async function fetchExternalContext(userId, startupUrl, socialHandles) {
   try {
     const [siteData, socialData, webMentions] = await Promise.all([
-      browse_page({ 
-        url: startupUrl, 
-        instructions: "Extract: key metrics mentions, growth signals, user feedback, recent updates, traffic patterns" 
-      }),
-      x_semantic_search({ 
-        query: `${socialHandles.x} startup growth traction`, 
-        limit: 5, 
-        usernames: [socialHandles.x] 
-      }),
-      web_search({ 
-        query: `"${startupName}" OR "${socialHandles.x}" site:techcrunch.com OR site:techcabal.com OR site:disrupt-africa.com`,
-        num_results: 3 
-      })
+      browse_page({ url: startupUrl, instructions: "Extract key metrics and updates" }),
+      x_semantic_search({ query: `${socialHandles.x} startup`, limit: 3, usernames: [socialHandles.x] }),
+      web_search({ query: `"${startupName}" site:techcrunch.com OR site:techcabal.com`, num_results: 2 })
     ]);
     
     return formatExternalContext(siteData, socialData, webMentions);
   } catch (error) {
-    return getFallbackContext(); // Basic website-only context
+    return 'Website: Basic traffic patterns'; // Fallback
   }
 }
 
 function formatExternalContext(site, social, web) {
   const parts = [];
-  
   if (site?.summary) parts.push(`Website: ${site.summary}`);
-  if (social?.posts?.[0]?.text) parts.push(`X: ${social.posts[0].text.substring(0, 100)}...`);
+  if (social?.posts?.[0]?.text) parts.push(`X: ${social.posts[0].text.substring(0, 80)}...`);
   if (web?.results?.[0]?.snippet) parts.push(`Web: ${web.results[0].snippet}`);
-  
-  return parts.join('; ') || 'Website: Basic traffic patterns detected';
+  return parts.join('; ');
 }
----
-
-## 🧩 **Behavioral Enhancements in Action**
-
-### **The "Meaningful Scaling" Effect**
-- **Pre-seed founder**: "Run 5 customer interviews" → 115 AUX (meaningful but accessible)
-- **Series A founder**: "Validate enterprise pricing with 3 Fortune 500 prospects" → 380 AUX (commensurate with impact)
-
-### **Progressional Psychology**
-```python
-# Creates natural career progression feeling
-"Early rewards feel earned → Later rewards feel deserved"
 ```
 
-### **Anti-Gaming Mechanism**
-The size-based multiplier prevents founders from "farming" easy tasks at later stages—the system naturally demands more impactful work as they grow.
+---
 
-### **Status Signaling**
-Completing high-AUX tasks becomes a status signal within the founder community, creating healthy social pressure.
+## 🎨 **EXPECTED UI OUTPUT** (With Your Current Design)
 
-## 📊 **Expected Behavioral Outcomes**
+Your UI will now show **enhanced, personalized content** while maintaining the same structure:
 
-1. **Increased Long-term Engagement**: Founders see the platform growing with them
-2. **Appropriate Challenge Matching**: Tasks scale with founder capability and resources  
-3. **Reduced Reward Inflation**: Meaningful AUX differentiation prevents point devaluation
-4. **Natural Skill Development**: Progressive difficulty curve builds founder competence
-5. **Enhanced Perceived Value**: Large AUX rewards for complex tasks feel earned and valuable
+```
+# Growth Nudge
++185 AUX
 
-This system creates what behavioral scientists call "**progressive mastery**"—the feeling of leveling up in both challenges and rewards, which is deeply motivating for achievement-oriented founders.- **Retention Hook**: Total AUX pool scales with engagement; redeem for perks (e.g., 500 AUX = VC intro call).
-- **Dev Notes**: Use JSON from Gina API to populate; cache for 24h to avoid over-querying.
+Launch Referrals via X Engagement: Your viral thread on problem Y shows demand—projected 25% CAC reduction by rewarding shares.
+
+## Setup Referrals
+
+# Validation Nudge  
++220 AUX
+
+Interview Reddit Pricing Commenters: Your Reddit thread shows pricing confusion—validate premium model with 5 interviews to prevent build waste.
+
+## Find Leads
+
+# Funding Nudge
++260 AUX
+
+Update Deck with TechCrunch Mention: Your TechCrunch feature builds credibility—add to slide 3 to increase warm intro response by 20%.
+
+## Edit Deck
+```
+
+---
+
+## 🚀 **IMMEDIATE IMPLEMENTATION STEPS**
+
+1. **Replace your current Core Prompt Template** with the enhanced version above
+2. **Add the `fetchExternalContext` function** to your backend
+3. **Update your nudge generator** to include `[EXTERNAL_CONTEXT]` in the prompt
+4. **Keep everything else the same** - your UI, JSON structure, and workflows remain compatible
+
+This gives you:
+- ✅ **Backward compatibility** with your current UI
+- ✅ **Enhanced personalization** with external signals  
+- ✅ **Dynamic AUX rewards** based on startup stage and signal strength
+- ✅ **Behavioral science principles** for higher engagement
+- ✅ **Minimal code changes** required
+
+Your founders will see noticeably more relevant, personalized nudges starting tomorrow!
