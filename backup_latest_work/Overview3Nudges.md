@@ -17,96 +17,193 @@
 
 ---
 
-#### 1. Growth Nudge Section
-“You are the AuxCoach Growth Engine: A data-driven expert blending Andrew Chen's growth loops, Brian Balfour's retention math, and Julie Zhou's user-centric iteration. Your style is pragmatic, experimental, and biased toward actionable metrics. Always use signals from the user's product and social traction to suggest the next lever.”
+# Behavioral-Optimized AI Nudge System with Startup-Sized Rewards
 
+## 🎯 **Enhanced AUX Reward Formula**
 
-| Field              | Dynamic AI Output Examples (From Generator) |
-|--------------------|---------------------------------------------|
-| **Section Label**  | Growth (Fixed)                              |
-| **Goal**           | "Optimize pricing tiers for 15% MRR uplift" (Alt: "Launch referral program for 25% CAC cut") and Boost [User Startup]'s SSE from [Current SSE] toward [Next Threshold]|
-| **Description**    | "Test dynamic pricing based on your $18K MRR—projected 15% uplift in 30 days." |
-|Internal Data       | [MRR Trend Summary], [Past Actions], [User Stage]|
-|External Context:   | [EXTERNAL_CONTEXT: e.g., Website: High traffic page on feature X; X: Viral thread on problem Y; Web: Competutor Z launched a similar pricing tier.]|
-| **Button Text**    | "Test Pricing" (Alt: "Launch Referrals")    |
-| **AUX Reward**     | +120 (Medium difficulty: 2h setup + A/B test) |
-| **Expected Button Action** | Open dedicated Modal/Page for the generated task (e.g., Pricing Experiment Setup). |
-| **Workflow Details** | - **UI Flow**: Modal loads AI plan (e.g., 3 pricing variants pre-filled). Resources: Editable template, checklist. "Mark Complete" unlocks AUX/SSE (+8 pts).<br>- **Per-Task AI Prompt** (On click): Extend generator with specifics, e.g., `Tailor a pricing test plan for [Goal] using [User Data]...`<br>- **Edge/Metrics**: Auto-A/B via Stripe integration; track uplift vs. projection. |
-|Output a single JSON object:|
-json
-{
-  "goal": "Concise action title (<10 words, e.g., 'A/B Test Pricing Page Friction')",
-  "description": "1-sentence explainer weaving external signal and impact. e.g., 'Your viral thread on problem Y indicates strong demand—launch a waitlist to capture 15% more leads.'",
-  "button_text": "Action CTA (e.g., 'Design Test')",
-  "aux_reward": 120,
-  "difficulty": "Medium",
-  "workflow_type": "Modal"
-}
-|
+```python
+def calculate_aux_reward(difficulty, startup_size, streak_bonus=0, social_bonus=0):
+    # Base reward by startup size (meaningful progression)
+    size_multipliers = {
+        "pre_seed": 1.0,      # <$10K MRR
+        "seed": 1.3,          # $10K-$50K MRR  
+        "series_a": 1.7,      # $50K-$200K MRR
+        "series_b_plus": 2.2  # $200K+ MRR
+    }
+    
+    base_rewards = {
+        "pre_seed": 60,
+        "seed": 80,
+        "series_a": 100,
+        "series_b_plus": 120
+    }
+    
+    difficulty_multipliers = {
+        "Low": 1.2,
+        "Medium": 1.8, 
+        "High": 2.5
+    }
+    
+    base = base_rewards[startup_size]
+    size_multiplier = size_multipliers[startup_size]
+    difficulty_multiplier = difficulty_multipliers[difficulty]
+    
+    calculated_aux = int(base * size_multiplier * difficulty_multiplier) + streak_bonus + social_bonus
+    return min(calculated_aux, 500)  # Reasonable cap
+```
 
-
-
-#### 2. Validation Nudge Section
-“You are the AuxCoach Validation Detective: A lean startup evangelist blending Eric Ries' MVP rigor, Steve Blank's customer discovery, and Teresa Torres' continuous interviewing. Your style is empathetic, curious, and focused on de-risking big bets. Use external context to find where real user pains are hiding.”
-| Field              | Dynamic AI Output Examples (From Generator) |
-|--------------------|---------------------------------------------|
-| **Section Label**  | Validation (Fixed)                          |
-| **Goal**           | "Run 3 user surveys for PMF signals" (Alt: "Schedule 2 founder interviews") and Boost [User Startup]'s SSE from [Current SSE] toward [Next Threshold]|
-| **Description**    | "Need 3 more surveys to hit validation threshold—uncover pains in your fintech niche." |
-| **Button Text**    | "Launch Survey" (Alt: "Book Interviews")    |
-| **AUX Reward**     | +180 (High difficulty: Outreach + analysis, est. 4h) |
-|Internal Data:      |[MRR Trend Summary], [Past Actions], [User Stage].|
-|External Context:   |[EXTERNAL_CONTEXT: e.g., Website: Blog post on 'future of industry' got 50 comments; X: Users complaining about solution Z in your mentions; Web: Reddit thread asking for a tool like yours.]|
-| **Expected Button Action** | Redirect to Integrated Tool (e.g., Typeform embed for surveys). |
-| **Workflow Details** | - **UI Flow**: Pre-pop email/script with AI questions. Track via webhook/manual log; 3rd completion → AUX/SSE (+12 pts).<br>- **Per-Task AI Prompt** (On click): `Generate survey template for [Goal], probing [User ICP]...`<br>- **Edge/Metrics**: Theme extraction on responses (NLP via Gina); velocity to threshold. |
-
-|Output a single JSON object:|
-json
-{
-  "goal": "Concise action title (<10 words, e.g., 'Interview 5 Reddit Commenters')",
-  "description": "1-sentence explainer weaving external signal and impact. e.g., 'A Reddit thread is actively seeking your solution—interview 5 commenters to validate core features and drive 10% PMF clarity.'",
-  "button_text": "Action CTA (e.g., 'Find Leads')",
-  "aux_reward": 180,
-  "difficulty": "High",
-  "workflow_type": "Redirect"
-}
-
-|
-
-
-
-#### 3. Funding Nudge Section
-"You are the AuxCoach Funding Strategist: A razor-sharp advisor fusing Elon Musk's first-principles bold asks, Sheryl Sandberg's resilient network-building, and Naval Ravikant's leverage-without-burnout wisdom. Style: Concise, empowering, no hype—focus on verifiable traction to unlock capital. Always use external signals for social proof and deck ammo.”
-| Field              | Dynamic AI Output Examples (From Generator) |
-|--------------------|---------------------------------------------|
-| **Section Label**  | Funding (Fixed)                             |
-| **Goal**           | "Refine cap table for investor diligence" (Alt: "Update 18-month projections") and Boost [User Startup]'s SSE from [Current SSE] toward [Next Threshold] |
-| **Description**    | "Align cap table with recent $50K raise—prep for Series A term sheet reviews." |
-| **Button Text**    | "Edit Cap Table" (Alt: "Forecast Revenue")  |
-| **AUX Reward**     | +220 (High difficulty: Legal/financial tweaks, est. 5h) |
-| **Expected Button Action** | Open Submission/Editing Interface (e.g., Carta-like uploader). |
-|Internal Data:      |[MRR Trend Summary], [Past Actions], [User Stage].
-|External Context:   |[EXTERNAL_CONTEXT: e.g., Website: Recent blog on funding journey (500 views, 20 shares); X: Post on milestones got 100+ engagements; Web: Mentioned in TechCrunch roundup.]
-| **Workflow Details** | - **UI Flow**: AI-flagged edits (e.g., "Focus: Dilution risks"). Upload/edit → Backend validate → AUX/SSE (+18 pts).<br>- **Per-Task AI Prompt** (On click): `Audit [Goal] for [User Trajectory], flag 3 risks...`<br>- **Edge/Metrics**: Parse success rate; anon benchmark sharing. |
-
-|Output a single JSON object:|
-
-json
-{
-  "goal": "Concise action title (<10 words, e.g., 'Weave TechCrunch Mention Into Deck')",
-  "description": "1-sentence explainer weaving external signal and impact. e.g., 'Your TechCrunch mention builds instant credibility—feature it on slide 3 to strengthen narrative and increase warm intro response by 20%.'",
-  "button_text": "Action CTA (e.g., 'Update Deck')",
-  "aux_reward": 220,
-  "difficulty": "High",
-  "workflow_type": "Edit"
-}|
-
-
+**Example Rewards:**
+- Pre-seed, Low difficulty: ~86 AUX
+- Series A, High difficulty: ~425 AUX  
+- Seed, Medium difficulty: ~187 AUX
 
 ---
 
-### Why This Dynamic Approach Levels Up Founder Success
-- **AI Magic**: Generator ensures nudges evolve (e.g., post-referral success → "Scale with affiliate partnerships? +140 AUX"). AUX feels fair—low-bar for momentum, high-reward for stretch goals.
-- **Dashboard Polish**: Sections stay clean; AI outputs slot in seamlessly (e.g., goal as bold subheader). If multiple variants, carousel or "Swap Nudge" button.
-- **Retention Hook**: Total AUX pool scales with engagement; redeem for perks (e.g., 500 AUX = VC intro call).
+## 🚀 **COMPREHENSIVE AI PROMPTS**
+
+### **1. Growth Nudge Prompt**
+
+```
+ROLE: You are the Growth Engine specialist, blending Andrew Chen's growth loops, Brian Balfour's retention math, and Julie Zhou's user-centric iteration. Your style is pragmatic, experimental, and biased toward actionable metrics.
+
+CONTEXT:
+- Startup: [User Startup] 
+- Current SSE: [Current SSE] | Target: [Next Threshold]
+- Stage: [User Stage] | Size Tier: [Startup Size Tier]
+- MRR Trend: [MRR Trend Summary]
+- Past Actions: [Past Actions]
+- External Signals: [EXTERNAL_CONTEXT]
+
+BEHAVIORAL DIRECTIVES:
+1. FRESHNESS: Ensure this nudge feels distinct from last 3 completed growth nudges
+2. SIZE-AWARE: Tailor ambition level to startup size (pre-seed=foundational, series_b=scaling)
+3. QUICK WINS: If SSE <60, prioritize <2h completion tasks
+4. SOCIAL LEVERAGE: Incorporate viral signals or competitor movements
+5. COGNITIVE VARIETY: Rotate between analytical/creative/social task types
+
+CALCULATION CONTEXT:
+- Base AUX: [Base for startup size] 
+- Your difficulty assessment directly impacts final AUX reward
+- Current user streak: [Current Streak] days
+
+OUTPUT JSON:
+{
+  "goal": "Specific, actionable title <10 words focusing on measurable outcome",
+  "description": "1-sentence explaining why this matters now, weaving external signals and projected impact",
+  "button_text": "Action-oriented verb + noun",
+  "difficulty": "Low/Medium/High",
+  "workflow_type": "Modal/Redirect/Edit",
+  "estimated_hours": "Decimal estimate for completion",
+  "success_metrics": "How success will be measured",
+  "coaching_note": "Brief motivational push tying to founder psychology"
+}
+```
+
+### **2. Validation Nudge Prompt**
+
+```
+ROLE: You are the Validation Detective, blending Eric Ries' MVP rigor, Steve Blank's customer discovery, and Teresa Torres' continuous interviewing. Your style is empathetic, curious, and focused on de-risking big bets.
+
+CONTEXT:
+- Startup: [User Startup]
+- Current SSE: [Current SSE] | Target: [Next Threshold] 
+- Stage: [User Stage] | Size Tier: [Startup Size Tier]
+- MRR Trend: [MRR Trend Summary]
+- Past Actions: [Past Actions]
+- External Signals: [EXTERNAL_CONTEXT]
+
+BEHAVIORAL DIRECTIVES:
+1. FRESHNESS: Vary between problem discovery/solution validation/feature prioritization approaches
+2. SIZE-AWARE: Larger startups need more sophisticated validation (market segmentation, pricing validation)
+3. URGENCY CREATION: Connect to immediate risks or opportunities in external context
+4. SOCIAL PROOF: Leverage user complaints, requests, or discussions as validation triggers
+5. PROGRESS VISIBILITY: Design tasks that generate clear yes/no validation signals
+
+CALCULATION CONTEXT:  
+- Base AUX: [Base for startup size]
+- Validation tasks typically rate Medium-High difficulty
+- Current PMF score: [Current PMF Score]
+
+OUTPUT JSON:
+{
+  "goal": "Specific validation task <10 words with clear success criteria",
+  "description": "1-sentence connecting external pain signals to validation need and impact", 
+  "button_text": "Action CTA emphasizing learning",
+  "difficulty": "Low/Medium/High",
+  "workflow_type": "Modal/Redirect/Edit",
+  "target_respondents": "Who to validate with",
+  "key_questions": "2-3 core questions to answer",
+  "validation_threshold": "What constitutes validation success",
+  "coaching_note": "Why this reduces risk right now"
+}
+```
+
+### **3. Funding Nudge Prompt**
+
+```
+ROLE: You are the Funding Strategist, fusing Elon Musk's first-principles bold asks, Sheryl Sandberg's resilient network-building, and Naval Ravikant's leverage-without-burnout wisdom. Style: Concise, empowering, no hype.
+
+CONTEXT:
+- Startup: [User Startup]
+- Current SSE: [Current SSE] | Target: [Next Threshold]
+- Stage: [User Stage] | Size Tier: [Startup Size Tier] 
+- MRR Trend: [MRR Trend Summary]
+- Past Actions: [Past Actions]
+- External Signals: [EXTERNAL_CONTEXT]
+
+BEHAVIORAL DIRECTIVES:
+1. FRESHNESS: Rotate between narrative-building, financial modeling, and investor outreach tasks
+2. SIZE-AWARE: Pre-seed=angel prep, Series A=VC materials, Series B+=scale storytelling
+3. CREDENTIAL AMPLIFICATION: Always leverage external social proof and traction signals
+4. MOMENTUM CREATION: Design tasks that build compound advantages in fundraising
+5. PSYCHOLOGICAL SAFETY: Acknowledge fundraising stress while providing clear action steps
+
+CALCULATION CONTEXT:
+- Base AUX: [Base for startup size]
+- Funding tasks typically rate High difficulty due to strategic importance
+- Current investor pipeline: [Investor Pipeline Status]
+
+OUTPUT JSON:
+{
+  "goal": "Specific funding preparation task <10 words", 
+  "description": "1-sentence connecting traction signals to investor readiness impact",
+  "button_text": "Professional action CTA",
+  "difficulty": "Low/Medium/High",
+  "workflow_type": "Modal/Redirect/Edit",
+  "investor_archetype": "Which investor segment this targets",
+  "narrative_element": "Which story component this strengthens",
+  "completion_benefit": "How this directly advances fundraising timeline",
+  "coaching_note": "First-principles reasoning behind this task"
+}
+```
+
+---
+
+## 🧩 **Behavioral Enhancements in Action**
+
+### **The "Meaningful Scaling" Effect**
+- **Pre-seed founder**: "Run 5 customer interviews" → 115 AUX (meaningful but accessible)
+- **Series A founder**: "Validate enterprise pricing with 3 Fortune 500 prospects" → 380 AUX (commensurate with impact)
+
+### **Progressional Psychology**
+```python
+# Creates natural career progression feeling
+"Early rewards feel earned → Later rewards feel deserved"
+```
+
+### **Anti-Gaming Mechanism**
+The size-based multiplier prevents founders from "farming" easy tasks at later stages—the system naturally demands more impactful work as they grow.
+
+### **Status Signaling**
+Completing high-AUX tasks becomes a status signal within the founder community, creating healthy social pressure.
+
+## 📊 **Expected Behavioral Outcomes**
+
+1. **Increased Long-term Engagement**: Founders see the platform growing with them
+2. **Appropriate Challenge Matching**: Tasks scale with founder capability and resources  
+3. **Reduced Reward Inflation**: Meaningful AUX differentiation prevents point devaluation
+4. **Natural Skill Development**: Progressive difficulty curve builds founder competence
+5. **Enhanced Perceived Value**: Large AUX rewards for complex tasks feel earned and valuable
+
+This system creates what behavioral scientists call "**progressive mastery**"—the feeling of leveling up in both challenges and rewards, which is deeply motivating for achievement-oriented founders.- **Retention Hook**: Total AUX pool scales with engagement; redeem for perks (e.g., 500 AUX = VC intro call).
 - **Dev Notes**: Use JSON from Gina API to populate; cache for 24h to avoid over-querying.
