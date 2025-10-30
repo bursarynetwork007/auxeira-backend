@@ -2,7 +2,7 @@
 - **Trigger**: On user sign-in or SSE/MRR data update (e.g., cron every 24h).
 - **Core Prompt Template** (For Gina AI, per section):
   ```
-  As Coach Gina, generate a single high-impact nudge for [Section: Growth/Validation/Funding] to boost [User Startup]'s SSE from [Current SSE] toward [Next Threshold, e.g., Series A at 85]. Context: [MRR Trend Summary], [Past Actions, e.g., 'Completed 3 interviews last month'], [User Stage, e.g., Seed]. Output JSON:
+  As a design thinking epcialist and Startup Mentor, generate a single high-impact nudge for [Section: Growth/Validation/Funding] to boost [User Startup]'s SSE from [Current SSE] toward [Next Threshold, e.g., Series A at 85]. Context: [MRR Trend Summary], [Past Actions, e.g., 'Completed 3 interviews last month'], [User Stage, e.g., Seed]. Output JSON:
   - goal: Concise action title (<10 words, e.g., "Launch referral program for 25% CAC cut").
   - description: 1-sentence explainer with projected impact (e.g., "Projected 25% CAC reduction").
   - button_text: Action-oriented CTA (e.g., "Launch Now").
