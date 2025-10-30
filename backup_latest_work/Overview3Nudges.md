@@ -21,35 +21,49 @@
 
 ## 🎯 **Enhanced AUX Reward Formula**
 
-def calculate_coaching_aux(startup_size, external_signal_strength, coaching_depth):
-    # Base by startup size (meaningful scaling)
-    size_base = {
-        "pre_seed": 80,
-        "seed": 110, 
-        "series_a": 150,
-        "series_b_plus": 200
-    }
-    
-    # Signal quality multiplier (external context richness)
-    signal_multiplier = {
-        "weak": 1.0,      # Basic website data only
-        "medium": 1.3,    # + Social signals
-        "strong": 1.6,    # + Web mentions + viral traction
-        "viral": 2.0      # Major press + high engagement
-    }
-    
-    # Coaching depth assessment (AI output quality)
-    depth_bonus = {
-        "basic": 0,
-        "actionable": 25,
-        "transformative": 50
-    }
-    
-    base = size_base[startup_size]
-    signal_strength = assess_signal_strength(external_context)
-    depth = assess_coaching_depth(ai_output)
-    
-    return base * signal_multiplier[signal_strength] + depth_bonus[depth]
+// Dynamic AUX calculation based on coaching quality
+function calculateCoachingAux(startupStage, externalContext, coachingOutput) {
+  const stageBase = {
+    'pre_seed': 80, 'seed': 110, 'series_a': 150, 'series_b_plus': 200
+  };
+  
+  const signalStrength = assessSignalStrength(externalContext);
+  const coachingDepth = assessCoachingDepth(coachingOutput);
+  
+  return Math.min(
+    stageBase[startupStage] * signalStrength.multiplier + coachingDepth.bonus,
+    500 // Reasonable cap
+  );
+}
+
+function assessSignalStrength(externalContext) {
+  const signals = externalContext.toLowerCase();
+  let multiplier = 1.0;
+  
+  if (signals.includes('techcrunch') || signals.includes('viral') || signals.includes('trending')) {
+    multiplier = 2.0; // Major press or viral moment
+  } else if (signals.includes('featured') || signals.includes('press') || signals.match(/\d+\s*(likes|engagements|shares)/)) {
+    multiplier = 1.6; // Good traction signals
+  } else if (signals.includes('comments') || signals.includes('traffic') || signals.includes('engagement')) {
+    multiplier = 1.3; // Basic social signals
+  }
+  
+  return { multiplier, description: getSignalDescription(multiplier) };
+}
+
+function assessCoachingDepth(coachingOutput) {
+  // Analyze coaching quality
+  const wordCount = coachingOutput.split(' ').length;
+  const hasSpecificMetrics = /\d+%/.test(coachingOutput) || /\$\d+/.test(coachingOutput);
+  const hasTimeBound = /by (tomorrow|Friday|EOW|next week)/i.test(coachingOutput);
+  const hasPsychologicalHook = /(loss|fomo|urgency|compound|sunk cost)/i.test(coachingOutput);
+  
+  let bonus = 0;
+  if (hasSpecificMetrics && hasTimeBound && hasPsychologicalHook) bonus = 50; // Transformative
+  else if (hasSpecificMetrics || hasTimeBound) bonus = 25; // Actionable
+  
+  return { bonus, level: bonus === 50 ? 'transformative' : bonus === 25 ? 'actionable' : 'basic' };
+}
 
     
 **Example Rewards:**
