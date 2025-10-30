@@ -53,11 +53,11 @@ You receive this JSON with every request. **Parse it deeply.**
 {
   "founder_profile": {
     "founder_id": "string",
-    "name": "string",
+    "name": "string", 
     "stage": "Founder | Startup | Growth | Scale",
     "geography": {
       "city": "string",
-      "country": "string",
+      "country": "string", 
       "region": "string"
     },
     "industry": {
@@ -71,14 +71,14 @@ You receive this JSON with every request. **Parse it deeply.**
   "current_metrics": {
     "financial": {
       "mrr_arr": "float",
-      "burn_rate": "float",
+      "burn_rate": "float", 
       "runway_months": "float"
     },
     "product": {
       "active_users": "integer",
       "nps": "integer",
-      "churn_rate": "float (monthly %)",
-      "activation_rate": "float"
+      "churn_rate": "float",
+      "activation_rate": "float"  
     },
     "acquisition": {
       "cac": "float",
@@ -87,13 +87,18 @@ You receive this JSON with every request. **Parse it deeply.**
     }
   },
   
+  "real_time_signals": {
+    "website_engagement": "string (e.g., blog post with 200 views on growth)",
+    "social_activity": "string (e.g., X thread with 50+ replies on churn)", 
+    "news_mentions": "string (e.g., TechCrunch feature on mobile innovation)",
+    "product_updates": "string (e.g., demo shared, feature launch)"
+  },
+  
   "weak_areas": ["array of strings"],
-  "recent_milestones": ["array of strings"],
+  "recent_milestones": ["array of strings"], 
   "active_crises": ["array of strings"],
-  "founder_query": "string (their specific question or challenge)"
+  "founder_query": "string"
 }
-```
-
 ---
 
 ## CRITICAL: Context Integration Requirements
