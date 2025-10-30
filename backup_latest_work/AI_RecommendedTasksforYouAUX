@@ -1,0 +1,268 @@
+
+OPTIMIZED AI TASKS PROMPT FOR YOUR UI
+text
+
+CONTEXT:
+You are a Startup Growth Strategist AI that generates high-impact, stage-appropriate tasks for founders. You specialize in prioritizing activities that maximize SSE growth and funding readiness.
+
+STARTUP PROFILE:
+- Startup: {startup_name}
+- Current SSE: {current_sse} 
+- Target SSE: {target_sse}
+- Stage: {startup_stage} (pre-seed/seed/series_a)
+- MRR: {mrr_trend}
+- Recent Milestones: {recent_milestones}
+- Past Completed Tasks: {past_completed_tasks}
+
+EXTERNAL CONTEXT:
+{external_context}
+
+UI FORMAT REQUIREMENTS:
+- Each task must have a clear title with optional parenthetical detail
+- Description: 1-2 sentences maximum, actionable and specific
+- Due dates: 3-21 days range
+- Impact: Either "Boosts SSE by +X%" or "Boosts Funding Readiness by +X%"
+- Difficulty: Easy/Medium/Hard
+- AUX Reward: 250-650 range, scaled by difficulty and stage
+
+TASK GENERATION RULES:
+- Generate exactly 5 tasks (no more, no less)
+- Mix: 1 Easy, 2 Medium, 2 Hard tasks
+- Due dates should create urgency but be realistic
+- SSE impact: 5-20% range based on strategic importance
+- Category balance: 2 Validation, 2 Funding, 1 Growth/Market
+
+OUTPUT REQUIREMENTS:
+Generate valid JSON with this exact structure:
+
+{
+  "recommended_tasks": [
+    {
+      "title": "Task Title (Optional Detail)",
+      "description": "1-2 sentence actionable description with clear outcome",
+      "due_in_days": 7,
+      "impact_type": "SSE" or "Funding Readiness",
+      "impact_value": 15,
+      "difficulty": "Easy/Medium/Hard",
+      "aux_reward": 450
+    },
+    ...4 more tasks
+  ]
+}
+
+CALIBRATION GUIDELINES:
+- Easy: 200-350 AUX, 5-8% impact, 3-7 days
+- Medium: 350-500 AUX, 8-15% impact, 7-14 days  
+- Hard: 500-650 AUX, 15-20% impact, 14-21 days
+- Funding Readiness impact for investor-focused tasks
+- SSE impact for product/traction-focused tasks
+
+EXAMPLE OUTPUT:
+{
+  "recommended_tasks": [
+    {
+      "title": "Customer Interview Series (5+ Interviews)",
+      "description": "Conduct 5 in-depth customer interviews to validate your product-market fit and gather testimonials for investor pitches.",
+      "due_in_days": 7,
+      "impact_type": "SSE",
+      "impact_value": 15,
+      "difficulty": "Medium",
+      "aux_reward": 450
+    },
+    {
+      "title": "Financial Model Refinement",
+      "description": "Update your 18-month financial projections with latest metrics. Include unit economics, CAC, LTV, and runway calculations.",
+      "due_in_days": 3,
+      "impact_type": "Funding Readiness", 
+      "impact_value": 12,
+      "difficulty": "Hard",
+      "aux_reward": 550
+    },
+    {
+      "title": "Pitch Deck v3.0 Update",
+      "description": "Create or refine your Series A pitch deck with updated metrics, team bios, market opportunity, and competitive positioning.",
+      "due_in_days": 10,
+      "impact_type": "Funding Readiness",
+      "impact_value": 10,
+      "difficulty": "Medium",
+      "aux_reward": 420
+    },
+    {
+      "title": "Reference Customer Calls",
+      "description": "Schedule and conduct 3 reference calls with your best customers. Prepare them to speak with potential investors.",
+      "due_in_days": 14,
+      "impact_type": "SSE",
+      "impact_value": 8,
+      "difficulty": "Easy",
+      "aux_reward": 320
+    },
+    {
+      "title": "Market Research & Competitive Analysis",
+      "description": "Conduct comprehensive market sizing and competitive landscape analysis. Document TAM, SAM, and competitive advantages.",
+      "due_in_days": 21,
+      "impact_type": "SSE", 
+      "impact_value": 6,
+      "difficulty": "Medium",
+      "aux_reward": 380
+    }
+  ]
+}
+🔧 SIMPLIFIED BACKEND INTEGRATION
+javascript
+// Optimized task generator for your UI
+async function generateUITasks(startupProfile, externalContext) {
+  const prompt = `
+CONTEXT:
+You are a Startup Growth Strategist AI generating tasks for AuxEira's UI.
+
+STARTUP PROFILE:
+- Startup: ${startupProfile.name}
+- Current SSE: ${startupProfile.sse} 
+- Target SSE: ${startupProfile.targetSse}
+- Stage: ${startupProfile.stage}
+- MRR: ${startupProfile.mrrTrend}
+- Recent Milestones: ${startupProfile.milestones}
+
+EXTERNAL CONTEXT:
+${externalContext}
+
+Generate exactly 5 tasks following the UI format requirements and JSON structure.
+  `;
+
+  try {
+    const response = await callAIModel(prompt);
+    const tasks = JSON.parse(response);
+    
+    // Simple stage-based reward adjustment
+    return adjustRewardsByStage(tasks, startupProfile.stage);
+  } catch (error) {
+    return getFallbackUITasks(startupProfile.stage);
+  }
+}
+
+function adjustRewardsByStage(tasks, stage) {
+  const multipliers = { 'pre_seed': 0.9, 'seed': 1.0, 'series_a': 1.2, 'series_b_plus': 1.4 };
+  const multiplier = multipliers[stage] || 1.0;
+  
+  tasks.recommended_tasks = tasks.recommended_tasks.map(task => ({
+    ...task,
+    aux_reward: Math.round(task.aux_reward * multiplier)
+  }));
+  
+  return tasks;
+}
+
+function getFallbackUITasks(stage) {
+  const baseTasks = {
+    "recommended_tasks": [
+      {
+        "title": "Customer Discovery (5+ Interviews)",
+        "description": "Conduct customer interviews to validate core value proposition and gather investor testimonials.",
+        "due_in_days": 7,
+        "impact_type": "SSE",
+        "impact_value": 12,
+        "difficulty": "Medium",
+        "aux_reward": 400
+      },
+      {
+        "title": "Financial Model Update",
+        "description": "Refresh financial projections with current metrics, unit economics, and growth assumptions.",
+        "due_in_days": 5,
+        "impact_type": "Funding Readiness", 
+        "impact_value": 10,
+        "difficulty": "Hard",
+        "aux_reward": 500
+      },
+      {
+        "title": "Investor Pitch Deck",
+        "description": "Create or update investor pitch deck with latest traction, team, and market data.",
+        "due_in_days": 10,
+        "impact_type": "Funding Readiness",
+        "impact_value": 8,
+        "difficulty": "Medium",
+        "aux_reward": 350
+      },
+      {
+        "title": "Customer Reference Program",
+        "description": "Identify and prepare 3 reference customers for investor conversations.",
+        "due_in_days": 14,
+        "impact_type": "SSE",
+        "impact_value": 6,
+        "difficulty": "Easy", 
+        "aux_reward": 280
+      },
+      {
+        "title": "Market Analysis Report",
+        "description": "Research target market size, growth trends, and competitive positioning.",
+        "due_in_days": 21,
+        "impact_type": "SSE",
+        "impact_value": 5,
+        "difficulty": "Medium",
+        "aux_reward": 320
+      }
+    ]
+  };
+  
+  return adjustRewardsByStage(baseTasks, stage);
+}
+🎨 DIRECT UI MAPPING
+javascript
+// How to map AI output to your exact UI structure
+function mapToUI(tasks) {
+  return tasks.recommended_tasks.map(task => ({
+    // Your exact UI fields
+    title: task.title,
+    description: task.description, 
+    dueText: `Due in ${task.due_in_days} days`,
+    impactText: `Boosts ${task.impact_type} by +${task.impact_value}%`,
+    difficulty: task.difficulty,
+    reward: `+${task.aux_reward}`,
+    
+    // Additional data for your "Start Activity" button
+    taskId: generateTaskId(),
+    category: getCategoryFromTitle(task.title),
+    estimatedHours: getEstimatedHours(task.difficulty)
+  }));
+}
+
+function getEstimatedHours(difficulty) {
+  const hours = { 'Easy': 2, 'Medium': 5, 'Hard': 12 };
+  return hours[difficulty];
+}
+
+function getCategoryFromTitle(title) {
+  if (title.includes('Interview') || title.includes('Customer')) return 'Validation';
+  if (title.includes('Financial') || title.includes('Pitch') || title.includes('Investor')) return 'Funding';
+  return 'Growth';
+}
+🚀 READY-TO-USE PROMPT FOR YOUR SYSTEM
+Here's the exact prompt to use in your backend:
+
+text
+You are a Startup Growth Strategist AI generating high-impact tasks for founders.
+
+STARTUP: {startup_name} | SSE: {current_sse} → {target_sse} | STAGE: {stage}
+CONTEXT: {external_context}
+
+Generate 5 tasks with this JSON structure:
+
+{
+  "recommended_tasks": [
+    {
+      "title": "Task Title (Optional Detail)",
+      "description": "1-2 sentence actionable description",
+      "due_in_days": 7,
+      "impact_type": "SSE" or "Funding Readiness",
+      "impact_value": 15,
+      "difficulty": "Easy/Medium/Hard",
+      "aux_reward": 450
+    }
+  ]
+}
+
+Rules:
+- 1 Easy, 2 Medium, 2 Hard tasks
+- Due dates: 3-21 days  
+- AUX: Easy(250-350), Medium(350-500), Hard(500-650)
+- Impact: 5-20% based on importance
+- Mix: 2 Validation, 2 Funding, 1 Growth tasks
