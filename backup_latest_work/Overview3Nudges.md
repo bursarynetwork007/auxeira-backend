@@ -21,37 +21,37 @@
 
 ## 🎯 **Enhanced AUX Reward Formula**
 
-```python
-def calculate_aux_reward(difficulty, startup_size, streak_bonus=0, social_bonus=0):
-    # Base reward by startup size (meaningful progression)
-    size_multipliers = {
-        "pre_seed": 1.0,      # <$10K MRR
-        "seed": 1.3,          # $10K-$50K MRR  
-        "series_a": 1.7,      # $50K-$200K MRR
-        "series_b_plus": 2.2  # $200K+ MRR
+def calculate_coaching_aux(startup_size, external_signal_strength, coaching_depth):
+    # Base by startup size (meaningful scaling)
+    size_base = {
+        "pre_seed": 80,
+        "seed": 110, 
+        "series_a": 150,
+        "series_b_plus": 200
     }
     
-    base_rewards = {
-        "pre_seed": 60,
-        "seed": 80,
-        "series_a": 100,
-        "series_b_plus": 120
+    # Signal quality multiplier (external context richness)
+    signal_multiplier = {
+        "weak": 1.0,      # Basic website data only
+        "medium": 1.3,    # + Social signals
+        "strong": 1.6,    # + Web mentions + viral traction
+        "viral": 2.0      # Major press + high engagement
     }
     
-    difficulty_multipliers = {
-        "Low": 1.2,
-        "Medium": 1.8, 
-        "High": 2.5
+    # Coaching depth assessment (AI output quality)
+    depth_bonus = {
+        "basic": 0,
+        "actionable": 25,
+        "transformative": 50
     }
     
-    base = base_rewards[startup_size]
-    size_multiplier = size_multipliers[startup_size]
-    difficulty_multiplier = difficulty_multipliers[difficulty]
+    base = size_base[startup_size]
+    signal_strength = assess_signal_strength(external_context)
+    depth = assess_coaching_depth(ai_output)
     
-    calculated_aux = int(base * size_multiplier * difficulty_multiplier) + streak_bonus + social_bonus
-    return min(calculated_aux, 500)  # Reasonable cap
-```
+    return base * signal_multiplier[signal_strength] + depth_bonus[depth]
 
+    
 **Example Rewards:**
 - Pre-seed, Low difficulty: ~86 AUX
 - Series A, High difficulty: ~425 AUX  
