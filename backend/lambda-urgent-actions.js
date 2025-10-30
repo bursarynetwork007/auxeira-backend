@@ -20,16 +20,30 @@ const initializeAnthropic = () => {
 };
 
 /**
- * Build prompt for urgent actions generation
+ * Build prompt for urgent actions generation with external context
  */
-const buildUrgentActionsPrompt = (context) => {
+const buildUrgentActionsPrompt = (context, externalContext) => {
     const currentDate = new Date().toLocaleDateString('en-US', { 
         year: 'numeric', 
         month: 'long', 
         day: 'numeric' 
     });
 
+    // Format external context if available
+    const extContextStr = externalContext ? `
+
+**External Context (Website/Social/Web):**
+${externalContext}
+
+Use this external context to make urgent actions more specific and timely. Reference real signals like:
+- Recent website activity or user feedback
+- X/Twitter engagement or community discussions
+- Press mentions or funding announcements
+- Industry trends or competitive moves` : '';
+
     return `As Coach Gina, generate exactly 3 personalized items for the "Urgent Actions & Opportunities" section to accelerate ${context.startupName || 'this startup'}'s success.
+
+**CRITICAL: DO NOT use section headers or name-drop thinkers. Be natural and conversational.**
 
 **Current Context:**
 - Date: ${currentDate}
@@ -39,7 +53,7 @@ const buildUrgentActionsPrompt = (context) => {
 - Users: ${context.users || '2,847'}
 - Interviews: ${context.interviewsCompleted || 7}/10 complete
 - Projections: ${context.projectionsAge || 'Overdue 45 days'}
-- Stage: ${context.stage || 'Series A'}
+- Stage: ${context.stage || 'Series A'}${extContextStr}
 
 **Generate exactly 3 items as a JSON array (NO additional text, ONLY the JSON array):**
 
@@ -183,14 +197,17 @@ const getFallbackUrgentActions = (context) => {
 };
 
 /**
- * Generate urgent actions using Claude API
+ * Generate urgent actions using Claude API with optional external context
  */
-const generateUrgentActions = async (context) => {
+const generateUrgentActions = async (context, externalContext = null) => {
     try {
         const client = initializeAnthropic();
-        const prompt = buildUrgentActionsPrompt(context);
+        const prompt = buildUrgentActionsPrompt(context, externalContext);
         
         console.log('Generating urgent actions with context:', JSON.stringify(context, null, 2));
+        if (externalContext) {
+            console.log('External context:', externalContext);
+        }
         
         const response = await client.messages.create({
             model: 'claude-3-haiku-20240307',
@@ -265,7 +282,7 @@ exports.handler = async (event) => {
     try {
         // Parse request body
         const body = JSON.parse(event.body || '{}');
-        const { context } = body;
+        const { context, externalContext } = body;
         
         if (!context) {
             return {
@@ -284,14 +301,15 @@ exports.handler = async (event) => {
                             users: 2847,
                             interviewsCompleted: 8,
                             projectionsAge: '30 days old'
-                        }
+                        },
+                        externalContext: 'Website: Beta sign-up form (30% conversion); X: Feedback thread (10 comments on pricing pain); Web: Reddit r/fintech mention' // Optional
                     }
                 })
             };
         }
         
-        // Generate urgent actions
-        const result = await generateUrgentActions(context);
+        // Generate urgent actions with optional external context
+        const result = await generateUrgentActions(context, externalContext);
         
         return {
             statusCode: 200,
@@ -299,6 +317,7 @@ exports.handler = async (event) => {
             body: JSON.stringify({
                 success: true,
                 data: result,
+                hasExternalContext: !!externalContext,
                 timestamp: new Date().toISOString()
             })
         };

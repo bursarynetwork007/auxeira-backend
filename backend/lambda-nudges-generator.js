@@ -20,16 +20,30 @@ const initializeAnthropic = () => {
 };
 
 /**
- * Build prompt for nudges generation
+ * Build prompt for nudges generation with external context
  */
-const buildNudgesPrompt = (context) => {
+const buildNudgesPrompt = (context, externalContext) => {
     const currentDate = new Date().toLocaleDateString('en-US', { 
         year: 'numeric', 
         month: 'long', 
         day: 'numeric' 
     });
 
+    // Format external context if available
+    const extContextStr = externalContext ? `
+
+**External Context (Website/Social/Web):**
+${externalContext}
+
+Use this external context to make nudges more specific and actionable. Reference real signals like:
+- Website traffic spikes or content engagement
+- X/Twitter posts with high engagement
+- Press mentions or industry recognition
+- User feedback from social channels` : '';
+
     return `As Coach Gina, generate 3 personalized nudges for ${context.startupName || 'this startup'}'s dashboard to boost their SSE from ${context.sseScore || 72} toward Series A readiness (>85).
+
+**CRITICAL: DO NOT use section headers or name-drop thinkers in your nudges. Be natural and conversational.**
 
 **Current Context:**
 - Date: ${currentDate}
@@ -41,7 +55,7 @@ const buildNudgesPrompt = (context) => {
 - CAC: $${context.cac || '127'}
 - Churn Rate: ${context.churnRate || '2.3'}%
 - Interviews Completed: ${context.interviewsCompleted || 8}/10
-- Projections Age: ${context.projectionsAge || '30 days old'}
+- Projections Age: ${context.projectionsAge || '30 days old'}${extContextStr}
 
 **Generate exactly 3 nudges as a JSON array (NO additional text, ONLY the JSON array):**
 
@@ -165,14 +179,17 @@ const getFallbackNudges = (context) => {
 };
 
 /**
- * Generate nudges using Claude API
+ * Generate nudges using Claude API with optional external context
  */
-const generateNudges = async (context) => {
+const generateNudges = async (context, externalContext = null) => {
     try {
         const client = initializeAnthropic();
-        const prompt = buildNudgesPrompt(context);
+        const prompt = buildNudgesPrompt(context, externalContext);
         
         console.log('Generating nudges with context:', JSON.stringify(context, null, 2));
+        if (externalContext) {
+            console.log('External context:', externalContext);
+        }
         
         const response = await client.messages.create({
             model: 'claude-3-haiku-20240307',
@@ -247,7 +264,7 @@ exports.handler = async (event) => {
     try {
         // Parse request body
         const body = JSON.parse(event.body || '{}');
-        const { context } = body;
+        const { context, externalContext } = body;
         
         if (!context) {
             return {
@@ -268,14 +285,15 @@ exports.handler = async (event) => {
                             churnRate: 2.3,
                             interviewsCompleted: 8,
                             projectionsAge: '30 days old'
-                        }
+                        },
+                        externalContext: 'Website: Recent blog on funding journey (500 views, 20 shares); X: Post on traction got 45 engagements; Web: Mentioned in TechCabal article' // Optional
                     }
                 })
             };
         }
         
-        // Generate nudges
-        const result = await generateNudges(context);
+        // Generate nudges with optional external context
+        const result = await generateNudges(context, externalContext);
         
         return {
             statusCode: 200,
@@ -283,6 +301,7 @@ exports.handler = async (event) => {
             body: JSON.stringify({
                 success: true,
                 data: result,
+                hasExternalContext: !!externalContext,
                 timestamp: new Date().toISOString()
             })
         };
