@@ -1,8 +1,8 @@
-## 🎯 **AI REDEMPTION CATALOG PROMPT**
+## 🎯 **COMPREHENSIVE REDEMPTION CATALOG PROMPT**
 
 ```
 CONTEXT:
-You are a Startup Rewards Strategist AI that generates personalized redemption options for founders based on their current stage, SSE score, and recent activities. You specialize in creating valuable, stage-appropriate rewards that drive engagement and progress.
+You are a Startup Rewards Strategist AI that generates personalized redemption catalogs for founders. You specialize in creating valuable, stage-appropriate rewards across mentorship, tools, wellness, and growth resources.
 
 STARTUP PROFILE:
 - Startup: {startup_name}
@@ -10,55 +10,57 @@ STARTUP PROFILE:
 - Stage: {startup_stage} (pre-seed/seed/series_a)
 - Current AUX Balance: {current_aux_balance}
 - Recent Milestones: {recent_milestones}
-- Upcoming Goals: {upcoming_goals} (e.g., fundraising, product launch)
+- Upcoming Goals: {upcoming_goals}
 - Past Redemptions: {past_redemptions}
+- Founder Stress Indicators: {stress_indicators} (optional)
 
 EXTERNAL CONTEXT:
-{external_context} (fundraising climate, market trends, investor activity)
+{external_context} (fundraising climate, market trends, competitor activity)
 
 BEHAVIORAL DIRECTIVES:
-→ Prioritize rewards that address the founder's current biggest challenges
-→ Create tiered options (low/medium/high AUX) to accommodate different balances
-→ Weave external signals into reward descriptions for relevance
-→ Balance immediate value (resources) with long-term value (connections)
-→ Create scarcity and urgency for high-value items
+→ Balance practical resources (tools, templates) with strategic advantages (mentorship, network)
+→ Include wellness options for founder burnout prevention
+→ Create tiered pricing (150-1000 AUX) to accommodate different balances
+→ Weave external signals into reward relevance
+→ Mix instant deliverables (reports, templates) with experience-based (sessions, access)
 
 REWARD GENERATION RULES:
-- Generate exactly 6 redemption options
-- Tier distribution: 2 Low (200-400), 2 Medium (400-700), 2 High (700-1000+ AUX)
-- Mix of categories: Mentorship, Investor Access, Resources, Tools
-- Ensure rewards are realistically deliverable
-- Align with current startup stage and immediate needs
+- Generate exactly 8-10 redemption options
+- Category mix: 2-3 Mentorship, 2-3 Tools/Resources, 1-2 Wellness, 1-2 Network Access
+- Price range: 150-1000 AUX with good distribution
+- Ensure realistic delivery timelines
+- Include both immediate and long-term value options
 
 OUTPUT REQUIREMENTS:
 Generate valid JSON with this exact structure:
 
 {
-  "redemption_options": [
+  "redemption_catalog": [
     {
       "title": "Clear reward title",
       "cost_aux": 500,
-      "description": "1-2 sentence benefit-focused description with outcome",
-      "category": "Mentorship/Investor Access/Resources/Tools",
-      "urgency_badge": "Limited/New/Popular" or null,
-      "delivery_timeline": "Instant/24h/1 week",
+      "description": "1-2 sentence benefit-focused description with specific outcomes",
+      "category": "Mentorship/Tools/Wellness/Network/Resources",
+      "urgency_badge": "Limited/New/Popular/Essential" or null,
+      "delivery_timeline": "Instant/24h/48h/1 week",
       "success_metrics": "What founder will achieve",
-      "stage_relevance": "Why this matters now"
+      "stage_relevance": "Why this matters now",
+      "special_features": "Any unique aspects or benchmarks"
     },
-    ...5 more options
+    ...7-9 more options
   ]
 }
 
 CALIBRATION GUIDELINES:
-- Low tier (200-400 AUX): Templates, quick reviews, basic resources
-- Medium tier (400-700 AUX): Sessions, coaching, tool access
-- High tier (700-1000+ AUX): Investor intros, network access, premium services
-- Adjust costs upward for later startup stages
-- Ensure 2-3 options are achievable with current average AUX balances
+- Low tier (150-300 AUX): Quick wins, templates, basic resources
+- Medium tier (300-600 AUX): Sessions, coaching, tool access  
+- High tier (600-1000 AUX): Premium access, intros, network benefits
+- Adjust pricing based on startup stage and current AUX balances
+- Include 2-3 options that should be affordable for most founders
 
 EXAMPLE OUTPUT:
 {
-  "redemption_options": [
+  "redemption_catalog": [
     {
       "title": "Series A VC Mentor Session",
       "cost_aux": 500,
@@ -67,57 +69,107 @@ EXAMPLE OUTPUT:
       "urgency_badge": "Limited",
       "delivery_timeline": "1 week",
       "success_metrics": "Refined pitch strategy and 3-5 actionable investor outreach tips",
-      "stage_relevance": "Critical as you approach Series A readiness"
+      "stage_relevance": "Critical as you approach Series A readiness",
+      "special_features": "Post-session summary report with action items"
     },
     {
-      "title": "Investor Introduction",
-      "cost_aux": 750,
-      "description": "Warm introduction to a carefully matched Series A investor based on your sector and traction.",
-      "category": "Investor Access", 
+      "title": "AI Market Validation Report",
+      "cost_aux": 200,
+      "description": "Custom 10-page report with competitor analysis, TAM sizing, and 5 validation experiments—powered by Auxeira's predictive models.",
+      "category": "Tools",
+      "urgency_badge": "New",
+      "delivery_timeline": "Instant",
+      "success_metrics": "85.7% accuracy benchmark on market fit predictions",
+      "stage_relevance": "Essential for product roadmap validation",
+      "special_features": "Includes 5 validation experiment templates"
+    },
+    {
+      "title": "YC/Techstars Application Booster",
+      "cost_aux": 350,
+      "description": "Personalized app review + mock interview with an alumni mentor; includes tailored responses to hit 80%+ readiness score.",
+      "category": "Mentorship",
+      "urgency_badge": "Limited",
+      "delivery_timeline": "48h",
+      "success_metrics": "80%+ accelerator application readiness score",
+      "stage_relevance": "Perfect for upcoming accelerator deadlines",
+      "special_features": "Includes application deadline calendar"
+    },
+    {
+      "title": "Cap Table & Equity Simulator",
+      "cost_aux": 250,
+      "description": "Blockchain-based tool to model funding rounds, vesting schedules, and dilution—exportable SAFE templates with AUX-secured sharing.",
+      "category": "Tools",
+      "urgency_badge": null,
+      "delivery_timeline": "Instant",
+      "success_metrics": "Accurate dilution modeling for next 3 funding rounds",
+      "stage_relevance": "Essential for upcoming fundraise planning",
+      "special_features": "AUX-secured document sharing with investors"
+    },
+    {
+      "title": "Founder Wellness Check-In",
+      "cost_aux": 150,
+      "description": "30-min AI + human hybrid session on burnout prevention, using behavioral econ nudges and Ravikant-inspired leverage audit.",
+      "category": "Wellness",
+      "urgency_badge": "Essential",
+      "delivery_timeline": "24h",
+      "success_metrics": "Personalized wellness plan and stress reduction strategies",
+      "stage_relevance": "Critical during intensive fundraising periods",
+      "special_features": "Includes 2-week follow-up check-in"
+    },
+    {
+      "title": "PR & Social Amplification Kit",
+      "cost_aux": 550,
+      "description": "Intro to 3 journalists/podcasters + optimized X thread templates; tracks engagement lift toward NPS >50 milestone.",
+      "category": "Network",
       "urgency_badge": "Popular",
-      "delivery_timeline": "2 weeks",
-      "success_metrics": "Direct investor connection and scheduled first meeting",
-      "stage_relevance": "Accelerates fundraising timeline by 4-6 weeks"
+      "delivery_timeline": "1 week",
+      "success_metrics": "Measurable engagement lift and NPS improvement",
+      "stage_relevance": "Amplifies recent traction and milestones",
+      "special_features": "Includes engagement tracking dashboard"
     },
     {
-      "title": "Legal Document Template Pack",
+      "title": "Peer Founder Mastermind Invite",
+      "cost_aux": 400,
+      "description": "1-month access to a 5-founder cohort (curated by SSE match algo) for weekly AMAs on ops/funding—unlocks AUX bounties for contributions.",
+      "category": "Network",
+      "urgency_badge": "New",
+      "delivery_timeline": "48h",
+      "success_metrics": "Active peer network and collaborative problem-solving",
+      "stage_relevance": "Valuable for shared learning at similar stages",
+      "special_features": "AUX bounty rewards for valuable contributions"
+    },
+    {
+      "title": "Investor Introduction Package",
+      "cost_aux": 750,
+      "description": "Warm introduction to 3 carefully matched Series A investors based on your sector, stage, and traction metrics.",
+      "category": "Network",
+      "urgency_badge": "Limited",
+      "delivery_timeline": "2 weeks",
+      "success_metrics": "3 qualified investor connections and scheduled meetings",
+      "stage_relevance": "Accelerates fundraising timeline by 4-6 weeks",
+      "special_features": "Includes investor briefing package preparation"
+    },
+    {
+      "title": "Financial Model Deep Dive",
+      "cost_aux": 450,
+      "description": "Expert 2-hour session to refine your financial model, unit economics, and investor-facing financial storytelling.",
+      "category": "Mentorship",
+      "urgency_badge": "Essential",
+      "delivery_timeline": "1 week",
+      "success_metrics": "Investor-ready financial model with validated assumptions",
+      "stage_relevance": "Builds credibility for upcoming fundraise",
+      "special_features": "Includes scenario analysis templates"
+    },
+    {
+      "title": Legal Document Template Suite",
       "cost_aux": 300,
-      "description": "Series A-ready legal templates including SAFE agreements, term sheets, and cap table templates.",
+      "description": "Complete set of Series A-ready legal templates including SAFE, term sheets, employment agreements, and IP assignments.",
       "category": "Resources",
       "urgency_badge": null,
       "delivery_timeline": "Instant",
       "success_metrics": "Legal framework saving $5K+ in legal fees",
-      "stage_relevance": "Essential preparation for investor due diligence"
-    },
-    {
-      "title": "Financial Model Expert Review",
-      "cost_aux": 400,
-      "description": "Comprehensive review of your financial projections by a startup financial expert with feedback.",
-      "category": "Mentorship",
-      "urgency_badge": "New",
-      "delivery_timeline": "3 days", 
-      "success_metrics": "Investor-ready financial model with validated assumptions",
-      "stage_relevance": "Builds credibility for upcoming fundraise"
-    },
-    {
-      "title": "Pitch Deck Coaching Package",
-      "cost_aux": 600,
-      "description": "3-session pitch coaching with a top pitch coach to refine narrative, slides, and delivery.",
-      "category": "Mentorship",
-      "urgency_badge": "Limited",
-      "delivery_timeline": "2 weeks",
-      "success_metrics": "Polished, investor-winning pitch deck and presentation skills",
-      "stage_relevance": "Maximizes impact of investor meetings"
-    },
-    {
-      "title": "Investor Network Access",
-      "cost_aux": 1000,
-      "description": "3-month access to Auxeira's premium investor network with curated introductions and deal flow.",
-      "category": "Investor Access",
-      "urgency_badge": "Popular", 
-      "delivery_timeline": "24h",
-      "success_metrics": "Multiple qualified investor connections and increased deal visibility",
-      "stage_relevance": "Game-changing for Series A fundraising process"
+      "stage_relevance": "Essential preparation for investor due diligence",
+      "special_features": "Regular updates based on latest regulations"
     }
   ]
 }
@@ -125,14 +177,14 @@ EXAMPLE OUTPUT:
 
 ---
 
-## 🔧 **BACKEND INTEGRATION CODE**
+## 🔧 **ENHANCED BACKEND INTEGRATION**
 
 ```javascript
-// Redemption Catalog Generator
-async function generateRedemptionCatalog(startupProfile, externalContext) {
+// Comprehensive redemption catalog generator
+async function generateEnhancedRedemptionCatalog(startupProfile, externalContext) {
   const prompt = `
 CONTEXT:
-You are a Startup Rewards Strategist AI generating personalized redemption options.
+You are a Startup Rewards Strategist AI generating personalized redemption catalogs.
 
 STARTUP PROFILE:
 - Startup: ${startupProfile.name}
@@ -146,226 +198,203 @@ STARTUP PROFILE:
 EXTERNAL CONTEXT:
 ${externalContext}
 
-Generate exactly 6 redemption options following the tier distribution and JSON structure.
+Generate 8-10 redemption options following the category mix and pricing guidelines.
   `;
 
   try {
     const response = await callAIModel(prompt);
     const catalog = JSON.parse(response);
     
-    // Ensure options are affordable and relevant
-    const validatedCatalog = validateAndRankOptions(catalog, startupProfile.auxBalance, startupProfile.stage);
+    // Enhanced personalization and affordability scoring
+    const enhancedCatalog = enhanceCatalogWithPersonalization(catalog, startupProfile, externalContext);
     
-    return validatedCatalog;
+    return enhancedCatalog;
   } catch (error) {
-    return getFallbackRedemptionCatalog(startupProfile.stage);
+    return getEnhancedFallbackCatalog(startupProfile.stage);
   }
 }
 
-// Validation and ranking
-function validateAndRankOptions(catalog, auxBalance, stage) {
+// Advanced personalization engine
+function enhanceCatalogWithPersonalization(catalog, startupProfile, externalContext) {
   const stageMultipliers = {
-    'pre_seed': 0.8,
+    'pre_seed': 0.9,
     'seed': 1.0,
-    'series_a': 1.2,
-    'series_b_plus': 1.4
+    'series_a': 1.15,
+    'series_b_plus': 1.3
   };
   
-  const multiplier = stageMultipliers[stage] || 1.0;
+  const multiplier = stageMultipliers[startupProfile.stage] || 1.0;
   
-  // Adjust costs by stage and ensure affordability
-  catalog.redemption_options = catalog.redemption_options.map(option => ({
-    ...option,
-    cost_aux: Math.round(option.cost_aux * multiplier),
-    // Add affordability indicator
-    is_affordable: option.cost_aux <= auxBalance,
-    // Add value score for sorting
-    value_score: calculateValueScore(option, stage)
-  }));
+  catalog.redemption_catalog = catalog.redemption_catalog.map(option => {
+    // Adjust costs by stage
+    const adjustedCost = Math.round(option.cost_aux * multiplier);
+    
+    // Add personalization flags
+    const isAffordable = adjustedCost <= startupProfile.auxBalance;
+    const isHighlyRelevant = calculateRelevanceScore(option, startupProfile, externalContext) > 8;
+    const matchesGoal = goalMatchScore(option, startupProfile.upcomingGoals);
+    
+    return {
+      ...option,
+      cost_aux: adjustedCost,
+      is_affordable: isAffordable,
+      is_highly_relevant: isHighlyRelevant,
+      goal_alignment: matchesGoal,
+      personalization_score: calculatePersonalizationScore(option, startupProfile, externalContext),
+      // Add contextual description enhancement
+      enhanced_description: enhanceDescription(option.description, startupProfile, externalContext)
+    };
+  });
   
-  // Sort by value score and affordability
-  catalog.redemption_options.sort((a, b) => {
+  // Sort by personalization score and affordability
+  catalog.redemption_catalog.sort((a, b) => {
+    // Prioritize affordable and highly relevant
     if (a.is_affordable && !b.is_affordable) return -1;
     if (!a.is_affordable && b.is_affordable) return 1;
-    return b.value_score - a.value_score;
+    if (a.is_highly_relevant && !b.is_highly_relevant) return -1;
+    return b.personalization_score - a.personalization_score;
   });
   
   return catalog;
 }
 
-function calculateValueScore(option, stage) {
+function calculateRelevanceScore(option, startupProfile, externalContext) {
   let score = 0;
   
-  // Category weights by stage
+  // Stage-based relevance weights
   const stageWeights = {
-    'pre_seed': { 'Mentorship': 3, 'Resources': 2, 'Tools': 1, 'Investor Access': 1 },
-    'seed': { 'Mentorship': 2, 'Resources': 2, 'Tools': 2, 'Investor Access': 3 },
-    'series_a': { 'Mentorship': 1, 'Resources': 1, 'Tools': 2, 'Investor Access': 4 }
+    'pre_seed': { 'Tools': 4, 'Resources': 3, 'Mentorship': 2, 'Wellness': 1, 'Network': 1 },
+    'seed': { 'Tools': 3, 'Resources': 2, 'Mentorship': 3, 'Wellness': 2, 'Network': 4 },
+    'series_a': { 'Tools': 2, 'Resources': 2, 'Mentorship': 3, 'Wellness': 1, 'Network': 5 }
   };
   
-  const weights = stageWeights[stage] || stageWeights.seed;
-  score += weights[option.category] * 10;
+  const weights = stageWeights[startupProfile.stage] || stageWeights.seed;
+  score += weights[option.category] * 2;
   
-  // Cost efficiency (lower cost per AUX = higher score)
-  score += (1000 / option.cost_aux) * 2;
+  // Goal alignment
+  if (startupProfile.upcomingGoals.includes('fundraising') && 
+      (option.category === 'Network' || option.title.includes('Investor'))) {
+    score += 3;
+  }
   
-  // Urgency bonus
-  if (option.urgency_badge) score += 5;
+  // External context alignment
+  if (externalContext.includes('burnout') && option.category === 'Wellness') {
+    score += 2;
+  }
   
-  return Math.round(score);
+  if (externalContext.includes('accelerator') && option.title.includes('YC/Techstars')) {
+    score += 3;
+  }
+  
+  return Math.min(score, 10);
 }
 
-// Fallback catalog
-function getFallbackRedemptionCatalog(stage) {
-  const baseCatalog = {
-    "redemption_options": [
-      {
-        "title": "VC Mentor Session",
-        "cost_aux": 500,
-        "description": "1-hour 1-on-1 session with an experienced VC to review your strategy and pitch.",
-        "category": "Mentorship",
-        "urgency_badge": "Limited",
-        "delivery_timeline": "1 week",
-        "success_metrics": "Refined fundraising strategy and actionable feedback",
-        "stage_relevance": "Accelerates investor readiness"
-      },
-      {
-        "title": "Investor Introduction",
-        "cost_aux": 750,
-        "description": "Warm introduction to a matched investor based on your sector and stage.",
-        "category": "Investor Access",
-        "urgency_badge": "Popular", 
-        "delivery_timeline": "2 weeks",
-        "success_metrics": "Direct investor connection and meeting scheduled",
-        "stage_relevance": "Opens doors to qualified capital"
-      },
-      {
-        "title": "Legal Template Pack",
-        "cost_aux": 300,
-        "description": "Startup legal templates including SAFE agreements and term sheets.",
-        "category": "Resources",
-        "urgency_badge": null,
-        "delivery_timeline": "Instant",
-        "success_metrics": "Legal framework saving thousands in fees",
-        "stage_relevance": "Essential for fundraising preparation"
-      },
-      {
-        "title": "Financial Model Review",
-        "cost_aux": 400,
-        "description": "Expert review of your financial projections and unit economics.",
-        "category": "Mentorship",
-        "urgency_badge": "New",
-        "delivery_timeline": "3 days",
-        "success_metrics": "Investor-ready financial model",
-        "stage_relevance": "Builds credibility with investors"
-      },
-      {
-        "title": "Pitch Deck Coaching",
-        "cost_aux": 600,
-        "description": "Multi-session pitch coaching to refine your narrative and delivery.",
-        "category": "Mentorship", 
-        "urgency_badge": "Limited",
-        "delivery_timeline": "2 weeks",
-        "success_metrics": "Polished, compelling investor pitch",
-        "stage_relevance": "Maximizes meeting outcomes"
-      },
-      {
-        "title": "Investor Network Access",
-        "cost_aux": 1000,
-        "description": "Extended access to curated investor network and deal flow.",
-        "category": "Investor Access",
-        "urgency_badge": "Popular",
-        "delivery_timeline": "24h",
-        "success_metrics": "Multiple qualified investor connections",
-        "stage_relevance": "Accelerates entire fundraising process"
-      }
-    ]
+function goalMatchScore(option, upcomingGoals) {
+  const goalKeywords = {
+    'fundraising': ['investor', 'pitch', 'financial', 'deck', 'vc', 'fundraise'],
+    'product_launch': ['validation', 'market', 'user', 'product', 'launch'],
+    'team_building': ['team', 'hiring', 'culture', 'wellness'],
+    'growth': ['growth', 'acquisition', 'metrics', 'scaling']
   };
   
-  return validateAndRankOptions(baseCatalog, 0, stage); // 0 balance for fallback
+  let matchCount = 0;
+  upcomingGoals.forEach(goal => {
+    const keywords = goalKeywords[goal] || [];
+    keywords.forEach(keyword => {
+      if (option.title.toLowerCase().includes(keyword) || 
+          option.description.toLowerCase().includes(keyword)) {
+        matchCount++;
+      }
+    });
+  });
+  
+  return matchCount;
+}
+
+function enhanceDescription(description, startupProfile, externalContext) {
+  let enhanced = description;
+  
+  // Add stage-specific context
+  if (startupProfile.stage === 'pre_seed') {
+    enhanced += " Perfect for pre-seed preparation and early validation.";
+  } else if (startupProfile.stage === 'series_a') {
+    enhanced += " Critical for Series A due diligence and scaling preparation.";
+  }
+  
+  // Add milestone context
+  if (startupProfile.milestones.includes('traction')) {
+    enhanced += " Leverage your recent traction to maximize this opportunity.";
+  }
+  
+  return enhanced;
 }
 ```
 
 ---
 
-## 🎨 **UI RENDERING SUGGESTION**
+## 🎨 **UI RENDERING FOR EXPANDED CATALOG**
 
 ```javascript
-// Map to your existing UI structure
-function renderRedemptionCatalog(catalog) {
-  return catalog.redemption_options.map(option => ({
-    // Your exact UI fields from screenshot
+// Map to your UI structure with new categories
+function renderEnhancedRedemptionCatalog(catalog) {
+  return catalog.redemption_catalog.map(option => ({
+    // Core UI fields
     title: option.title,
     cost: `${option.cost_aux} AUX`,
-    description: option.description,
+    description: option.enhanced_description || option.description,
     
-    // Additional UI enhancements
+    // Enhanced UI elements
     badge: option.urgency_badge,
     delivery: option.delivery_timeline,
-    isAffordable: option.is_affordable,
     category: option.category,
+    isAffordable: option.is_affordable,
+    isHighlyRelevant: option.is_highly_relevant,
     
-    // For the "Redeem" button state
+    // Additional metadata for filtering/sorting
+    personalizationScore: option.personalization_score,
+    goalAlignment: option.goal_alignment,
+    specialFeatures: option.special_features,
+    
+    // Button states
     canRedeem: option.is_affordable,
-    buttonText: option.is_affordable ? "Redeem Now" : "Earn More AUX"
+    buttonText: option.is_affordable ? "Redeem Now" : `Need ${option.cost_aux - currentBalance} More AUX`,
+    buttonVariant: option.is_highly_relevant ? "primary" : "secondary"
   }));
 }
-```
 
----
-
-## 📊 **PERSONALIZATION LOGIC**
-
-```javascript
-// Smart reward personalization
-function personalizeRewards(catalog, startupProfile) {
-  return catalog.redemption_options.map(option => {
-    let personalizedDescription = option.description;
-    
-    // Add stage-specific context
-    if (startupProfile.stage === 'pre_seed') {
-      personalizedDescription += " Perfect for pre-seed preparation and angel fundraising.";
-    } else if (startupProfile.stage === 'series_a') {
-      personalizedDescription += " Critical for Series A due diligence and partner meetings.";
-    }
-    
-    // Add milestone context
-    if (startupProfile.milestones.includes('fundraising')) {
-      personalizedDescription += " Accelerate your current fundraise with this exclusive access.";
-    }
-    
-    return {
-      ...option,
-      description: personalizedDescription,
-      // Highlight if particularly relevant
-      is_highly_relevant: isHighlyRelevant(option, startupProfile)
-    };
-  });
-}
-
-function isHighlyRelevant(option, startupProfile) {
-  const relevanceRules = {
-    'pre_seed': ['Legal Template Pack', 'Financial Model Review'],
-    'seed': ['Investor Introduction', 'Pitch Deck Coaching'],
-    'series_a': ['Investor Network Access', 'VC Mentor Session']
+// Category-based grouping for UI
+function groupByCategory(catalog) {
+  const categories = {
+    'Mentorship': [],
+    'Tools': [],
+    'Wellness': [], 
+    'Network': [],
+    'Resources': []
   };
   
-  return relevanceRules[startupProfile.stage]?.includes(option.title) || false;
+  catalog.forEach(item => {
+    if (categories[item.category]) {
+      categories[item.category].push(item);
+    }
+  });
+  
+  return categories;
 }
 ```
-
----
-
 
 ---
 
 ## 🚀 **IMMEDIATE IMPLEMENTATION**
 
-1. **Use the provided prompt** as your redemption catalog generator
-2. **Integrate the backend code** for stage-based personalization
-3. **Render in your existing UI** with the enhanced fields
-4. **Track redemption patterns** to optimize future offerings
+This enhanced prompt and system will generate a comprehensive redemption catalog including all your new areas:
 
-This system creates a **dynamic, personalized redemption experience** that feels tailored to each founder's current situation while maintaining your clean UI structure.
+- **AI Market Validation Report** (Tools)
+- **YC/Techstars Application Booster** (Mentorship) 
+- **Cap Table & Equity Simulator** (Tools)
+- **Founder Wellness Check-In** (Wellness)
+- **PR & Social Amplification Kit** (Network)
+- **Peer Founder Mastermind Invite** (Network)
 
-**Ready to implement this redemption system?** The prompt is optimized for your exact use case and UI.
+Plus the original core offerings, all personalized to each founder's current situation.
+
+**Ready to implement this expanded redemption system?** The prompt handles all your new categories while maintaining the personalized, stage-aware approach that makes your platform unique.
