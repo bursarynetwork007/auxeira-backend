@@ -134,6 +134,8 @@ END: "Scale smart. Execute now."
 EXAMPLE OUTPUT:
 "Maria's Nairobi edtech hit 5K users by embedding in parent WhatsApp groups—echoing your X thread's engagement spike. Jobs: Fix one pain perfectly; your site analytics show onboarding drop-off at step 3. A/B test two onboarding flows by Friday—projected 20% conversion lift. Leverage: Small tweaks compound—like your 30% referral traffic goldmine. What's your next 10x vector? Scale smart. Execute now."```
 
+
+----
 ### **2. Validation Nudge Prompt**
 
 ```
@@ -169,6 +171,9 @@ END: "Validate or pivot. Your call."
 EXAMPLE OUTPUT:
 "Aisha's Lagos fintech pivoted from premium to freemium after 5 user exits—inspired by her Reddit thread on pricing pain. Ries: Build-Measure-Learn; your X comments flag subscription aversion. Run 3 concierge tests by Thursday—if <70% pay, pivot. Sunk cost: Each week on wrong features compounds tech debt. Which assumption scares you most to test? Validate or pivot. Your call."
 ```
+
+
+----
 
 ### **3. Funding Nudge Prompt**
 
@@ -206,7 +211,7 @@ EXAMPLE OUTPUT:
 "Thabo's Cape Town SaaS landed $500K by featuring TechCrunch coverage on slide 3—amplifying your recent media buzz. Musk: First principles—what's your defensible data moat? Your 45% MoM growth. Update deck by EOW highlighting 3 traction metrics from your blog. Compound: Weekly investor updates build trust—small touches, big checks. What metric would make investors fight for this? Fund it. Next step yours."
 ```
 
----
+----
 
 BACKEND INTEGRATION CODE
 // Enhanced external context fetcher (add to your existing toolchain)
