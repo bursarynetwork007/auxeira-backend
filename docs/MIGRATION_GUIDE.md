@@ -249,7 +249,7 @@ Add your production keys:
 NODE_ENV=development
 PORT=3000
 PAYSTACK_PUBLIC_KEY=pk_test_your_actual_key
-PAYSTACK_SECRET_KEY=sk_test_your_actual_key
+PAYSTACK_SECRET_KEY=sk_test_YOUR_STRIPE_KEY
 OPENAI_API_KEY=sk-your_openai_key
 # ... etc
 ```

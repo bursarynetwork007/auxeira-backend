@@ -164,7 +164,7 @@ backend/lambda-coach-gina.js - Updated with v2 prompt
 ### Deployment
 ```bash
 cd backend
-export CLAUDE_API_KEY="sk-ant-api03-..."
+export CLAUDE_API_KEY="YOUR_ANTHROPIC_API_KEY..."
 npx serverless deploy --config serverless-coach-gina.yml --stage prod
 ```
 

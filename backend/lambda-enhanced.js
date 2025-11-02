@@ -474,6 +474,122 @@ app.post('/api/captcha/verify',
   }
 );
 
+// Startup Profiles Service
+let startupProfilesService = null;
+let serviceLoadError = null;
+try {
+  startupProfilesService = require('./src/services/startup-profiles.service');
+  console.log('Startup profiles service loaded successfully');
+} catch (error) {
+  serviceLoadError = error.message + ' | Stack: ' + error.stack;
+  console.error('Failed to load startup profiles service:', serviceLoadError);
+}
+
+// List startup profiles
+app.get('/api/startup-profiles', async (req, res) => {
+  if (!startupProfilesService) {
+    return res.status(503).json({ success: false, error: 'Service unavailable' });
+  }
+  try {
+    const result = await startupProfilesService.listProfiles(req.query);
+    res.json(result);
+  } catch (error) {
+    console.error('Error listing profiles:', error);
+    res.status(500).json({ success: false, error: 'Internal server error', message: error.message });
+  }
+});
+
+// Get activity feed (365-day rolling feed by default)
+app.get('/api/startup-profiles/activity-feed', async (req, res) => {
+  if (!startupProfilesService) {
+    return res.status(503).json({ success: false, error: 'Service unavailable' });
+  }
+  try {
+    const result = await startupProfilesService.getActivityFeed(req.query);
+    res.json(result);
+  } catch (error) {
+    console.error('Error getting activity feed:', error);
+    res.status(500).json({ success: false, error: 'Internal server error', message: error.message });
+  }
+});
+
+// Search profiles
+app.get('/api/startup-profiles/search', async (req, res) => {
+  if (!startupProfilesService) {
+    return res.status(503).json({ success: false, error: 'Service unavailable' });
+  }
+  try {
+    const { q, limit } = req.query;
+    if (!q) {
+      return res.status(400).json({ success: false, error: 'Search query required' });
+    }
+    const result = await startupProfilesService.searchProfiles(q, limit);
+    res.json(result);
+  } catch (error) {
+    console.error('Error searching profiles:', error);
+    res.status(500).json({ success: false, error: 'Internal server error', message: error.message });
+  }
+});
+
+// Get aggregate statistics
+app.get('/api/startup-profiles/stats', async (req, res) => {
+  if (!startupProfilesService) {
+    return res.status(503).json({ success: false, error: 'Service unavailable' });
+  }
+  try {
+    const result = await startupProfilesService.getStats(req.query);
+    res.json(result);
+  } catch (error) {
+    console.error('Error getting stats:', error);
+    res.status(500).json({ success: false, error: 'Internal server error', message: error.message });
+  }
+});
+
+// Get single profile
+app.get('/api/startup-profiles/:id', async (req, res) => {
+  if (!startupProfilesService) {
+    return res.status(503).json({ success: false, error: 'Service unavailable' });
+  }
+  try {
+    const result = await startupProfilesService.getProfile(req.params.id, req.query);
+    if (!result.success) {
+      return res.status(404).json(result);
+    }
+    res.json(result);
+  } catch (error) {
+    console.error('Error getting profile:', error);
+    res.status(500).json({ success: false, error: 'Internal server error', message: error.message });
+  }
+});
+
+// Get profile activities
+app.get('/api/startup-profiles/:id/activities', async (req, res) => {
+  if (!startupProfilesService) {
+    return res.status(503).json({ success: false, error: 'Service unavailable' });
+  }
+  try {
+    const result = await startupProfilesService.getProfileActivities(req.params.id, req.query);
+    res.json(result);
+  } catch (error) {
+    console.error('Error getting profile activities:', error);
+    res.status(500).json({ success: false, error: 'Internal server error', message: error.message });
+  }
+});
+
+// Get profile metrics
+app.get('/api/startup-profiles/:id/metrics', async (req, res) => {
+  if (!startupProfilesService) {
+    return res.status(503).json({ success: false, error: 'Service unavailable' });
+  }
+  try {
+    const result = await startupProfilesService.getProfileMetrics(req.params.id, req.query);
+    res.json(result);
+  } catch (error) {
+    console.error('Error getting profile metrics:', error);
+    res.status(500).json({ success: false, error: 'Internal server error', message: error.message });
+  }
+});
+
 // 404 handler for undefined routes
 app.use('*', (req, res) => {
   res.status(404).json({
@@ -496,6 +612,15 @@ app.use('*', (req, res) => {
       captcha: {
         generate: '/api/captcha/generate',
         verify: '/api/captcha/verify'
+      },
+      startupProfiles: {
+        list: '/api/startup-profiles',
+        get: '/api/startup-profiles/:id',
+        activityFeed: '/api/startup-profiles/activity-feed (365-day default, use ?days=1825 for 5-year)',
+        activities: '/api/startup-profiles/:id/activities',
+        metrics: '/api/startup-profiles/:id/metrics',
+        stats: '/api/startup-profiles/stats',
+        search: '/api/startup-profiles/search?q=query'
       }
     },
     timestamp: new Date().toISOString(),

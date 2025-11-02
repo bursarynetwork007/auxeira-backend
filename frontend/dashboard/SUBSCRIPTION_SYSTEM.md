@@ -222,7 +222,7 @@ FROZEN → (payment) → ACTIVE
 ```bash
 # Required for subscription system
 PAYSTACK_PUBLIC_KEY=pk_test_your_key
-PAYSTACK_SECRET_KEY=sk_test_your_key
+PAYSTACK_SECRET_KEY=sk_test_YOUR_STRIPE_KEY
 DATABASE_URL=postgresql://user:pass@host:5432/auxeira
 WEBHOOK_SECRET=your_paystack_webhook_secret
 

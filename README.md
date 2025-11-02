@@ -160,7 +160,7 @@ RATE_LIMIT_MAX_REQUESTS=100
 
 # Payment Integration (Paystack)
 PAYSTACK_PUBLIC_KEY=pk_test_your_public_key_here
-PAYSTACK_SECRET_KEY=sk_test_your_secret_key_here
+PAYSTACK_SECRET_KEY=sk_test_YOUR_STRIPE_KEY
 
 # AI Features (OpenAI)
 OPENAI_API_KEY=sk-your-openai-key-here

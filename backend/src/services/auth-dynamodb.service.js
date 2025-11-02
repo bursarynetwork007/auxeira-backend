@@ -194,8 +194,16 @@ class AuthService {
         };
       }
 
-      // Verify password
-      const isPasswordValid = await bcrypt.compare(password, user.password);
+      // Verify password (support both 'password' and 'passwordHash' fields)
+      const hashedPassword = user.password || user.passwordHash;
+      if (!hashedPassword) {
+        return {
+          success: false,
+          message: 'Account configuration error',
+        };
+      }
+      
+      const isPasswordValid = await bcrypt.compare(password, hashedPassword);
       if (!isPasswordValid) {
         return {
           success: false,
@@ -220,22 +228,23 @@ class AuthService {
         // Continue with login even if update fails
       }
 
-      // Generate tokens
+      // Generate tokens (use userId field from DynamoDB)
+      const userId = user.userId || user.id;
       const token = this.generateAccessToken({ 
-        userId: user.id, 
+        userId: userId, 
         email: user.email, 
         role: user.role 
       });
       const refreshToken = this.generateRefreshToken({ 
-        userId: user.id, 
+        userId: userId, 
         email: user.email 
       });
 
       // Save session
-      await this.saveSession(user.id, refreshToken);
+      await this.saveSession(userId, refreshToken);
 
-      // Return user without password
-      const { password: _, ...userWithoutPassword } = user;
+      // Return user without password (remove both possible password fields)
+      const { password: _, passwordHash: __, ...userWithoutPassword } = user;
       userWithoutPassword.lastLoginAt = now;
       userWithoutPassword.loginCount = (user.loginCount || 0) + 1;
 

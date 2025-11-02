@@ -1,5 +1,5 @@
 service: auxeira-backend
-frameworkVersion: ^4.0.0
+frameworkVersion: '3'
 
 package:
   patterns:
@@ -19,6 +19,7 @@ package:
     - '!src/ml-pipeline/**'
     - 'lambda-enhanced.js'
     - 'src/services/auth-dynamodb.service.js'
+    - 'src/services/startup-profiles.service.js'
     - 'package.json'
     - 'node_modules/**'
 
@@ -46,6 +47,10 @@ provider:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-users-${self:provider.stage}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-sessions-${self:provider.stage}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-users-${self:provider.stage}/index/*"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/auxeira-startup-profiles-prod"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/auxeira-startup-profiles-prod/index/*"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/auxeira-startup-activities-prod"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/auxeira-startup-activities-prod/index/*"
         
 
           

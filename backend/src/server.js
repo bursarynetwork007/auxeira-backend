@@ -14,6 +14,7 @@ import sseRoutes from './routes/sse';
 import kpiRoutes from './routes/kpi';
 import activityRewardsRoutes from './routes/activity-rewards';
 import onboardingRoutes from './routes/onboarding';
+import dashboardRoutes from './routes/dashboard';
 
 // Load environment variables
 config();
@@ -189,6 +190,7 @@ app.use('/api/sse', sseRoutes);
 app.use('/api/kpi', kpiRoutes);
 app.use('/api/activities', activityRewardsRoutes);
 app.use('/api/onboarding', onboardingRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // 404 handler for undefined routes
 app.use('*', (req, res) => {

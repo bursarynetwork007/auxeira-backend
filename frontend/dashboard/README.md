@@ -167,7 +167,7 @@ npm install @radix-ui/react-dialog @radix-ui/react-select
 ```bash
 # Paystack Integration
 PAYSTACK_PUBLIC_KEY=pk_test_your_key
-PAYSTACK_SECRET_KEY=sk_test_your_key
+PAYSTACK_SECRET_KEY=sk_test_YOUR_STRIPE_KEY
 
 # Database Connection
 DATABASE_URL=postgresql://user:pass@host:5432/auxeira

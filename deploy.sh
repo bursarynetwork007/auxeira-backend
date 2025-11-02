@@ -1,43 +1,82 @@
 #!/bin/bash
-# Auxeira Dashboard Deployment Script
+set -e
 
-echo "🚀 Deploying Auxeira ESG Dashboard"
+echo "=== Auxeira Dashboard Deployment ==="
+echo "Date: $(date)"
 echo ""
 
-# Upload to S3
-echo "1️⃣ Uploading to S3: dashboard.auxeira.com"
-aws s3 cp dashboard-html/esg_education.html \
-    s3://dashboard.auxeira.com/esg_education.html \
-    --content-type "text/html" \
-    --cache-control "no-cache, no-store, must-revalidate"
+# Deploy Frontend
+echo "1. Deploying dashboard to S3..."
+aws s3 cp frontend/dashboard/startup_founder_live.html \
+  s3://dashboard.auxeira.com/startup_founder.html \
+  --region us-east-1 \
+  --content-type "text/html" \
+  --cache-control "max-age=0, no-cache, no-store, must-revalidate"
 
-if [ -f dashboard-html/sim-data.json ]; then
-    aws s3 cp dashboard-html/sim-data.json \
-        s3://dashboard.auxeira.com/sim-data.json \
-        --content-type "application/json"
-fi
+aws s3 cp frontend/dashboard/startup_founder_live.html \
+  s3://dashboard.auxeira.com/startup/index.html \
+  --region us-east-1 \
+  --content-type "text/html" \
+  --cache-control "max-age=0, no-cache, no-store, must-revalidate"
 
-echo "✅ Uploaded to S3"
+echo "2. Deploying login page to S3..."
+aws s3 cp frontend/index.html \
+  s3://auxeira.com/index.html \
+  --region us-east-1 \
+  --content-type "text/html" \
+  --cache-control "max-age=0, no-cache, no-store, must-revalidate"
+
+echo "3. Invalidating CloudFront cache..."
+aws cloudfront create-invalidation \
+  --distribution-id E2SK5CDOUJ7KKB \
+  --paths "/startup_founder.html" "/startup/index.html" \
+  --region us-east-1 \
+  --query 'Invalidation.Id' \
+  --output text
+
+aws cloudfront create-invalidation \
+  --distribution-id E1O2Q0Z86U0U5T \
+  --paths "/index.html" \
+  --region us-east-1 \
+  --query 'Invalidation.Id' \
+  --output text
+
+echo "4. Deploying Lambda functions..."
+cd backend
+
+# Package and deploy Auth Lambda
+echo "   - Packaging Auth Lambda..."
+zip -q -r lambda-enhanced.zip . \
+  -x "*.git*" "node_modules/aws-sdk/*" "*.zip"
+
+echo "   - Deploying Auth Lambda..."
+aws lambda update-function-code \
+  --function-name auxeira-backend-prod-api \
+  --zip-file fileb://lambda-enhanced.zip \
+  --region us-east-1 \
+  --query 'LastModified' \
+  --output text
+
+# Package and deploy Dashboard Context Lambda
+echo "   - Packaging Dashboard Context Lambda..."
+zip -q -j lambda-dashboard-context.zip lambda-dashboard-context.js
+
+echo "   - Deploying Dashboard Context Lambda..."
+aws lambda update-function-code \
+  --function-name auxeira-dashboard-context-prod \
+  --zip-file fileb://lambda-dashboard-context.zip \
+  --region us-east-1 \
+  --query 'LastModified' \
+  --output text
+
+cd ..
+
 echo ""
-
-# Invalidate CloudFront
-echo "2️⃣ Invalidating CloudFront"
-INVALIDATION_ID=$(aws cloudfront create-invalidation \
-    --distribution-id E2SK5CDOUJ7KKB \
-    --paths "/*" \
-    --query 'Invalidation.Id' \
-    --output text)
-
-echo "✅ Invalidation: $INVALIDATION_ID"
+echo "=== Deployment Complete ==="
+echo "Dashboard: https://dashboard.auxeira.com/startup_founder.html"
+echo "Login: https://auxeira.com"
 echo ""
-
-# Commit to GitHub
-echo "3️⃣ Committing to GitHub..."
-git add dashboard-html/
-git commit -m "Update dashboard $(date +%Y-%m-%d)" 2>/dev/null || echo "No changes"
-git push origin main 2>/dev/null || echo "Already up to date"
-
+echo "Test credentials:"
+echo "  Email: founder@startup.com"
+echo "  Password: Testpass123"
 echo ""
-echo "✅ DEPLOYMENT COMPLETE!"
-echo "🌐 https://dashboard.auxeira.com/esg_education.html"
-echo "⏰ Wait 30-60 seconds for propagation"

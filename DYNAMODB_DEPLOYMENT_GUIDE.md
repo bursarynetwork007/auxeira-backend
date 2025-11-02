@@ -198,7 +198,7 @@ THUNDERBIT_API_KEY=your-thunderbit-api-key
 
 # Payment Processing
 PAYSTACK_PUBLIC_KEY=pk_live_your_paystack_public_key
-PAYSTACK_SECRET_KEY=sk_live_your_paystack_secret_key
+PAYSTACK_SECRET_KEY=sk_live_YOUR_PAYSTACK_SECRET_KEY_paystack_secret_key
 
 # Application
 NODE_ENV=production

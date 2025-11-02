@@ -1,0 +1,170 @@
+// Business Structure Change Tracking Schema
+// This schema tracks business structure changes and payment requirements
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../dev.db"
+}
+
+// Business Structure Types
+enum BusinessStructure {
+  SOLE_PROPRIETORSHIP
+  PARTNERSHIP
+  LLC
+  CORPORATION
+  S_CORP
+  C_CORP
+  NONPROFIT
+  COOPERATIVE
+  JOINT_VENTURE
+  FRANCHISE
+}
+
+// Payment Status
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+// Business Structure Change Cases
+model BusinessStructureChange {
+  id                    String            @id @default(cuid())
+  userId                String
+  companyName           String
+  
+  // Structure details
+  oldStructure          BusinessStructure
+  newStructure          BusinessStructure
+  changeReason          String?
+  changeDescription     String?
+  
+  // Status tracking
+  status                String            @default("pending_payment")
+  requiresPayment       Boolean           @default(true)
+  paymentStatus         PaymentStatus     @default(PENDING)
+  
+  // Payment details
+  paymentAmount         Float             @default(200000) // in kobo (₦2,000)
+  paymentCurrency       String            @default("NGN")
+  paymentReference      String?           @unique
+  paymentDate           DateTime?
+  
+  // Paystack integration
+  paystackReference     String?           @unique
+  paystackStatus        String?
+  paystackResponse      String?           @default("{}")
+  
+  // Dates
+  changeDetectedAt      DateTime          @default(now())
+  changeEffectiveDate   DateTime?
+  paymentDueDate        DateTime?
+  accessRestoredAt      DateTime?
+  
+  // Metadata
+  metadata              String            @default("{}")
+  notes                 String?
+  
+  // Synthetic data flags
+  isSynthetic           Boolean           @default(false)
+  syntheticSeed         String?
+  
+  // Timestamps
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  
+  // Relations
+  payments              Payment[]
+  
+  @@index([userId])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([changeDetectedAt])
+  @@index([isSynthetic])
+}
+
+// Payment Records
+model Payment {
+  id                    String            @id @default(cuid())
+  
+  // Reference to business structure change
+  structureChangeId     String?
+  structureChange       BusinessStructureChange? @relation(fields: [structureChangeId], references: [id], onDelete: Cascade)
+  
+  // User details
+  userId                String
+  userEmail             String
+  
+  // Payment details
+  amount                Float
+  currency              String            @default("NGN")
+  paymentType           String            @default("business_structure_update")
+  description           String?
+  
+  // Paystack details
+  paystackReference     String            @unique
+  paystackStatus        String?
+  paystackResponse      String            @default("{}")
+  paystackAmount        Int               // Amount in kobo
+  
+  // Status
+  status                PaymentStatus     @default(PENDING)
+  verifiedAt            DateTime?
+  verifiedBy            String?
+  
+  // Metadata
+  metadata              String            @default("{}")
+  
+  // Synthetic data
+  isSynthetic           Boolean           @default(false)
+  
+  // Timestamps
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  
+  @@index([userId])
+  @@index([paystackReference])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// User Subscription Status
+model UserSubscription {
+  id                    String            @id @default(cuid())
+  userId                String            @unique
+  
+  // Subscription details
+  tier                  String            @default("free")
+  status                String            @default("active")
+  
+  // Business structure
+  currentStructure      BusinessStructure @default(SOLE_PROPRIETORSHIP)
+  structureLastUpdated  DateTime          @default(now())
+  
+  // Payment tracking
+  lastPaymentDate       DateTime?
+  nextPaymentDue        DateTime?
+  totalPayments         Float             @default(0)
+  
+  // Access control
+  dashboardAccess       Boolean           @default(true)
+  accessBlockedAt       DateTime?
+  accessBlockedReason   String?
+  
+  // Metadata
+  metadata              String            @default("{}")
+  
+  // Timestamps
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+  @@index([dashboardAccess])
+}

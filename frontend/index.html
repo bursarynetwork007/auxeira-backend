@@ -5254,7 +5254,9 @@
                         'government': 'https://dashboard.auxeira.com/government.html',
                         'esg_funder': 'https://dashboard.auxeira.com/esg_funder.html'
                     };
-                    window.location.href = dashboardMap[userData.userType] || 'https://dashboard.auxeira.com/venture_capital.html';
+                    // Use role or userType (for backward compatibility)
+                    const userRole = userData.role || userData.userType;
+                    window.location.href = dashboardMap[userRole] || 'https://dashboard.auxeira.com/venture_capital.html';
                 }, 1500);
                 
             } catch (error) {

@@ -134,7 +134,7 @@ Transformed the Auxeira Share Value Partners dashboard from a basic data display
 ```bash
 OPENAI_API_KEY=your_key
 PAYSTACK_PUBLIC_KEY=pk_live_xxx
-PAYSTACK_SECRET_KEY=sk_live_xxx
+PAYSTACK_SECRET_KEY=sk_live_YOUR_PAYSTACK_SECRET_KEY
 ```
 
 ## Testing Status

@@ -92,7 +92,7 @@ Use Paystack test credentials:
 ```bash
 OPENAI_API_KEY=your_api_key_here
 PAYSTACK_PUBLIC_KEY=pk_live_your_key
-PAYSTACK_SECRET_KEY=sk_live_your_secret
+PAYSTACK_SECRET_KEY=sk_live_YOUR_PAYSTACK_SECRET_KEY_secret
 ```
 
 ## 🎨 Customization

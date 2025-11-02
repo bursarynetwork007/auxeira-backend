@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira Dashboard Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #0d1117;
+            color: #fff;
+        }
+        .status {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+        }
+        .success { border-left: 4px solid #10b981; }
+        .error { border-left: 4px solid #ef4444; }
+        .loading { border-left: 4px solid #f59e0b; }
+        pre {
+            background: #000;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Auxeira Dashboard Test</h1>
+    
+    <div class="status loading" id="status">
+        <h3>Testing API Connection...</h3>
+        <p>Please wait...</p>
+    </div>
+
+    <div>
+        <h3>Test Actions:</h3>
+        <button onclick="testAPI()">Test API Endpoint</button>
+        <button onclick="testWithAuth()">Test with Auth Token</button>
+        <button onclick="clearStorage()">Clear LocalStorage</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        const API_URL = 'https://24ndip5xbbgahv4m5cvicrmzta0vgdho.lambda-url.us-east-1.on.aws/';
+        const TEST_USER_ID = '045b4095-3388-4ea6-8de3-b7b04be5bc1b';
+
+        async function testAPI() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="status loading"><h3>Testing API...</h3></div>';
+
+            try {
+                console.log('Testing API:', API_URL);
+                const response = await fetch(`${API_URL}?userId=${TEST_USER_ID}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    resultsDiv.innerHTML = `
+                        <div class="status success">
+                            <h3>✅ API Test Successful</h3>
+                            <p><strong>Company:</strong> ${data.data.startupName}</p>
+                            <p><strong>SSE Score:</strong> ${data.data.sseScore}</p>
+                            <p><strong>MRR:</strong> $${data.data.mrr.toLocaleString()}</p>
+                            <p><strong>Team Size:</strong> ${data.data.teamSize}</p>
+                            <h4>Full Response:</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div class="status error">
+                            <h3>❌ API Error</h3>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="status error">
+                        <h3>❌ Connection Error</h3>
+                        <p>${error.message}</p>
+                        <pre>${error.stack}</pre>
+                    </div>
+                `;
+            }
+        }
+
+        async function testWithAuth() {
+            const resultsDiv = document.getElementById('results');
+            const token = localStorage.getItem('authToken');
+
+            if (!token) {
+                resultsDiv.innerHTML = `
+                    <div class="status error">
+                        <h3>❌ No Auth Token</h3>
+                        <p>No authToken found in localStorage</p>
+                        <p>You need to login first at: <a href="https://auxeira.com" style="color: #007bff;">auxeira.com</a></p>
+                    </div>
+                `;
+                return;
+            }
+
+            resultsDiv.innerHTML = '<div class="status loading"><h3>Testing with Auth Token...</h3></div>';
+
+            try {
+                const response = await fetch(API_URL, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    resultsDiv.innerHTML = `
+                        <div class="status success">
+                            <h3>✅ Authenticated API Test Successful</h3>
+                            <p><strong>Company:</strong> ${data.data.startupName}</p>
+                            <p><strong>SSE Score:</strong> ${data.data.sseScore}</p>
+                            <p><strong>MRR:</strong> $${data.data.mrr.toLocaleString()}</p>
+                            <h4>Full Response:</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div class="status error">
+                            <h3>❌ API Error</h3>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="status error">
+                        <h3>❌ Connection Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function clearStorage() {
+            localStorage.clear();
+            sessionStorage.clear();
+            document.getElementById('results').innerHTML = `
+                <div class="status success">
+                    <h3>✅ Storage Cleared</h3>
+                    <p>LocalStorage and SessionStorage have been cleared.</p>
+                </div>
+            `;
+        }
+
+        // Check localStorage on load
+        window.addEventListener('DOMContentLoaded', function() {
+            const statusDiv = document.getElementById('status');
+            const authToken = localStorage.getItem('authToken');
+            const user = localStorage.getItem('auxeira_user');
+
+            if (authToken) {
+                statusDiv.innerHTML = `
+                    <div class="status success">
+                        <h3>✅ Auth Token Found</h3>
+                        <p>You are logged in. Click "Test with Auth Token" to test.</p>
+                        <p><small>Token: ${authToken.substring(0, 20)}...</small></p>
+                    </div>
+                `;
+            } else {
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        <h3>⚠️ No Auth Token</h3>
+                        <p>You need to login first at <a href="https://auxeira.com" style="color: #007bff;">auxeira.com</a></p>
+                        <p>Or click "Test API Endpoint" to test without authentication.</p>
+                    </div>
+                `;
+            }
+
+            // Auto-test API on load
+            testAPI();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+Environment: linux, node 20.19.5, framework 3.40.0 (local), plugin 7.2.3, SDK 4.5.1
+Docs:        docs.serverless.com
+Support:     forum.serverless.com
+Bugs:        github.com/serverless/serverless/issues
+
+Error:
+The Serverless version (3.40.0) does not satisfy the "frameworkVersion" (^4.0.0) in serverless.yml

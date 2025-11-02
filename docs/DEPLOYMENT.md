@@ -75,7 +75,7 @@ RATE_LIMIT_MAX_REQUESTS=100
 
 # Payment Integration
 PAYSTACK_PUBLIC_KEY=pk_live_your_live_public_key
-PAYSTACK_SECRET_KEY=sk_live_your_live_secret_key
+PAYSTACK_SECRET_KEY=sk_live_YOUR_PAYSTACK_SECRET_KEY_live_secret_key
 
 # AI Features
 OPENAI_API_KEY=sk-your-production-key

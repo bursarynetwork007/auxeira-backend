@@ -5,16 +5,15 @@
 
 const Anthropic = require('@anthropic-ai/sdk');
 
+// Claude API Key for Overview tab
+const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || 'YOUR_ANTHROPIC_API_KEY';
+
 // Initialize Anthropic client
 let anthropic;
 
 const initializeAnthropic = () => {
     if (!anthropic) {
-        const apiKey = process.env.CLAUDE_API_KEY;
-        if (!apiKey) {
-            throw new Error('CLAUDE_API_KEY environment variable not set');
-        }
-        anthropic = new Anthropic({ apiKey });
+        anthropic = new Anthropic({ apiKey: CLAUDE_API_KEY });
     }
     return anthropic;
 };
@@ -41,60 +40,95 @@ Use this external context to make nudges more specific and actionable. Reference
 - Press mentions or industry recognition
 - User feedback from social channels` : '';
 
-    return `As Coach Gina, generate 3 personalized nudges for ${context.startupName || 'this startup'}'s dashboard to boost their SSE from ${context.sseScore || 72} toward Series A readiness (>85).
+    return `As a design thinking specialist and Startup Mentor, generate 3 high-impact nudges for ${context.startupName || 'this startup'} to boost SSE from ${context.sseScore || 72} toward Series A readiness (>85).
 
-**CRITICAL: DO NOT use section headers or name-drop thinkers in your nudges. Be natural and conversational.**
-
-**Current Context:**
+**CONTEXT:**
 - Date: ${currentDate}
-- SSE Score: ${context.sseScore || 72}/100
-- Stage: ${context.stage || 'Series A'}
+- Startup: ${context.startupName || 'Unknown'}
+- SSE Score: ${context.sseScore || 72}/100 → Target: Series A (85+)
+- Stage: ${context.stage || 'Seed'}
 - Industry: ${context.industry || 'SaaS'}
 - MRR: $${context.mrr || '18,000'} (${context.mrrGrowth || '+23%'} MoM)
 - Users: ${context.users || '2,847'}
 - CAC: $${context.cac || '127'}
 - Churn Rate: ${context.churnRate || '2.3'}%
-- Interviews Completed: ${context.interviewsCompleted || 8}/10
-- Projections Age: ${context.projectionsAge || '30 days old'}${extContextStr}
+- Past Actions: ${context.pastActions || 'Completed 3 interviews last month'}${extContextStr}
 
-**Generate exactly 3 nudges as a JSON array (NO additional text, ONLY the JSON array):**
+**BEHAVIORAL DIRECTIVES:**
+→ Weave specific external signals into the description
+→ Create urgency using opportunity cost psychology
+→ Focus on 10x leverage points from actual data
+→ Use loss aversion: "Don't let your [viral thread] momentum fade"
+→ Frame as compounding habits, not one-off tasks
+
+**OUTPUT FORMAT (JSON array ONLY, no extra text):**
 
 [
   {
     "type": "growth",
-    "goal": "Concise action title (<10 words, e.g., 'Launch referral program for 25% CAC cut')",
-    "description": "1-sentence explainer with projected impact (e.g., 'Projected 25% CAC reduction in 30 days')",
-    "buttonText": "Action-oriented CTA (e.g., 'Launch Now', 'Start Program')",
-    "auxReward": 100-150,
-    "difficulty": "Low/Medium/High"
+    "goal": "Concise action title <10 words with measurable outcome",
+    "description": "1-sentence incorporating external signals + projected impact",
+    "buttonText": "Action-oriented CTA",
+    "auxReward": 75-300,
+    "difficulty": "Low/Medium/High",
+    "workflowType": "Modal/Redirect/Edit"
   },
   {
     "type": "validation",
-    "goal": "Concise action title (<10 words, e.g., 'Complete 2 customer interviews')",
-    "description": "1-sentence explainer with projected impact (e.g., 'Unlock Series A validation threshold')",
-    "buttonText": "Action-oriented CTA (e.g., 'Schedule Now', 'Start Interviews')",
-    "auxReward": 150-200,
-    "difficulty": "Medium/High"
+    "goal": "Concise validation action <10 words",
+    "description": "1-sentence using external signals + validation impact",
+    "buttonText": "Action CTA",
+    "auxReward": 75-300,
+    "difficulty": "Low/Medium/High",
+    "workflowType": "Modal/Redirect/Edit"
   },
   {
     "type": "funding",
-    "goal": "Concise action title (<10 words, e.g., 'Update 18-month financial model')",
-    "description": "1-sentence explainer with projected impact (e.g., 'Reflect recent MRR growth for investor readiness')",
-    "buttonText": "Action-oriented CTA (e.g., 'Update Model', 'Prepare Projections')",
-    "auxReward": 200-300,
-    "difficulty": "High"
+    "goal": "Concise funding prep <10 words",
+    "description": "1-sentence amplifying external signals + investor impact",
+    "buttonText": "Action CTA",
+    "auxReward": 75-300,
+    "difficulty": "Low/Medium/High",
+    "workflowType": "Modal/Redirect/Edit"
   }
 ]
 
-**Requirements:**
-- Draw from YC/a16z playbooks
-- Prioritize quick wins if SSE < 60
-- Make goals specific and actionable
-- Tie to their actual metrics (MRR, CAC, churn, etc.)
-- AUX rewards based on difficulty: Low (<1h) = 100-120, Medium (1-3h) = 120-180, High (3-5h) = 180-300
-- If CAC > $200, bias toward referral/organic growth
-- If churn > 5%, bias toward retention/activation
-- If interviews < 10, bias toward validation
+**PERSONALIZATION HOOKS:**
+- Infuse user signals (e.g., if CAC >$200, bias toward referrals)
+- Draw from top founder/VC playbooks (YC/a16z)
+- Prioritize quick wins if SSE <60
+- AUX reward formula: base 75 + difficulty [low=1x/medium=1.5x/high=2x] based on est. effort: low<1h, med 1-3h, high>3h
+
+**EXAMPLE OUTPUT:**
+[
+  {
+    "type": "growth",
+    "goal": "Launch referral program leveraging X engagement",
+    "description": "Your viral X thread on problem Y shows demand—projected 25% CAC reduction by rewarding shares.",
+    "buttonText": "Setup Referrals",
+    "auxReward": 185,
+    "difficulty": "Medium",
+    "workflowType": "Modal"
+  },
+  {
+    "type": "validation",
+    "goal": "Interview 5 Reddit commenters on pricing",
+    "description": "Your Reddit thread shows pricing confusion—validate premium model with 5 interviews to prevent build waste.",
+    "buttonText": "Find Leads",
+    "auxReward": 220,
+    "difficulty": "High",
+    "workflowType": "Redirect"
+  },
+  {
+    "type": "funding",
+    "goal": "Update deck with TechCrunch mention",
+    "description": "Your TechCrunch feature builds credibility—add to slide 3 to increase warm intro response by 20%.",
+    "buttonText": "Edit Deck",
+    "auxReward": 260,
+    "difficulty": "Medium",
+    "workflowType": "Edit"
+  }
+]
 
 **CRITICAL: Output ONLY the JSON array, no explanatory text before or after.**`;
 };
@@ -117,6 +151,12 @@ const parseNudgesResponse = (response) => {
             // Validate each nudge has required fields
             const requiredFields = ['type', 'goal', 'description', 'buttonText', 'auxReward', 'difficulty'];
             nudges.forEach((nudge, index) => {
+                // Convert workflowType to workflow_type if present
+                if (nudge.workflowType && !nudge.workflow_type) {
+                    nudge.workflow_type = nudge.workflowType;
+                    delete nudge.workflowType;
+                }
+                
                 requiredFields.forEach(field => {
                     if (!nudge[field]) {
                         throw new Error(`Nudge ${index} missing required field: ${field}`);
@@ -252,8 +292,8 @@ exports.handler = async (event) => {
         };
     }
     
-    // Only allow POST
-    if (event.httpMethod !== 'POST') {
+    // Only allow POST (skip check for direct Lambda invocation)
+    if (event.httpMethod && event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
             headers,
@@ -262,8 +302,8 @@ exports.handler = async (event) => {
     }
     
     try {
-        // Parse request body
-        const body = JSON.parse(event.body || '{}');
+        // Parse request body (handle both API Gateway and direct invocation)
+        const body = event.body ? JSON.parse(event.body) : event;
         const { context, externalContext } = body;
         
         if (!context) {

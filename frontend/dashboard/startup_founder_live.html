@@ -1780,7 +1780,7 @@
                                     <div class="sse-score" id="sseScoreDisplay">78</div>
                                 </div>
                             </div>
-                            <p class="lead fw-bold mb-1">Series A Readiness: <span class="text-warning">78%</span></p>
+                            <p class="lead fw-bold mb-1">Series A Readiness: <span class="text-warning" id="seriesAReadiness">78%</span></p>
                             <small class="text-secondary">Target: 85+ for Investor Introductions</small>
                             
                             <hr class="my-3" style="border-color: var(--glass-border);">
@@ -1788,25 +1788,25 @@
                             <div class="row text-start">
                                 <div class="col-6">
                                     <div class="metric-card" style="border-left-color: var(--success-green);">
-                                        <div class="metric-value text-success">$2.4M</div>
+                                        <div class="metric-value text-success" id="valuationOverview">$2.4M</div>
                                         <div class="metric-label">Valuation</div>
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="metric-card" style="border-left-color: var(--neon-blue);">
-                                        <div class="metric-value text-primary">$18.5K</div>
+                                        <div class="metric-value text-primary" id="mrrOverview">$18.5K</div>
                                         <div class="metric-label">Monthly MRR</div>
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="metric-card" style="border-left-color: var(--danger-red);">
-                                        <div class="metric-value text-danger">$127</div>
+                                        <div class="metric-value text-danger" id="cacOverview">$127</div>
                                         <div class="metric-label">Customer CAC</div>
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="metric-card" style="border-left-color: var(--neon-gold);">
-                                        <div class="metric-value text-warning">14</div>
+                                        <div class="metric-value text-warning" id="runwayOverview">14</div>
                                         <div class="metric-label">Runway (Months)</div>
                                     </div>
                                 </div>
@@ -1920,7 +1920,7 @@
             <div class="col-lg-3 col-md-6 mb-3">
                 <div class="metric-card" style="border-left-color: var(--neon-blue);">
                     <div class="metric-label">Customer Lifetime Value</div>
-                    <div class="metric-value text-primary">$1,890</div>
+                    <div class="metric-value text-primary" id="ltv">$1,890</div>
                     <div class="metric-trend trend-up">
                         <i class="fas fa-arrow-up"></i> +5.2% vs last month
                     </div>
@@ -1937,7 +1937,7 @@
             <div class="col-lg-3 col-md-6 mb-3">
                 <div class="metric-card" style="border-left-color: var(--warning-orange);">
                     <div class="metric-label">Customer Acquisition Cost</div>
-                    <div class="metric-value text-warning">$127</div>
+                    <div class="metric-value text-warning" id="cac">$127</div>
                     <div class="metric-trend trend-down">
                         <i class="fas fa-arrow-down"></i> -15.2% (Excellent!)
                     </div>
@@ -1954,7 +1954,7 @@
             <div class="col-lg-3 col-md-6 mb-3">
                 <div class="metric-card" style="border-left-color: var(--success-green);">
                     <div class="metric-label">LTV:CAC Ratio</div>
-                    <div class="metric-value text-success">14.9:1</div>
+                    <div class="metric-value text-success" id="ltvCacRatio">14.9:1</div>
                     <div class="metric-trend trend-up">
                         <i class="fas fa-arrow-up"></i> Ideal ratio: 3:1 or higher
                     </div>
@@ -1991,7 +1991,7 @@
             <div class="col-lg-3 col-md-6 mb-3">
                 <div class="metric-card" style="border-left-color: var(--neon-purple);">
                     <div class="metric-label">Total Customers</div>
-                    <div class="metric-value text-primary">1,247</div>
+                    <div class="metric-value text-primary" id="customers">1,247</div>
                     <div class="metric-trend trend-up">
                         <i class="fas fa-arrow-up"></i> +18% vs last quarter
                     </div>
@@ -2005,7 +2005,7 @@
             <div class="col-lg-3 col-md-6 mb-3">
                 <div class="metric-card" style="border-left-color: var(--danger-red);">
                     <div class="metric-label">Monthly Churn Rate</div>
-                    <div class="metric-value text-danger">2.3%</div>
+                    <div class="metric-value text-danger" id="churnRate">2.3%</div>
                     <div class="metric-trend trend-down">
                         <i class="fas fa-arrow-down"></i> -0.9% vs last quarter
                     </div>
@@ -2022,7 +2022,7 @@
             <div class="col-lg-3 col-md-6 mb-3">
                 <div class="metric-card" style="border-left-color: var(--success-green);">
                     <div class="metric-label">Monthly Recurring Revenue</div>
-                    <div class="metric-value text-success">$18,500</div>
+                    <div class="metric-value text-success" id="currentMRR">$18,500</div>
                     <div class="metric-trend trend-up">
                         <i class="fas fa-arrow-up"></i> +40% vs last quarter
                     </div>
@@ -2256,7 +2256,7 @@
                     <div class="col-md-6 mb-3">
                         <div class="metric-card" style="border-left-color: var(--neon-blue);">
                             <div class="metric-label">Runway (Months)</div>
-                            <div class="metric-value text-primary">14</div>
+                            <div class="metric-value text-primary" id="runway">14</div>
                             <div class="metric-trend trend-up">
                                 <i class="fas fa-arrow-up"></i> +2 months vs last quarter
                             </div>
@@ -2286,7 +2286,7 @@
                     <div class="col-md-6 mb-3">
                         <div class="metric-card" style="border-left-color: var(--success-green);">
                             <div class="metric-label">Team Size</div>
-                            <div class="metric-value text-success">12</div>
+                            <div class="metric-value text-success" id="teamSize">12</div>
                             <div class="metric-trend trend-up">
                                 <i class="fas fa-arrow-up"></i> +3 this quarter
                             </div>
@@ -5599,8 +5599,200 @@
     <script>
         // Initialize Coach Gina and Nudges when page loads
         let coachGina, nudgesWorkflow, overviewDynamic;
+        let currentUserData = null;
         
-        document.addEventListener('DOMContentLoaded', function() {
+        // API Configuration
+        const DASHBOARD_CONTEXT_API = 'https://24ndip5xbbgahv4m5cvicrmzta0vgdho.lambda-url.us-east-1.on.aws/';
+        
+        /**
+         * Load real user data from database
+         */
+        async function loadUserData() {
+            try {
+                // Check for token with both possible keys
+                const token = localStorage.getItem('authToken') || localStorage.getItem('auxeira_auth_token');
+                if (!token) {
+                    console.error('No auth token found');
+                    window.location.href = 'https://auxeira.com/';
+                    return null;
+                }
+                
+                console.log('Loading user data from API...');
+                const response = await fetch(DASHBOARD_CONTEXT_API, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        console.error('Authentication failed');
+                        localStorage.removeItem('authToken');
+                        window.location.href = '/';
+                        return null;
+                    }
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('User data loaded successfully:', result);
+                return result.data;
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                return null;
+            }
+        }
+        
+        /**
+         * Update dashboard UI with real data
+         */
+        function updateDashboardUI(context) {
+            console.log('Updating dashboard UI with context:', context);
+            
+            // Update SSE Score (multiple locations)
+            console.log('Updating SSE Score to:', context.sseScore);
+            
+            // Direct update by ID
+            const sseDisplay = document.getElementById('sseScoreDisplay');
+            if (sseDisplay) {
+                console.log('Found sseScoreDisplay, updating to:', context.sseScore);
+                sseDisplay.textContent = context.sseScore;
+            } else {
+                console.error('sseScoreDisplay element not found!');
+            }
+            
+            // Update all other SSE elements
+            const sseElements = document.querySelectorAll('.sse-score-value, #sseScore, .sse-score');
+            console.log('Found additional SSE elements:', sseElements.length);
+            sseElements.forEach(el => {
+                console.log('Updating element:', el.id || el.className, 'to', context.sseScore);
+                el.textContent = context.sseScore;
+            });
+            
+            // Update Series A Readiness (same as SSE score)
+            const seriesAElement = document.getElementById('seriesAReadiness');
+            if (seriesAElement) seriesAElement.textContent = `${context.sseScore}%`;
+            
+            // Update Funding Readiness Score (based on SSE)
+            const readinessScore = Math.min(100, context.sseScore + 10);
+            const readinessElement = document.getElementById('readinessScore');
+            if (readinessElement) {
+                readinessElement.textContent = readinessScore;
+                // Update progress bar
+                const progressBar = readinessElement.closest('.glass-card')?.querySelector('.progress-bar');
+                if (progressBar) progressBar.style.width = `${readinessScore}%`;
+                // Update circle
+                const readinessCircle = document.getElementById('readinessCircle');
+                if (readinessCircle) {
+                    const degrees = (readinessScore / 100) * 360;
+                    readinessCircle.style.background = `conic-gradient(var(--neon-blue) 0deg, var(--neon-blue) ${degrees}deg, var(--accent-bg) ${degrees}deg)`;
+                }
+            }
+            
+            // Update company name in header
+            const companyElements = document.querySelectorAll('.company-name, .brand-logo');
+            companyElements.forEach(el => {
+                if (el.classList.contains('brand-logo')) {
+                    el.textContent = `${context.startupName} Dashboard`;
+                } else {
+                    el.textContent = context.startupName;
+                }
+            });
+            
+            // Update metrics in Overview tab
+            const mrrElement = document.getElementById('currentMRR');
+            if (mrrElement) mrrElement.textContent = `$${context.mrr.toLocaleString()}`;
+            
+            // Update SSE card mini metrics
+            const mrrOverview = document.getElementById('mrrOverview');
+            if (mrrOverview) mrrOverview.textContent = `$${(context.mrr / 1000).toFixed(1)}K`;
+            
+            const cacOverview = document.getElementById('cacOverview');
+            if (cacOverview) cacOverview.textContent = `$${context.cac}`;
+            
+            const runwayOverview = document.getElementById('runwayOverview');
+            if (runwayOverview) runwayOverview.textContent = Math.round(context.runway);
+            
+            const growthElement = document.getElementById('growthRate');
+            if (growthElement) growthElement.textContent = context.mrrGrowth;
+            
+            const teamElement = document.getElementById('teamSize');
+            if (teamElement) teamElement.textContent = context.teamSize;
+            
+            const runwayElement = document.getElementById('runway');
+            if (runwayElement) runwayElement.textContent = `${context.runway} months`;
+            
+            const customersElement = document.getElementById('customers');
+            if (customersElement) customersElement.textContent = context.customers.toLocaleString();
+            
+            const usersElement = document.getElementById('activeUsers');
+            if (usersElement) usersElement.textContent = context.users.toLocaleString();
+            
+            // Update financial metrics
+            const cacElement = document.getElementById('cac');
+            if (cacElement) cacElement.textContent = `$${context.cac}`;
+            
+            const ltvElement = document.getElementById('ltv');
+            if (ltvElement) ltvElement.textContent = `$${context.ltv}`;
+            
+            const ltvCacElement = document.getElementById('ltvCacRatio');
+            if (ltvCacElement) {
+                const ratio = (context.ltv / context.cac).toFixed(1);
+                ltvCacElement.textContent = `${ratio}:1`;
+            }
+            
+            const churnElement = document.getElementById('churnRate');
+            if (churnElement) churnElement.textContent = `${context.churnRate}%`;
+            
+            const npsElement = document.getElementById('nps');
+            if (npsElement) npsElement.textContent = context.nps;
+            
+            // Update stage and industry
+            const stageElements = document.querySelectorAll('.funding-stage');
+            stageElements.forEach(el => el.textContent = context.stage);
+            
+            const industryElements = document.querySelectorAll('.industry');
+            industryElements.forEach(el => el.textContent = context.industry);
+            
+            // Update document title
+            document.title = `${context.startupName} - Auxeira Dashboard`;
+            
+            console.log('Dashboard UI updated successfully');
+        }
+        
+        /**
+         * Show loading state
+         */
+        function showLoadingState() {
+            const dashboard = document.querySelector('.container-fluid');
+            if (dashboard) {
+                dashboard.style.opacity = '0.6';
+                dashboard.style.pointerEvents = 'none';
+            }
+        }
+        
+        /**
+         * Hide loading state
+         */
+        function hideLoadingState() {
+            const dashboard = document.querySelector('.container-fluid');
+            if (dashboard) {
+                dashboard.style.opacity = '1';
+                dashboard.style.pointerEvents = 'auto';
+            }
+        }
+        
+        /**
+         * Initialize dashboard with real data
+         */
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Dashboard initializing...');
+            
+            // Show loading state
+            showLoadingState();
+            
             // Initialize Coach Gina with API endpoint
             const COACH_GINA_API = 'https://9t3nivd6wg.execute-api.us-east-1.amazonaws.com/prod/api/coach-gina';
             coachGina = new CoachGinaChat(null, COACH_GINA_API);
@@ -5614,38 +5806,33 @@
             const URGENT_ACTIONS_API = 'https://yyf8vfdvs6.execute-api.us-east-1.amazonaws.com/prod/api/urgent-actions/generate';
             overviewDynamic = new OverviewDynamicManager(NUDGES_GENERATOR_API, URGENT_ACTIONS_API);
             
-            // Get founder context from page data
-            const founderContext = {
-                startupName: 'Auxeira',
-                sseScore: 72,
-                stage: 'Series A',
-                industry: 'FinTech',
-                geography: 'United States',
-                teamSize: 12,
-                runway: 14,
-                mrr: 18500,
-                mrrGrowth: '+23%',
-                users: 2847,
-                customers: 1247,
-                cac: 127,
-                ltv: 1890,
-                churnRate: 2.3,
-                nps: 68,
-                interviewsCompleted: 8,
-                projectionsAge: '30 days old',
-                recentMilestones: [
-                    'Achieved $18.5K MRR',
-                    'Reduced CAC by 15.2%',
-                    'Reached 1,247 customers'
-                ],
-                activeChallenges: [
-                    'Churn rate above SaaS benchmark (2.3% vs 1-2%)',
-                    'Need to complete 2 more customer interviews',
-                    'Financial model needs updating'
-                ]
-            };
+            // Load real user data from database
+            const founderContext = await loadUserData();
             
-            // Load dynamic nudges
+            if (!founderContext) {
+                console.error('Failed to load user data, using fallback');
+                hideLoadingState();
+                alert('Unable to load your data. Please refresh the page or contact support.');
+                return;
+            }
+            
+            // Store for later use
+            currentUserData = founderContext;
+            
+            // Update UI with real data
+            updateDashboardUI(founderContext);
+            
+            // Force update SSE score after a short delay (in case dynamic content overwrites it)
+            setTimeout(() => {
+                console.log('Force updating SSE score after delay');
+                const sseDisplay = document.getElementById('sseScoreDisplay');
+                if (sseDisplay) {
+                    sseDisplay.textContent = founderContext.sseScore;
+                    console.log('SSE score force updated to:', founderContext.sseScore);
+                }
+            }, 1000);
+            
+            // Load dynamic nudges with real context
             overviewDynamic.initialize(founderContext).then(result => {
                 console.log('Dynamic nudges loaded:', result);
                 // Re-attach event handlers after dynamic content is loaded
@@ -5654,8 +5841,13 @@
                 console.error('Failed to load dynamic nudges:', error);
             });
             
-            // Update Coach Gina with founder context
+            // Update Coach Gina with real founder context
             coachGina.updateFounderContext(founderContext);
+            
+            // Hide loading state
+            hideLoadingState();
+            
+            console.log('Dashboard initialized successfully with real data');
             
             // Attach click handler to "Chat with Coach Gina" button
             const chatButton = document.getElementById('openCoachGinaBtn');

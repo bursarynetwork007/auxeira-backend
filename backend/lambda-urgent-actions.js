@@ -5,16 +5,15 @@
 
 const Anthropic = require('@anthropic-ai/sdk');
 
+// Claude API Key for Overview tab
+const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || 'YOUR_ANTHROPIC_API_KEY';
+
 // Initialize Anthropic client
 let anthropic;
 
 const initializeAnthropic = () => {
     if (!anthropic) {
-        const apiKey = process.env.CLAUDE_API_KEY;
-        if (!apiKey) {
-            throw new Error('CLAUDE_API_KEY environment variable not set');
-        }
-        anthropic = new Anthropic({ apiKey });
+        anthropic = new Anthropic({ apiKey: CLAUDE_API_KEY });
     }
     return anthropic;
 };
@@ -41,74 +40,69 @@ Use this external context to make urgent actions more specific and timely. Refer
 - Press mentions or funding announcements
 - Industry trends or competitive moves` : '';
 
-    return `As Coach Gina, generate exactly 3 personalized items for the "Urgent Actions & Opportunities" section to accelerate ${context.startupName || 'this startup'}'s success.
+    return `As Coach Gina, an AI startup mentor blending insights from top founders (YC, Techstars) and VCs (a16z, Sequoia), generate exactly 3 personalized items for the "Urgent Actions & Opportunities" section to accelerate ${context.startupName || 'this startup'}'s success.
 
-**CRITICAL: DO NOT use section headers or name-drop thinkers. Be natural and conversational.**
+**Current date**: ${currentDate}
 
-**Current Context:**
-- Date: ${currentDate}
-- SSE Score: ${context.sseScore || 72}/100
+**Analyze user profile:**
+- SSE: ${context.sseScore || 72}/100
 - Industry: ${context.industry || 'AI-blockchain for startups'}
-- MRR: $${context.mrr || '18,000'} (${context.mrrGrowth || '+23%'} MoM)
-- Users: ${context.users || '2,847'}
-- Interviews: ${context.interviewsCompleted || 7}/10 complete
-- Projections: ${context.projectionsAge || 'Overdue 45 days'}
-- Stage: ${context.stage || 'Series A'}${extContextStr}
+- Key Metrics: MRR $${context.mrr || '18K'} (${context.mrrGrowth || '+23%'} MoM); Users ${context.users || '2,847'}
+- Console Gaps: Interviews: ${context.interviewsCompleted || 7}/10 complete; Projections ${context.projectionsAge || 'overdue 45 days'}; Missing: Churn data, ESG alignment score (low)
+- Stage: ${context.stage || 'pre-pilot'}${extContextStr}
 
-**Generate exactly 3 items as a JSON array (NO additional text, ONLY the JSON array):**
+**Prioritize for SSE boost toward Series A readiness (>85):**
+
+1. **Blocker (Red Urgency)**: Critical validation gap, e.g., final interview—enhance with scan for missing opportunities (query X semantic: 'startup interview enhancements 2025 hypothesis-led questions' for tips like probing implicit PMF signals).
+
+2. **Overdue (Yellow Urgency)**: Stale data risk, e.g., model update—flag necessary info needs (e.g., 'Add behavioral churn benchmarks') and tie to console trends.
+
+3. **Opportunity (Blue High-Reward)**: Timely ESG funding or intro—deep scan web/X (query: 'ESG grants ${context.industry || 'AI'} startups ${currentDate.split(',')[1]} deadlines' e.g., NEXUS Scaleup, EU €2M climate tech; X: 'ESG investor intros for AI impact tools') for 2-3 fits, leveraging user strengths (e.g., 85.7% success prediction).
+
+**For each item, ensure 80% feasibility (<3h effort), motivational tone, and ties to success levers (e.g., 'Unlocks 20% faster partner closes').**
+
+**Output a JSON array with no extra text:**
 
 [
   {
     "title": "Concise, bold label (10-15 words max)",
-    "description": "1-2 sentences: Urgency/impact + personalization (e.g., 'Leverage your 23% user growth for...')",
+    "description": "1-2 sentences: Urgency/impact + personalization (e.g., 'Leverage your 23% user growth for...') + scan insight (e.g., 'X tips: Structure as buyer chat')",
     "buttonText": "Action-oriented CTA (e.g., 'Start Now')",
     "urgencyColor": "red",
-    "auxReward": 100-200,
+    "auxReward": 50-500,
     "actionId": "unique_lowercase_with_underscores (e.g., partner_interview_3)",
-    "workflowType": "Modal"
+    "workflowType": "Redirect/Modal/Edit",
+    "enhancementTip": "Brief scan-derived add-on (e.g., 'Probe: How do bias blind spots tank ROI?')"
   },
   {
     "title": "...",
     "description": "...",
     "buttonText": "...",
     "urgencyColor": "yellow",
-    "auxReward": 150-250,
+    "auxReward": 50-500,
     "actionId": "...",
-    "workflowType": "Edit"
+    "workflowType": "...",
+    "enhancementTip": "..."
   },
   {
     "title": "...",
     "description": "...",
     "buttonText": "...",
     "urgencyColor": "blue",
-    "auxReward": 300-500,
+    "auxReward": 50-500,
     "actionId": "...",
-    "workflowType": "Redirect"
+    "workflowType": "...",
+    "enhancementTip": "..."
   }
 ]
 
-**Requirements:**
-1. **Red (Blocker)**: Critical validation gap requiring immediate attention
-   - Example: "Customer Interview #${context.interviewsCompleted + 1} - Required to unlock Series A assessment"
-   - Focus: Missing validation, incomplete data, critical blockers
-   - AUX: 100-200
+**AUX Reward Guidelines:**
+- Low effort/quick wins: 50-100 AUX
+- Medium strategic tasks: 100-300 AUX
+- High-impact opportunities: 300-500 AUX
+- Difficulty-based: low=100 for quick, high=500 for strategic
 
-2. **Yellow (Overdue)**: Stale data risk that needs updating
-   - Example: "Financial Model Update - Your projections are ${context.projectionsAge}"
-   - Focus: Outdated metrics, overdue tasks, data freshness
-   - AUX: 150-250
-
-3. **Blue (Opportunity)**: Timely high-reward opportunity
-   - Example: "ESG Grant Opportunity - NEXUS Scaleup €2M climate tech deadline ${currentDate}"
-   - Focus: Funding opportunities, investor intros, strategic partnerships
-   - AUX: 300-500
-
-**Personalization:**
-- Tie to SSE score (prioritize for Series A readiness if SSE < 85)
-- Reference actual metrics (MRR growth, user count, etc.)
-- 80% feasibility (<3h effort)
-- Motivational tone
-- Ties to success levers (e.g., "Unlocks 20% faster partner closes")
+**If scans yield no fits, default to strong generics (e.g., 'Generic ESG Audit +50 AUX'). Ensure outputs are empowering and founder-specific—no hallucinations.**
 
 **CRITICAL: Output ONLY the JSON array, no explanatory text before or after.**`;
 };
@@ -131,15 +125,43 @@ const parseUrgentActionsResponse = (response) => {
             // Validate each action has required fields
             const requiredFields = ['title', 'description', 'buttonText', 'urgencyColor', 'auxReward', 'actionId', 'workflowType'];
             actions.forEach((action, index) => {
+                // Convert camelCase to snake_case for consistency
+                if (action.urgencyColor && !action.urgency_color) {
+                    action.urgency_color = action.urgencyColor;
+                    delete action.urgencyColor;
+                }
+                if (action.buttonText && !action.button_text) {
+                    action.button_text = action.buttonText;
+                    delete action.buttonText;
+                }
+                if (action.auxReward && !action.aux_reward) {
+                    action.aux_reward = action.auxReward;
+                    delete action.auxReward;
+                }
+                if (action.actionId && !action.action_id) {
+                    action.action_id = action.actionId;
+                    delete action.actionId;
+                }
+                if (action.workflowType && !action.workflow_type) {
+                    action.workflow_type = action.workflowType;
+                    delete action.workflowType;
+                }
+                if (action.enhancementTip && !action.enhancement_tip) {
+                    action.enhancement_tip = action.enhancementTip;
+                    delete action.enhancementTip;
+                }
+                
                 requiredFields.forEach(field => {
-                    if (!action[field]) {
+                    const snakeField = field.replace(/([A-Z])/g, '_$1').toLowerCase();
+                    if (!action[field] && !action[snakeField]) {
                         throw new Error(`Action ${index} missing required field: ${field}`);
                     }
                 });
                 
                 // Validate urgency colors
-                if (!['red', 'yellow', 'blue'].includes(action.urgencyColor)) {
-                    throw new Error(`Action ${index} has invalid urgencyColor: ${action.urgencyColor}`);
+                const urgencyColor = action.urgency_color || action.urgencyColor;
+                if (!['red', 'yellow', 'blue'].includes(urgencyColor)) {
+                    throw new Error(`Action ${index} has invalid urgencyColor: ${urgencyColor}`);
                 }
             });
             
@@ -270,8 +292,8 @@ exports.handler = async (event) => {
         };
     }
     
-    // Only allow POST
-    if (event.httpMethod !== 'POST') {
+    // Only allow POST (skip check for direct Lambda invocation)
+    if (event.httpMethod && event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
             headers,
@@ -280,8 +302,8 @@ exports.handler = async (event) => {
     }
     
     try {
-        // Parse request body
-        const body = JSON.parse(event.body || '{}');
+        // Parse request body (handle both API Gateway and direct invocation)
+        const body = event.body ? JSON.parse(event.body) : event;
         const { context, externalContext } = body;
         
         if (!context) {

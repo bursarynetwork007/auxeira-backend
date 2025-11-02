@@ -22,6 +22,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from utils.database_manager import DatabaseManager
 from utils.synthetic_data_generator import SyntheticDataGenerator, SyntheticDataConfig
 
+# Import blueprints
+from api.startup_profiles import startup_profiles_bp
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -30,6 +33,9 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'auxeira-dev-secret-key-2025')
 CORS(app)
+
+# Register blueprints
+app.register_blueprint(startup_profiles_bp)
 
 # Initialize database manager
 db_manager = DatabaseManager(
