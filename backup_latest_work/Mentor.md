@@ -90,8 +90,346 @@ You're Gina: Empower 1M founders to 50% less failure—data-driven, tab-smart, o
 - **Predictive Scenario Simulator**: Baked into Framework #3 and JSON ("scenario_sims" array)—Gina flags 2-3 branches (e.g., "If churn drops, Manus-simmed $30K upside") with confidence scores, triggered via [MANUS_HANDoFF: code_execution]. It's interactive: Founders tweak vars in-chat.
 - **Global Network Weaver**: Integrated into Context Engine and Insight #2—pulls anon cohort data (e.g., "70% fixed via A/Bs") for benchmarking, with Manus for fresh peer scripts. Scales community wisdom without doxxing.
 - Cut everything that doesn't drive clarity, confidence, or accountability.
+```
 
-Input Context Schema
+---
+
+
+### JavaSript
+const AWS = require('aws-sdk');
+const Anthropic = require('@anthropic-ai/sdk');
+const crypto = require('crypto');  // For session IDs
+
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+exports.handler = async (event) => {
+  try {
+    const { userId, message } = JSON.parse(event.body);
+    if (!userId || !message) throw new Error('userId and message required');
+
+    const sessionId = crypto.randomUUID();  // Or from request
+
+    // 1. Build comprehensive context (intern's buildFounderContext adapted)
+    const context = await buildFounderContext(userId);
+
+    // 2. Get conversation history (last 10, DynamoDB query)
+    const conversationHistory = await getConversationHistory(userId, 10);
+
+    // 3. Format messages for Claude (intern's formatMessagesForClaude enhanced)
+    const messages = formatMessagesForClaude(conversationHistory, message, context);
+
+    // 4. Call Claude with comprehensive prompt
+    const startTime = Date.now();
+    const response = await anthropic.messages.create({
+      model: 'claude-3-5-sonnet-20240620',  // Or latest
+      max_tokens: 2000,
+      temperature: 0.7,
+      system: AUXCOACH_SYSTEM_PROMPT,  // Your full prompt here
+      messages
+    });
+    const responseTime = Date.now() - startTime;
+    const assistantMessage = response.content[0].text;
+
+    // 5. Store conversation (intern's storeConversation adapted)
+    const conversationId = await storeConversation(userId, sessionId, 'user', message, context);
+    await storeConversation(userId, sessionId, 'assistant', assistantMessage, { ...context, tokens: response.usage.total_tokens });
+
+    // 6. Extract & store action items (intern's extractAndStoreActionItems enhanced)
+    await extractAndStoreActionItems(userId, conversationId, assistantMessage);
+
+    // 7. Update engagement (intern's updateEngagement adapted)
+    await updateEngagement(userId);
+
+    // 8. Recalculate weak areas (intern's recalculateWeakAreas)
+    await recalculateWeakAreas(userId, context.current_metrics);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: assistantMessage,
+        context_used: {
+          stage: context.founder_profile.stage,
+          weak_areas: context.weak_areas,
+          metrics_trending: context.metrics_trends?.trend_direction
+        },
+        tokens_used: response.usage.total_tokens,
+        response_time_ms: responseTime
+      })
+    };
+  } catch (error) {
+    console.error('Gina error:', error);
+    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+  }
+};
+
+// Intern's buildFounderContext (DynamoDB-ified)
+async function buildFounderContext(userId) {
+  // Profile
+  const profileParams = { TableName: 'AuxeiraChats', Key: { PK: `${userId}#profile`, SK: 'profile' } };
+  const profile = await dynamoDb.get(profileParams).promise();
+
+  // Latest metrics
+  const latestMetricsParams = {
+    TableName: 'AuxeiraChats',
+    IndexName: 'UserHistoryIndex',
+    KeyConditionExpression: 'userId = :uid AND begins_with(SK, :sk)',
+    ExpressionAttributeValues: { ':uid': userId, ':sk': 'metrics#' },
+    Limit: 1,
+    ScanIndexForward: false
+  };
+  const latestMetricsRes = await dynamoDb.query(latestMetricsParams).promise();
+  const latestMetrics = latestMetricsRes.Items[0]?.data || {};
+
+  // Metrics history (last 90 days for trends)
+  const historyParams = { ...latestMetricsParams, Limit: 90 };  // Adjust for time filter via SK if patterned
+  const historyRes = await dynamoDb.query(historyParams).promise();
+  const metricsHistory = historyRes.Items.map(item => item.data);
+
+  const metricsTrends = calculateMetricsTrends(metricsHistory);  // Intern's function
+
+  // Weak areas (query unresolved)
+  const weakParams = {
+    TableName: 'AuxeiraChats',
+    IndexName: 'UserHistoryIndex',
+    KeyConditionExpression: 'userId = :uid AND begins_with(SK, :sk)',
+    ExpressionAttributeValues: { ':uid': userId, ':sk': 'weak_areas#' },
+    FilterExpression: 'resolved_at = :null',
+    ExpressionAttributeValues: { ...latestMetricsParams.ExpressionAttributeValues, ':null': null }
+  };
+  const weakRes = await dynamoDb.query(weakParams).promise();
+  const weakAreas = weakRes.Items.map(item => item.area);
+
+  // Pending actions (query count)
+  const actionsParams = {
+    TableName: 'AuxeiraChats',
+    IndexName: 'UserHistoryIndex',
+    KeyConditionExpression: 'userId = :uid AND begins_with(SK, :sk)',
+    ExpressionAttributeValues: { ':uid': userId, ':sk': 'actions#pending#' }
+  };
+  const actionsRes = await dynamoDb.query(actionsParams).promise();
+  const pendingActions = actionsRes.Count;
+
+  // Engagement (single get)
+  const engagementParams = { TableName: 'AuxeiraChats', Key: { PK: `${userId}#engagement`, SK: 'engagement' } };
+  const engagement = await dynamoDb.get(engagementParams).promise();
+
+  return {
+    founder_profile: profile.Item || { stage: 'Unknown' },
+    current_metrics: latestMetrics,
+    metrics_trends: metricsTrends,
+    weak_areas,
+    pending_actions: pendingActions,
+    completion_rate: engagement.Item?.completion_rate || 0,
+    days_since_last_activity: engagement.Item?.days_since_last_activity || 0,
+    current_streak: engagement.Item?.current_streak_days || 0
+  };
+}
+
+// Intern's getConversationHistory (DynamoDB query)
+async function getConversationHistory(userId, limit = 10) {
+  const params = {
+    TableName: 'AuxeiraChats',
+    IndexName: 'UserHistoryIndex',
+    KeyConditionExpression: 'userId = :uid AND begins_with(PK, :pk)',
+    ExpressionAttributeValues: { ':uid': userId, ':pk': `${userId}#chat` },
+    Limit,
+    ScanIndexForward: false
+  };
+  const res = await dynamoDb.query(params).promise();
+  return res.Items.reverse();  // Chronological
+}
+
+// Intern's formatMessagesForClaude (enhanced with context string)
+function formatMessagesForClaude(history, message, context) {
+  const messages = history.map(item => ({
+    role: item.role === 'assistant' ? 'assistant' : 'user',
+    content: item.message
+  }));
+
+  const contextString = `
+---FOUNDER CONTEXT---
+Stage: ${context.founder_profile.stage}
+Current Metrics: ${JSON.stringify(context.current_metrics)}
+Trends: ${JSON.stringify(context.metrics_trends)}
+Weak Areas: ${context.weak_areas.join(', ')}
+Pending Actions: ${context.pending_actions}
+Engagement: Streak ${context.current_streak} days, Completion ${context.completion_rate * 100}%
+`;
+
+  messages.push({
+    role: 'user',
+    content: `${message}\n\n${contextString}`
+  });
+
+  return messages;
+}
+
+// Intern's calculateMetricsTrends (unchanged, works with arrays)
+function calculateMetricsTrends(metricsHistory) {
+  if (metricsHistory.length < 2) return { insufficient_data: true };
+
+  const latest = metricsHistory[metricsHistory.length - 1];
+  const previous = metricsHistory[metricsHistory.length - 2];
+
+  const calculateChange = (current, past) => past ? ((current - past) / past * 100).toFixed(1) : null;
+
+  return {
+    mrr_change: calculateChange(latest.mrr_arr, previous.mrr_arr),
+    churn_change: calculateChange(latest.churn_rate, previous.churn_rate),
+    nps_change: latest.nps - previous.nps,
+    trend_direction: {
+      mrr: latest.mrr_arr > previous.mrr_arr ? 'improving' : 'declining',
+      churn: latest.churn_rate < previous.churn_rate ? 'improving' : 'declining',
+      nps: latest.nps > previous.nps ? 'improving' : 'declining'
+    }
+  };
+}
+
+// Intern's storeConversation (DynamoDB put)
+async function storeConversation(userId, sessionId, role, message, context) {
+  const timestamp = new Date().toISOString();
+  const ttl = Math.floor(Date.now() / 1000) + (90 * 24 * 60 * 60);  // 90 days
+
+  const item = {
+    TableName: 'AuxeiraChats',
+    Item: {
+      PK: `${userId}#chat`,
+      SK: `${sessionId}#${timestamp}`,
+      userId,
+      sessionId,
+      role,
+      message,
+      context: JSON.stringify(context),
+      ttl
+    }
+  };
+
+  await dynamoDb.put(item).promise();
+  return timestamp;  // As ID
+}
+
+// Intern's extractAndStoreActionItems (enhanced with handoff flag)
+async function extractAndStoreActionItems(userId, conversationId, responseText) {
+  const actionPattern = /^[\-\*]\s+(.+?):\s*(.+)$/gm;
+  const matches = [...responseText.matchAll(actionPattern)];
+
+  for (const match of matches) {
+    const timeframe = match[1].trim();
+    const actionText = match[2].trim();
+    const dueDate = calculateDueDate(timeframe);
+    const handoff = actionText.includes('Manus') ? 'pending' : null;  // Flag for execution
+
+    const item = {
+      TableName: 'AuxeiraChats',
+      Item: {
+        PK: `${userId}#actions`,
+        SK: `${conversationId}#${Date.now()}`,
+        userId,
+        conversationId,
+        action_text: `${timeframe}: ${actionText}`,
+        timeframe,
+        due_date: dueDate,
+        status: 'pending',
+        handoff,
+        ttl: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60)  // 30 days
+      }
+    };
+
+    await dynamoDb.put(item).promise();
+  }
+}
+
+// Intern's calculateDueDate (unchanged)
+function calculateDueDate(timeframe) {
+  if (!timeframe) return null;
+  const now = new Date();
+  const lower = timeframe.toLowerCase();
+  if (lower.includes('this week')) return new Date(now.setDate(now.getDate() + 7));
+  if (lower.includes('friday')) {
+    const daysUntilFriday = (5 - now.getDay() + 7) % 7 || 7;
+    return new Date(now.setDate(now.getDate() + daysUntilFriday));
+  }
+  if (lower.includes('today')) return new Date(now.setDate(now.getDate() + 1));
+  if (lower.includes('month')) return new Date(now.setMonth(now.getMonth() + 1));
+  return null;
+}
+
+// Intern's updateEngagement (DynamoDB get/put)
+async function updateEngagement(userId) {
+  const getParams = { TableName: 'AuxeiraChats', Key: { PK: `${userId}#engagement`, SK: 'engagement' } };
+  const res = await dynamoDb.get(getParams).promise();
+  let engagement = res.Item || { current_streak_days: 0, total_conversations: 0 };
+
+  const daysSinceLast = /* calc from last_active_at */ 0;  // Implement based on attr
+  let newStreak = engagement.current_streak_days;
+  if (daysSinceLast === 1) newStreak++;
+  else if (daysSinceLast > 1) newStreak = 1;
+
+  const updateItem = {
+    TableName: 'AuxeiraChats',
+    Item: {
+      ...engagement,
+      PK: `${userId}#engagement`,
+      SK: 'engagement',
+      total_conversations: engagement.total_conversations + 1,
+      last_active_at: new Date().toISOString(),
+      current_streak_days: newStreak,
+      longest_streak_days: Math.max(engagement.longest_streak_days || 0, newStreak),
+      ttl: 0  // No TTL for engagement
+    }
+  };
+
+  await dynamoDb.put(updateItem).promise();
+}
+
+// Intern's recalculateWeakAreas (DynamoDB query/put, stage-aware)
+async function recalculateWeakAreas(userId, metrics) {
+  // Clear old (set resolved_at)
+  const clearParams = {
+    TableName: 'AuxeiraChats',
+    IndexName: 'UserHistoryIndex',
+    KeyConditionExpression: 'userId = :uid AND begins_with(SK, :sk)',
+    ExpressionAttributeValues: { ':uid': userId, ':sk': 'weak_areas#' }
+  };
+  // Update to resolved (batch if needed)
+
+  const stage = /* from profile */ 'Growth';  // Fetch as needed
+  const thresholds = {  // Intern's structure
+    Founder: { critical: 0.15, warning: 0.10 },
+    // ... other stages
+  }[stage];
+
+  const weaknesses = [];
+  if (metrics.churn_rate >= thresholds.critical) weaknesses.push({ area: 'high_churn', severity: 'critical' });
+  // Add other checks (LTV, NPS, runway)
+
+  for (const weakness of weaknesses) {
+    const item = {
+      TableName: 'AuxeiraChats',
+      Item: {
+        PK: `${userId}#weak_areas`,
+        SK: `${weakness.area}_${Date.now()}`,
+        userId,
+        area: weakness.area,
+        severity: weakness.severity,
+        metric_value: metrics[weakness.area.split('_')[1]] || metrics.churn_rate,
+        threshold_value: thresholds.warning,  // Or critical
+        resolved_at: null,
+        ttl: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60)
+      }
+    };
+    await dynamoDb.put(item).promise();
+  }
+
+  return weaknesses;
+}
+```
+---
+
+
+
+###Input Context Schema
 Parse this JSON deeply with every request:
 
 json
@@ -144,7 +482,11 @@ json
   "active_crises": ["array of strings"],
   "founder_query": "string"
 }
-Response Framework (4-Part Structure)
+
+```
+---
+
+###Response Framework (4-Part Structure)
 1. REALITY CHECK (2-3 sentences)
 Ground the conversation in their actual data with numbers and math
 
