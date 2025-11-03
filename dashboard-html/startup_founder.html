@@ -1777,7 +1777,7 @@
                             <h5 class="text-neon-blue mb-3">Your SSE Score</h5>
                             <div class="sse-circle-container">
                                 <div class="sse-circle" id="sseCircle">
-                                    <div class="sse-score" id="sseScoreDisplay">78</div>
+                                    <div class="sse-score" id="sseScoreDisplay">0</div>
                                 </div>
                             </div>
                             <p class="lead fw-bold mb-1">Series A Readiness: <span class="text-warning">78%</span></p>
@@ -5784,34 +5784,53 @@
          * Initialize dashboard with real data
          */
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('Dashboard initializing...');
-            
-            // Check authentication - redirect if no token
-            const token = localStorage.getItem('auxeira_auth_token');
-            if (!token) {
-                console.warn('No authentication token found, redirecting to login...');
-                window.location.href = 'https://auxeira.com';
-                return;
-            }
+            console.log('=== DASHBOARD INITIALIZING ===');
+            console.log('Timestamp:', new Date().toISOString());
+            console.log('URL:', window.location.href);
             
             // Show loading state
             showLoadingState();
             
             // Initialize Coach Gina with API endpoint
-            const COACH_GINA_API = 'https://9t3nivd6wg.execute-api.us-east-1.amazonaws.com/prod/api/coach-gina';
-            coachGina = new CoachGinaChat(null, COACH_GINA_API);
+            try {
+                const COACH_GINA_API = 'https://9t3nivd6wg.execute-api.us-east-1.amazonaws.com/prod/api/coach-gina';
+                if (typeof CoachGinaChat !== 'undefined') {
+                    coachGina = new CoachGinaChat(null, COACH_GINA_API);
+                    console.log('Coach Gina initialized');
+                } else {
+                    console.warn('CoachGinaChat class not found, skipping initialization');
+                }
+            } catch (error) {
+                console.error('Error initializing Coach Gina:', error);
+            }
             
             // Initialize Nudges Workflow
-            const NUDGES_API = 'https://qh56ng61eh.execute-api.us-east-1.amazonaws.com/prod/api/nudges';
-            nudgesWorkflow = new NudgesWorkflow(NUDGES_API);
+            try {
+                const NUDGES_API = 'https://qh56ng61eh.execute-api.us-east-1.amazonaws.com/prod/api/nudges';
+                if (typeof NudgesWorkflow !== 'undefined') {
+                    nudgesWorkflow = new NudgesWorkflow(NUDGES_API);
+                    console.log('Nudges Workflow initialized');
+                }
+            } catch (error) {
+                console.error('Error initializing Nudges Workflow:', error);
+            }
             
             // Initialize Overview Dynamic Manager
-            const NUDGES_GENERATOR_API = 'https://koo8kun6ge.execute-api.us-east-1.amazonaws.com/prod/api/nudges/generate';
-            const URGENT_ACTIONS_API = 'https://yyf8vfdvs6.execute-api.us-east-1.amazonaws.com/prod/api/urgent-actions/generate';
-            overviewDynamic = new OverviewDynamicManager(NUDGES_GENERATOR_API, URGENT_ACTIONS_API);
+            try {
+                const NUDGES_GENERATOR_API = 'https://koo8kun6ge.execute-api.us-east-1.amazonaws.com/prod/api/nudges/generate';
+                const URGENT_ACTIONS_API = 'https://yyf8vfdvs6.execute-api.us-east-1.amazonaws.com/prod/api/urgent-actions/generate';
+                if (typeof OverviewDynamicManager !== 'undefined') {
+                    overviewDynamic = new OverviewDynamicManager(NUDGES_GENERATOR_API, URGENT_ACTIONS_API);
+                    console.log('Overview Dynamic Manager initialized');
+                }
+            } catch (error) {
+                console.error('Error initializing Overview Dynamic Manager:', error);
+            }
             
             // Load real user data from database
+            console.log('=== CALLING loadUserData() ===');
             const founderContext = await loadUserData();
+            console.log('=== loadUserData() RETURNED ===', founderContext);
             
             if (!founderContext) {
                 console.error('Failed to load user data, using fallback');
