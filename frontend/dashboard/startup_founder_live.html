@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auxeira - Startup Founder Success Engine</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #1a1a1a;
+            --accent-bg: #2a2a2a;
+            --neon-blue: #00d4ff;
+            --neon-purple: #8b5cf6;
+            --neon-gold: #fbbf24;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Glass Morphism Effects */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+        }
+
+        /* Header */
+        .dashboard-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand-logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* SSE Score Display */
+        .sse-score-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        .sse-score-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--neon-blue) 0deg,
+                var(--neon-purple) calc(var(--score) * 3.6deg),
+                var(--accent-bg) calc(var(--score) * 3.6deg)
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: rotateGlow 3s ease-in-out infinite;
+        }
+
+        .sse-score-inner {
+            width: 85%;
+            height: 85%;
+            border-radius: 50%;
+            background: var(--secondary-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sse-score-value {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .metric-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--neon-blue);
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-change {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .metric-change.positive {
+            color: var(--success-green);
+        }
+
+        .metric-change.negative {
+            color: var(--danger-red);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--neon-blue);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes rotateGlow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.5)); }
+            50% { filter: drop-shadow(0 0 40px rgba(139, 92, 246, 0.5)); }
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .alert-info {
+            background: var(--glass-bg);
+            border: 1px solid var(--neon-blue);
+            color: var(--text-primary);
+        }
+
+        .alert-warning {
+            background: var(--glass-bg);
+            border: 1px solid var(--warning-orange);
+            color: var(--text-primary);
+        }
+
+        .milestone-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: var(--glass-bg);
+            border-left: 3px solid var(--success-green);
+            border-radius: 4px;
+        }
+
+        .challenge-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: var(--glass-bg);
+            border-left: 3px solid var(--warning-orange);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="brand-logo">Auxeira</div>
+                <div class="d-flex align-items-center gap-3">
+                    <span id="userName" class="text-secondary">Loading...</span>
+                    <button class="btn btn-sm btn-outline-light" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-5">
+            <div class="loading-spinner mb-3" style="width: 60px; height: 60px; border-width: 5px;"></div>
+            <p class="text-secondary">Loading your dashboard...</p>
+        </div>
+
+        <!-- Dashboard Content (Hidden until loaded) -->
+        <div id="dashboardContent" style="display: none;">
+            <!-- Welcome Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h1 class="mb-2">Welcome back, <span id="startupName">Founder</span>!</h1>
+                    <p class="text-secondary">Here's your startup performance overview</p>
+                </div>
+            </div>
+
+            <!-- SSE Score Section -->
+            <div class="row mb-4">
+                <div class="col-lg-4">
+                    <div class="glass-card text-center">
+                        <h5 class="mb-4">Startup Success Engine Score</h5>
+                        <div class="sse-score-container" style="--score: 62;">
+                            <div class="sse-score-circle">
+                                <div class="sse-score-inner">
+                                    <div class="sse-score-value" id="sseScoreDisplay">--</div>
+                                    <div class="text-secondary">SSE Score</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div class="text-secondary mb-2">Series A Readiness</div>
+                            <div class="h4 text-success" id="seriesAReadiness">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-8">
+                    <div class="glass-card">
+                        <h5 class="mb-3">Key Metrics Overview</h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="metric-card">
+                                    <div class="metric-label">Monthly Recurring Revenue</div>
+                                    <div class="metric-value" id="currentMRR">$--</div>
+                                    <div class="metric-change positive" id="mrrGrowth">--</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="metric-card">
+                                    <div class="metric-label">Customer Acquisition Cost</div>
+                                    <div class="metric-value" id="cac">$--</div>
+                                    <div class="metric-change" id="cacChange">--</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="metric-card">
+                                    <div class="metric-label">Runway</div>
+                                    <div class="metric-value" id="runway">--</div>
+                                    <div class="metric-change" id="runwayChange">months</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <div class="metric-card">
+                                    <div class="metric-label">Customers</div>
+                                    <div class="metric-value" id="customers">--</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="metric-card">
+                                    <div class="metric-label">Churn Rate</div>
+                                    <div class="metric-value" id="churnRate">--%</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="metric-card">
+                                    <div class="metric-label">LTV</div>
+                                    <div class="metric-value" id="ltv">$--</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="metric-card">
+                                    <div class="metric-label">Team Size</div>
+                                    <div class="metric-value" id="teamSize">--</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="glass-card">
+                        <h5 class="mb-3"><i class="fas fa-trophy text-warning me-2"></i>Recent Milestones</h5>
+                        <div id="recentMilestones">
+                            <p class="text-secondary">Loading milestones...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="glass-card">
+                        <h5 class="mb-3"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Active Challenges</h5>
+                        <div id="activeChallenges">
+                            <p class="text-secondary">Loading challenges...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Startup Info -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="glass-card">
+                        <h5 class="mb-3">Startup Information</h5>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="text-secondary mb-1">Stage</div>
+                                <div class="h6" id="stage">--</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-secondary mb-1">Industry</div>
+                                <div class="h6" id="industry">--</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-secondary mb-1">Geography</div>
+                                <div class="h6" id="geography">--</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-secondary mb-1">NPS Score</div>
+                                <div class="h6" id="nps">--</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" style="display: none;" class="text-center py-5">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Unable to load dashboard data</strong>
+                <p class="mb-0 mt-2" id="errorMessage">Please try refreshing the page or contact support if the issue persists.</p>
+            </div>
+            <button class="btn btn-primary mt-3" onclick="location.reload()">
+                <i class="fas fa-refresh me-2"></i>Retry
+            </button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // API Configuration
+        const API_CONFIG = {
+            dashboardContext: 'https://24ndip5xbbgahv4m5cvicrmzta0vgdho.lambda-url.us-east-1.on.aws/',
+            authEndpoint: 'https://6qfa3ssb10.execute-api.us-east-1.amazonaws.com/prod/api/auth/login'
+        };
+
+        // Get authentication token
+        function getAuthToken() {
+            // Check both possible token keys
+            return localStorage.getItem('auxeira_auth_token') || 
+                   localStorage.getItem('authToken') || 
+                   sessionStorage.getItem('auxeira_auth_token') ||
+                   sessionStorage.getItem('authToken');
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = 'https://auxeira.com/index.html';
+        }
+
+        // Format currency
+        function formatCurrency(value) {
+            if (!value && value !== 0) return '$--';
+            return '$' + Math.round(value).toLocaleString();
+        }
+
+        // Format percentage
+        function formatPercentage(value) {
+            if (!value && value !== 0) return '--%';
+            return value.toFixed(1) + '%';
+        }
+
+        // Update Dashboard UI with data
+        function updateDashboardUI(data) {
+            console.log('Updating dashboard with data:', data);
+
+            // Update startup name
+            if (data.startupName) {
+                document.getElementById('startupName').textContent = data.startupName;
+                document.getElementById('userName').textContent = data.startupName;
+            }
+
+            // Update SSE Score
+            if (data.sseScore !== undefined) {
+                document.getElementById('sseScoreDisplay').textContent = data.sseScore;
+                const scoreCircle = document.querySelector('.sse-score-container');
+                if (scoreCircle) {
+                    scoreCircle.style.setProperty('--score', data.sseScore);
+                }
+            }
+
+            // Update Series A Readiness (calculate from SSE score if not provided)
+            const readiness = data.seriesAReadiness || Math.min(Math.round(data.sseScore * 1.2), 100);
+            document.getElementById('seriesAReadiness').textContent = readiness + '%';
+
+            // Update MRR
+            if (data.mrr !== undefined) {
+                document.getElementById('currentMRR').textContent = formatCurrency(data.mrr);
+                if (data.mrrGrowth) {
+                    document.getElementById('mrrGrowth').textContent = data.mrrGrowth;
+                }
+            }
+
+            // Update CAC
+            if (data.cac !== undefined) {
+                document.getElementById('cac').textContent = formatCurrency(data.cac);
+            }
+
+            // Update Runway
+            if (data.runway !== undefined) {
+                document.getElementById('runway').textContent = data.runway.toFixed(1);
+            }
+
+            // Update Customers
+            if (data.customers !== undefined) {
+                document.getElementById('customers').textContent = data.customers.toLocaleString();
+            }
+
+            // Update Churn Rate
+            if (data.churnRate !== undefined) {
+                document.getElementById('churnRate').textContent = formatPercentage(data.churnRate);
+            }
+
+            // Update LTV
+            if (data.ltv !== undefined) {
+                document.getElementById('ltv').textContent = formatCurrency(data.ltv);
+            }
+
+            // Update Team Size
+            if (data.teamSize !== undefined) {
+                document.getElementById('teamSize').textContent = data.teamSize;
+            }
+
+            // Update Startup Info
+            if (data.stage) {
+                document.getElementById('stage').textContent = data.stage;
+            }
+            if (data.industry) {
+                document.getElementById('industry').textContent = data.industry;
+            }
+            if (data.geography) {
+                document.getElementById('geography').textContent = data.geography;
+            }
+            if (data.nps !== undefined) {
+                document.getElementById('nps').textContent = data.nps.toFixed(1);
+            }
+
+            // Update Recent Milestones
+            if (data.recentMilestones && data.recentMilestones.length > 0) {
+                const milestonesHTML = data.recentMilestones.map(milestone => 
+                    `<div class="milestone-item">
+                        <i class="fas fa-check-circle text-success me-2"></i>${milestone}
+                    </div>`
+                ).join('');
+                document.getElementById('recentMilestones').innerHTML = milestonesHTML;
+            } else {
+                document.getElementById('recentMilestones').innerHTML = 
+                    '<p class="text-secondary">No recent milestones</p>';
+            }
+
+            // Update Active Challenges
+            if (data.activeChallenges && data.activeChallenges.length > 0) {
+                const challengesHTML = data.activeChallenges.map(challenge => 
+                    `<div class="challenge-item">
+                        <i class="fas fa-exclamation-circle text-warning me-2"></i>${challenge}
+                    </div>`
+                ).join('');
+                document.getElementById('activeChallenges').innerHTML = challengesHTML;
+            } else {
+                document.getElementById('activeChallenges').innerHTML = 
+                    '<p class="text-secondary">No active challenges</p>';
+            }
+        }
+
+        // Load dashboard data from API
+        async function loadDashboardData() {
+            const token = getAuthToken();
+
+            if (!token) {
+                console.error('No authentication token found');
+                showError('Authentication required. Please log in again.');
+                setTimeout(() => {
+                    window.location.href = 'https://auxeira.com/index.html';
+                }, 2000);
+                return;
+            }
+
+            try {
+                console.log('Fetching dashboard data...');
+                
+                const response = await fetch(API_CONFIG.dashboardContext, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('Authentication failed. Please log in again.');
+                    }
+                    throw new Error(`Failed to load dashboard data: ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log('API Response:', result);
+
+                if (result.success && result.data) {
+                    updateDashboardUI(result.data);
+                    showDashboard();
+                } else {
+                    throw new Error(result.message || 'Invalid response format');
+                }
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                showError(error.message);
+            }
+        }
+
+        // Show dashboard content
+        function showDashboard() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'block';
+        }
+
+        // Show error state
+        function showError(message) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        // Initialize dashboard on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Dashboard initializing...');
+            loadDashboardData();
+        });
+    </script>
+</body>
+</html>
