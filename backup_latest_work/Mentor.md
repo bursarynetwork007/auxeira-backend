@@ -256,6 +256,7 @@ Trends: ${JSON.stringify(context.metrics_trends)}
 Weak Areas: ${context.weak_areas.join(', ')}
 Pending Actions: ${context.pending_actions}
 Engagement: Streak ${context.current_streak} days, Completion ${context.completion_rate * 100}%
+Online Edge: [INSERT_ONLINE_SIGNALS]
 `;
 
   messages.push({
