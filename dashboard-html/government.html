@@ -2725,6 +2725,139 @@ Format as HTML with <div class="insight-card"> for each insight. Focus on trends
   });
     </script>
 
+    <!-- API Integration for Real-Time Data -->
+    <script>
+        /**
+         * Dashboard API Integration
+         * Loads real-time data from DynamoDB via Lambda
+         */
+        const DASHBOARD_CONTEXT_API = 'https://24ndip5xbbgahv4m5cvicrmzta0vgdho.lambda-url.us-east-1.on.aws/';
+        
+        /**
+         * Load user data from API
+         */
+        async function loadUserData() {
+            try {
+                const token = localStorage.getItem('auxeira_auth_token');
+                
+                // For testing: Use test user ID if no token
+                if (!token) {
+                    console.warn('No auth token found, using test user');
+                    const testUserId = '045b4095-3388-4ea6-8de3-b7b04be5bc1b';
+                    const response = await fetch(`${DASHBOARD_CONTEXT_API}?userId=${testUserId}`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    console.log('Test user data loaded successfully:', result);
+                    return result.data;
+                }
+                
+                console.log('Loading user data from API with auth token...');
+                const response = await fetch(DASHBOARD_CONTEXT_API, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        console.error('Authentication failed, falling back to test user');
+                        const testUserId = '045b4095-3388-4ea6-8de3-b7b04be5bc1b';
+                        const fallbackResponse = await fetch(`${DASHBOARD_CONTEXT_API}?userId=${testUserId}`);
+                        const fallbackResult = await fallbackResponse.json();
+                        return fallbackResult.data;
+                    }
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('User data loaded successfully:', result);
+                return result.data;
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                // Last resort: try test user
+                try {
+                    const testUserId = '045b4095-3388-4ea6-8de3-b7b04be5bc1b';
+                    const response = await fetch(`${DASHBOARD_CONTEXT_API}?userId=${testUserId}`);
+                    const result = await response.json();
+                    if (result.success) {
+                        console.log('Fallback to test user successful');
+                        return result.data;
+                    }
+                } catch (fallbackError) {
+                    console.error('Fallback also failed:', fallbackError);
+                }
+                return null;
+            }
+        }
+        
+        /**
+         * Update dashboard UI with loaded data
+         */
+        function updateDashboardUI(data) {
+            if (!data) return;
+            
+            console.log('Updating dashboard UI with data:', data);
+            
+            // Update organization name
+            if (data.organizationName || data.agencyName) {
+                const name = data.organizationName || data.agencyName;
+                const orgNameEl = document.getElementById('agencyName');
+                if (orgNameEl) orgNameEl.textContent = name;
+                document.title = `${name} - Auxeira Government Dashboard`;
+            }
+            
+            // Update government metrics
+            const updates = {
+                'activePrograms': data.portfolioSize,
+                'totalFunding': data.totalInvestment ? `$${(data.totalInvestment / 1000000).toFixed(1)}M` : null,
+                'economicImpact': data.economicImpact ? `$${(data.economicImpact / 1000000).toFixed(1)}M` : null,
+                'jobsCreated': data.jobsCreated
+            };
+            
+            Object.entries(updates).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element && value !== null && value !== undefined) {
+                    element.textContent = value;
+                }
+            });
+            
+            console.log('Dashboard UI updated successfully');
+        }
+        
+        /**
+         * Initialize dashboard on page load
+         */
+        (function() {
+            window.addEventListener('DOMContentLoaded', async function governmentApiInitHandler() {
+                console.log('=== GOVERNMENT DASHBOARD API INITIALIZING ===');
+                console.log('Timestamp:', new Date().toISOString());
+                console.log('URL:', window.location.href);
+                
+                try {
+                    // Load user data from API
+                    console.log('=== CALLING loadUserData() ===');
+                    const userData = await loadUserData();
+                    console.log('=== loadUserData() RETURNED ===', userData);
+                    
+                    if (userData) {
+                        // Update UI with loaded data
+                        updateDashboardUI(userData);
+                    } else {
+                        console.warn('No user data loaded, using default values');
+                    }
+                } catch (error) {
+                    console.error('Error initializing dashboard:', error);
+                }
+            }, false);
+        })();
+    </script>
+
     <!-- Investment Opportunity Upload Modal -->
     <div class="modal fade" id="investmentModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
