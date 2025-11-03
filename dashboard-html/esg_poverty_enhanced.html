@@ -1461,6 +1461,170 @@
         });
     </script>
     <script src="esg_leaderboard_system.js"></script>
-    <script src="esg_enhanced_framework.js"></script>
+    <script src="esg_enhanced_framework.js">
+        /**
+         * ========================================
+         * API Integration for ESG/SDG Dashboard
+         * ========================================
+         */
+        const ESG_API_BASE = 'https://24ndip5xbbgahv4m5cvicrmzta0vgdho.lambda-url.us-east-1.on.aws';
+        
+        /**
+         * Load ESG data from API
+         */
+        async function loadESGDataFromAPI() {
+            console.log('=== ESG DASHBOARD API INITIALIZING ===');
+            console.log('Timestamp:', new Date().toISOString());
+            
+            try {
+                // Get auth token
+                const token = localStorage.getItem('auxeira_auth_token') || localStorage.getItem('auth_token');
+                
+                if (!token) {
+                    console.warn('No auth token found, using test user fallback');
+                    // Use test user ID as fallback
+                    const testUserId = '045b4095-3388-4ea6-8de3-b7b04be5bc1b';
+                    const response = await fetch(`${ESG_API_BASE}?userId=${testUserId}`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`API returned ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log('ESG API Data Loaded (test user):', data);
+                    return data;
+                }
+                
+                console.log('Calling ESG API:', ESG_API_BASE);
+                
+                const response = await fetch(ESG_API_BASE, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('ESG API Response Status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`API returned ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('ESG API Data Loaded:', data);
+                
+                return data;
+                
+            } catch (error) {
+                console.error('Error loading ESG data:', error);
+                return null;
+            }
+        }
+        
+        /**
+         * Update dashboard UI with ESG data
+         */
+        function updateESGDashboard(data) {
+            console.log('=== UPDATING ESG DASHBOARD UI ===');
+            
+            if (!data || !data.success || !data.data) {
+                console.warn('No data to update dashboard');
+                return;
+            }
+            
+            const context = data.data;
+            
+            // Update SSE/ESG score if available
+            if (context.sseScore !== undefined) {
+                const sseElements = document.querySelectorAll('[data-metric="sse-score"]');
+                sseElements.forEach(el => {
+                    el.textContent = context.sseScore;
+                });
+            }
+            
+            // Update company name
+            if (context.startupName) {
+                const nameElements = document.querySelectorAll('[data-metric="company-name"]');
+                nameElements.forEach(el => {
+                    el.textContent = context.startupName;
+                });
+            }
+            
+            // Update industry
+            if (context.industry) {
+                const industryElements = document.querySelectorAll('[data-metric="industry"]');
+                industryElements.forEach(el => {
+                    el.textContent = context.industry;
+                });
+            }
+            
+            // Update team size
+            if (context.teamSize !== undefined) {
+                const teamElements = document.querySelectorAll('[data-metric="team-size"]');
+                teamElements.forEach(el => {
+                    el.textContent = context.teamSize;
+                });
+            }
+            
+            // Update users/customers
+            if (context.users !== undefined) {
+                const userElements = document.querySelectorAll('[data-metric="users"]');
+                userElements.forEach(el => {
+                    el.textContent = context.users.toLocaleString();
+                });
+            }
+            
+            if (context.customers !== undefined) {
+                const customerElements = document.querySelectorAll('[data-metric="customers"]');
+                customerElements.forEach(el => {
+                    el.textContent = context.customers.toLocaleString();
+                });
+            }
+            
+            // Update MRR
+            if (context.mrr !== undefined) {
+                const mrrElements = document.querySelectorAll('[data-metric="mrr"]');
+                mrrElements.forEach(el => {
+                    el.textContent = `$${(context.mrr / 1000).toFixed(1)}K`;
+                });
+            }
+            
+            // Update growth rate
+            if (context.mrrGrowth) {
+                const growthElements = document.querySelectorAll('[data-metric="growth"]');
+                growthElements.forEach(el => {
+                    el.textContent = context.mrrGrowth;
+                });
+            }
+            
+            console.log('✅ ESG dashboard UI updated successfully');
+        }
+        
+        /**
+         * Initialize ESG dashboard on page load
+         */
+        (function() {
+            window.addEventListener('DOMContentLoaded', async function esgDashboardInitHandler() {
+                console.log('=== ESG DASHBOARD INITIALIZING ===');
+                console.log('URL:', window.location.href);
+                
+                try {
+                    // Load ESG data from API
+                    const esgData = await loadESGDataFromAPI();
+                    
+                    if (esgData) {
+                        // Update UI with loaded data
+                        updateESGDashboard(esgData);
+                    } else {
+                        console.warn('No ESG data loaded, using default values');
+                    }
+                } catch (error) {
+                    console.error('Error initializing ESG dashboard:', error);
+                }
+            });
+        })();
+
+</script>
 </body>
 </html>
