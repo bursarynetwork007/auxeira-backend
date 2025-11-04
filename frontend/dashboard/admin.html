@@ -2365,6 +2365,64 @@
         // Load dashboard data when page is ready
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('Admin dashboard initializing...');
+            
+            // ===== AUTHENTICATION GUARD =====
+            // Check for authentication token
+            const token = localStorage.getItem('auxeira_auth_token') || localStorage.getItem('authToken');
+            
+            if (!token) {
+                console.error('❌ No authentication token found');
+                alert('Please login to access the admin dashboard');
+                window.location.href = 'https://auxeira.com';
+                return;
+            }
+            
+            // Validate token format and expiry
+            try {
+                const parts = token.split('.');
+                if (parts.length !== 3) {
+                    throw new Error('Invalid token format');
+                }
+                
+                const payload = JSON.parse(atob(parts[1]));
+                const now = Math.floor(Date.now() / 1000);
+                
+                if (payload.exp && payload.exp < now) {
+                    console.error('❌ Token expired');
+                    localStorage.removeItem('auxeira_auth_token');
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('auxeira_user');
+                    alert('Your session has expired. Please login again.');
+                    window.location.href = 'https://auxeira.com';
+                    return;
+                }
+                
+                // Check if user has admin role
+                const userRole = payload.role || payload.userType;
+                if (userRole !== 'admin' && userRole !== 'founder' && userRole !== 'startup_founder') {
+                    console.error('❌ Unauthorized role:', userRole);
+                    alert('You do not have permission to access the admin dashboard');
+                    window.location.href = 'https://auxeira.com';
+                    return;
+                }
+                
+                console.log('✅ Admin authentication validated:', {
+                    email: payload.email,
+                    role: userRole,
+                    expiresIn: Math.floor((payload.exp - now) / 60) + ' minutes'
+                });
+                
+            } catch (error) {
+                console.error('❌ Token validation failed:', error);
+                localStorage.removeItem('auxeira_auth_token');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('auxeira_user');
+                alert('Invalid session. Please login again.');
+                window.location.href = 'https://auxeira.com';
+                return;
+            }
+            // ===== END AUTHENTICATION GUARD =====
+            
             console.log('Waiting for charts to initialize...');
             
             // Wait a bit for charts to be ready
