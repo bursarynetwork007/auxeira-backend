@@ -1785,7 +1785,7 @@
             const featCtx = document.getElementById('featureChart');
             if (featCtx) {
                 new Chart(featCtx, {
-                    type: 'horizontalBar',
+                    type: 'bar',
                     data: {
                         labels: ['Dashboard', 'Analytics', 'Reports', 'AI Mentor', 'Valuation'],
                         datasets: [{
@@ -1794,7 +1794,10 @@
                             backgroundColor: '#007bff'
                         }]
                     },
-                    options: chartOptions
+                    options: {
+                        ...chartOptions,
+                        indexAxis: 'y'  // Makes the bar chart horizontal (Chart.js v3+)
+                    }
                 });
             }
 
