@@ -5247,16 +5247,17 @@
 
                 setTimeout(() => {
                     const dashboardMap = {
-                        'startup_founder': 'https://dashboard.auxeira.com/startup_founder.html',
+                        'startup_founder': 'https://dashboard.auxeira.com/startup_founder_live.html',
                         'corporate_partner': 'https://dashboard.auxeira.com/corporate_partner.html',
-                        'venture_capital': 'https://dashboard.auxeira.com/venture_capital.html',
+                        'venture_capital': 'https://dashboard.auxeira.com/vc.html',
                         'angel_investor': 'https://dashboard.auxeira.com/angel_investor.html',
                         'government': 'https://dashboard.auxeira.com/government.html',
-                        'esg_funder': 'https://dashboard.auxeira.com/esg_funder.html'
+                        'esg_funder': 'https://dashboard.auxeira.com/esg_funder.html',
+                        'admin': 'https://dashboard.auxeira.com/admin.html'
                     };
                     // Use role or userType (for backward compatibility)
                     const userRole = userData.role || userData.userType;
-                    window.location.href = dashboardMap[userRole] || 'https://dashboard.auxeira.com/venture_capital.html';
+                    window.location.href = dashboardMap[userRole] || 'https://dashboard.auxeira.com/vc.html';
                 }, 1500);
                 
             } catch (error) {
