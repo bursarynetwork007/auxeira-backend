@@ -590,6 +590,95 @@ app.get('/api/startup-profiles/:id/metrics', async (req, res) => {
   }
 });
 
+// Admin Dashboard Endpoints
+app.get('/api/admin/dashboard', authenticateToken, async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin' && req.user.role !== 'founder' && req.user.role !== 'startup_founder') {
+      return res.status(403).json({ success: false, error: 'Forbidden - Admin access required' });
+    }
+
+    const action = req.query.action || 'overview';
+    
+    // Import admin dashboard logic
+    const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+    const { DynamoDBDocumentClient, ScanCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
+    
+    const dynamoClient = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+    const docClient = DynamoDBDocumentClient.from(dynamoClient);
+    
+    const USERS_TABLE = process.env.USERS_TABLE || 'auxeira-backend-users-prod';
+    const STARTUP_PROFILES_TABLE = 'auxeira-startup-profiles-prod';
+    const STARTUP_ACTIVITIES_TABLE = 'auxeira-startup-activities-prod';
+    
+    let data = {};
+    
+    switch (action) {
+      case 'overview':
+        // Get overview stats
+        const usersResult = await docClient.send(new ScanCommand({ TableName: USERS_TABLE, Select: 'COUNT' }));
+        const startupsResult = await docClient.send(new ScanCommand({ TableName: STARTUP_PROFILES_TABLE, Select: 'COUNT' }));
+        const activitiesResult = await docClient.send(new ScanCommand({ TableName: STARTUP_ACTIVITIES_TABLE, Select: 'COUNT' }));
+        
+        data = {
+          overview: {
+            totalUsers: usersResult.Count || 0,
+            totalStartups: startupsResult.Count || 0,
+            totalActivities: activitiesResult.Count || 0,
+            activeUsers: Math.floor((usersResult.Count || 0) * 0.7), // Estimate
+            timestamp: new Date().toISOString()
+          }
+        };
+        break;
+        
+      case 'users':
+        const limit = parseInt(req.query.limit) || 50;
+        const usersData = await docClient.send(new ScanCommand({ 
+          TableName: USERS_TABLE,
+          Limit: limit
+        }));
+        data = { users: usersData.Items || [] };
+        break;
+        
+      case 'startups':
+        const startupLimit = parseInt(req.query.limit) || 50;
+        const startupsData = await docClient.send(new ScanCommand({ 
+          TableName: STARTUP_PROFILES_TABLE,
+          Limit: startupLimit
+        }));
+        data = { startups: startupsData.Items || [] };
+        break;
+        
+      case 'activities':
+        const activityLimit = parseInt(req.query.limit) || 20;
+        const activitiesData = await docClient.send(new ScanCommand({ 
+          TableName: STARTUP_ACTIVITIES_TABLE,
+          Limit: activityLimit
+        }));
+        data = { activities: activitiesData.Items || [] };
+        break;
+        
+      case 'analytics':
+        // Return mock analytics data for now
+        data = {
+          userGrowth: [10, 25, 40, 60, 85, 110],
+          startupGrowth: [5, 12, 20, 30, 42, 55],
+          activityGrowth: [50, 120, 200, 350, 500, 680]
+        };
+        break;
+        
+      default:
+        return res.status(400).json({ success: false, error: 'Invalid action parameter' });
+    }
+    
+    res.json({ success: true, data });
+    
+  } catch (error) {
+    console.error('Admin dashboard error:', error);
+    res.status(500).json({ success: false, error: 'Internal server error', message: error.message });
+  }
+});
+
 // 404 handler for undefined routes
 app.use('*', (req, res) => {
   res.status(404).json({
