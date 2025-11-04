@@ -2061,6 +2061,23 @@
                 console.log('=== ADMIN DASHBOARD INITIALIZING ===');
                 console.log('URL:', window.location.href);
                 
+                // Add delay to allow login flow to complete and set token
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                console.log('Checking authentication...');
+                const token = localStorage.getItem('auxeira_auth_token') || localStorage.getItem('authToken');
+                
+                if (!token) {
+                    console.error('❌ No authentication token found after delay');
+                    showAuthError('Session expired or not logged in. Please login again.');
+                    setTimeout(() => {
+                        window.location.href = 'https://auxeira.com/';
+                    }, 2000);
+                    return;
+                }
+                
+                console.log('✅ Token found, proceeding with dashboard load');
+                
                 try {
                     // Load admin data from API
                     const adminData = await loadAdminData();
@@ -2068,14 +2085,50 @@
                     if (adminData) {
                         // Update UI with loaded data
                         updateAdminDashboard(adminData);
+                        console.log('✅ Admin dashboard loaded successfully');
                     } else {
                         console.warn('No admin data loaded, using default values');
                     }
                 } catch (error) {
                     console.error('Error initializing admin dashboard:', error);
+                    showAuthError('Failed to load dashboard data: ' + error.message);
                 }
             });
         })();
+        
+        // Helper function to show auth errors
+        function showAuthError(message) {
+            let errorDiv = document.getElementById('auth-error-banner');
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.id = 'auth-error-banner';
+                errorDiv.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+                    color: white;
+                    padding: 20px;
+                    text-align: center;
+                    z-index: 10000;
+                    font-size: 16px;
+                    font-weight: 600;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                `;
+                document.body.appendChild(errorDiv);
+            }
+            errorDiv.innerHTML = `
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">🔒</div>
+                    <div>${message}</div>
+                    <div style="font-size: 14px; margin-top: 8px; opacity: 0.9;">
+                        Redirecting to login page...
+                    </div>
+                </div>
+            `;
+            errorDiv.style.display = 'block';
+        }
 
         // Close modal when clicking outside
         window.addEventListener('click', (e) => {
