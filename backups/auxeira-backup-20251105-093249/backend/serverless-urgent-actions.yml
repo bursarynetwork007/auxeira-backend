@@ -1,0 +1,54 @@
+service: auxeira-urgent-actions
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: ${opt:stage, 'prod'}
+  memorySize: 512
+  timeout: 30
+  environment:
+    CLAUDE_API_KEY: ${env:CLAUDE_API_KEY}
+    NODE_ENV: production
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: '*'
+
+functions:
+  urgentActions:
+    handler: lambda-urgent-actions.handler
+    name: auxeira-urgent-actions-${self:provider.stage}
+    description: Generates 3 personalized urgent actions (red, yellow, blue)
+    events:
+      - http:
+          path: /api/urgent-actions/generate
+          method: post
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+      - http:
+          path: /api/urgent-actions/generate
+          method: options
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+package:
+  individually: true
+  patterns:
+    - lambda-urgent-actions.js
+    - node_modules/@anthropic-ai/**
+    - '!node_modules/@aws-sdk/**'
+    - '!node_modules/aws-sdk/**'
