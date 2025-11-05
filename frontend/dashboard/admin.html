@@ -45,7 +45,22 @@
       // STEP 3: VALIDATE TOKEN
       function checkAuth() {
         try {
+          console.log('🔍 AUTH GUARD: Starting authentication check...');
+          console.log('   Dashboard:', CONFIG.DASHBOARD_NAME);
+          console.log('   Required roles:', CONFIG.ALLOWED_ROLES);
+          console.log('   Token key:', CONFIG.TOKEN_KEY);
+          
           const token = getToken();
+          
+          console.log('🔍 Token check result:', token ? 'FOUND' : 'NOT FOUND');
+          if (token) {
+            console.log('   Token length:', token.length);
+            console.log('   Token preview:', token.substring(0, 30) + '...');
+          } else {
+            console.log('   localStorage keys:', Object.keys(localStorage));
+            console.log('   Checking specific key:', CONFIG.TOKEN_KEY);
+            console.log('   Value:', localStorage.getItem(CONFIG.TOKEN_KEY));
+          }
           
           if (!token) {
             if (CONFIG.DEBUG) {
@@ -84,12 +99,21 @@
           }
           
           // Check role
+          console.log('🔍 Role validation:');
+          console.log('   User role from token:', payload.role);
+          console.log('   Allowed roles:', CONFIG.ALLOWED_ROLES);
+          console.log('   Role check:', CONFIG.ALLOWED_ROLES.includes(payload.role) ? 'PASS' : 'FAIL');
+          
           if (!CONFIG.ALLOWED_ROLES.includes(payload.role)) {
             console.error('❌ Role mismatch');
             console.error('   Required:', CONFIG.ALLOWED_ROLES);
             console.error('   User role:', payload.role);
+            console.error('   Type of user role:', typeof payload.role);
+            console.error('   Type of allowed roles:', typeof CONFIG.ALLOWED_ROLES[0]);
             throw new Error('INSUFFICIENT_PERMISSIONS');
           }
+          
+          console.log('✅ Role validation passed!');
           
           // ✅ AUTH SUCCESS
           if (CONFIG.DEBUG) {
@@ -114,13 +138,18 @@
           }
           
           // Show page content
+          console.log('🎨 Showing page content...');
           document.documentElement.style.visibility = 'visible';
           document.documentElement.style.opacity = '1';
+          console.log('✅ Page visibility set to visible');
+          console.log('✅ Page opacity set to 1');
           
           // Dispatch success event
+          console.log('📢 Dispatching auth success event...');
           document.dispatchEvent(new CustomEvent('auxeira-auth-success', {
             detail: payload
           }));
+          console.log('✅ Auth success event dispatched');
           
           return true;
           
