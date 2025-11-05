@@ -1,0 +1,319 @@
+service: auxeira-central-database
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: us-east-1
+  stage: ${opt:stage, 'prod'}
+  memorySize: 512
+  timeout: 30
+  
+  # Environment variables
+  environment:
+    STAGE: ${self:provider.stage}
+    DB_HOST: ${self:custom.rdsEndpoint.${self:provider.stage}}
+    DB_NAME: auxeira_central_${self:provider.stage}
+    DB_USER: ${ssm:/auxeira/database/username}
+    DB_PASSWORD: ${ssm:/auxeira/database/password}
+    SECRET_KEY: ${ssm:/auxeira/api/secret-key}
+    REDIS_HOST: ${self:custom.redisEndpoint.${self:provider.stage}}
+    
+  # IAM permissions
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - rds:DescribeDBInstances
+            - rds:DescribeDBClusters
+            - elasticache:DescribeCacheClusters
+            - ssm:GetParameter
+            - ssm:GetParameters
+            - ssm:GetParametersByPath
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: "*"
+
+  # VPC Configuration for RDS access
+  vpc:
+    securityGroupIds:
+      - ${self:custom.securityGroupId.${self:provider.stage}}
+    subnetIds:
+      - ${self:custom.subnetIds.${self:provider.stage}.subnet1}
+      - ${self:custom.subnetIds.${self:provider.stage}.subnet2}
+
+# Custom variables
+custom:
+  # Database endpoints per stage
+  rdsEndpoint:
+    prod: auxeira-central-db-prod.cluster-xyz.us-east-1.rds.amazonaws.com
+    dev: auxeira-central-db-dev.cluster-xyz.us-east-1.rds.amazonaws.com
+  
+  # Redis endpoints per stage  
+  redisEndpoint:
+    prod: auxeira-central-redis-prod.xyz.cache.amazonaws.com
+    dev: auxeira-central-redis-dev.xyz.cache.amazonaws.com
+    
+  # Security group IDs
+  securityGroupId:
+    prod: sg-0123456789abcdef0
+    dev: sg-0123456789abcdef1
+    
+  # Subnet IDs
+  subnetIds:
+    prod:
+      subnet1: subnet-0123456789abcdef0
+      subnet2: subnet-0123456789abcdef1
+    dev:
+      subnet1: subnet-0123456789abcdef2
+      subnet2: subnet-0123456789abcdef3
+
+  # Python requirements
+  pythonRequirements:
+    dockerizePip: true
+    slim: true
+    strip: false
+    
+  # WSGI configuration
+  wsgi:
+    app: api.main.app
+    packRequirements: false
+
+# Functions
+functions:
+  # Main API function
+  api:
+    handler: wsgi_handler.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
+      - http:
+          path: /
+          method: ANY
+          cors: true
+    environment:
+      FLASK_ENV: production
+    
+  # Database initialization function
+  initDatabase:
+    handler: handlers.init_database.handler
+    timeout: 300
+    memorySize: 1024
+    events:
+      - schedule: rate(1 day)  # Run daily for maintenance
+    
+  # Synthetic data generation function
+  generateSyntheticData:
+    handler: handlers.synthetic_data.handler
+    timeout: 900
+    memorySize: 2048
+    events:
+      - schedule: rate(6 hours)  # Generate data every 6 hours
+      - http:
+          path: /generate-synthetic
+          method: POST
+          cors: true
+    
+  # Data cleanup function
+  cleanupOldData:
+    handler: handlers.cleanup.handler
+    timeout: 600
+    events:
+      - schedule: rate(7 days)  # Weekly cleanup
+    
+  # Health check function
+  healthCheck:
+    handler: handlers.health.handler
+    events:
+      - http:
+          path: /health
+          method: GET
+          cors: true
+
+# Plugins
+plugins:
+  - serverless-python-requirements
+  - serverless-wsgi
+  - serverless-offline
+
+# Package configuration
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!.git/**'
+    - '!.pytest_cache/**'
+    - '!tests/**'
+    - '!docs/**'
+    - '!*.md'
+    - '!.env*'
+
+# Resources (Infrastructure as Code)
+resources:
+  Resources:
+    # API Gateway Custom Domain
+    ApiGatewayCustomDomain:
+      Type: AWS::ApiGateway::DomainName
+      Properties:
+        DomainName: api-central.auxeira.com
+        CertificateArn: arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012
+        SecurityPolicy: TLS_1_2
+        
+    # API Gateway Base Path Mapping
+    ApiGatewayBasePathMapping:
+      Type: AWS::ApiGateway::BasePathMapping
+      Properties:
+        DomainName: !Ref ApiGatewayCustomDomain
+        RestApiId: !Ref RestApi
+        Stage: ${self:provider.stage}
+        
+    # CloudWatch Log Group
+    ApiLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/lambda/auxeira-central-database-${self:provider.stage}
+        RetentionInDays: 30
+        
+    # Parameter Store for configuration
+    DatabaseUsernameParameter:
+      Type: AWS::SSM::Parameter
+      Properties:
+        Name: /auxeira/database/username
+        Type: String
+        Value: auxeira_admin
+        Description: Database username for Auxeira Central DB
+        
+    # RDS Aurora PostgreSQL Cluster (if not exists)
+    AuxeiraRDSCluster:
+      Type: AWS::RDS::DBCluster
+      Properties:
+        DBClusterIdentifier: auxeira-central-db-${self:provider.stage}
+        Engine: aurora-postgresql
+        EngineVersion: '15.4'
+        MasterUsername: !Ref DatabaseUsernameParameter
+        MasterUserPassword: ${ssm:/auxeira/database/password}
+        DatabaseName: auxeira_central_${self:provider.stage}
+        BackupRetentionPeriod: 7
+        PreferredBackupWindow: "03:00-04:00"
+        PreferredMaintenanceWindow: "sun:04:00-sun:05:00"
+        VpcSecurityGroupIds:
+          - ${self:custom.securityGroupId.${self:provider.stage}}
+        DBSubnetGroupName: !Ref AuxeiraDBSubnetGroup
+        StorageEncrypted: true
+        DeletionProtection: true
+        EnableCloudwatchLogsExports:
+          - postgresql
+        
+    # RDS DB Instance
+    AuxeiraRDSInstance:
+      Type: AWS::RDS::DBInstance
+      Properties:
+        DBInstanceIdentifier: auxeira-central-db-instance-${self:provider.stage}
+        DBClusterIdentifier: !Ref AuxeiraRDSCluster
+        DBInstanceClass: db.r6g.large
+        Engine: aurora-postgresql
+        PubliclyAccessible: false
+        
+    # DB Subnet Group
+    AuxeiraDBSubnetGroup:
+      Type: AWS::RDS::DBSubnetGroup
+      Properties:
+        DBSubnetGroupDescription: Subnet group for Auxeira Central Database
+        SubnetIds:
+          - ${self:custom.subnetIds.${self:provider.stage}.subnet1}
+          - ${self:custom.subnetIds.${self:provider.stage}.subnet2}
+        Tags:
+          - Key: Name
+            Value: auxeira-central-db-subnet-group-${self:provider.stage}
+            
+    # ElastiCache Redis Cluster
+    AuxeiraRedisCluster:
+      Type: AWS::ElastiCache::CacheCluster
+      Properties:
+        CacheClusterId: auxeira-central-redis-${self:provider.stage}
+        Engine: redis
+        CacheNodeType: cache.r6g.large
+        NumCacheNodes: 1
+        VpcSecurityGroupIds:
+          - ${self:custom.securityGroupId.${self:provider.stage}}
+        CacheSubnetGroupName: !Ref AuxeiraRedisSubnetGroup
+        
+    # Redis Subnet Group
+    AuxeiraRedisSubnetGroup:
+      Type: AWS::ElastiCache::SubnetGroup
+      Properties:
+        Description: Subnet group for Auxeira Redis
+        SubnetIds:
+          - ${self:custom.subnetIds.${self:provider.stage}.subnet1}
+          - ${self:custom.subnetIds.${self:provider.stage}.subnet2}
+          
+    # CloudWatch Dashboard
+    AuxeiraDashboard:
+      Type: AWS::CloudWatch::Dashboard
+      Properties:
+        DashboardName: Auxeira-Central-Database-${self:provider.stage}
+        DashboardBody: !Sub |
+          {
+            "widgets": [
+              {
+                "type": "metric",
+                "properties": {
+                  "metrics": [
+                    ["AWS/Lambda", "Duration", "FunctionName", "${AWS::StackName}-api"],
+                    ["AWS/Lambda", "Errors", "FunctionName", "${AWS::StackName}-api"],
+                    ["AWS/Lambda", "Invocations", "FunctionName", "${AWS::StackName}-api"]
+                  ],
+                  "period": 300,
+                  "stat": "Average",
+                  "region": "us-east-1",
+                  "title": "Lambda Metrics"
+                }
+              },
+              {
+                "type": "metric",
+                "properties": {
+                  "metrics": [
+                    ["AWS/RDS", "CPUUtilization", "DBClusterIdentifier", "auxeira-central-db-${self:provider.stage}"],
+                    ["AWS/RDS", "DatabaseConnections", "DBClusterIdentifier", "auxeira-central-db-${self:provider.stage}"]
+                  ],
+                  "period": 300,
+                  "stat": "Average",
+                  "region": "us-east-1",
+                  "title": "RDS Metrics"
+                }
+              }
+            ]
+          }
+
+  Outputs:
+    ApiGatewayRestApiId:
+      Value: !Ref RestApi
+      Export:
+        Name: ${self:service}-${self:provider.stage}-restapi-id
+        
+    ApiGatewayRestApiRootResourceId:
+      Value: !GetAtt RestApi.RootResourceId
+      Export:
+        Name: ${self:service}-${self:provider.stage}-rootresource-id
+        
+    DatabaseEndpoint:
+      Value: !GetAtt AuxeiraRDSCluster.Endpoint.Address
+      Export:
+        Name: ${self:service}-${self:provider.stage}-db-endpoint
+        
+    RedisEndpoint:
+      Value: !GetAtt AuxeiraRedisCluster.RedisEndpoint.Address
+      Export:
+        Name: ${self:service}-${self:provider.stage}-redis-endpoint

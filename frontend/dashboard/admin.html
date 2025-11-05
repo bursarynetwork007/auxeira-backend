@@ -1053,6 +1053,7 @@
                     <input type="text" class="search-box" placeholder="Search users, startups, payments...">
                     <button class="btn btn-secondary" id="notificationBtn"><i class="fas fa-bell"></i> Alerts</button>
                     <button class="btn btn-secondary" id="profileBtn"><i class="fas fa-user-circle"></i> Profile</button>
+                    <button class="btn btn-danger" id="logoutBtn" style="margin-left: 0.5rem;"><i class="fas fa-sign-out-alt"></i> Logout</button>
                 </div>
             </div>
 
@@ -1896,8 +1897,8 @@
     </div>
 
     <script>
-        // API Configuration
-        const ADMIN_API_URL = 'https://6qfa3ssb10.execute-api.us-east-1.amazonaws.com/prod/api/admin/dashboard';
+        // API Configuration - Using Lambda Function URL
+        const ADMIN_API_URL = 'https://4nfviaokncu6osk3imrlhr4uoe0koigh.lambda-url.us-east-1.on.aws';
         
         // Get auth token
         function getAuthToken() {
@@ -2037,45 +2038,59 @@
         
         // Update overview statistics
         function updateOverviewStats(data) {
-            if (!data || !data.overview) return;
+            if (!data || !data.overview) {
+                console.warn('⚠️ No overview data to display');
+                return;
+            }
             
             const overview = data.overview;
             
-            // Update stat cards
-            document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = 
-                overview.totalUsers.toLocaleString();
-            document.querySelector('.stat-card:nth-child(1) .stat-change').textContent = 
-                overview.userGrowthPercent;
+            // Helper function to safely update element
+            const safeUpdate = (selector, value) => {
+                const element = document.querySelector(selector);
+                if (element) {
+                    element.textContent = value;
+                } else {
+                    console.warn(`⚠️ Element not found: ${selector}`);
+                }
+            };
             
-            document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = 
-                `$${(overview.monthlyRevenue / 1000).toFixed(1)}K`;
+            // Update stat cards safely
+            safeUpdate('.stat-card:nth-child(1) .stat-value', overview.totalUsers?.toLocaleString() || '0');
+            safeUpdate('.stat-card:nth-child(1) .stat-change', overview.userGrowthPercent || '+0%');
             
-            document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = 
-                overview.totalStartups.toLocaleString();
-            document.querySelector('.stat-card:nth-child(3) .stat-change').textContent = 
-                `+${overview.newStartupsThisMonth} this month`;
+            safeUpdate('.stat-card:nth-child(2) .stat-value', `$${((overview.monthlyRevenue || 0) / 1000).toFixed(1)}K`);
             
-            document.querySelector('.stat-card:nth-child(4) .stat-value').textContent = 
-                overview.activeSessions.toLocaleString();
+            safeUpdate('.stat-card:nth-child(3) .stat-value', overview.totalStartups?.toLocaleString() || '0');
+            safeUpdate('.stat-card:nth-child(3) .stat-change', `+${overview.newStartupsThisMonth || 0} this month`);
             
-            document.querySelector('.stat-card:nth-child(5) .stat-value').textContent = 
-                overview.systemUptime;
+            safeUpdate('.stat-card:nth-child(4) .stat-value', overview.activeSessions?.toLocaleString() || '0');
             
-            document.querySelector('.stat-card:nth-child(6) .stat-value').textContent = 
-                overview.avgResponseTime;
+            safeUpdate('.stat-card:nth-child(5) .stat-value', overview.systemUptime || '99.9%');
             
-            document.querySelector('.stat-card:nth-child(7) .stat-value').textContent = 
-                overview.pendingIssues;
+            safeUpdate('.stat-card:nth-child(6) .stat-value', overview.avgResponseTime || '0ms');
             
-            document.querySelector('.stat-card:nth-child(8) .stat-value').textContent = 
-                overview.trialConversions;
+            safeUpdate('.stat-card:nth-child(7) .stat-value', overview.pendingIssues || '0');
+            
+            safeUpdate('.stat-card:nth-child(8) .stat-value', overview.trialConversions || '0%');
+            
+            console.log('✅ Updated overview stats');
         }
         
         // Update users table
         function updateUsersTable(users) {
-            if (!users || users.length === 0) return;
-            
             const tbody = document.querySelector('#users tbody');
+            
+            if (!tbody) {
+                console.warn('⚠️ #users tbody element not found, skipping users table update');
+                return;
+            }
+            
+            if (!users || users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #999;">No users found</td></tr>';
+                return;
+            }
+            
             tbody.innerHTML = '';
             
             users.forEach((user, index) => {
@@ -2098,13 +2113,24 @@
                 `;
                 tbody.appendChild(row);
             });
+            
+            console.log(`✅ Updated users table (${users.length} items)`);
         }
         
         // Update startups table
         function updateStartupsTable(startups) {
-            if (!startups || startups.length === 0) return;
-            
             const tbody = document.querySelector('#startups tbody');
+            
+            if (!tbody) {
+                console.warn('⚠️ #startups tbody element not found, skipping startups table update');
+                return;
+            }
+            
+            if (!startups || startups.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #999;">No startups found</td></tr>';
+                return;
+            }
+            
             tbody.innerHTML = '';
             
             startups.slice(0, 10).forEach((startup, index) => {
@@ -2124,13 +2150,25 @@
                 `;
                 tbody.appendChild(row);
             });
+            
+            console.log(`✅ Updated startups table (${startups.length} items)`);
         }
         
         // Update activities table
         function updateActivitiesTable(activities) {
-            if (!activities || activities.length === 0) return;
-            
             const tbody = document.querySelector('.recent-activity tbody');
+            
+            // Defensive check - element might not exist
+            if (!tbody) {
+                console.warn('⚠️ .recent-activity tbody element not found, skipping activities table update');
+                return;
+            }
+            
+            if (!activities || activities.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #999;">No recent activities</td></tr>';
+                return;
+            }
+            
             tbody.innerHTML = '';
             
             activities.slice(0, 5).forEach(activity => {
@@ -2143,6 +2181,8 @@
                 `;
                 tbody.appendChild(row);
             });
+            
+            console.log(`✅ Updated activities table (${activities.length} items)`);
         }
         
         // Update charts with analytics data
@@ -2674,12 +2714,65 @@
         });
         
         // Load dashboard data when page is ready
+        // ═══════════════════════════════════════════════════════════
+        // LOGOUT FUNCTIONALITY
+        // ═══════════════════════════════════════════════════════════
+        function logout() {
+            console.log('🚪 Logging out...');
+            
+            // Clear all authentication data
+            localStorage.removeItem('auxeira_auth_token');
+            localStorage.removeItem('auxeira_user');
+            localStorage.removeItem('authToken');
+            
+            // Clear session storage
+            sessionStorage.clear();
+            
+            console.log('✅ Authentication data cleared');
+            
+            // Show logout message
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #4CAF50;
+                color: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 9999;
+                font-weight: 500;
+            `;
+            notification.innerHTML = '✅ Logged out successfully. Redirecting...';
+            document.body.appendChild(notification);
+            
+            // Redirect to login page after 1 second
+            setTimeout(() => {
+                window.location.href = 'https://auxeira.com/';
+            }, 1000);
+        }
+        
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('Admin dashboard initializing...');
             
             // Auth guard already executed at page load
             // User data available in window.AUXEIRA_USER
             // Token available in window.AUXEIRA_TOKEN
+            
+            // Setup logout button
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Confirm logout
+                    if (confirm('Are you sure you want to logout?')) {
+                        logout();
+                    }
+                });
+                console.log('✅ Logout button initialized');
+            }
             
             console.log('Waiting for charts to initialize...');
             

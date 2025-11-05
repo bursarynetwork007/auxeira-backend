@@ -1,0 +1,54 @@
+service: auxeira-coach-gina
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: ${opt:stage, 'prod'}
+  memorySize: 512
+  timeout: 30
+  environment:
+    CLAUDE_API_KEY: ${env:CLAUDE_API_KEY}
+    NODE_ENV: production
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: '*'
+
+functions:
+  coachGina:
+    handler: lambda-coach-gina.handler
+    name: auxeira-coach-gina-${self:provider.stage}
+    description: Coach Gina AI Mentor powered by Claude
+    events:
+      - http:
+          path: /api/coach-gina
+          method: post
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+      - http:
+          path: /api/coach-gina
+          method: options
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: false
+
+package:
+  individually: true
+  patterns:
+    - lambda-coach-gina.js
+    - node_modules/@anthropic-ai/**
+    - '!node_modules/@aws-sdk/**'
+    - '!node_modules/aws-sdk/**'
