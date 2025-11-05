@@ -20,11 +20,45 @@
         };
         
         function getToken() {
-            const token = localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
             if (AUTH_CONFIG.DEBUG_MODE) {
                 console.log('🔍 AUTH GUARD: Checking for token...');
+            }
+            
+            // STEP 1: Check URL hash for token (from login redirect)
+            const hash = window.location.hash;
+            if (hash && hash.includes('token=')) {
+                const tokenMatch = hash.match(/token=([^&]+)/);
+                if (tokenMatch && tokenMatch[1]) {
+                    const tokenFromUrl = decodeURIComponent(tokenMatch[1]);
+                    if (AUTH_CONFIG.DEBUG_MODE) {
+                        console.log('✅ Found token in URL hash');
+                        console.log('  Token length:', tokenFromUrl.length);
+                    }
+                    
+                    // Store in localStorage for future visits
+                    localStorage.setItem(AUTH_CONFIG.TOKEN_KEY, tokenFromUrl);
+                    
+                    // Also get user data from URL if present
+                    const userMatch = hash.match(/user=([^&]+)/);
+                    if (userMatch && userMatch[1]) {
+                        localStorage.setItem(AUTH_CONFIG.USER_KEY, decodeURIComponent(userMatch[1]));
+                    }
+                    
+                    // Clean URL (remove hash)
+                    if (AUTH_CONFIG.DEBUG_MODE) {
+                        console.log('🧹 Cleaning URL hash...');
+                    }
+                    history.replaceState(null, '', window.location.pathname);
+                    
+                    return tokenFromUrl;
+                }
+            }
+            
+            // STEP 2: Check localStorage
+            const token = localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
+            if (AUTH_CONFIG.DEBUG_MODE) {
                 console.log('  Token key:', AUTH_CONFIG.TOKEN_KEY);
-                console.log('  Token found:', token ? 'YES' : 'NO');
+                console.log('  Token in localStorage:', token ? 'YES' : 'NO');
                 if (token) {
                     console.log('  Token length:', token.length);
                     console.log('  Token preview:', token.substring(0, 30) + '...');

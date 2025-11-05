@@ -5268,9 +5268,18 @@
                         'esg_funder': 'https://dashboard.auxeira.com/esg_funder.html',
                         'admin': 'https://dashboard.auxeira.com/admin.html'
                     };
+                    
                     // Use role or userType (for backward compatibility)
                     const userRole = userData.role || userData.userType;
-                    window.location.href = dashboardMap[userRole] || 'https://dashboard.auxeira.com/vc.html';
+                    const dashboardUrl = dashboardMap[userRole] || 'https://dashboard.auxeira.com/vc.html';
+                    
+                    // CRITICAL: Pass token via URL hash (not query param for security)
+                    // Dashboard will read from hash and store in its localStorage
+                    const token = localStorage.getItem('auxeira_auth_token');
+                    const redirectUrl = `${dashboardUrl}#token=${encodeURIComponent(token)}`;
+                    
+                    console.log('🔄 Redirecting to dashboard with token in URL hash');
+                    window.location.href = redirectUrl;
                 }, 1500);
                 
             } catch (error) {
