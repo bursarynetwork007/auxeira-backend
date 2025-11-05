@@ -5,132 +5,267 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auxeira Admin Panel - System Control Center</title>
     
-    <!-- AUXEIRA AUTH GUARD - MUST BE FIRST SCRIPT -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- CRITICAL: Auth guard BLOCKS page rendering until auth passes -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
     <script>
-    (function auxeiraAuthGuard() {
-        'use strict';
+    (function() {
+      'use strict';
+      
+      const CONFIG = {
+        DASHBOARD_NAME: 'Admin Dashboard',
+        ALLOWED_ROLES: ['admin'],
+        LOGIN_URL: 'https://auxeira.com/',
+        TOKEN_KEY: 'auxeira_auth_token',
+        USER_KEY: 'auxeira_user',
+        DEBUG: true
+      };
+      
+      // STEP 1: IMMEDIATELY HIDE PAGE CONTENT
+      document.documentElement.style.visibility = 'hidden';
+      document.documentElement.style.opacity = '0';
+      
+      if (CONFIG.DEBUG) {
+        console.log('🔒 AUTH GUARD: Page content hidden');
+        console.log('🔍 AUTH GUARD: Checking authentication...');
+      }
+      
+      // STEP 2: CHECK TOKEN FROM URL HASH OR LOCALSTORAGE
+      function getToken() {
+        // Check URL hash first (from login redirect)
+        const hash = window.location.hash;
+        if (hash && hash.includes('token=')) {
+          const tokenMatch = hash.match(/token=([^&]+)/);
+          if (tokenMatch && tokenMatch[1]) {
+            const tokenFromUrl = decodeURIComponent(tokenMatch[1]);
+            if (CONFIG.DEBUG) {
+              console.log('✅ Found token in URL hash');
+            }
+            localStorage.setItem(CONFIG.TOKEN_KEY, tokenFromUrl);
+            history.replaceState(null, '', window.location.pathname);
+            return tokenFromUrl;
+          }
+        }
         
-        const AUTH_CONFIG = {
-            LOGIN_URL: 'https://auxeira.com/',
-            TOKEN_KEY: 'auxeira_auth_token',
-            USER_KEY: 'auxeira_user',
-            DASHBOARD_NAME: 'Admin Dashboard',
-            ALLOWED_ROLES: ['admin'],
-            DEBUG_MODE: true  // Enable debug logging
+        // Check localStorage
+        return localStorage.getItem(CONFIG.TOKEN_KEY);
+      }
+      
+      // STEP 3: VALIDATE TOKEN
+      function checkAuth() {
+        try {
+          const token = getToken();
+          
+          if (!token) {
+            if (CONFIG.DEBUG) {
+              console.error('❌ AUTH GUARD: No token found');
+              console.log('   Checked key:', CONFIG.TOKEN_KEY);
+              console.log('   Available keys:', Object.keys(localStorage));
+            }
+            throw new Error('NO_TOKEN');
+          }
+          
+          if (CONFIG.DEBUG) {
+            console.log('✅ Token found:', token.substring(0, 20) + '...');
+          }
+          
+          // Decode JWT
+          const parts = token.split('.');
+          if (parts.length !== 3) {
+            throw new Error('INVALID_TOKEN_FORMAT');
+          }
+          
+          const payload = JSON.parse(atob(parts[1]));
+          
+          if (CONFIG.DEBUG) {
+            console.log('📋 Token payload:');
+            console.log('   User:', payload.email);
+            console.log('   Role:', payload.role);
+            console.log('   Expires:', new Date(payload.exp * 1000).toISOString());
+          }
+          
+          // Check expiration
+          const now = Math.floor(Date.now() / 1000);
+          if (payload.exp < now) {
+            const expiredAgo = Math.floor((now - payload.exp) / 60);
+            console.error(`❌ Token expired ${expiredAgo} minutes ago`);
+            throw new Error('TOKEN_EXPIRED');
+          }
+          
+          // Check role
+          if (!CONFIG.ALLOWED_ROLES.includes(payload.role)) {
+            console.error('❌ Role mismatch');
+            console.error('   Required:', CONFIG.ALLOWED_ROLES);
+            console.error('   User role:', payload.role);
+            throw new Error('INSUFFICIENT_PERMISSIONS');
+          }
+          
+          // ✅ AUTH SUCCESS
+          if (CONFIG.DEBUG) {
+            console.log('═══════════════════════════════════════════');
+            console.log('✅ AUTHENTICATION SUCCESSFUL');
+            console.log('   User:', payload.email);
+            console.log('   Role:', payload.role);
+            console.log('   Dashboard:', CONFIG.DASHBOARD_NAME);
+            console.log('═══════════════════════════════════════════');
+          }
+          
+          // Make user data available globally
+          window.AUXEIRA_USER = payload;
+          window.AUXEIRA_TOKEN = token;
+          
+          // Show page content
+          document.documentElement.style.visibility = 'visible';
+          document.documentElement.style.opacity = '1';
+          
+          // Dispatch success event
+          document.dispatchEvent(new CustomEvent('auxeira-auth-success', {
+            detail: payload
+          }));
+          
+          return true;
+          
+        } catch (error) {
+          // ❌ AUTH FAILED
+          handleAuthFailure(error.message);
+          return false;
+        }
+      }
+      
+      // STEP 4: HANDLE AUTH FAILURE
+      function handleAuthFailure(errorCode) {
+        console.error('🚫 AUTH GUARD: AUTHENTICATION FAILED');
+        console.error('   Error:', errorCode);
+        console.error('   Dashboard:', CONFIG.DASHBOARD_NAME);
+        
+        // Clear invalid tokens
+        localStorage.removeItem(CONFIG.TOKEN_KEY);
+        localStorage.removeItem(CONFIG.USER_KEY);
+        localStorage.removeItem('auxeira_refresh_token');
+        sessionStorage.clear();
+        
+        // Show error overlay
+        const messages = {
+          'NO_TOKEN': 'No authentication token found. Please login to access this dashboard.',
+          'INVALID_TOKEN_FORMAT': 'Invalid authentication token. Please login again.',
+          'TOKEN_EXPIRED': 'Your session has expired. Please login again.',
+          'INSUFFICIENT_PERMISSIONS': `Access denied. Admin role required.`
         };
+        const message = messages[errorCode] || 'Authentication required. Please login.';
         
-        function getToken() {
-            if (AUTH_CONFIG.DEBUG_MODE) {
-                console.log('🔍 AUTH GUARD: Checking for token...');
+        document.write(`
+          <style>
+            #auxeira-auth-overlay {
+              position: fixed;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              z-index: 2147483647;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             }
-            
-            // STEP 1: Check URL hash for token (from login redirect)
-            const hash = window.location.hash;
-            if (hash && hash.includes('token=')) {
-                const tokenMatch = hash.match(/token=([^&]+)/);
-                if (tokenMatch && tokenMatch[1]) {
-                    const tokenFromUrl = decodeURIComponent(tokenMatch[1]);
-                    if (AUTH_CONFIG.DEBUG_MODE) {
-                        console.log('✅ Found token in URL hash');
-                        console.log('  Token length:', tokenFromUrl.length);
-                    }
-                    
-                    // Store in localStorage for future visits
-                    localStorage.setItem(AUTH_CONFIG.TOKEN_KEY, tokenFromUrl);
-                    
-                    // Also get user data from URL if present
-                    const userMatch = hash.match(/user=([^&]+)/);
-                    if (userMatch && userMatch[1]) {
-                        localStorage.setItem(AUTH_CONFIG.USER_KEY, decodeURIComponent(userMatch[1]));
-                    }
-                    
-                    // Clean URL (remove hash)
-                    if (AUTH_CONFIG.DEBUG_MODE) {
-                        console.log('🧹 Cleaning URL hash...');
-                    }
-                    history.replaceState(null, '', window.location.pathname);
-                    
-                    return tokenFromUrl;
-                }
+            #auxeira-auth-overlay .content {
+              background: white;
+              padding: 48px;
+              border-radius: 20px;
+              box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+              text-align: center;
+              max-width: 500px;
+              margin: 20px;
+              animation: slideIn 0.3s ease-out;
             }
-            
-            // STEP 2: Check localStorage
-            const token = localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
-            if (AUTH_CONFIG.DEBUG_MODE) {
-                console.log('  Token key:', AUTH_CONFIG.TOKEN_KEY);
-                console.log('  Token in localStorage:', token ? 'YES' : 'NO');
-                if (token) {
-                    console.log('  Token length:', token.length);
-                    console.log('  Token preview:', token.substring(0, 30) + '...');
-                }
-                console.log('  All localStorage keys:', Object.keys(localStorage));
+            #auxeira-auth-overlay .icon {
+              font-size: 72px;
+              margin-bottom: 24px;
+              animation: pulse 2s infinite;
             }
-            return token;
-        }
-        
-        function validateToken(token) {
-            try {
-                const parts = token.split('.');
-                if (parts.length !== 3) {
-                    return { valid: false, reason: 'Invalid token format' };
-                }
-                
-                const payload = JSON.parse(atob(parts[1]));
-                const now = Math.floor(Date.now() / 1000);
-                
-                if (payload.exp && payload.exp < now) {
-                    return { valid: false, reason: 'Token expired' };
-                }
-                
-                if (!AUTH_CONFIG.ALLOWED_ROLES.includes(payload.role)) {
-                    return { valid: false, reason: 'Access denied - admin role required' };
-                }
-                
-                return { valid: true, payload };
-            } catch (error) {
-                return { valid: false, reason: 'Token validation failed' };
+            #auxeira-auth-overlay h1 {
+              color: #1a202c;
+              margin: 0 0 16px 0;
+              font-size: 28px;
+              font-weight: 700;
             }
-        }
+            #auxeira-auth-overlay p {
+              color: #4a5568;
+              margin: 0 0 24px 0;
+              font-size: 16px;
+              line-height: 1.6;
+            }
+            #auxeira-auth-overlay .redirect-text {
+              color: #718096;
+              font-size: 14px;
+              margin: 0 0 24px 0;
+            }
+            #auxeira-auth-overlay .progress-bar {
+              height: 6px;
+              background: #e2e8f0;
+              border-radius: 3px;
+              overflow: hidden;
+            }
+            #auxeira-auth-overlay .progress-fill {
+              height: 100%;
+              background: linear-gradient(90deg, #667eea, #764ba2);
+              animation: progress 2.5s ease-out;
+            }
+            @keyframes slideIn {
+              from {
+                opacity: 0;
+                transform: translateY(-20px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+            @keyframes progress {
+              from { width: 0%; }
+              to { width: 100%; }
+            }
+            @keyframes pulse {
+              0%, 100% { transform: scale(1); }
+              50% { transform: scale(1.05); }
+            }
+          </style>
+          <div id="auxeira-auth-overlay">
+            <div class="content">
+              <div class="icon">🔒</div>
+              <h1>Authentication Required</h1>
+              <p>${message}</p>
+              <p class="redirect-text">Redirecting to login page...</p>
+              <div class="progress-bar">
+                <div class="progress-fill"></div>
+              </div>
+            </div>
+          </div>
+        `);
         
-        function handleAuthFailure(reason) {
-            console.error('🚫 AUTH GUARD:', reason);
-            localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
-            localStorage.removeItem(AUTH_CONFIG.USER_KEY);
-            
-            document.write(`
-                <div style="position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;z-index:9999;font-family:sans-serif;">
-                    <div style="background:white;padding:40px;border-radius:12px;text-align:center;max-width:400px;">
-                        <div style="font-size:48px;margin-bottom:20px;">🔒</div>
-                        <h2 style="color:#333;margin-bottom:10px;">Authentication Required</h2>
-                        <p style="color:#666;margin-bottom:20px;">${reason}</p>
-                        <p style="color:#999;font-size:14px;">Redirecting to login...</p>
-                    </div>
-                </div>
-            `);
-            
-            setTimeout(() => {
-                window.location.replace(AUTH_CONFIG.LOGIN_URL);
-            }, 2000);
-        }
+        // Redirect after delay
+        setTimeout(() => {
+          console.log('🔄 Redirecting to:', CONFIG.LOGIN_URL);
+          window.location.replace(CONFIG.LOGIN_URL);
+        }, 2500);
         
-        const token = getToken();
-        if (!token) {
-            handleAuthFailure('No authentication token found. Please login.');
-            throw new Error('AUTH_GUARD: No token');
+        // CRITICAL: Stop all further execution
+        if (document.readyState === 'loading') {
+          window.stop();
         }
-        
-        const validation = validateToken(token);
-        if (!validation.valid) {
-            handleAuthFailure(validation.reason);
-            throw new Error('AUTH_GUARD: Invalid token');
+        throw new Error('AUTH_GUARD_BLOCK');
+      }
+      
+      // EXECUTE IMMEDIATELY (SYNCHRONOUS - BLOCKING)
+      const authResult = checkAuth();
+      
+      if (!authResult) {
+        console.error('🛑 AUTH GUARD: Blocking dashboard execution');
+        if (document.readyState === 'loading') {
+          window.stop();
         }
-        
-        window.AUXEIRA_USER = validation.payload;
-        window.AUXEIRA_TOKEN = token;
-        
-        if (AUTH_CONFIG.DEBUG_MODE) {
-            console.log('✅ AUTH GUARD: Success -', validation.payload.email);
-        }
+      }
+      
     })();
     </script>
     
