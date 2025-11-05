@@ -5,6 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auxeira - Startup Founder Dashboard</title>
     
+    <!-- AUXEIRA AUTH GUARD - MUST BE FIRST SCRIPT -->
+    <script>
+    (function auxeiraAuthGuard() {
+        'use strict';
+        
+        const AUTH_CONFIG = {
+            LOGIN_URL: 'https://auxeira.com/',
+            TOKEN_KEY: 'auxeira_auth_token',
+            USER_KEY: 'auxeira_user',
+            DASHBOARD_NAME: 'Startup Founder Dashboard',
+            ALLOWED_ROLES: ['admin', 'startup_founder', 'founder'],
+            DEBUG_MODE: false
+        };
+        
+        function getToken() {
+            return localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
+        }
+        
+        function validateToken(token) {
+            try {
+                const parts = token.split('.');
+                if (parts.length !== 3) {
+                    return { valid: false, reason: 'Invalid token format' };
+                }
+                
+                const payload = JSON.parse(atob(parts[1]));
+                const now = Math.floor(Date.now() / 1000);
+                
+                if (payload.exp && payload.exp < now) {
+                    return { valid: false, reason: 'Token expired' };
+                }
+                
+                if (!AUTH_CONFIG.ALLOWED_ROLES.includes(payload.role)) {
+                    return { valid: false, reason: 'Access denied - wrong role' };
+                }
+                
+                return { valid: true, payload };
+            } catch (error) {
+                return { valid: false, reason: 'Token validation failed' };
+            }
+        }
+        
+        function handleAuthFailure(reason) {
+            console.error('🚫 AUTH GUARD:', reason);
+            localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
+            localStorage.removeItem(AUTH_CONFIG.USER_KEY);
+            
+            // Show error and redirect
+            document.write(`
+                <div style="position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;z-index:9999;font-family:sans-serif;">
+                    <div style="background:white;padding:40px;border-radius:12px;text-align:center;max-width:400px;">
+                        <div style="font-size:48px;margin-bottom:20px;">🔒</div>
+                        <h2 style="color:#333;margin-bottom:10px;">Authentication Required</h2>
+                        <p style="color:#666;margin-bottom:20px;">${reason}</p>
+                        <p style="color:#999;font-size:14px;">Redirecting to login...</p>
+                    </div>
+                </div>
+            `);
+            
+            setTimeout(() => {
+                window.location.replace(AUTH_CONFIG.LOGIN_URL);
+            }, 2000);
+        }
+        
+        // Execute auth check
+        const token = getToken();
+        if (!token) {
+            handleAuthFailure('No authentication token found. Please login.');
+            throw new Error('AUTH_GUARD: No token');
+        }
+        
+        const validation = validateToken(token);
+        if (!validation.valid) {
+            handleAuthFailure(validation.reason);
+            throw new Error('AUTH_GUARD: Invalid token');
+        }
+        
+        // Success - make user data available
+        window.AUXEIRA_USER = validation.payload;
+        window.AUXEIRA_TOKEN = token;
+        
+        if (AUTH_CONFIG.DEBUG_MODE) {
+            console.log('✅ AUTH GUARD: Success -', validation.payload.email, '(' + validation.payload.role + ')');
+        }
+    })();
+    </script>
+    
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -5783,62 +5870,9 @@
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Dashboard initializing...');
             
-            // ===== AUTHENTICATION GUARD =====
-            // Check for authentication token
-            const token = localStorage.getItem('auxeira_auth_token') || localStorage.getItem('authToken');
-            
-            if (!token) {
-                console.error('❌ No authentication token found');
-                alert('Please login to access the dashboard');
-                window.location.href = 'https://auxeira.com';
-                return;
-            }
-            
-            // Validate token format and expiry
-            try {
-                const parts = token.split('.');
-                if (parts.length !== 3) {
-                    throw new Error('Invalid token format');
-                }
-                
-                const payload = JSON.parse(atob(parts[1]));
-                const now = Math.floor(Date.now() / 1000);
-                
-                if (payload.exp && payload.exp < now) {
-                    console.error('❌ Token expired');
-                    localStorage.removeItem('auxeira_auth_token');
-                    localStorage.removeItem('authToken');
-                    localStorage.removeItem('auxeira_user');
-                    alert('Your session has expired. Please login again.');
-                    window.location.href = 'https://auxeira.com';
-                    return;
-                }
-                
-                // Check if user has correct role
-                const userRole = payload.role || payload.userType;
-                if (userRole !== 'startup_founder' && userRole !== 'founder' && userRole !== 'admin') {
-                    console.error('❌ Unauthorized role:', userRole);
-                    alert('You do not have permission to access this dashboard');
-                    window.location.href = 'https://auxeira.com';
-                    return;
-                }
-                
-                console.log('✅ Authentication validated:', {
-                    email: payload.email,
-                    role: userRole,
-                    expiresIn: Math.floor((payload.exp - now) / 60) + ' minutes'
-                });
-                
-            } catch (error) {
-                console.error('❌ Token validation failed:', error);
-                localStorage.removeItem('auxeira_auth_token');
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('auxeira_user');
-                alert('Invalid session. Please login again.');
-                window.location.href = 'https://auxeira.com';
-                return;
-            }
-            // ===== END AUTHENTICATION GUARD =====
+            // Auth guard already executed at page load
+            // User data available in window.AUXEIRA_USER
+            // Token available in window.AUXEIRA_TOKEN
             
             // Show loading state
             showLoadingState();
