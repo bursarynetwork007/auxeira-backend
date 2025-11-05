@@ -30,11 +30,29 @@
         console.log('🔍 AUTH GUARD: Checking authentication...');
       }
       
-      // STEP 2: CHECK TOKEN FROM LOCALSTORAGE ONLY
+      // STEP 2: CHECK TOKEN FROM URL HASH OR LOCALSTORAGE
       function getToken() {
-        // Get token from localStorage (set by login page)
-        const token = localStorage.getItem(CONFIG.TOKEN_KEY);
+        // CRITICAL: Check URL hash FIRST (for cross-domain token passing)
+        // auxeira.com and dashboard.auxeira.com have SEPARATE localStorage
+        const hash = window.location.hash;
+        if (hash && hash.includes('token=')) {
+          const tokenMatch = hash.match(/token=([^&]+)/);
+          if (tokenMatch && tokenMatch[1]) {
+            const tokenFromUrl = decodeURIComponent(tokenMatch[1]);
+            if (CONFIG.DEBUG) {
+              console.log('✅ Found token in URL hash (cross-domain transfer)');
+              console.log('   Token length:', tokenFromUrl.length);
+            }
+            // Store in dashboard.auxeira.com localStorage
+            localStorage.setItem(CONFIG.TOKEN_KEY, tokenFromUrl);
+            // Clean URL immediately
+            window.history.replaceState({}, document.title, window.location.pathname);
+            return tokenFromUrl;
+          }
+        }
         
+        // Check localStorage (for subsequent visits)
+        const token = localStorage.getItem(CONFIG.TOKEN_KEY);
         if (CONFIG.DEBUG && token) {
           console.log('✅ Token found in localStorage');
         }

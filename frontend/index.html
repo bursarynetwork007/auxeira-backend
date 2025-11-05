@@ -5282,10 +5282,13 @@
                     }
                     
                     console.log('✅ Token verified in localStorage');
-                    console.log('🔄 Redirecting to dashboard (token in localStorage, NOT in URL)');
+                    console.log('🔄 Redirecting to dashboard with token in URL hash (cross-domain)');
+                    console.log('   Note: auxeira.com and dashboard.auxeira.com have separate localStorage');
                     
-                    // Redirect WITHOUT token in URL (token already in localStorage)
-                    window.location.href = dashboardUrl;
+                    // CRITICAL: Pass token via URL hash for cross-domain
+                    // dashboard.auxeira.com cannot access auxeira.com localStorage
+                    const redirectUrl = `${dashboardUrl}#token=${encodeURIComponent(storedToken)}`;
+                    window.location.href = redirectUrl;
                 }, 1500);
                 
             } catch (error) {
