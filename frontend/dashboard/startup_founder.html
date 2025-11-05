@@ -16,11 +16,22 @@
             USER_KEY: 'auxeira_user',
             DASHBOARD_NAME: 'Startup Founder Dashboard',
             ALLOWED_ROLES: ['admin', 'startup_founder', 'founder'],
-            DEBUG_MODE: false
+            DEBUG_MODE: true  // Enable debug logging
         };
         
         function getToken() {
-            return localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
+            const token = localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
+            if (AUTH_CONFIG.DEBUG_MODE) {
+                console.log('🔍 AUTH GUARD: Checking for token...');
+                console.log('  Token key:', AUTH_CONFIG.TOKEN_KEY);
+                console.log('  Token found:', token ? 'YES' : 'NO');
+                if (token) {
+                    console.log('  Token length:', token.length);
+                    console.log('  Token preview:', token.substring(0, 30) + '...');
+                }
+                console.log('  All localStorage keys:', Object.keys(localStorage));
+            }
+            return token;
         }
         
         function validateToken(token) {

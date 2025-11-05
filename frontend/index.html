@@ -5219,11 +5219,19 @@
                     throw new Error(data.message || data.error || 'Login failed');
                 }
 
+                console.log('✅ Login successful, storing tokens...');
+                console.log('Response data:', data);
+                
                 if (data.data?.access_token) {
                     localStorage.setItem('auxeira_auth_token', data.data.access_token);
+                    console.log('✅ Stored auxeira_auth_token');
+                } else {
+                    console.error('❌ No access_token in response');
                 }
+                
                 if (data.data?.refresh_token) {
                     localStorage.setItem('auxeira_refresh_token', data.data.refresh_token);
+                    console.log('✅ Stored auxeira_refresh_token');
                 }
 
                 const userData = {
@@ -5237,6 +5245,11 @@
                 };
                 
                 localStorage.setItem('auxeira_user', JSON.stringify(userData));
+                console.log('✅ Stored auxeira_user:', userData);
+                
+                // Verify storage
+                console.log('Verification - Token in localStorage:', localStorage.getItem('auxeira_auth_token') ? 'YES' : 'NO');
+                console.log('Verification - User in localStorage:', localStorage.getItem('auxeira_user') ? 'YES' : 'NO');
 
                 showNotification('Login successful! Redirecting...', 'success');
 
